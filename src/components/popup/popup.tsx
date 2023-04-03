@@ -33,7 +33,7 @@ export default function Popup() {
       if (e.key === 'k' && e.metaKey) {
         console.log(open);
 
-        setOpen((open) => !open)
+        setOpen(!open)
       }
     }
 
