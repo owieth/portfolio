@@ -12,12 +12,10 @@ export default function Home() {
       <Head>
         <title>Create Next App</title>
       </Head>
-      <div className={styles.main}>
-        <div className={styles.description}>
-          <h1 className={inter.className}>Hello. Hallo. Hola. Hej. Hoi.</h1>
+      <div className={styles.description}>
+        <h1 className={inter.className}>Hello. Hallo. Hola. Hej. Hoi.</h1>
 
-          {/* <h2 className={inter.className}>I'm Olivier</h2> */}
-        </div>
+        {/* <h2 className={inter.className}>I'm Olivier</h2> */}
       </div>
     </>
   )
