@@ -9,9 +9,6 @@ const footerItems = [];
 export default function Home() {
   return (
     <>
-      <Head>
-        <title>Create Next App</title>
-      </Head>
       <div className={styles.description}>
         <h1 className={inter.className}>Hello. Hallo. Hola. Hej. Hoi.</h1>
 
