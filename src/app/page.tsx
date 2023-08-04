@@ -1,6 +1,43 @@
 export default function Home() {
+  const styles = {
+    main: [
+      'flex',
+      'min-h-screen',
+      'flex-col',
+      'items-center',
+      'justify-center',
+      'p-24',
+    ].join(' '),
+    title: [
+      'text-bold',
+      'flex',
+      'items-center',
+      'text-6xl',
+      'font-medium',
+    ].join(' '),
+    slider: [
+      'relative',
+      'ml-3',
+      'h-[1em]',
+      'w-36',
+      'overflow-hidden',
+      'before:absolute',
+      'before:top-0',
+      'before:h-5',
+      'before:w-full',
+      'before:bg-gradient-to-t from-transparent to-black',
+      'before:z-[1]',
+      'after:absolute',
+      'after:bottom-0',
+      'after:h-5',
+      'after:w-full',
+      'after:bg-gradient-to-b from-transparent to-black',
+      'after:z-[1]',
+    ].join(' '),
+  };
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-24">
+    <main className={styles.main}>
       {/* <h1 className="flex items-center text-6xl font-medium text-bold">
         <span className="relative ml-3 h-[1em] w-36 overflow-hidden">
           {['Hello.', 'Hallo.', 'Hola.'].map((word, i) => (
@@ -15,9 +52,9 @@ export default function Home() {
         </span>
       </h1> */}
 
-      <h1 className="text-bold flex items-center text-6xl font-medium">
+      <h1 className={styles.title}>
         Hello. Hey.
-        <span className="relative ml-3 h-[1em] w-36 overflow-hidden">
+        <span className={styles.slider}>
           <span className="absolute h-full w-full -translate-y-full animate-slide leading-none text-white">
             Hola.
           </span>
