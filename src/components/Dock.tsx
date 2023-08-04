@@ -3,9 +3,18 @@
 import IconHome from '@/icons/Home';
 import IconPhotos from '@/icons/Photos';
 import IconProjects from '@/icons/Projects';
+import Link from 'next/link';
 import { ReactNode, useEffect, useRef, useState } from 'react';
 
-const DockItem = ({ children }: { children: ReactNode }) => {
+const DockItem = ({
+  href,
+  external,
+  children,
+}: {
+  href: string;
+  children: ReactNode;
+  external?: boolean;
+}) => {
   const styles = {
     item: [
       'flex',
@@ -20,7 +29,13 @@ const DockItem = ({ children }: { children: ReactNode }) => {
     ].join(' '),
   };
 
-  return <div className={styles.item}>{children}</div>;
+  return (
+    <div className={styles.item}>
+      <Link href={href} target={external ? '_blank' : '_self'}>
+        {children}
+      </Link>
+    </div>
+  );
 };
 
 const Dock = () => {
@@ -44,15 +59,15 @@ const Dock = () => {
 
   return (
     <footer className={styles.footer}>
-      <DockItem>
+      <DockItem href="/">
         <IconHome />
       </DockItem>
 
-      <DockItem>
+      <DockItem href="/projects">
         <IconProjects />
       </DockItem>
 
-      <DockItem>
+      <DockItem href="/photos">
         <IconPhotos />
       </DockItem>
 
