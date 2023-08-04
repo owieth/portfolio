@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import { ReactNode } from 'react';
 import Dock from '../dock/dock';
-import Popup from '../popup/popup';
+import Popup from '../command/command';
 import styles from './layout.module.scss';
 
 export default function Layout({ children }: { children: ReactNode }) {
