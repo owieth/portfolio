@@ -1,10 +1,16 @@
 'use client';
 
+import IconHome from '@/icons/Home';
+import IconPhotos from '@/icons/Photos';
+import IconProjects from '@/icons/Projects';
 import { ReactNode, useEffect, useRef, useState } from 'react';
 
 const DockItem = ({ children }: { children: ReactNode }) => {
   const styles = {
     item: [
+      'flex',
+      'justify-center',
+      'items-center',
       'h-10',
       'w-10',
       'rounded',
@@ -14,7 +20,7 @@ const DockItem = ({ children }: { children: ReactNode }) => {
     ].join(' '),
   };
 
-  return <div className={styles.item}></div>;
+  return <div className={styles.item}>{children}</div>;
 };
 
 const Dock = () => {
@@ -38,7 +44,17 @@ const Dock = () => {
 
   return (
     <footer className={styles.footer}>
-      <DockItem></DockItem>
+      <DockItem>
+        <IconHome />
+      </DockItem>
+
+      <DockItem>
+        <IconProjects />
+      </DockItem>
+
+      <DockItem>
+        <IconPhotos />
+      </DockItem>
 
       {/* <button className="h-[100px] w-[100px] rounded" style={{ background: 'linear-gradient(rgb(17, 17, 17) 0%, rgb(6, 6, 6) 100%)', boxShadow: 'rgba(255, 255, 255, 0.08) 0px 4px 6px 0px inset, rgba(0, 0, 0, 0.15) 0px 0.76382px 0.76382px -0.53571px, rgba(0, 0, 0, 0.145) 0px 1.87304px 1.87304px -1.07143px, rgba(0, 0, 0, 0.14) 0px 3.54344px 3.54344px -1.60714px, rgba(0, 0, 0, 0.133) 0px 6.19599px 6.19599px -2.14286px, rgba(0, 0, 0, 0.12) 0px 10.7712px 10.7712px -2.67857px, rgba(0, 0, 0, 0.098) 0px 19.7435px 19.7435px -3.21429px, rgba(0, 0, 0, 0.05) 0px 39px 39px -3.75px, rgba(0, 255, 255, 0) 0px 20px 120px 0px' }}>
         <p>
