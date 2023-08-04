@@ -1,5 +1,3 @@
 export default function Photos() {
-  return (
-    <h1>Photos</h1>
-  )
-};
+  return <h1>Photos</h1>;
+}

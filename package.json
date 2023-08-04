@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "prettier": "prettier --write --ignore-path .gitignore ."
   },
   "dependencies": {
     "@radix-ui/react-popover": "^1.0.6",
@@ -21,5 +22,9 @@
     "react-dom": "18.2.0",
     "sass": "^1.64.2",
     "typescript": "5.1.6"
+  },
+  "devDependencies": {
+    "prettier": "^2.8.6",
+    "prettier-plugin-tailwindcss": "^0.2.6"
   }
 }

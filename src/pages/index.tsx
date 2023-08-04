@@ -15,5 +15,5 @@ export default function Home() {
         {/* <h2 className={inter.className}>I'm Olivier</h2> */}
       </div>
     </>
-  )
+  );
 }

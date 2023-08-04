@@ -127,7 +127,12 @@
       width: 50%;
       height: 1px;
       position: absolute;
-      background: linear-gradient(90deg, transparent 0%, var(--loader-color) 50%, transparent 100%);
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        var(--loader-color) 50%,
+        transparent 100%
+      );
       top: -1px;
       opacity: 0;
       animation-duration: 1.5s;
