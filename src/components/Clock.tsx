@@ -5,8 +5,16 @@ import { useEffect, useState } from 'react';
 const Clock = () => {
   const [date, setDate] = useState(new Date());
 
+  const getLocalDate = (date: Date) => {
+    return new Date(
+      date.toLocaleString('en-US', {
+        timeZone: 'Europe/Berlin',
+      })
+    );
+  };
+
   useEffect(() => {
-    const timer = setInterval(() => setDate(new Date()), 1000);
+    const timer = setInterval(() => setDate(getLocalDate(new Date())), 1000);
     return () => clearInterval(timer);
   }, []);
 
@@ -33,10 +41,10 @@ const Clock = () => {
     ].join(' '),
     hour: [
       'bg-white',
-      'h-[16px]',
+      'h-[12px]',
       'w-[2px]',
       'absolute',
-      'top-[3px]',
+      'top-[7px]',
       'z-30',
       'w-1',
       'origin-bottom',
@@ -44,10 +52,10 @@ const Clock = () => {
     ].join(' '),
     minute: [
       'bg-white',
-      'h-[10px]',
+      'h-[16px]',
       'w-[2px]',
       'absolute',
-      'top-[9px]',
+      'top-[3px]',
       'z-20',
       'origin-bottom',
       'rounded-md',
