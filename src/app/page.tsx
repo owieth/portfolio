@@ -1,6 +1,9 @@
+import Clock from '@/components/Clock';
+
 export default function Home() {
   const styles = {
     main: [
+      'relative',
       'flex',
       'min-h-screen',
       'flex-col',
@@ -66,6 +69,10 @@ export default function Home() {
           </span>
         </span>
       </h1>
+
+      <div className="absolute bottom-8 right-8">
+        <Clock />
+      </div>
     </main>
   );
 }
