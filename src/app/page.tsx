@@ -22,7 +22,7 @@ export default function Home() {
       'relative',
       'ml-3',
       'h-[1em]',
-      'w-36',
+      'w-40',
       'overflow-hidden',
       'before:absolute',
       'before:-top-px',
