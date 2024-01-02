@@ -2,6 +2,7 @@ import Footer from '@/components/Footer';
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import './globals.css';
+import Header from '@/components/Header';
 
 const aeonik = localFont({ src: '../../public/fonts/Aeonik-Medium.woff2' });
 
@@ -18,6 +19,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={aeonik.className}>
+        <Header />
         {children}
         {/* <Dock /> */}
         <Footer />
