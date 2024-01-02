@@ -9,7 +9,7 @@ const Clock = () => {
     return new Date(
       date.toLocaleString('en-US', {
         timeZone: 'Europe/Berlin',
-      })
+      }),
     );
   };
 
