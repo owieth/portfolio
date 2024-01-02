@@ -69,10 +69,6 @@ export default function Home() {
           </span>
         </span>
       </h1>
-
-      <div className="absolute bottom-8 right-8">
-        <Clock />
-      </div>
     </main>
   );
 }
