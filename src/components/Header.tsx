@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { type ReactNode } from 'react';
 
 const navigation = [
-  { name: 'Home', href: '' },
+  { name: 'Home', href: '/' },
   { name: 'Gallery', href: '/gallery' },
 ];
 
