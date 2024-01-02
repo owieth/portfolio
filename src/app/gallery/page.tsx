@@ -1,3 +1,3 @@
-export default function Photos() {
+export default function GalleryPage() {
   return <div className="h-screen" />;
 }
