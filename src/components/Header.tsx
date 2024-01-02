@@ -94,7 +94,7 @@ const Header = () => {
       'w-full',
       'grid-cols-2',
       'border-b',
-      'border-white/10',
+      'border-white/50',
       'items-center',
       'backdrop-blur-sm',
       'grid-cols-5',
