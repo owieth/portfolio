@@ -1,9 +1,9 @@
 import Footer from '@/components/Footer';
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import localFont from 'next/font/local';
 import './globals.css';
 
-const inter = Inter({ subsets: ['latin'] });
+const aeonik = localFont({ src: '../../public/fonts/Aeonik-Medium.woff2' });
 
 export const metadata: Metadata = {
   title: 'Olivier Winkler',
@@ -17,7 +17,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={aeonik.className}>
         {children}
         {/* <Dock /> */}
         <Footer />
