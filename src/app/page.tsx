@@ -42,8 +42,13 @@ export default function Home() {
 
   return (
     <div className={styles.main}>
-      <span>Building Software for the Future.</span>
-      <CustomLink link="https://frigg.eco">frigg.eco</CustomLink>
+      <span className="italic">Building Software for the Future.</span>
+      <CustomLink
+        link="https://frigg.eco"
+        className="text-white/100 hover:border-[#71BC92] hover:text-[#71BC92]"
+      >
+        frigg.eco
+      </CustomLink>
 
       {/* <h1 className="flex items-center text-6xl font-medium text-bold">
         <span className="relative ml-3 h-[1em] w-36 overflow-hidden">

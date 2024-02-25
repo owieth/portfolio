@@ -5,9 +5,11 @@ import { ReactNode } from 'react';
 const CustomLink = ({
   link,
   children,
+  className,
 }: {
   link: string;
   children: ReactNode;
+  className?: string;
 }) => {
   const isExternal = link.startsWith('http');
 
@@ -22,6 +24,7 @@ const CustomLink = ({
       'border-transparent',
       'text-white/50',
       'transition-colors',
+      'ease-in-out',
       'hover:border-white hover:text-white',
     ].join(' '),
   };
@@ -29,7 +32,7 @@ const CustomLink = ({
   return (
     <Link
       href={link}
-      className={styles.link}
+      className={`${styles.link} ${className || ''}`}
       target={isExternal ? '_blank' : '_self'}
     >
       {children}
