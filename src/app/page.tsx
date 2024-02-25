@@ -35,7 +35,7 @@ export default function Home() {
       <span className="italic">Building Software for the Future.</span>
       <CustomLink
         link="https://frigg.eco"
-        className="text-white/100 hover:border-[#71BC92] hover:text-[#71BC92]"
+        className="!text-white/100 hover:!border-[#71BC92] hover:!text-[#71BC92]"
       >
         frigg.eco
       </CustomLink>
