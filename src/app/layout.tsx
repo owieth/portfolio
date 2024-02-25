@@ -4,7 +4,17 @@ import localFont from 'next/font/local';
 import './globals.css';
 import Header from '@/components/Header';
 
-const aeonik = localFont({ src: '../../public/fonts/Aeonik-Medium.woff2' });
+const aeonik = localFont({
+  src: '../../public/fonts/Aeonik-Medium.woff2',
+  weight: '400',
+  style: 'normal',
+});
+
+const soehne = localFont({
+  src: '../../public/fonts/soehne-buch.woff2',
+  weight: '400',
+  style: 'normal',
+});
 
 export const metadata: Metadata = {
   title: 'Olivier Winkler',
