@@ -1,11 +1,12 @@
-import Clock from '@/components/Clock';
+import CustomLink from '@/components/Link';
+import Link from 'next/link';
 
 export default function Home() {
   const styles = {
     main: [
       'relative',
       'flex',
-      'min-h-screen',
+      'min-h-[85vh]',
       'flex-col',
       'items-center',
       'justify-center',
@@ -40,7 +41,10 @@ export default function Home() {
   };
 
   return (
-    <main className={styles.main}>
+    <div className={styles.main}>
+      <span>Building Software for the Future.</span>
+      <CustomLink link="https://frigg.eco">frigg.eco</CustomLink>
+
       {/* <h1 className="flex items-center text-6xl font-medium text-bold">
         <span className="relative ml-3 h-[1em] w-36 overflow-hidden">
           {['Hello.', 'Hallo.', 'Hola.'].map((word, i) => (
@@ -55,7 +59,7 @@ export default function Home() {
         </span>
       </h1> */}
 
-      <h1 className={styles.title}>
+      {/* <h1 className={styles.title}>
         Hello. Hey.
         <span className={styles.slider}>
           <span className="absolute h-full w-full -translate-y-full animate-slide leading-none text-white">
@@ -68,7 +72,7 @@ export default function Home() {
             Hoi.
           </span>
         </span>
-      </h1>
-    </main>
+      </h1> */}
+    </div>
   );
 }

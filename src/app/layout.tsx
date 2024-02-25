@@ -30,7 +30,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={aeonik.className}>
         <Header />
-        {children}
+        <main>{children}</main>
         {/* <Dock /> */}
         <Footer />
       </body>
