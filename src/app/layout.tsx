@@ -26,11 +26,23 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const styles = {
+    main: [
+      'relative',
+      'flex',
+      'min-h-[85vh]',
+      'flex-col',
+      'items-center',
+      'justify-center',
+      'p-24',
+    ].join(' '),
+  };
+
   return (
     <html lang="en">
       <body className={aeonik.className}>
         <Header />
-        <main>{children}</main>
+        <main className={styles.main}>{children}</main>
         {/* <Dock /> */}
         <Footer />
       </body>

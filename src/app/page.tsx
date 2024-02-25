@@ -1,17 +1,7 @@
 import CustomLink from '@/components/Link';
-import Link from 'next/link';
 
 export default function Home() {
   const styles = {
-    main: [
-      'relative',
-      'flex',
-      'min-h-[85vh]',
-      'flex-col',
-      'items-center',
-      'justify-center',
-      'p-24',
-    ].join(' '),
     title: [
       'text-bold',
       'flex',
@@ -41,7 +31,7 @@ export default function Home() {
   };
 
   return (
-    <div className={styles.main}>
+    <>
       <span className="italic">Building Software for the Future.</span>
       <CustomLink
         link="https://frigg.eco"
@@ -78,6 +68,6 @@ export default function Home() {
           </span>
         </span>
       </h1> */}
-    </div>
+    </>
   );
 }
