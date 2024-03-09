@@ -6,7 +6,7 @@ import { type ReactNode } from 'react';
 
 const navigation = [
   { name: 'Home', href: '/' },
-  { name: 'Gallery', href: '/gallery' },
+  // { name: 'Gallery', href: '/gallery' },
 ];
 
 const NavItem = ({
