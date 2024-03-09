@@ -3,12 +3,8 @@ import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import './globals.css';
 import Header from '@/components/Header';
-
-const aeonik = localFont({
-  src: '../../public/fonts/Aeonik-Medium.woff2',
-  weight: '400',
-  style: 'normal',
-});
+import { GeistSans } from 'geist/font/sans';
+import { GeistMono } from 'geist/font/mono';
 
 const soehne = localFont({
   src: '../../public/fonts/soehne-buch.woff2',
@@ -40,7 +36,7 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-      <body className={aeonik.className}>
+      <body className={`${GeistSans.variable} ${GeistMono.variable} font-sans`}>
         <Header />
         <main className={styles.main}>{children}</main>
         {/* <Dock /> */}

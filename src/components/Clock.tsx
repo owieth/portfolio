@@ -4,7 +4,7 @@ import ClockLib from 'react-live-clock';
 
 const Clock = () => {
   return (
-    <div className="flex flex-col items-center gap-8">
+    <div className="flex flex-col items-center gap-8 font-mono">
       <ClockLib
         format="HH:mm:ss"
         timezone="Europe/Zurich"

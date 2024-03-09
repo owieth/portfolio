@@ -24,6 +24,10 @@ module.exports = {
           '100%': { transform: 'translateY(-120%)', opacity: 0.1 },
         },
       },
+      fontFamily: {
+        sans: ['var(--font-geist-sans)'],
+        mono: ['var(--font-geist-mono)'],
+      },
     },
   },
   plugins: [],
