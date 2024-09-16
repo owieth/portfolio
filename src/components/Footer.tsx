@@ -18,7 +18,7 @@ const Footer = () => (
           <Column>
             <FooterLabel>Pages</FooterLabel>
             <CustomLink link="/">Home</CustomLink>
-            <CustomLink link="/gallery">Gallery</CustomLink>
+            {/* <CustomLink link="/gallery">Gallery</CustomLink> */}
           </Column>
 
           <Column>
