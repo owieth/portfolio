@@ -5,6 +5,7 @@ import './globals.css';
 import Header from '@/components/Header';
 import { GeistSans } from 'geist/font/sans';
 import { GeistMono } from 'geist/font/mono';
+import { Analytics } from '@vercel/analytics/react';
 
 const soehne = localFont({
   src: '../../public/fonts/soehne-buch.woff2',
@@ -55,6 +56,7 @@ export default function RootLayout({
       <body className={`${GeistSans.variable} ${GeistMono.variable} font-sans`}>
         <Header />
         <main className={styles.main}>{children}</main>
+        <Analytics />
         {/* <Dock /> */}
         <Footer />
       </body>
