@@ -19,14 +19,14 @@ export default function Home() {
       'before:-top-px',
       'before:h-5',
       'before:w-full',
-      'before:bg-gradient-to-t from-transparent to-black',
-      'before:z-[1]',
+      'before:bg-linear-to-t from-transparent to-black',
+      'before:z-1',
       'after:absolute',
       'after:-bottom-px',
       'after:h-5',
       'after:w-full',
-      'after:bg-gradient-to-b from-transparent to-black',
-      'after:z-[1]',
+      'after:bg-linear-to-b from-transparent to-black',
+      'after:z-1',
     ].join(' '),
   };
 
@@ -35,7 +35,7 @@ export default function Home() {
       <span className="italic">Building Software for the Future.</span>
       <CustomLink
         link="https://frigg.eco"
-        className="!text-white/100 hover:!border-[#71BC92] hover:!text-[#71BC92]"
+        className="text-white/100! hover:border-[#71BC92]! hover:text-[#71BC92]!"
       >
         frigg.eco
       </CustomLink>
