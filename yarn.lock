@@ -521,7 +521,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tailwindcss/node@npm:^4.0.0":
+"@tailwindcss/node@npm:^4.0.3":
   version: 4.0.3
   resolution: "@tailwindcss/node@npm:4.0.3"
   dependencies:
@@ -609,7 +609,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tailwindcss/oxide@npm:^4.0.0":
+"@tailwindcss/oxide@npm:^4.0.3":
   version: 4.0.3
   resolution: "@tailwindcss/oxide@npm:4.0.3"
   dependencies:
@@ -651,17 +651,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tailwindcss/postcss@npm:4.0.0":
-  version: 4.0.0
-  resolution: "@tailwindcss/postcss@npm:4.0.0"
+"@tailwindcss/postcss@npm:4.0.3":
+  version: 4.0.3
+  resolution: "@tailwindcss/postcss@npm:4.0.3"
   dependencies:
     "@alloc/quick-lru": "npm:^5.2.0"
-    "@tailwindcss/node": "npm:^4.0.0"
-    "@tailwindcss/oxide": "npm:^4.0.0"
+    "@tailwindcss/node": "npm:^4.0.3"
+    "@tailwindcss/oxide": "npm:^4.0.3"
     lightningcss: "npm:^1.29.1"
     postcss: "npm:^8.4.41"
-    tailwindcss: "npm:4.0.0"
-  checksum: 10/76a232425ae75053ab501b404d3689e14f8d3ca15168fb3d0f88b3709b3b59e8c2d5a6ad5eeb88cc5f239376ba904b9fcf6424735807766f9c0e9c3a6ddeb67e
+    tailwindcss: "npm:4.0.3"
+  checksum: 10/f23240ea8eb0ea0a487ff88786566f1156db38f5448aeb514eeefebb6b6d99b0b7f5cf00b4fc7d2e835f1bbf7a88edee04f8585b4ff825cdae6a4a62ca9d5de3
   languageName: node
   linkType: hard
 
@@ -4084,7 +4084,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "portfolio@workspace:."
   dependencies:
-    "@tailwindcss/postcss": "npm:4.0.0"
+    "@tailwindcss/postcss": "npm:4.0.3"
     "@types/node": "npm:22.10.10"
     "@types/react": "npm:19.0.6"
     "@types/react-dom": "npm:19.0.3"
