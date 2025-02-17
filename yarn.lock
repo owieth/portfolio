@@ -4110,7 +4110,7 @@ __metadata:
     react-dom: "npm:19.0.0"
     react-live-clock: "npm:^6.1.25"
     react-moment: "npm:^1.1.3"
-    tailwindcss: "npm:4.0.3"
+    tailwindcss: "npm:4.0.6"
     typescript: "npm:5.7.3"
   languageName: unknown
   linkType: soft
@@ -4917,13 +4917,6 @@ __metadata:
   version: 1.0.0
   resolution: "supports-preserve-symlinks-flag@npm:1.0.0"
   checksum: 10/a9dc19ae2220c952bd2231d08ddeecb1b0328b61e72071ff4000c8384e145cc07c1c0bdb3b5a1cb06e186a7b2790f1dee793418b332f6ddf320de25d9125be7e
-  languageName: node
-  linkType: hard
-
-"tailwindcss@npm:4.0.3":
-  version: 4.0.3
-  resolution: "tailwindcss@npm:4.0.3"
-  checksum: 10/d9c464b205df6169aab7bf05b158562ec15820c47ad7e9fff2419c98d2040ef53ff5689a8f57b80510576311e356fbb02ab7c47b3868885fe39dc3d1bd83b543
   languageName: node
   linkType: hard
 
