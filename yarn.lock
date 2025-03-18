@@ -4109,7 +4109,7 @@ __metadata:
     react-dom: "npm:19.0.0"
     react-live-clock: "npm:^6.1.25"
     react-moment: "npm:^1.1.3"
-    tailwindcss: "npm:4.0.12"
+    tailwindcss: "npm:4.0.14"
     typescript: "npm:5.8.2"
   languageName: unknown
   linkType: soft
@@ -4919,10 +4919,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tailwindcss@npm:4.0.12":
-  version: 4.0.12
-  resolution: "tailwindcss@npm:4.0.12"
-  checksum: 10/efe9cfffcd109cac7f4b5f80c29f88348eab36dc4df232d74f71d8cd6f6d922019afaef22f287c847742e2c6f6480e618bbf5b399c7bb52cd1d1d6267dc110f1
+"tailwindcss@npm:4.0.14":
+  version: 4.0.14
+  resolution: "tailwindcss@npm:4.0.14"
+  checksum: 10/8d6e039b99b22d4dd97d8713d7ad6ff0e7762ece2a8e99eeb3b4e52ea8273fbded363a4b63c2e668a7f08f95fa87371aa29fd710b1a1d840d5fbb846ba87445a
   languageName: node
   linkType: hard
 
