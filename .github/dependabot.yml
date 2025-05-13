@@ -5,16 +5,12 @@
 
 version: 2
 updates:
-  - package-ecosystem: 'npm'
-    directory: '/'
+  - package-ecosystem: 'npm' # See documentation for possible values
+    directory: '/' # Location of package manifests
     schedule:
       interval: 'weekly'
-    reviewers:
-      - 'owieth'
 
-  - package-ecosystem: 'github-actions'
-    directory: '/'
+  - package-ecosystem: 'github-actions' # See documentation for possible values
+    directory: '/' # Location of package manifests
     schedule:
       interval: 'weekly'
-    reviewers:
-      - 'owieth'
