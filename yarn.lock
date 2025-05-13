@@ -908,12 +908,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-dom@npm:19.1.2":
-  version: 19.1.2
-  resolution: "@types/react-dom@npm:19.1.2"
+"@types/react-dom@npm:19.1.4":
+  version: 19.1.4
+  resolution: "@types/react-dom@npm:19.1.4"
   peerDependencies:
     "@types/react": ^19.0.0
-  checksum: 10/bcadf2a1f4d23db8c1aaa0d13e30866d7bcda076801bbc66df14512932e0802ddac526bf15f4cce9777cd6e0bd3803aba47a1d726977f5193b4bc173348508d0
+  checksum: 10/bf25b3911152b7b5be0f65313532e1cefb33c5d836c49e6bafa55e55f61b04dfad065108b6145f294e22bb280002f9f75538c9b5353df25e83083435e1c00f05
   languageName: node
   linkType: hard
 
@@ -4714,7 +4714,7 @@ __metadata:
     "@tailwindcss/postcss": "npm:4.1.6"
     "@types/node": "npm:22.15.17"
     "@types/react": "npm:19.1.4"
-    "@types/react-dom": "npm:19.1.2"
+    "@types/react-dom": "npm:19.1.4"
     "@vercel/analytics": "npm:^1.5.0"
     eslint: "npm:9.26.0"
     eslint-config-next: "npm:15.3.2"
