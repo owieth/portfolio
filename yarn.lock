@@ -2557,12 +2557,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"geist@npm:^1.4.2":
-  version: 1.4.2
-  resolution: "geist@npm:1.4.2"
+"geist@npm:^1.5.1":
+  version: 1.5.1
+  resolution: "geist@npm:1.5.1"
   peerDependencies:
     next: ">=13.2.0"
-  checksum: 10/18e5eb0e4f0cedb870b907803dfcf801d4f464bf7f832105fdcd6ead0dbcde2c798f8f41422a4de3c41203c16082dc2ab16d4dda1c44a074f12c085f8f332445
+  checksum: 10/a1f8838d485e6d6fa327ddeac2637709b9c426be7d4a3592ac74c1c2be0b3329e100134f8094b00fe16585ff2611c78f17c54b41c492ca27255442cd195e7ff6
   languageName: node
   linkType: hard
 
@@ -4380,7 +4380,7 @@ __metadata:
     "@vercel/speed-insights": "npm:^1.2.0"
     eslint: "npm:9.35.0"
     eslint-config-next: "npm:15.5.2"
-    geist: "npm:^1.4.2"
+    geist: "npm:^1.5.1"
     next: "npm:15.5.2"
     next-mdx-remote: "npm:^5.0.0"
     postcss: "npm:8.5.6"
