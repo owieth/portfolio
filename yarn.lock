@@ -578,12 +578,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@next/eslint-plugin-next@npm:15.5.2":
-  version: 15.5.2
-  resolution: "@next/eslint-plugin-next@npm:15.5.2"
+"@next/eslint-plugin-next@npm:15.5.3":
+  version: 15.5.3
+  resolution: "@next/eslint-plugin-next@npm:15.5.3"
   dependencies:
     fast-glob: "npm:3.3.1"
-  checksum: 10/2c87039e3a70d96e7c3585d66610517ad424f3548e5f227085c49e55e0a21093642e43b15a765aec9b20a617aa21fc078ccf7fa6c32880d8182b2f64e27ee713
+  checksum: 10/f737cfa8e1b083d4d87dcaa42137eec3b3e0eac92a8d21879b9d4d45a134c4d56bb5076d28ba81aac86207ea6cc9e910136010517527391328e6bbd94b5e1ea6
   languageName: node
   linkType: hard
 
@@ -2060,11 +2060,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-config-next@npm:15.5.2":
-  version: 15.5.2
-  resolution: "eslint-config-next@npm:15.5.2"
+"eslint-config-next@npm:15.5.3":
+  version: 15.5.3
+  resolution: "eslint-config-next@npm:15.5.3"
   dependencies:
-    "@next/eslint-plugin-next": "npm:15.5.2"
+    "@next/eslint-plugin-next": "npm:15.5.3"
     "@rushstack/eslint-patch": "npm:^1.10.3"
     "@typescript-eslint/eslint-plugin": "npm:^5.4.2 || ^6.0.0 || ^7.0.0 || ^8.0.0"
     "@typescript-eslint/parser": "npm:^5.4.2 || ^6.0.0 || ^7.0.0 || ^8.0.0"
@@ -2080,7 +2080,7 @@ __metadata:
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: 10/136fe6767f256063a93912e240c7e7f1fddad2c7eb66e7e40d1745d0c452277b20f15c135a4b582be1fa2d099c1125d365a07a734347c272c933eabc2de273b7
+  checksum: 10/2acbd954f01609f98d313741f30841e60a4f615a2572511696207544754ca6a6d2f030e7451f07ff23819a288ea64c4b6b15a7b21082566b766e4b0898cc8c7b
   languageName: node
   linkType: hard
 
@@ -4386,7 +4386,7 @@ __metadata:
     "@vercel/analytics": "npm:^1.5.0"
     "@vercel/speed-insights": "npm:^1.2.0"
     eslint: "npm:9.35.0"
-    eslint-config-next: "npm:15.5.2"
+    eslint-config-next: "npm:15.5.3"
     geist: "npm:^1.5.1"
     next: "npm:15.5.2"
     next-mdx-remote: "npm:^5.0.0"
@@ -5221,13 +5221,6 @@ __metadata:
   version: 1.0.0
   resolution: "supports-preserve-symlinks-flag@npm:1.0.0"
   checksum: 10/a9dc19ae2220c952bd2231d08ddeecb1b0328b61e72071ff4000c8384e145cc07c1c0bdb3b5a1cb06e186a7b2790f1dee793418b332f6ddf320de25d9125be7e
-  languageName: node
-  linkType: hard
-
-"tailwindcss@npm:4.1.12":
-  version: 4.1.12
-  resolution: "tailwindcss@npm:4.1.12"
-  checksum: 10/12f453b37b8eb1f209a02e556d6f2e3ffdf14bf79d79652fd542e50de619092a1f1d62457199b3859a8894fb54b7e2a2be9f65ebe78de7f39457ba1b94151a45
   languageName: node
   linkType: hard
 
