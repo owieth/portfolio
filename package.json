@@ -15,7 +15,7 @@
     "geist": "^1.5.1",
     "next": "15.5.4",
     "next-mdx-remote": "^5.0.0",
-    "react": "19.2.0",
+    "react": "19.2.1",
     "react-dom": "19.2.0",
     "react-live-clock": "^6.1.25",
     "react-moment": "^1.1.3"
