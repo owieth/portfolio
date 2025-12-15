@@ -1320,13 +1320,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vercel/speed-insights@npm:^1.3.0":
-  version: 1.3.0
-  resolution: "@vercel/speed-insights@npm:1.3.0"
+"@vercel/speed-insights@npm:^1.3.1":
+  version: 1.3.1
+  resolution: "@vercel/speed-insights@npm:1.3.1"
   peerDependencies:
     "@sveltejs/kit": ^1 || ^2
     next: ">= 13"
-    nuxt: ">= 3"
     react: ^18 || ^19 || ^19.0.0-rc
     svelte: ">= 4"
     vue: ^3
@@ -1344,7 +1343,7 @@ __metadata:
       optional: true
     vue-router:
       optional: true
-  checksum: 10/92f38db335b0805e40796e8a1e92fcb8aebba298002210b01c5c8f424ffee3bc95cea93f03eedcc8be28b5fb184bc9231c3c42cb6ae5ff8365c3cd7415c84028
+  checksum: 10/64d82e980900961c144bdf0054a4a261c99bcb1150f2cc37614b0cf879143885f56077360325c4805c4491eba027bca908ebd8c7c200eb068b581b13533b2de1
   languageName: node
   linkType: hard
 
@@ -5237,7 +5236,7 @@ __metadata:
     "@types/react": "npm:19.2.7"
     "@types/react-dom": "npm:19.2.3"
     "@vercel/analytics": "npm:^1.6.1"
-    "@vercel/speed-insights": "npm:^1.3.0"
+    "@vercel/speed-insights": "npm:^1.3.1"
     eslint: "npm:9.39.1"
     eslint-config-next: "npm:16.0.8"
     geist: "npm:^1.5.1"
