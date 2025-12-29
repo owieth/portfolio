@@ -23,6 +23,7 @@ const Footer = () => (
 
           <Column>
             <FooterLabel>Connect</FooterLabel>
+            <CustomLink link="https://github.com/owieth">GitHub</CustomLink>
             <CustomLink link="https://www.linkedin.com/in/olivier-winkler/">
               LinkedIn
             </CustomLink>
