@@ -32,7 +32,7 @@ export default function Home() {
 
   return (
     <>
-      <span className="italic">Building Software for the Future.</span>
+      <h1 className="italic">Building Software for the Future.</h1>
       <CustomLink
         link="https://frigg.eco"
         className="text-white/100! hover:border-[#71BC92]! hover:text-[#71BC92]!"
