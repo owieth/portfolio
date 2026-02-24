@@ -34,6 +34,7 @@ const CustomLink = ({
       href={link}
       className={`${styles.link} ${className || ''}`}
       target={isExternal ? '_blank' : '_self'}
+      rel={isExternal ? 'noopener noreferrer' : undefined}
     >
       {children}
       {isExternal && <IconLink />}
