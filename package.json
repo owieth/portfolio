@@ -10,7 +10,7 @@
     "prettier": "prettier --write --ignore-path .gitignore ."
   },
   "dependencies": {
-    "@vercel/analytics": "^1.6.1",
+    "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
     "geist": "^1.7.0",
     "next": "16.1.6",
