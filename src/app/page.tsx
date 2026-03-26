@@ -32,6 +32,7 @@ export default function Home() {
 
   return (
     <>
+      <p className="mb-2 text-sm text-white/50">Olivier Winkler</p>
       <h1 className="italic">Building Software for the Future.</h1>
       <CustomLink
         link="https://frigg.eco"

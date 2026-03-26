@@ -7,7 +7,7 @@ import { GeistSans } from 'geist/font/sans';
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 
-const SITE_URL = 'https://owieth.me';
+const SITE_URL = 'https://olivierwinkler.ch';
 const title = 'Olivier Winkler — Software Engineer';
 const description =
   'Software Engineer building products for the future. Creator of frigg.eco — sustainable technology for a better world.';

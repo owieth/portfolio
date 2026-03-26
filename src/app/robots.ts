@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: ['/api/'],
     },
-    sitemap: 'https://owieth.me/sitemap.xml',
+    sitemap: 'https://olivierwinkler.ch/sitemap.xml',
   };
 }

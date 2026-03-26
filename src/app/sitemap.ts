@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next';
 
-const SITE_URL = 'https://owieth.me';
+const SITE_URL = 'https://olivierwinkler.ch';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
