@@ -15,7 +15,7 @@
     "geist": "^1.7.0",
     "next": "16.2.3",
     "next-mdx-remote": "^6.0.0",
-    "react": "19.2.4",
+    "react": "19.2.5",
     "react-dom": "19.2.4",
     "react-live-clock": "^6.1.25",
     "react-moment": "^1.2.2"
@@ -23,7 +23,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "4.2.2",
     "@types/node": "25.5.2",
-    "@types/react": "19.2.13",
+    "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
     "eslint": "10.2.0",
     "eslint-config-next": "16.2.2",
@@ -36,7 +36,7 @@
   "packageManager": "pnpm@10.29.3",
   "pnpm": {
     "overrides": {
-      "@types/react": "19.2.13",
+      "@types/react": "19.2.14",
       "@types/react-dom": "19.2.3",
       "minimatch": "10.2.3",
       "brace-expansion": "5.0.5",
