@@ -5,7 +5,7 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  '@types/react': 19.2.13
+  '@types/react': 19.2.14
   '@types/react-dom': 19.2.3
   minimatch: 10.2.3
   brace-expansion: 5.0.5
@@ -17,31 +17,31 @@ importers:
     dependencies:
       '@vercel/analytics':
         specifier: ^2.0.1
-        version: 2.0.1(next@16.2.3(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react@19.2.4)
+        version: 2.0.1(next@16.2.3(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.5))(react@19.2.5))(react@19.2.5)
       '@vercel/speed-insights':
         specifier: ^2.0.0
-        version: 2.0.0(next@16.2.3(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react@19.2.4)
+        version: 2.0.0(next@16.2.3(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.5))(react@19.2.5))(react@19.2.5)
       geist:
         specifier: ^1.7.0
-        version: 1.7.0(next@16.2.3(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))
+        version: 1.7.0(next@16.2.3(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.5))(react@19.2.5))
       next:
         specifier: 16.2.3
-        version: 16.2.3(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+        version: 16.2.3(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.5))(react@19.2.5)
       next-mdx-remote:
         specifier: ^6.0.0
-        version: 6.0.0(@types/react@19.2.13)(react@19.2.4)
+        version: 6.0.0(@types/react@19.2.14)(react@19.2.5)
       react:
-        specifier: 19.2.4
-        version: 19.2.4
+        specifier: 19.2.5
+        version: 19.2.5
       react-dom:
         specifier: 19.2.4
-        version: 19.2.4(react@19.2.4)
+        version: 19.2.4(react@19.2.5)
       react-live-clock:
         specifier: ^6.1.25
-        version: 6.1.25(react-moment@1.2.2(moment@2.30.1)(prop-types@15.8.1)(react@19.2.4))(react@19.2.4)
+        version: 6.1.25(react-moment@1.2.2(moment@2.30.1)(prop-types@15.8.1)(react@19.2.5))(react@19.2.5)
       react-moment:
         specifier: ^1.2.2
-        version: 1.2.2(moment@2.30.1)(prop-types@15.8.1)(react@19.2.4)
+        version: 1.2.2(moment@2.30.1)(prop-types@15.8.1)(react@19.2.5)
     devDependencies:
       '@tailwindcss/postcss':
         specifier: 4.2.2
@@ -50,11 +50,11 @@ importers:
         specifier: 25.5.2
         version: 25.5.2
       '@types/react':
-        specifier: 19.2.13
-        version: 19.2.13
+        specifier: 19.2.14
+        version: 19.2.14
       '@types/react-dom':
         specifier: 19.2.3
-        version: 19.2.3(@types/react@19.2.13)
+        version: 19.2.3(@types/react@19.2.14)
       eslint:
         specifier: 10.2.0
         version: 10.2.0(jiti@2.6.1)
@@ -380,7 +380,7 @@ packages:
   '@mdx-js/react@3.1.1':
     resolution: {integrity: sha512-f++rKLQgUVYDAtECQ6fn/is15GkEH9+nZPM3MS0RcxVqoTfawHvDlSCH7JbMhAM6uJ32v3eXLvLmLvjGu7PTQw==}
     peerDependencies:
-      '@types/react': 19.2.13
+      '@types/react': 19.2.14
       react: '>=16'
 
   '@napi-rs/wasm-runtime@0.2.12':
@@ -597,10 +597,10 @@ packages:
   '@types/react-dom@19.2.3':
     resolution: {integrity: sha512-jp2L/eY6fn+KgVVQAOqYItbF0VY/YApe5Mz2F0aykSO8gx31bYCZyvSeYxCHKvzHG5eZjc+zyaS5BrBWya2+kQ==}
     peerDependencies:
-      '@types/react': 19.2.13
+      '@types/react': 19.2.14
 
-  '@types/react@19.2.13':
-    resolution: {integrity: sha512-KkiJeU6VbYbUOp5ITMIc7kBfqlYkKA5KhEHVrGMmUUMt7NeaZg65ojdPk+FtNrBAOXNVM5QM72jnADjM+XVRAQ==}
+  '@types/react@19.2.14':
+    resolution: {integrity: sha512-ilcTH/UniCkMdtexkoCN0bI7pMcJDvmQFPvuPvmEaYA/NSfFTAgdUSLAoVjaRJm7+6PvcM+q1zYOwS4wTYMF9w==}
 
   '@types/unist@2.0.11':
     resolution: {integrity: sha512-CmBKiL6NNo/OqgmMn95Fk9Whlp2mtvIv+KNpQKN2F4SjvrEesubTRWGYSg+BnWZOnlCaSTU1sMpsBOzgbYhnsA==}
@@ -2047,8 +2047,8 @@ packages:
       prop-types: ^15.7.0
       react: ^16.0 || ^17.0.0 || ^18.0.0
 
-  react@19.2.4:
-    resolution: {integrity: sha512-9nfp2hYpCwOjAN+8TZFGhtWEwgvWHXqESH8qT89AT/lWklpLON22Lc8pEtnpsZz7VmawabSU0gCjnj8aC0euHQ==}
+  react@19.2.5:
+    resolution: {integrity: sha512-llUJLzz1zTUBrskt2pwZgLq59AemifIftw4aB7JxOqf1HY2FDaGDxgwpAPVzHU1kdWabH7FauP4i1oEeer2WCA==}
     engines: {node: '>=0.10.0'}
 
   recma-build-jsx@1.0.0:
@@ -2708,11 +2708,11 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@mdx-js/react@3.1.1(@types/react@19.2.13)(react@19.2.4)':
+  '@mdx-js/react@3.1.1(@types/react@19.2.14)(react@19.2.5)':
     dependencies:
       '@types/mdx': 2.0.13
-      '@types/react': 19.2.13
-      react: 19.2.4
+      '@types/react': 19.2.14
+      react: 19.2.5
 
   '@napi-rs/wasm-runtime@0.2.12':
     dependencies:
@@ -2877,11 +2877,11 @@ snapshots:
     dependencies:
       undici-types: 7.18.2
 
-  '@types/react-dom@19.2.3(@types/react@19.2.13)':
+  '@types/react-dom@19.2.3(@types/react@19.2.14)':
     dependencies:
-      '@types/react': 19.2.13
+      '@types/react': 19.2.14
 
-  '@types/react@19.2.13':
+  '@types/react@19.2.14':
     dependencies:
       csstype: 3.2.3
 
@@ -3041,15 +3041,15 @@ snapshots:
   '@unrs/resolver-binding-win32-x64-msvc@1.11.1':
     optional: true
 
-  '@vercel/analytics@2.0.1(next@16.2.3(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react@19.2.4)':
+  '@vercel/analytics@2.0.1(next@16.2.3(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.5))(react@19.2.5))(react@19.2.5)':
     optionalDependencies:
-      next: 16.2.3(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      react: 19.2.4
+      next: 16.2.3(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.5))(react@19.2.5)
+      react: 19.2.5
 
-  '@vercel/speed-insights@2.0.0(next@16.2.3(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react@19.2.4)':
+  '@vercel/speed-insights@2.0.0(next@16.2.3(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.5))(react@19.2.5))(react@19.2.5)':
     optionalDependencies:
-      next: 16.2.3(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      react: 19.2.4
+      next: 16.2.3(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.5))(react@19.2.5)
+      react: 19.2.5
 
   acorn-jsx@5.3.2(acorn@8.15.0):
     dependencies:
@@ -3708,9 +3708,9 @@ snapshots:
 
   functions-have-names@1.2.3: {}
 
-  geist@1.7.0(next@16.2.3(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)):
+  geist@1.7.0(next@16.2.3(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.5))(react@19.2.5)):
     dependencies:
-      next: 16.2.3(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      next: 16.2.3(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.5))(react@19.2.5)
 
   generator-function@2.0.1: {}
 
@@ -4429,12 +4429,12 @@ snapshots:
 
   natural-compare@1.4.0: {}
 
-  next-mdx-remote@6.0.0(@types/react@19.2.13)(react@19.2.4):
+  next-mdx-remote@6.0.0(@types/react@19.2.14)(react@19.2.5):
     dependencies:
       '@babel/code-frame': 7.29.0
       '@mdx-js/mdx': 3.1.1
-      '@mdx-js/react': 3.1.1(@types/react@19.2.13)(react@19.2.4)
-      react: 19.2.4
+      '@mdx-js/react': 3.1.1(@types/react@19.2.14)(react@19.2.5)
+      react: 19.2.5
       unist-util-remove: 4.0.0
       unist-util-visit: 5.1.0
       vfile: 6.0.3
@@ -4443,16 +4443,16 @@ snapshots:
       - '@types/react'
       - supports-color
 
-  next@16.2.3(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
+  next@16.2.3(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.5))(react@19.2.5):
     dependencies:
       '@next/env': 16.2.3
       '@swc/helpers': 0.5.15
       baseline-browser-mapping: 2.10.17
       caniuse-lite: 1.0.30001787
       postcss: 8.4.31
-      react: 19.2.4
-      react-dom: 19.2.4(react@19.2.4)
-      styled-jsx: 5.1.6(@babel/core@7.29.0)(react@19.2.4)
+      react: 19.2.5
+      react-dom: 19.2.4(react@19.2.5)
+      styled-jsx: 5.1.6(@babel/core@7.29.0)(react@19.2.5)
     optionalDependencies:
       '@next/swc-darwin-arm64': 16.2.3
       '@next/swc-darwin-x64': 16.2.3
@@ -4597,27 +4597,27 @@ snapshots:
 
   queue-microtask@1.2.3: {}
 
-  react-dom@19.2.4(react@19.2.4):
+  react-dom@19.2.4(react@19.2.5):
     dependencies:
-      react: 19.2.4
+      react: 19.2.5
       scheduler: 0.27.0
 
   react-is@16.13.1: {}
 
-  react-live-clock@6.1.25(react-moment@1.2.2(moment@2.30.1)(prop-types@15.8.1)(react@19.2.4))(react@19.2.4):
+  react-live-clock@6.1.25(react-moment@1.2.2(moment@2.30.1)(prop-types@15.8.1)(react@19.2.5))(react@19.2.5):
     dependencies:
       moment: 2.30.1
       moment-timezone: 0.5.48
-      react: 19.2.4
-      react-moment: 1.2.2(moment@2.30.1)(prop-types@15.8.1)(react@19.2.4)
+      react: 19.2.5
+      react-moment: 1.2.2(moment@2.30.1)(prop-types@15.8.1)(react@19.2.5)
 
-  react-moment@1.2.2(moment@2.30.1)(prop-types@15.8.1)(react@19.2.4):
+  react-moment@1.2.2(moment@2.30.1)(prop-types@15.8.1)(react@19.2.5):
     dependencies:
       moment: 2.30.1
       prop-types: 15.8.1
-      react: 19.2.4
+      react: 19.2.5
 
-  react@19.2.4: {}
+  react@19.2.5: {}
 
   recma-build-jsx@1.0.0:
     dependencies:
@@ -4908,10 +4908,10 @@ snapshots:
     dependencies:
       inline-style-parser: 0.2.7
 
-  styled-jsx@5.1.6(@babel/core@7.29.0)(react@19.2.4):
+  styled-jsx@5.1.6(@babel/core@7.29.0)(react@19.2.5):
     dependencies:
       client-only: 0.0.1
-      react: 19.2.4
+      react: 19.2.5
     optionalDependencies:
       '@babel/core': 7.29.0
 
