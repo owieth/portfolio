@@ -1,5 +1,6 @@
 import Footer from '@/components/Footer';
 import Header from '@/components/Header';
+import { SITE_URL } from '@/lib/site';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { GeistMono } from 'geist/font/mono';
@@ -7,7 +8,6 @@ import { GeistSans } from 'geist/font/sans';
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 
-const SITE_URL = 'https://olivierwinkler.ch';
 const title = 'Olivier Winkler — Software Engineer';
 const description =
   'Software Engineer building products for the future. Building frigg.eco — sustainable technology for a better world.';
