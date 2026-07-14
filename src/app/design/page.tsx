@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { MDXRemote } from 'next-mdx-remote/rsc';
+import { notFound } from 'next/navigation';
 
 export const metadata: Metadata = {
   title: 'Design',
@@ -13,7 +14,13 @@ export const metadata: Metadata = {
 export default async function DesignPage() {
   const res = await fetch(
     'https://raw.githubusercontent.com/owieth/designs/main/README.md',
+    { next: { revalidate: 3600 } },
   );
+
+  if (!res.ok) {
+    notFound();
+  }
+
   const markdown = await res.text();
 
   return (
