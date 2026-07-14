@@ -87,11 +87,18 @@ export default function RootLayout({
         '@id': `${SITE_URL}/#person`,
         name: 'Olivier Winkler',
         url: SITE_URL,
+        image: `${SITE_URL}/opengraph-image`,
         jobTitle: 'Software Engineer',
+        worksFor: {
+          '@type': 'Organization',
+          name: 'frigg.eco',
+          url: 'https://frigg.eco',
+        },
         sameAs: [
           'https://github.com/owieth',
           'https://www.linkedin.com/in/olivier-winkler/',
           'https://twitter.com/_owieth',
+          'https://frigg.eco',
         ],
       },
     ],
