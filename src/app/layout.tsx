@@ -4,8 +4,8 @@ import { SITE_URL } from '@/lib/site';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { GeistMono } from 'geist/font/mono';
-import { GeistSans } from 'geist/font/sans';
 import type { Metadata, Viewport } from 'next';
+import { GeistSans } from './fonts';
 import './globals.css';
 
 const title = 'Olivier Winkler — Software Engineer';
