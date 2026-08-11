@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "prettier": "prettier --write --ignore-path .gitignore ."
+    "prettier": "prettier --write --ignore-path .gitignore .",
+    "vocab:wo-haere": "node scripts/wo-haere-vocab.mjs"
   },
   "dependencies": {
     "@base-ui/react": "1.7.0",
