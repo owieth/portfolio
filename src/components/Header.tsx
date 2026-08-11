@@ -6,6 +6,7 @@ import { type ReactNode } from 'react';
 
 const navigation = [
   { name: 'Home', href: '/' },
+  { name: 'Projects', href: '/projects' },
   // { name: 'Gallery', href: '/gallery' },
 ];
 
@@ -18,7 +19,10 @@ const NavItem = ({
   className?: string;
   children: ReactNode;
 }) => {
-  const isActive = usePathname() === href;
+  const pathname = usePathname();
+  // A prefix match so /projects/wo-haere keeps Projects highlighted; '/' would
+  // otherwise prefix-match everything, so it stays exact.
+  const isActive = href === '/' ? pathname === href : pathname.startsWith(href);
 
   const styles = {
     link: ({ isActive }: { isActive: boolean }) =>

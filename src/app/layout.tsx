@@ -1,5 +1,3 @@
-import Footer from '@/components/Footer';
-import Header from '@/components/Header';
 import { SITE_URL } from '@/lib/site';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
@@ -60,18 +58,6 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const styles = {
-    main: [
-      'relative',
-      'flex',
-      'min-h-[85vh]',
-      'flex-col',
-      'items-center',
-      'justify-center',
-      'p-24',
-    ].join(' '),
-  };
-
   const jsonLd = {
     '@context': 'https://schema.org',
     '@graph': [
@@ -87,7 +73,9 @@ export default function RootLayout({
         '@id': `${SITE_URL}/#person`,
         name: 'Olivier Winkler',
         url: SITE_URL,
-        image: `${SITE_URL}/opengraph-image`,
+        // No `image`: Next 16.3 gives metadata image routes a content-hashed
+        // pathname, so /opengraph-image is not a real URL and cannot be
+        // hardcoded here.
         jobTitle: 'Software Engineer',
         worksFor: {
           '@type': 'Organization',
@@ -111,10 +99,8 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        <Header />
-        <main className={styles.main}>{children}</main>
+        {children}
         <Analytics />
-        <Footer />
         <SpeedInsights />
       </body>
     </html>

@@ -18,6 +18,7 @@ const Footer = () => (
           <Column>
             <FooterLabel>Pages</FooterLabel>
             <CustomLink link="/">Home</CustomLink>
+            <CustomLink link="/projects">Projects</CustomLink>
             {/* <CustomLink link="/gallery">Gallery</CustomLink> */}
           </Column>
 
