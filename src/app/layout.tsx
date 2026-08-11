@@ -73,7 +73,9 @@ export default function RootLayout({
         '@id': `${SITE_URL}/#person`,
         name: 'Olivier Winkler',
         url: SITE_URL,
-        image: `${SITE_URL}/opengraph-image`,
+        // No `image`: Next 16.3 gives metadata image routes a content-hashed
+        // pathname, so /opengraph-image is not a real URL and cannot be
+        // hardcoded here.
         jobTitle: 'Software Engineer',
         worksFor: {
           '@type': 'Organization',
