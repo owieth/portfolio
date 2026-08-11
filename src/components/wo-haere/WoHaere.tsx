@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useCallback, useRef, useState } from 'react';
 
 import Pfyl from '@/components/wo-haere/Pfyl';
@@ -28,7 +29,11 @@ import { cn } from '@/lib/wo-haere/cn';
 import type { LatLon } from '@/lib/wo-haere/geo/ch';
 import type { Wurf } from '@/lib/wo-haere/geo/resolveHit';
 import { noechschtsZiu, reaktion } from '@/lib/wo-haere/reactions';
-import { PLAY_PATH, WURF_ENDPOINT } from '@/lib/wo-haere/routes';
+import {
+  CASE_STUDY_PATH,
+  PLAY_PATH,
+  WURF_ENDPOINT,
+} from '@/lib/wo-haere/routes';
 import { formatWurf } from '@/lib/wo-haere/wurfParam';
 import { gsammleteKantöne, useWoHaere } from '@/lib/wo-haere/store';
 import {
@@ -211,7 +216,13 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
   const gsammlet = gsammleteKantöne(wurfbuech);
 
   return (
-    <main className="relative h-dvh w-full overflow-hidden bg-stone-800">
+    // gsw is the ISO code for Swiss German — the whole interface is
+    // Berndeutsch. <html lang> cannot vary per route under one root layout,
+    // so the override lives here.
+    <main
+      lang="gsw-CH"
+      className="relative h-dvh w-full overflow-hidden bg-stone-800"
+    >
       <div className="absolute inset-0">
         <Wandcharte
           ref={charteRef}
@@ -249,6 +260,13 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
           <p className="mt-0.5 text-xs text-pretty text-stone-600 dark:text-stone-400">
             {APP.tagline}
           </p>
+          {/* Full-bleed means no site chrome, so this is the only way out. */}
+          <Link
+            href={CASE_STUDY_PATH}
+            className="mt-1 inline-block text-xs text-stone-500 underline underline-offset-2 hover:text-stone-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 dark:text-stone-400 dark:hover:text-white"
+          >
+            ← {AKTIONE.zrugg}
+          </Link>
         </div>
 
         <button
