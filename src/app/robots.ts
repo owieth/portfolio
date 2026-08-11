@@ -5,7 +5,10 @@ export default function robots(): MetadataRoute.Robots {
   return {
     rules: {
       userAgent: '*',
-      allow: '/',
+      // The OG route is allowed explicitly: facebookexternalhit respects
+      // robots.txt, so a blanket /api/ disallow would kill link previews for
+      // shared throws.
+      allow: ['/', '/api/wo-haere/og'],
       disallow: ['/api/'],
     },
     sitemap: `${SITE_URL}/sitemap.xml`,
