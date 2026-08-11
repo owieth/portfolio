@@ -13,7 +13,7 @@
     "@vercel/analytics": "2.0.1",
     "@vercel/speed-insights": "2.0.0",
     "geist": "1.7.2",
-    "next": "16.2.12",
+    "next": "16.3.0",
     "next-mdx-remote": "6.0.0",
     "react": "19.2.8",
     "react-dom": "19.2.8",
@@ -22,7 +22,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "4.3.3",
     "@types/node": "26.2.0",
-    "@types/react": "19.2.17",
+    "@types/react": "19.2.18",
     "@types/react-dom": "19.2.4",
     "eslint": "10.8.1",
     "eslint-config-next": "16.3.0",
@@ -35,7 +35,7 @@
   "packageManager": "pnpm@10.29.3",
   "pnpm": {
     "overrides": {
-      "@types/react": "19.2.17",
+      "@types/react": "19.2.18",
       "@types/react-dom": "19.2.4",
       "minimatch": "10.2.5",
       "brace-expansion": "5.0.8",
