@@ -28,6 +28,8 @@ import { cn } from '@/lib/wo-haere/cn';
 import type { LatLon } from '@/lib/wo-haere/geo/ch';
 import type { Wurf } from '@/lib/wo-haere/geo/resolveHit';
 import { noechschtsZiu, reaktion } from '@/lib/wo-haere/reactions';
+import { PLAY_PATH, WURF_ENDPOINT } from '@/lib/wo-haere/routes';
+import { formatWurf } from '@/lib/wo-haere/wurfParam';
 import { gsammleteKantöne, useWoHaere } from '@/lib/wo-haere/store';
 import {
   chueglogge,
@@ -101,7 +103,7 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
   const holResultat = useCallback(
     async (ort: LatLon) => {
       try {
-        const res = await fetch('/api/wurf', {
+        const res = await fetch(WURF_ENDPOINT, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(ort),
@@ -197,7 +199,7 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
   const teile = useCallback(async () => {
     if (resultat?.wurf.art !== 'preich') return;
     const { lat, lon } = resultat.wurf;
-    const url = `${window.location.origin}/?wurf=${lat.toFixed(4)},${lon.toFixed(4)}`;
+    const url = `${window.location.origin}${PLAY_PATH}?wurf=${formatWurf({ lat, lon })}`;
     try {
       await navigator.clipboard.writeText(url);
       setTeiletext(AKTIONE.kopiert);
