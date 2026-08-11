@@ -10,7 +10,10 @@ const styles = {
     'flex-col',
     'items-center',
     'justify-center',
-    'p-24',
+    'px-6',
+    'py-16',
+    'sm:px-12',
+    'lg:p-24',
   ].join(' '),
 };
 
