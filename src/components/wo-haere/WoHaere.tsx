@@ -221,6 +221,7 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
     // so the override lives here.
     <main
       lang="gsw-CH"
+      data-panee-offe={paneeOffe || undefined}
       className="relative h-dvh w-full overflow-hidden bg-stone-800"
     >
       <div className="absolute inset-0">

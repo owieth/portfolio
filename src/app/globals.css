@@ -101,3 +101,10 @@ body {
 .maplibregl-ctrl-bottom-right {
   margin-bottom: env(safe-area-inset-bottom);
 }
+
+/* When the settings panel is open it covers the bottom-right corner, hiding the
+   legally required attribution. Shift the control left by the panel width so it
+   stays visible. Panel width mirrors WoHaere's w-[min(20rem,100vw)]. */
+[data-panee-offe] .maplibregl-ctrl-bottom-right {
+  margin-right: min(20rem, 100vw);
+}
