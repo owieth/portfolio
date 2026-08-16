@@ -45,6 +45,7 @@ const shots =
 
 const woHaere = shots('wo-haere', 1280, 800);
 const macVitals = shots('macvitals', 1280, 800);
+const inputMetrics = shots('inputmetrics', 1280, 800);
 
 /** Array order is listing order — curated, not chronological. */
 export const projects: Project[] = [
@@ -122,6 +123,61 @@ export const projects: Project[] = [
         'battery',
         'Battery, network, GPU and thermals — including the battery health figure reading 1%, and a fan section reporting 0 RPM at 51 °C. The MAC address is pixelated out',
         { width: 444, height: 554 },
+      ),
+    ],
+  },
+  {
+    slug: 'inputmetrics',
+    title: 'InputMetrics',
+    tagline:
+      'Counts every keystroke and pixel of cursor travel, and stores nothing it could read back.',
+    year: 2026,
+    stack: [
+      'Swift 6',
+      'SwiftUI',
+      'Swift Charts',
+      'CGEventTap',
+      'GRDB',
+      'SQLite',
+    ],
+    links: [
+      {
+        label: 'Download',
+        href: 'https://github.com/owieth/InputMetrics/releases/latest',
+      },
+      { label: 'Source', href: 'https://github.com/owieth/InputMetrics' },
+    ],
+    // Dashboard-window shots land near the column width and run full bleed; the
+    // popover ones are ~400pt and are capped rather than upscaled.
+    cover: inputMetrics(
+      'dashboard',
+      'The InputMetrics dashboard on the Mouse view: a week of daily cursor travel, the click heatmap with its per-display picker, and the all-time totals',
+    ),
+    screenshots: [
+      inputMetrics(
+        'popover',
+        'The menu bar popover on Mouse Metrics: the day of activity so far as distance, clicks, scroll and active time, over a week-by-week chart',
+        { width: 415, height: 589 },
+      ),
+      inputMetrics(
+        'appusage',
+        'All-time totals above the App Usage breakdown, which names each application the counts are attributed to',
+        { width: 395, height: 546 },
+      ),
+      inputMetrics(
+        'keyboard',
+        'The Keyboard view: a QWERTZ layout coloured by press count, with Z on the ANSI Y position and Y on the ANSI Z position',
+        { width: 784, height: 613 },
+      ),
+      inputMetrics(
+        'distance',
+        'A month of daily cursor travel in kilometres, with the heatmap screen picker set to All Screens and the all-time distance beside it',
+        { width: 777, height: 618 },
+      ),
+      inputMetrics(
+        'wpm',
+        'The Keyboard Metrics card reporting a peak typing speed of 1618 words per minute',
+        { width: 402, height: 585 },
       ),
     ],
   },
