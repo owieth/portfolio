@@ -23,16 +23,18 @@ export default function ProjectsPage() {
       </p>
 
       <ul className="mt-12 flex flex-col gap-12">
-        {projects.map(project => (
+        {projects.map((project, index) => (
           <li key={project.slug}>
-            <Link href={project.href} className="group block">
+            <Link href={`/projects/${project.slug}`} className="group block">
               <Image
                 src={project.cover.src}
                 width={project.cover.width}
                 height={project.cover.height}
                 alt={project.cover.alt}
                 className="w-full rounded-lg border border-white/20 transition-colors group-hover:border-white/50"
-                priority
+                // Only the first cover is above the fold; preloading the rest
+                // just makes them compete for the same connection.
+                priority={index === 0}
               />
               <div className="mt-4 flex flex-wrap items-baseline gap-x-3 gap-y-1">
                 <h2 className="text-2xl font-medium">{project.title}</h2>
