@@ -4,7 +4,7 @@ import IconHome from '@/icons/Home';
 import IconPhotos from '@/icons/Photos';
 import IconProjects from '@/icons/Projects';
 import Link from 'next/link';
-import { ReactNode, useEffect, useRef, useState } from 'react';
+import { ReactNode } from 'react';
 
 const DockItem = ({
   href,

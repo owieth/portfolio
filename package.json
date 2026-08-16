@@ -6,7 +6,7 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint",
     "prettier": "prettier --write .",
     "vocab:wo-haere": "node scripts/wo-haere-vocab.mjs"
   },
@@ -36,7 +36,7 @@
     "prettier": "3.9.6",
     "prettier-plugin-tailwindcss": "0.8.1",
     "tailwindcss": "4.3.3",
-    "typescript": "7.0.2"
+    "typescript": "6.0.3"
   },
   "packageManager": "pnpm@10.29.3",
   "pnpm": {

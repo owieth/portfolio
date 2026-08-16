@@ -165,28 +165,32 @@ export default function InputMetricsCaseStudy() {
           head={['Table', 'Primary key', 'What it holds']}
           rows={[
             [
-              <code>daily_summary</code>,
-              <code>(date)</code>,
+              <code key="daily_summary">daily_summary</code>,
+              <code key="daily_summary-pk">(date)</code>,
               'distance, three click counters, keystrokes, two scroll distances, first and last activity, active minutes, three speed columns',
             ],
             [
-              <code>mouse_heatmap</code>,
-              <code>(date, screen_id, bucket_x, bucket_y)</code>,
+              <code key="mouse_heatmap">mouse_heatmap</code>,
+              <code key="mouse_heatmap-pk">
+                (date, screen_id, bucket_x, bucket_y)
+              </code>,
               'one click count per bucket',
             ],
             [
-              <code>keyboard_heatmap</code>,
-              <code>(date, key_code, modifier_flags)</code>,
+              <code key="keyboard_heatmap">keyboard_heatmap</code>,
+              <code key="keyboard_heatmap-pk">
+                (date, key_code, modifier_flags)
+              </code>,
               'one press count',
             ],
             [
-              <code>hourly_summary</code>,
-              <code>(date, hour)</code>,
+              <code key="hourly_summary">hourly_summary</code>,
+              <code key="hourly_summary-pk">(date, hour)</code>,
               'distance, clicks, keystrokes',
             ],
             [
-              <code>app_usage</code>,
-              <code>(date, bundle_id)</code>,
+              <code key="app_usage">app_usage</code>,
+              <code key="app_usage-pk">(date, bundle_id)</code>,
               'keystrokes and clicks per application, its display name, and an active_seconds column nothing has ever written to',
             ],
           ]}
@@ -238,8 +242,8 @@ export default function InputMetricsCaseStudy() {
         <Table
           head={['Keycode', 'Rendered as']}
           rows={[
-            [<code>kVK_ANSI_Y</code>, 'Z'],
-            [<code>kVK_ANSI_Z</code>, 'Y'],
+            [<code key="kVK_ANSI_Y">kVK_ANSI_Y</code>, 'Z'],
+            [<code key="kVK_ANSI_Z">kVK_ANSI_Z</code>, 'Y'],
           ]}
         />
         <P>
