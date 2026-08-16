@@ -37,11 +37,11 @@ export default function InputMetricsCaseStudy() {
           <h1 className="text-4xl font-medium text-balance italic sm:text-5xl">
             {project.title}
           </h1>
-          <span className="text-sm text-white/50 tabular-nums">
+          <span className="text-sm text-muted tabular-nums">
             {project.year}
           </span>
         </div>
-        <p className="text-pretty text-white/50 italic">
+        <p className="text-pretty text-muted italic">
           It counts. That is the whole of what it can do.
         </p>
         <P>
@@ -50,7 +50,7 @@ export default function InputMetricsCaseStudy() {
           counting — it is that the app is built so that counting is the only
           thing it is capable of.
         </P>
-        <p className="text-sm text-white/50">{project.stack.join(' · ')}</p>
+        <p className="text-sm text-muted">{project.stack.join(' · ')}</p>
         <ProjectLinks links={project.links} className="mt-2" />
       </header>
 
@@ -59,7 +59,7 @@ export default function InputMetricsCaseStudy() {
         width={project.cover.width}
         height={project.cover.height}
         alt={project.cover.alt}
-        className="mt-12 w-full rounded-lg border border-white/20"
+        className="mt-12 w-full rounded-lg border border-foreground/20"
         priority
       />
 
@@ -77,7 +77,7 @@ export default function InputMetricsCaseStudy() {
           listen-only tap is handed the event and its return value is discarded
           by the window server. The callback does return the event, out of
           habit, but nothing reads it.{' '}
-          <strong className="font-medium text-white">
+          <strong className="font-medium text-foreground">
             This tap cannot rewrite or drop a keystroke.
           </strong>
         </P>
@@ -196,7 +196,7 @@ export default function InputMetricsCaseStudy() {
           ]}
         />
         <P>
-          <strong className="font-medium text-white">
+          <strong className="font-medium text-foreground">
             Nothing records which keystroke followed which.
           </strong>{' '}
           Every row is a counter under a key that is some combination of a date,
@@ -396,7 +396,7 @@ export default function InputMetricsCaseStudy() {
           Nor is it rare, which is the part that matters. The app puts this
           number on the front of the Keyboard card, labelled{' '}
           <em>Peak Typing Speed</em>, and on{' '}
-          <strong className="font-medium text-white">
+          <strong className="font-medium text-foreground">
             121 of the 160 days recorded
           </strong>{' '}
           it reads above 500 words per minute. The world record is around 220.
@@ -414,7 +414,7 @@ export default function InputMetricsCaseStudy() {
           Which gives the cleanest statement of the whole problem. Over the same
           rows, the average mouse speed is about 1,800 points per second, and
           the peak is 64.9 million.{' '}
-          <strong className="font-medium text-white">
+          <strong className="font-medium text-foreground">
             A mean survives one bad sample; a maximum is defined by it.
           </strong>{' '}
           Both peaks are garbage, and permanently so, because nothing ever
@@ -431,7 +431,7 @@ export default function InputMetricsCaseStudy() {
         </P>
         <P>
           The tag action bumps a version{' '}
-          <strong className="font-medium text-white">once per push</strong>, not
+          <strong className="font-medium text-foreground">once per push</strong>, not
           once per commit — which is why 95 feature commits produced thirteen
           minor versions rather than ninety-five. Publishing the release that
           triggers the build is manual. So:
@@ -483,7 +483,7 @@ export default function InputMetricsCaseStudy() {
         </P>
       </Section>
 
-      <div className="mt-16 border-t border-white/20 pt-8">
+      <div className="mt-16 border-t border-foreground/20 pt-8">
         <ProjectLinks links={project.links} />
       </div>
     </article>

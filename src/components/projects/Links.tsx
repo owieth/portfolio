@@ -26,7 +26,7 @@ const ProjectLinks = ({
             prefetch={false}
             target={isExternal ? '_blank' : undefined}
             rel={isExternal ? 'noopener noreferrer' : undefined}
-            className="inline-flex w-fit items-center gap-1.5 rounded-md border border-white/50 px-4 py-2 text-sm transition-colors hover:border-white hover:bg-white hover:text-black"
+            className="inline-flex w-fit items-center gap-1.5 rounded-md border border-line px-4 py-2 text-sm transition-colors hover:border-foreground hover:bg-foreground hover:text-background"
           >
             {label}
             {isExternal ? <IconLink /> : <span aria-hidden="true">→</span>}

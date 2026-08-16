@@ -16,7 +16,7 @@ export const Section = ({
 );
 
 export const P = ({ children }: { children: ReactNode }) => (
-  <p className="text-pretty text-white/50">{children}</p>
+  <p className="text-pretty text-muted">{children}</p>
 );
 
 /** Citations mid-sentence. Links that are calls to action belong in Project.links. */
@@ -31,7 +31,7 @@ export const A = ({
     href={href}
     target="_blank"
     rel="noopener noreferrer"
-    className="border-b border-white/50 transition-colors hover:border-white hover:text-white"
+    className="border-b border-line transition-colors hover:border-foreground hover:text-foreground"
   >
     {children}
   </a>
@@ -47,7 +47,7 @@ export const Table = ({
   <div className="overflow-x-auto">
     <table className="w-full min-w-md border-collapse text-left text-sm">
       <thead>
-        <tr className="border-b border-white/20">
+        <tr className="border-b border-foreground/20">
           {head.map(cell => (
             <th key={cell} className="py-2 pr-4 font-medium">
               {cell}
@@ -55,9 +55,9 @@ export const Table = ({
           ))}
         </tr>
       </thead>
-      <tbody className="text-white/50 tabular-nums">
+      <tbody className="text-muted tabular-nums">
         {rows.map((row, i) => (
-          <tr key={i} className="border-b border-white/10">
+          <tr key={i} className="border-b border-foreground/10">
             {row.map((cell, j) => (
               <td key={j} className="py-2 pr-4 align-top">
                 {cell}
@@ -77,9 +77,9 @@ export const Shot = ({ shot }: { shot: Screenshot }) => (
       width={shot.width}
       height={shot.height}
       alt={shot.alt}
-      className="w-full rounded-lg border border-white/20"
+      className="w-full rounded-lg border border-foreground/20"
     />
-    <figcaption className="text-sm text-pretty text-white/50">
+    <figcaption className="text-sm text-pretty text-muted">
       {shot.alt}
     </figcaption>
   </figure>

@@ -11,10 +11,10 @@ export default function NotFound() {
     <SiteChrome>
       <div className="flex flex-col items-center gap-4">
         <h1 className="text-4xl font-medium">404</h1>
-        <p className="text-white/50">This page could not be found.</p>
+        <p className="text-muted">This page could not be found.</p>
         <Link
           href="/"
-          className="border-b border-white/50 text-white/50 transition-colors hover:border-white hover:text-white"
+          className="border-b border-line text-muted transition-colors hover:border-foreground hover:text-foreground"
         >
           Go back home
         </Link>
