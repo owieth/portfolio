@@ -11,8 +11,6 @@ export const viewport: Viewport = {
   themeColor: '#1c1917',
   width: 'device-width',
   initialScale: 1,
-  // The map fills the viewport, so pinch-zooming the page would fight panning.
-  maximumScale: 1,
 };
 
 /**
