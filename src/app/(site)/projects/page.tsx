@@ -18,7 +18,7 @@ export default function ProjectsPage() {
       <h1 className="text-4xl font-medium text-balance italic sm:text-5xl">
         Projects
       </h1>
-      <p className="mt-4 text-pretty text-white/50">
+      <p className="mt-4 text-pretty text-muted">
         Things I have built, with a write-up of how they work.
       </p>
 
@@ -31,19 +31,19 @@ export default function ProjectsPage() {
                 width={project.cover.width}
                 height={project.cover.height}
                 alt={project.cover.alt}
-                className="w-full rounded-lg border border-white/20 transition-colors group-hover:border-white/50"
+                className="w-full rounded-lg border border-foreground/20 transition-colors group-hover:border-foreground/50"
                 priority
               />
               <div className="mt-4 flex flex-wrap items-baseline gap-x-3 gap-y-1">
                 <h2 className="text-2xl font-medium">{project.title}</h2>
-                <span className="text-sm text-white/50 tabular-nums">
+                <span className="text-sm text-muted tabular-nums">
                   {project.year}
                 </span>
               </div>
-              <p className="mt-1 text-pretty text-white/50">
+              <p className="mt-1 text-pretty text-muted">
                 {project.tagline}
               </p>
-              <p className="mt-3 text-sm text-white/50">
+              <p className="mt-3 text-sm text-muted">
                 {project.stack.join(' · ')}
               </p>
             </Link>

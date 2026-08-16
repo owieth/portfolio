@@ -31,14 +31,14 @@ const Section = ({
 );
 
 const P = ({ children }: { children: ReactNode }) => (
-  <p className="text-pretty text-white/50">{children}</p>
+  <p className="text-pretty text-muted">{children}</p>
 );
 
 const Table = ({ head, rows }: { head: string[]; rows: ReactNode[][] }) => (
   <div className="overflow-x-auto">
     <table className="w-full min-w-md border-collapse text-left text-sm">
       <thead>
-        <tr className="border-b border-white/20">
+        <tr className="border-b border-foreground/20">
           {head.map(cell => (
             <th key={cell} className="py-2 pr-4 font-medium">
               {cell}
@@ -46,9 +46,9 @@ const Table = ({ head, rows }: { head: string[]; rows: ReactNode[][] }) => (
           ))}
         </tr>
       </thead>
-      <tbody className="text-white/50 tabular-nums">
+      <tbody className="text-muted tabular-nums">
         {rows.map((row, i) => (
-          <tr key={i} className="border-b border-white/10">
+          <tr key={i} className="border-b border-foreground/10">
             {row.map((cell, j) => (
               <td key={j} className="py-2 pr-4 align-top">
                 {cell}
@@ -71,9 +71,9 @@ const Shot = ({ index }: { index: number }) => {
         width={shot.width}
         height={shot.height}
         alt={shot.alt}
-        className="w-full rounded-lg border border-white/20"
+        className="w-full rounded-lg border border-foreground/20"
       />
-      <figcaption className="text-sm text-pretty text-white/50">
+      <figcaption className="text-sm text-pretty text-muted">
         {shot.alt}
       </figcaption>
     </figure>
@@ -90,11 +90,11 @@ export default function WoHaereCaseStudy() {
           <h1 className="text-4xl font-medium text-balance italic sm:text-5xl">
             {project.title}
           </h1>
-          <span className="text-sm text-white/50 tabular-nums">
+          <span className="text-sm text-muted tabular-nums">
             {project.year}
           </span>
         </div>
-        <p className="text-pretty text-white/50 italic">
+        <p className="text-pretty text-muted italic">
           Schmeiss e Pfyl u lue, wo&rsquo;s di häre nimmt.
         </p>
         <P>
@@ -102,7 +102,7 @@ export default function WoHaereCaseStudy() {
           next. The whole interface is in Berndeutsch. No API keys, no
           environment variables — every data source is public.
         </P>
-        <p className="text-sm text-white/50">{project.stack.join(' · ')}</p>
+        <p className="text-sm text-muted">{project.stack.join(' · ')}</p>
         {/*
           A plain link, never a dynamic import of the game: pulling the map
           component in here would land ~250KB gz of maplibre on a page that is
@@ -111,7 +111,7 @@ export default function WoHaereCaseStudy() {
         <Link
           href={PLAY_PATH}
           prefetch={false}
-          className="mt-2 inline-flex w-fit items-center gap-2 rounded-md border border-white/50 px-4 py-2 text-sm transition-colors hover:border-white hover:bg-white hover:text-black"
+          className="mt-2 inline-flex w-fit items-center gap-2 rounded-md border border-line px-4 py-2 text-sm transition-colors hover:border-foreground hover:bg-foreground hover:text-background"
         >
           Play it →
         </Link>
@@ -122,7 +122,7 @@ export default function WoHaereCaseStudy() {
         width={project.cover.width}
         height={project.cover.height}
         alt={project.cover.alt}
-        className="mt-12 w-full rounded-lg border border-white/20"
+        className="mt-12 w-full rounded-lg border border-foreground/20"
         priority
       />
 
@@ -131,14 +131,14 @@ export default function WoHaereCaseStudy() {
           A dart lands on a screen pixel, the pixel becomes a coordinate, and
           swisstopo turns the coordinate into a place.
         </P>
-        <ul className="flex list-disc flex-col gap-2 pl-5 text-pretty text-white/50 marker:text-white/30">
+        <ul className="flex list-disc flex-col gap-2 pl-5 text-pretty text-muted marker:text-foreground/30">
           <li>
-            <strong className="font-medium text-white">Tiles.</strong>{' '}
+            <strong className="font-medium text-foreground">Tiles.</strong>{' '}
             <code>wmts.geo.admin.ch</code> serves the swisstopo Landeskarte with
             no key.
           </li>
           <li>
-            <strong className="font-medium text-white">
+            <strong className="font-medium text-foreground">
               Reverse geocoding.
             </strong>{' '}
             One <code>identify</code> request against the Gemeinde layer returns
@@ -147,19 +147,19 @@ export default function WoHaereCaseStudy() {
             historical ones going back to 1850.
           </li>
           <li>
-            <strong className="font-medium text-white">Elevation.</strong> The{' '}
+            <strong className="font-medium text-foreground">Elevation.</strong> The{' '}
             <code>height</code> endpoint needs LV95 coordinates, so the app
             converts them with swisstopo&rsquo;s approximate formulas, checked
             against the reframe service and accurate to about 5 cm.
           </li>
           <li>
-            <strong className="font-medium text-white">Water.</strong> swisstopo
+            <strong className="font-medium text-foreground">Water.</strong> swisstopo
             lists lakes in the Gemeinde layer under their own name, so{' '}
             <em>Thunersee</em> comes back as a &ldquo;municipality&rdquo;. That
             is how the app detects a splash without shipping any polygons.
           </li>
           <li>
-            <strong className="font-medium text-white">Abroad.</strong> No
+            <strong className="font-medium text-foreground">Abroad.</strong> No
             records at all means the dart left the country. Records but none
             current means border water, like the French half of Lac Léman.
           </li>
@@ -242,7 +242,7 @@ export default function WoHaereCaseStudy() {
             href="https://www.stat.cmu.edu/~ryantibs/papers/darts-jrss.pdf"
             target="_blank"
             rel="noopener noreferrer"
-            className="border-b border-white/50 transition-colors hover:border-white hover:text-white"
+            className="border-b border-line transition-colors hover:border-foreground hover:text-foreground"
           >
             <em>A statistician plays darts</em>
           </a>{' '}
@@ -258,7 +258,7 @@ export default function WoHaereCaseStudy() {
               <>
                 author 1 — not a dart player, trying his best. Averaged 11.65
                 points,{' '}
-                <strong className="font-medium text-white">
+                <strong className="font-medium text-foreground">
                   worse than throwing uniformly at random
                 </strong>{' '}
                 (12.82)
@@ -269,7 +269,7 @@ export default function WoHaereCaseStudy() {
           ]}
         />
         <P>
-          64.6 / 170 ≈ <strong className="font-medium text-white">0.38</strong>,
+          64.6 / 170 ≈ <strong className="font-medium text-foreground">0.38</strong>,
           so a beginner&rsquo;s spread is nearly 40% of the target radius. That
           is what this app throws with. The map is the dartboard, so σ scales
           with the map&rsquo;s radius, and a throw at full force lands exactly
@@ -291,9 +291,9 @@ export default function WoHaereCaseStudy() {
           force, which is not &ldquo;occasionally&rdquo;.
         </P>
         <P>Three further details, all of them things real throwers do:</P>
-        <ul className="flex list-disc flex-col gap-2 pl-5 text-pretty text-white/50 marker:text-white/30">
+        <ul className="flex list-disc flex-col gap-2 pl-5 text-pretty text-muted marker:text-foreground/30">
           <li>
-            <strong className="font-medium text-white">
+            <strong className="font-medium text-foreground">
               Not circularly symmetric.
             </strong>{' '}
             The paper&rsquo;s section 3 moves to a general covariance matrix;
@@ -301,14 +301,14 @@ export default function WoHaereCaseStudy() {
             spread is the wider one.
           </li>
           <li>
-            <strong className="font-medium text-white">
+            <strong className="font-medium text-foreground">
               A consistent tendency.
             </strong>{' '}
             Everyone pulls one way. The bias is drawn once per session, so it
             feels like your own wonky arm rather than fresh noise.
           </li>
           <li>
-            <strong className="font-medium text-white">
+            <strong className="font-medium text-foreground">
               The occasional shank.
             </strong>{' '}
             7% of throws are a <em>Chnorz</em>: nearly double the spread, and
@@ -363,7 +363,7 @@ export default function WoHaereCaseStudy() {
             href="https://www.berndeutsch.ch"
             target="_blank"
             rel="noopener noreferrer"
-            className="border-b border-white/50 transition-colors hover:border-white hover:text-white"
+            className="border-b border-line transition-colors hover:border-foreground hover:text-foreground"
           >
             berndeutsch.ch
           </a>{' '}
@@ -398,11 +398,11 @@ export default function WoHaereCaseStudy() {
         </P>
       </Section>
 
-      <div className="mt-16 border-t border-white/20 pt-8">
+      <div className="mt-16 border-t border-foreground/20 pt-8">
         <Link
           href={PLAY_PATH}
           prefetch={false}
-          className="inline-flex w-fit items-center gap-2 rounded-md border border-white/50 px-4 py-2 text-sm transition-colors hover:border-white hover:bg-white hover:text-black"
+          className="inline-flex w-fit items-center gap-2 rounded-md border border-line px-4 py-2 text-sm transition-colors hover:border-foreground hover:bg-foreground hover:text-background"
         >
           Play it →
         </Link>
