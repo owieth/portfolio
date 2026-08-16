@@ -1,10 +1,9 @@
+import ProjectLinks from '@/components/projects/Links';
+import { A, P, Section, Shot, Table } from '@/components/projects/Prose';
 import { getProject } from '@/data/projects';
-import { PLAY_PATH } from '@/lib/wo-haere/routes';
 import type { Metadata } from 'next';
 import Image from 'next/image';
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import type { ReactNode } from 'react';
 
 const project = getProject('wo-haere');
 
@@ -15,69 +14,6 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/projects/wo-haere',
   },
-};
-
-const Section = ({
-  title,
-  children,
-}: {
-  title: string;
-  children: ReactNode;
-}) => (
-  <section className="mt-16 flex flex-col gap-4">
-    <h2 className="text-2xl font-medium text-balance">{title}</h2>
-    {children}
-  </section>
-);
-
-const P = ({ children }: { children: ReactNode }) => (
-  <p className="text-pretty text-muted">{children}</p>
-);
-
-const Table = ({ head, rows }: { head: string[]; rows: ReactNode[][] }) => (
-  <div className="overflow-x-auto">
-    <table className="w-full min-w-md border-collapse text-left text-sm">
-      <thead>
-        <tr className="border-b border-foreground/20">
-          {head.map(cell => (
-            <th key={cell} className="py-2 pr-4 font-medium">
-              {cell}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody className="text-muted tabular-nums">
-        {rows.map((row, i) => (
-          <tr key={i} className="border-b border-foreground/10">
-            {row.map((cell, j) => (
-              <td key={j} className="py-2 pr-4 align-top">
-                {cell}
-              </td>
-            ))}
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-);
-
-const Shot = ({ index }: { index: number }) => {
-  const shot = project?.screenshots[index];
-  if (!shot) return null;
-  return (
-    <figure className="mt-2 flex flex-col gap-2">
-      <Image
-        src={shot.src}
-        width={shot.width}
-        height={shot.height}
-        alt={shot.alt}
-        className="w-full rounded-lg border border-foreground/20"
-      />
-      <figcaption className="text-sm text-pretty text-muted">
-        {shot.alt}
-      </figcaption>
-    </figure>
-  );
 };
 
 export default function WoHaereCaseStudy() {
@@ -104,17 +40,11 @@ export default function WoHaereCaseStudy() {
         </P>
         <p className="text-sm text-muted">{project.stack.join(' · ')}</p>
         {/*
-          A plain link, never a dynamic import of the game: pulling the map
+          Plain links, never a dynamic import of the game: pulling the map
           component in here would land ~250KB gz of maplibre on a page that is
-          mostly prose. prefetch={false} stops a hover doing the same thing.
+          mostly prose.
         */}
-        <Link
-          href={PLAY_PATH}
-          prefetch={false}
-          className="mt-2 inline-flex w-fit items-center gap-2 rounded-md border border-line px-4 py-2 text-sm transition-colors hover:border-foreground hover:bg-foreground hover:text-background"
-        >
-          Play it →
-        </Link>
+        <ProjectLinks links={project.links} className="mt-2" />
       </header>
 
       <Image
@@ -170,7 +100,7 @@ export default function WoHaereCaseStudy() {
           zero results instead of an error — which reads exactly like
           &ldquo;abroad&rdquo;.
         </P>
-        <Shot index={1} />
+        <Shot shot={project.screenshots[0]} />
       </Section>
 
       <Section title="Three views">
@@ -198,7 +128,7 @@ export default function WoHaereCaseStudy() {
           for the world style — so readiness is tracked from the{' '}
           <code>style.load</code> event per map instance instead.
         </P>
-        <Shot index={2} />
+        <Shot shot={project.screenshots[1]} />
       </Section>
 
       <Section title="Three throw mechanics">
@@ -230,7 +160,7 @@ export default function WoHaereCaseStudy() {
           keeps the drag alive anywhere on screen while leaving the rest of the
           map free to pan.
         </P>
-        <Shot index={0} />
+        <Shot shot={project.screenshots[2]} />
       </Section>
 
       <Section title="How badly you miss">
@@ -238,14 +168,9 @@ export default function WoHaereCaseStudy() {
           Aiming only ever biases the throw — it never determines it, because
           nobody playing this can actually throw darts. The miss is calibrated
           from Tibshirani, Price &amp; Taylor,{' '}
-          <a
-            href="https://www.stat.cmu.edu/~ryantibs/papers/darts-jrss.pdf"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="border-b border-line transition-colors hover:border-foreground hover:text-foreground"
-          >
+          <A href="https://www.stat.cmu.edu/~ryantibs/papers/darts-jrss.pdf">
             <em>A statistician plays darts</em>
-          </a>{' '}
+          </A>{' '}
           (J. R. Statist. Soc. A, 2011), who model a throw as a 2-D Gaussian
           around the aim point and measured themselves over 100 throws at a
           board of radius 170 mm.
@@ -352,22 +277,14 @@ export default function WoHaereCaseStudy() {
           from a user gesture, and the pointer press that begins a drag is
           exactly that.
         </P>
-        <Shot index={3} />
+        <Shot shot={project.screenshots[3]} />
       </Section>
 
       <Section title="Copy">
         <P>
           Every user-facing string lives in one file, and every word is checked
-          against{' '}
-          <a
-            href="https://www.berndeutsch.ch"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="border-b border-line transition-colors hover:border-foreground hover:text-foreground"
-          >
-            berndeutsch.ch
-          </a>{' '}
-          by a script that ships with the project.
+          against <A href="https://www.berndeutsch.ch">berndeutsch.ch</A> by a
+          script that ships with the project.
         </P>
         <P>
           Words that failed the check were replaced rather than shipped: it is{' '}
@@ -399,13 +316,7 @@ export default function WoHaereCaseStudy() {
       </Section>
 
       <div className="mt-16 border-t border-foreground/20 pt-8">
-        <Link
-          href={PLAY_PATH}
-          prefetch={false}
-          className="inline-flex w-fit items-center gap-2 rounded-md border border-line px-4 py-2 text-sm transition-colors hover:border-foreground hover:bg-foreground hover:text-background"
-        >
-          Play it →
-        </Link>
+        <ProjectLinks links={project.links} />
       </div>
     </article>
   );

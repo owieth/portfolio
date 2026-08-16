@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "prettier": "prettier --write --ignore-path .gitignore .",
+    "prettier": "prettier --write .",
     "vocab:wo-haere": "node scripts/wo-haere-vocab.mjs"
   },
   "dependencies": {
