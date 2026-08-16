@@ -17,9 +17,6 @@ export const metadata: Metadata = {
     template: '%s | Olivier Winkler',
   },
   description,
-  alternates: {
-    canonical: '/',
-  },
   openGraph: {
     type: 'website',
     url: SITE_URL,
