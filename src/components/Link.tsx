@@ -22,10 +22,10 @@ const CustomLink = ({
       'gap-1',
       'border-b',
       'border-transparent',
-      'text-white/50',
+      'text-muted',
       'transition-colors',
       'ease-in-out',
-      'hover:border-white hover:text-white',
+      'hover:border-foreground hover:text-foreground',
     ].join(' '),
   };
 
