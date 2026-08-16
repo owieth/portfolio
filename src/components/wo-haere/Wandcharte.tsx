@@ -274,14 +274,20 @@ export default function Wandcharte({
 
     // Aaflug: hang on the globe for a moment, then dive into Switzerland.
     // Crossing the raster layer's minzoom reveals the Landeskarte on the way.
+    // End on Charte's framing (derived from CH_FIT, so it tracks the viewport
+    // aspect ratio) rather than a fixed zoom — a fixed zoom settles wide enough
+    // that the swisstopo coverage edge creeps into frame as a cream band.
+    const ziu = map.cameraForBounds(CH_FIT, { padding: 24 });
+    const center = ziu?.center ?? ([8.2, 46.8] as [number, number]);
+    const zoom = ziu?.zoom ?? 7.2;
     if (reduced) {
-      map.jumpTo({ center: [8.2, 46.8], zoom: 7.2 });
+      map.jumpTo({ center, zoom });
       return;
     }
     map.jumpTo({ center: [8.2, 46.8], zoom: 1.8 });
     map.flyTo({
-      center: [8.2, 46.8],
-      zoom: 7.2,
+      center,
+      zoom,
       duration: 4200,
       essential: true,
     });
