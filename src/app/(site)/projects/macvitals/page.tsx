@@ -73,8 +73,16 @@ export default function MacVitalsCaseStudy() {
         <Table
           head={['Metric', 'Call']}
           rows={[
-            ['CPU', <code>host_processor_info(PROCESSOR_CPU_LOAD_INFO)</code>],
-            ['Memory', <code>host_statistics64(HOST_VM_INFO64)</code>],
+            [
+              'CPU',
+              <code key="cpu">
+                host_processor_info(PROCESSOR_CPU_LOAD_INFO)
+              </code>,
+            ],
+            [
+              'Memory',
+              <code key="memory">host_statistics64(HOST_VM_INFO64)</code>,
+            ],
             [
               'Storage',
               <>
@@ -95,7 +103,7 @@ export default function MacVitalsCaseStudy() {
                 the SMC, via <code>AppleSMC</code>
               </>,
             ],
-            ['Network', <code>getifaddrs</code>],
+            ['Network', <code key="network">getifaddrs</code>],
             [
               'GPU',
               <>
@@ -174,13 +182,22 @@ export default function MacVitalsCaseStudy() {
         <Table
           head={['Type', 'Encoding']}
           rows={[
-            [<code>sp78</code>, 'signed 8.8 fixed-point, big-endian'],
-            [<code>fpe2</code>, 'unsigned 14.2 fixed-point, big-endian'],
             [
-              <code>flt&nbsp;</code>,
+              <code key="sp78">sp78</code>,
+              'signed 8.8 fixed-point, big-endian',
+            ],
+            [
+              <code key="fpe2">fpe2</code>,
+              'unsigned 14.2 fixed-point, big-endian',
+            ],
+            [
+              <code key="flt">flt&nbsp;</code>,
               'IEEE 754 single precision, little-endian',
             ],
-            [<code>ioft</code>, '8-byte IEEE 754 double, little-endian'],
+            [
+              <code key="ioft">ioft</code>,
+              '8-byte IEEE 754 double, little-endian',
+            ],
             [
               <>
                 <code>ui8</code>, <code>ui16</code>, <code>ui32</code>,{' '}
