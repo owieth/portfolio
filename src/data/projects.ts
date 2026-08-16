@@ -44,6 +44,7 @@ const shots =
   });
 
 const woHaere = shots('wo-haere', 1280, 800);
+const macVitals = shots('macvitals', 1280, 800);
 
 /** Array order is listing order — curated, not chronological. */
 export const projects: Project[] = [
@@ -76,6 +77,51 @@ export const projects: Project[] = [
       woHaere(
         'panel',
         'The settings panel showing the view and throw-style pickers, the canton stamp card and the throw log',
+      ),
+    ],
+  },
+  {
+    slug: 'macvitals',
+    title: 'MacVitals',
+    tagline:
+      'A menu bar system monitor that reads its numbers straight out of Mach and the SMC.',
+    year: 2026,
+    stack: ['Swift 6', 'SwiftUI', 'AppKit', 'IOKit', 'Mach', 'No dependencies'],
+    links: [
+      // /releases/latest, never a versioned asset URL: a pinned one 404s the
+      // moment the next release ships.
+      {
+        label: 'Download',
+        href: 'https://github.com/owieth/MacVitals/releases/latest',
+      },
+      { label: 'Source', href: 'https://github.com/owieth/MacVitals' },
+    ],
+    // The popover is 444pt wide, so these are shown at their captured size
+    // rather than stretched across the column.
+    cover: macVitals(
+      'popover',
+      'The MacVitals popover on its Dashboard tab: uptime, rings for CPU, memory and GPU, and rolling charts underneath',
+    ),
+    screenshots: [
+      macVitals(
+        'cpu',
+        'Total CPU split into user and system, a bar per core, and memory broken into active, wired and compressed',
+        { width: 444, height: 532 },
+      ),
+      macVitals(
+        'sensors',
+        'The Sensors tab: temperature keys the app discovered on this machine, grouped under CPU and shown by their raw four-character SMC names because no label was found for them',
+        { width: 453, height: 606 },
+      ),
+      macVitals(
+        'processes',
+        'The Processes tab, sorted by CPU, with per-process usage derived from the delta of proc_pidinfo user and system nanoseconds',
+        { width: 445, height: 604 },
+      ),
+      macVitals(
+        'battery',
+        'Battery, network, GPU and thermals — including the battery health figure reading 1%, and a fan section reporting 0 RPM at 51 °C. The MAC address is pixelated out',
+        { width: 444, height: 554 },
       ),
     ],
   },
