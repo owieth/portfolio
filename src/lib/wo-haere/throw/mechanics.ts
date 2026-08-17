@@ -1,5 +1,6 @@
 import { CH_BOUNDS, offset, type LatLon } from '@/lib/wo-haere/geo/ch';
 import { ZIU } from '@/lib/wo-haere/data/ziu';
+import type { Rand } from '@/lib/wo-haere/throw/rng';
 
 /** Where a mechanic wants the dart to land. */
 export type Zieu =
@@ -80,25 +81,35 @@ export interface Wind {
   chraft: number;
 }
 
-export function nöieWind(): Wind {
-  return { richtig: Math.random() * 360, chraft: 0.4 + Math.random() * 1.8 };
+export function nöieWind(rand: Rand = Math.random): Wind {
+  return { richtig: rand() * 360, chraft: 0.4 + rand() * 1.8 };
 }
 
 /** Box–Muller: one draw from a standard normal. */
-function normal(): number {
+function normal(rand: Rand): number {
   let u = 0;
-  while (u === 0) u = Math.random();
-  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * Math.random());
+  while (u === 0) u = rand();
+  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * rand());
+}
+
+/** A thrower's standing tendency to pull one way, in units of σ. */
+export interface Hang {
+  x: number;
+  y: number;
+}
+
+export function zieheHang(rand: Rand): Hang {
+  return { x: normal(rand) * 0.16, y: normal(rand) * 0.16 };
 }
 
 /**
  * Everyone has a consistent tendency to pull one way. Drawn once per session so
  * it feels like *your* wonky throwing arm rather than fresh noise every time.
  */
-let hang: { x: number; y: number } | null = null;
+let hang: Hang | null = null;
 
-function myHang(): { x: number; y: number } {
-  hang ??= { x: normal() * 0.16, y: normal() * 0.16 };
+function myHang(): Hang {
+  hang ??= zieheHang(Math.random);
   return hang;
 }
 
@@ -153,6 +164,14 @@ export function vorschau(zug: Zug, art: ZugArt): ZugVorschau {
   };
 }
 
+/** Lets a caller replay a throw — the calibration tests and debugging both need it. */
+export interface WurfOptione {
+  /** Where the scatter comes from. Defaults to `Math.random`. */
+  rand?: Rand;
+  /** The thrower's standing bias. Defaults to the once-per-session draw. */
+  hang?: Hang;
+}
+
 /**
  * The actual throw: the aim from the preview, plus how much a normal person
  * misses by. The aim only ever biases the outcome — it never determines it.
@@ -162,16 +181,18 @@ export function zugZieu(
   art: ZugArt,
   wind: Wind,
   brettRadius: number,
+  optione: WurfOptione = {},
 ): WurfErgebnis {
+  const rand = optione.rand ?? Math.random;
   const { ziel, chraft } = vorschau(zug, art);
 
-  const chnorz = Math.random() < CHNORZ_WAHRSCHYNLECHKEIT;
+  const chnorz = rand() < CHNORZ_WAHRSCHYNLECHKEIT;
   const sigma =
     streuigSigma(brettRadius, chraft) * (chnorz ? CHNORZ_FAKTOR : 1);
-  const bias = myHang();
+  const bias = optione.hang ?? myHang();
 
-  const abx = normal() * sigma * SIGMA_SYTLECH + bias.x * sigma;
-  const aby = normal() * sigma * SIGMA_UF_AB + bias.y * sigma;
+  const abx = normal(rand) * sigma * SIGMA_SYTLECH + bias.x * sigma;
+  const aby = normal(rand) * sigma * SIGMA_UF_AB + bias.y * sigma;
 
   const windRad = (wind.richtig * Math.PI) / 180;
   const abwychig = Math.hypot(abx, aby);
@@ -210,14 +231,14 @@ function clampInsCh(ort: LatLon): LatLon {
  * answer, but a fifth of the throws go somewhere entirely random, which is
  * where the "middle of a field" jokes come from.
  */
-export function tippZieu(wind: Wind): WurfErgebnis {
+export function tippZieu(wind: Wind, rand: Rand = Math.random): WurfErgebnis {
   const stil: WurfStil =
-    Math.random() < CHNORZ_WAHRSCHYNLECHKEIT ? 'chnorz' : 'gschlämpert';
+    rand() < CHNORZ_WAHRSCHYNLECHKEIT ? 'chnorz' : 'gschlämpert';
 
-  if (Math.random() < 0.8) {
-    const ziu = ZIU[Math.floor(Math.random() * ZIU.length)];
-    const streuig = Math.random() * 6;
-    const richtig = Math.random() * 360;
+  if (rand() < 0.8) {
+    const ziu = ZIU[Math.floor(rand() * ZIU.length)];
+    const streuig = rand() * 6;
+    const richtig = rand() * 360;
     const ort = offset({ lat: ziu.lat, lon: ziu.lon }, streuig, richtig);
     return { zieu: { kind: 'ort', ort: clampInsCh(mitWind(ort, wind)) }, stil };
   }
@@ -227,11 +248,8 @@ export function tippZieu(wind: Wind): WurfErgebnis {
       kind: 'ort',
       ort: mitWind(
         {
-          lat:
-            CH_BOUNDS.south +
-            Math.random() * (CH_BOUNDS.north - CH_BOUNDS.south),
-          lon:
-            CH_BOUNDS.west + Math.random() * (CH_BOUNDS.east - CH_BOUNDS.west),
+          lat: CH_BOUNDS.south + rand() * (CH_BOUNDS.north - CH_BOUNDS.south),
+          lon: CH_BOUNDS.west + rand() * (CH_BOUNDS.east - CH_BOUNDS.west),
         },
         wind,
       ),
