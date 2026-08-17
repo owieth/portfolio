@@ -10,8 +10,8 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <>
-      <p className="mb-2 text-sm text-muted">Olivier Winkler</p>
-      <h1 className="text-4xl font-medium text-balance italic sm:text-6xl">
+      <p className="text-muted mb-2 text-sm">Olivier Winkler</p>
+      <h1 className="text-center text-4xl font-medium text-balance italic sm:text-6xl">
         Building Software for the Future.
       </h1>
       <CustomLink
