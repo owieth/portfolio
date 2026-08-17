@@ -9,6 +9,7 @@
     "lint": "eslint",
     "prettier": "prettier --write .",
     "vocab:wo-haere": "node scripts/wo-haere-vocab.mjs",
+    "coords:wo-haere": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/wo-haere-coords.mjs",
     "simulate:wo-haere": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/wo-haere-simulate.mjs"
   },
   "dependencies": {
