@@ -322,13 +322,13 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
       )}
 
       <div
-        className="absolute inset-x-0 bottom-0 z-(--z-steuerig) flex flex-col items-center gap-3 p-4"
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-(--z-steuerig) flex flex-col items-center gap-3 p-4"
         style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}
       >
         {fähler && (
           <div
             role="alert"
-            className="w-full max-w-md rounded-xl border border-red-300 bg-white/95 p-4 shadow-xl dark:border-red-800 dark:bg-stone-900/95"
+            className="pointer-events-auto w-full max-w-md rounded-xl border border-red-300 bg-white/95 p-4 shadow-xl dark:border-red-800 dark:bg-stone-900/95"
           >
             <h2 className="font-bold text-red-700 dark:text-red-500">
               {FAEHLER.titu}

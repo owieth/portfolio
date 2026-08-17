@@ -44,7 +44,7 @@ export default function Resultatcharte({
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: reduced ? 0.12 : 0.2, ease: 'easeOut' }}
       className={cn(
-        'w-full max-w-md rounded-2xl border border-stone-300/80 bg-white/95 p-5 shadow-xl',
+        'pointer-events-auto w-full max-w-md rounded-2xl border border-stone-300/80 bg-white/95 p-5 shadow-xl',
         'backdrop-blur-none dark:border-stone-700/80 dark:bg-stone-900/95',
       )}
     >
