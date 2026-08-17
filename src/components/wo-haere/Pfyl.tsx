@@ -104,7 +104,7 @@ export default function Pfyl({ ziel, sorte, stil, onGladet }: PfylProps) {
 
   return (
     <motion.div
-      className="pointer-events-none absolute top-0 left-0 z-30 will-change-transform"
+      className="pointer-events-none absolute top-0 left-0 z-(--z-pfyl) will-change-transform"
       initial={
         reduced
           ? { opacity: 0, x: ziel.x, y: ziel.y, scale: 1, rotate: 0 }

@@ -33,7 +33,7 @@ export default function Zieuhilf({
 
   return (
     <svg
-      className="pointer-events-none absolute inset-0 z-20 size-full"
+      className="pointer-events-none absolute inset-0 z-(--z-steuerig) size-full"
       aria-hidden="true"
     >
       {/* Honest about the odds: roughly two thirds of throws land inside this

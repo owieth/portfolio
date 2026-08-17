@@ -160,7 +160,7 @@ export default function Wurfsteuerig({
 
   if (wurfart === 'tipp') {
     return (
-      <div className="flex flex-col items-center gap-2">
+      <div className="pointer-events-auto flex flex-col items-center gap-2">
         <button
           type="button"
           disabled={gsperrt}
@@ -187,7 +187,7 @@ export default function Wurfsteuerig({
     wurfart === 'schlüder' ? WURFARTE.schlüder.hiuf : WURFARTE.zieh.hiuf;
 
   return (
-    <div className="flex flex-col items-center gap-2">
+    <div className="pointer-events-auto flex flex-col items-center gap-2">
       {/* Grab the dart and drag: direction aims, length is the force. Pointer
           capture means the drag continues anywhere on screen, so the map keeps
           its own panning outside this handle. */}
