@@ -7,6 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "prettier": "prettier --write .",
     "vocab:wo-haere": "node scripts/wo-haere-vocab.mjs"
   },
@@ -36,7 +38,8 @@
     "prettier": "3.9.6",
     "prettier-plugin-tailwindcss": "0.8.1",
     "tailwindcss": "4.3.3",
-    "typescript": "6.0.3"
+    "typescript": "6.0.3",
+    "vitest": "4.1.10"
   },
   "packageManager": "pnpm@10.29.3",
   "pnpm": {
