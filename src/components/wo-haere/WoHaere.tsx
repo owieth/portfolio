@@ -205,6 +205,21 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
     if (resultat?.wurf.art !== 'preich') return;
     const { lat, lon } = resultat.wurf;
     const url = `${window.location.origin}${PLAY_PATH}?wurf=${formatWurf({ lat, lon })}`;
+    const daten = { title: APP.name, text: APP.tagline, url };
+
+    // navigator.share spends the transient activation from the button press,
+    // so nothing may be awaited before it.
+    if (navigator.canShare?.(daten)) {
+      try {
+        await navigator.share(daten);
+        setTeiletext(AKTIONE.gteilt);
+        return;
+      } catch (error) {
+        // Dismissing the sheet is a choice, not a failure. Anything else
+        // falls through to the clipboard.
+        if (error instanceof Error && error.name === 'AbortError') return;
+      }
+    }
 
     // navigator.clipboard is undefined outside a secure context.
     if (!navigator.clipboard) {
