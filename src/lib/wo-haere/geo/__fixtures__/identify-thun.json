@@ -1,0 +1,28 @@
+{
+  "results": [
+    {
+      "attributes": {
+        "gemname": "Thun",
+        "kanton": "BE",
+        "gde_nr": 942,
+        "is_current_jahr": true
+      }
+    },
+    {
+      "attributes": {
+        "gemname": "Thun",
+        "kanton": "BE",
+        "gde_nr": 942,
+        "is_current_jahr": false
+      }
+    },
+    {
+      "attributes": {
+        "gemname": "Strättligen",
+        "kanton": "BE",
+        "gde_nr": 941,
+        "is_current_jahr": false
+      }
+    }
+  ]
+}
