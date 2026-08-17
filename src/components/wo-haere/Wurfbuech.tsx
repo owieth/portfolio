@@ -69,10 +69,10 @@ export default function Wurfbuech({
               {TEXT.leere}
             </AlertDialog.Trigger>
             <AlertDialog.Portal>
-              <AlertDialog.Backdrop className="fixed inset-0 z-40 bg-black/40" />
+              <AlertDialog.Backdrop className="fixed inset-0 z-(--z-vorhang) bg-black/40" />
               <AlertDialog.Popup
                 className={cn(
-                  'fixed top-1/2 left-1/2 z-50 w-[min(24rem,calc(100vw-2rem))]',
+                  'fixed top-1/2 left-1/2 z-(--z-dialog) w-[min(24rem,calc(100vw-2rem))]',
                   '-translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white p-5 shadow-2xl',
                   'dark:bg-stone-900',
                 )}

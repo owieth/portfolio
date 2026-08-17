@@ -82,6 +82,18 @@ body {
   background: var(--background);
 }
 
+/* Wo häre? — the one place stacking order is decided. Every z-index in the
+   feature reads from here; nothing sets a bare z-* utility.
+   `pfyl` sits below `panee` deliberately: a dart thrown with the settings
+   panel open flies under it, not across it. */
+:root {
+  --z-steuerig: 10; /* Zieuhilf, the HUD header, the bottom controls */
+  --z-pfyl: 20; /* the dart in flight */
+  --z-panee: 30; /* the settings panel */
+  --z-vorhang: 40; /* Wurfbuech's dialog backdrop */
+  --z-dialog: 50; /* Wurfbuech's dialog */
+}
+
 /* Wo häre? — a landed dart, left behind on the map by an earlier throw. */
 .pfyl-loch {
   width: 0.55rem;

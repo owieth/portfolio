@@ -251,7 +251,7 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
       </div>
 
       <header
-        className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-start justify-between gap-3 p-4"
+        className="pointer-events-none absolute inset-x-0 top-0 z-(--z-steuerig) flex items-start justify-between gap-3 p-4"
         style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}
       >
         <div className="pointer-events-auto rounded-xl bg-white/90 px-3 py-2 shadow-lg dark:bg-stone-900/90">
@@ -284,7 +284,7 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
       {paneeOffe && (
         <aside
           className={cn(
-            'absolute top-0 right-0 z-30 flex h-dvh w-[min(20rem,100vw)] flex-col gap-5',
+            'absolute top-0 right-0 z-(--z-panee) flex h-dvh w-[min(20rem,100vw)] flex-col gap-5',
             'overflow-y-auto border-l border-stone-300 bg-white/97 p-4 shadow-2xl',
             'dark:border-stone-700 dark:bg-stone-900/97',
           )}
@@ -314,7 +314,7 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
       )}
 
       <div
-        className="absolute inset-x-0 bottom-0 z-20 flex flex-col items-center gap-3 p-4"
+        className="absolute inset-x-0 bottom-0 z-(--z-steuerig) flex flex-col items-center gap-3 p-4"
         style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}
       >
         {fähler && (
