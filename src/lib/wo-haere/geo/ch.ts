@@ -23,6 +23,18 @@ export function isInChBbox({ lat, lon }: LatLon): boolean {
   );
 }
 
+/**
+ * Grid resolution for coordinates sent upstream and shared in links.
+ * 4 decimals is ~7-11m at Swiss latitudes — far below the app's resolution,
+ * and enough to collapse adjacent throws onto one cache key.
+ */
+export const GRID_DECIMALS = 4;
+
+export function snapToGrid({ lat, lon }: LatLon): LatLon {
+  const f = 10 ** GRID_DECIMALS;
+  return { lat: Math.round(lat * f) / f, lon: Math.round(lon * f) / f };
+}
+
 const EARTH_RADIUS_KM = 6371;
 const toRad = (deg: number) => (deg * Math.PI) / 180;
 const toDeg = (rad: number) => (rad * 180) / Math.PI;
