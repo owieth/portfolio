@@ -199,14 +199,15 @@ export default function WoHaereCaseStudy() {
           is what this app throws with. The map is the dartboard, so σ scales
           with the map&rsquo;s radius, and a throw at full force lands exactly
           on that beginner figure — ease off and you do better. Measured over
-          120k simulated throws on a 1280×800 view:
+          1.2M simulated throws per force level on a 1280×800 view, by a script
+          that ships with the project and reads the constants off the game:
         </P>
         <Table
-          head={['Force', 'σ', 'Median miss', 'Lands off Switzerland']}
+          head={['Force', 'σ', 'Median miss', 'Off the board']}
           rows={[
-            ['0%', '61 px', '24 km', '0.1%'],
-            ['50%', '106 px', '42 km', '1.6%'],
-            ['100%', '152 px', '61 km', '7.8%'],
+            ['0%', '61 px', '23 km', '0.1%'],
+            ['50%', '106 px', '40 km', '1.6%'],
+            ['100%', '152 px', '57 km', '7.8%'],
           ]}
         />
         <P>
