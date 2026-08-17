@@ -1,4 +1,4 @@
-import type { LatLon } from '@/lib/wo-haere/geo/ch';
+import { GRID_DECIMALS, type LatLon } from '@/lib/wo-haere/geo/ch';
 
 /**
  * `?wurf=46.6200,8.0418` — a shared throw. Accepts the raw value from either a
@@ -19,7 +19,11 @@ export function parseWurf(
   return { lat, lon };
 }
 
-/** The canonical `lat,lon` form used in shared links and OG image URLs. */
+/**
+ * The canonical `lat,lon` form used in shared links and OG image URLs. Kept on
+ * the same grid as `snapToGrid`, so a shared throw hits the same upstream cache
+ * key as the original.
+ */
 export function formatWurf({ lat, lon }: LatLon): string {
-  return `${lat.toFixed(4)},${lon.toFixed(4)}`;
+  return `${lat.toFixed(GRID_DECIMALS)},${lon.toFixed(GRID_DECIMALS)}`;
 }
