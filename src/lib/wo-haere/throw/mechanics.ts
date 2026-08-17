@@ -39,12 +39,14 @@ const NOVIZ_SIGMA = 0.38;
 /**
  * Force makes it worse: a lob is controlled, a full-power throw is a gamble.
  * A throw at full force lands exactly on the paper's beginner figure; easing
- * off does better than that. Simulated over 120k throws on a 1280×800 view
- * (board radius 400 px, Switzerland ≈ 350 km across):
+ * off does better than that. Simulated over 1.2M throws per force level on a
+ * 1280×800 view (board radius 400 px; the map fits Switzerland, so ≈0.29 km
+ * per pixel) — scripts/wo-haere-simulate.mjs reproduces this from the
+ * constants below:
  *
- *   force   0%  σ =  61 px  median miss 24 km  off-board 0.1%
- *   force  50%  σ = 106 px  median miss 42 km  off-board 1.6%
- *   force 100%  σ = 152 px  median miss 61 km  off-board 7.8%
+ *   force   0%  σ =  61 px  median miss 23 km  off-board 0.1%
+ *   force  50%  σ = 106 px  median miss 40 km  off-board 1.6%
+ *   force 100%  σ = 152 px  median miss 57 km  off-board 7.8%
  *
  * The earlier calibration ran to 23% off-board at full force, which buried the
  * player in "Dernäbe!" cards — far more than the paper's "occasionally".

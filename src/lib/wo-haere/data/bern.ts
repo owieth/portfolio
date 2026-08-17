@@ -2,7 +2,7 @@
  * Every string the user sees lives here, in Berndeutsch.
  *
  * Spellings follow berndeutsch.ch. Words were checked against
- * https://www.berndeutsch.ch/search?q=<word> — see scripts/vocab.mjs, which
+ * https://www.berndeutsch.ch/search?q=<word> — scripts/wo-haere-vocab.mjs
  * re-runs that check. Notable results from the first pass:
  *   schmeisse = werfen · preiche = ein Ziel treffen · dernäbe = daneben
  *   "träffer", "stäigyse" and "badhösli" are NOT in the dictionary — avoided.
