@@ -205,11 +205,18 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
     if (resultat?.wurf.art !== 'preich') return;
     const { lat, lon } = resultat.wurf;
     const url = `${window.location.origin}${PLAY_PATH}?wurf=${formatWurf({ lat, lon })}`;
+
+    // navigator.clipboard is undefined outside a secure context.
+    if (!navigator.clipboard) {
+      setTeiletext(AKTIONE.nidTeilt);
+      return;
+    }
+
     try {
       await navigator.clipboard.writeText(url);
       setTeiletext(AKTIONE.kopiert);
     } catch {
-      setTeiletext(url);
+      setTeiletext(AKTIONE.nidTeilt);
     }
   }, [resultat]);
 
