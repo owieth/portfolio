@@ -313,5 +313,10 @@ export default function Wandcharte({
   // Sized explicitly rather than with `absolute inset-0`: maplibre's own
   // stylesheet forces `position: relative` on .maplibregl-map, which would
   // override the utility class and collapse the container to zero height.
-  return <div ref={containerRef} className="size-full" />;
+  //
+  // That same forced `position` is what makes --z-charte bite: it pins the map
+  // to the base layer of the scale and, being a stacking context, boxes
+  // maplibre's own control z-indexes in here rather than letting them compete
+  // with the app chrome outside.
+  return <div ref={containerRef} className="z-(--z-charte) size-full" />;
 }

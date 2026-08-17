@@ -87,6 +87,7 @@ body {
    `pfyl` sits below `panee` deliberately: a dart thrown with the settings
    panel open flies under it, not across it. */
 :root {
+  --z-charte: 0; /* Wandcharte — the map, and MapLibre's own controls */
   --z-steuerig: 10; /* Zieuhilf, the HUD header, the bottom controls */
   --z-pfyl: 20; /* the dart in flight */
   --z-panee: 30; /* the settings panel */
