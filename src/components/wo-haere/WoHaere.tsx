@@ -251,7 +251,7 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
       </div>
 
       <header
-        className="pointer-events-none absolute inset-x-0 top-0 z-(--z-steuerig) flex items-start justify-between gap-3 p-4"
+        className="pointer-events-none absolute inset-x-0 top-0 z-(--z-steuerig) flex items-start p-4"
         style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}
       >
         <div className="pointer-events-auto rounded-xl bg-white/90 px-3 py-2 shadow-lg dark:bg-stone-900/90">
@@ -269,7 +269,15 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
             ← {AKTIONE.zrugg}
           </Link>
         </div>
+      </header>
 
+      {/* Lives outside the header, on its own layer: this is the panel's own
+          close button, so the panel has to stay off it. The rest of the header
+          keeps the layer the panel is free to cover. */}
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 z-(--z-zue) flex justify-end p-4"
+        style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}
+      >
         <button
           type="button"
           aria-label={YTEXT.titu}
@@ -279,7 +287,7 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
         >
           {paneeOffe ? '✕' : '☰'}
         </button>
-      </header>
+      </div>
 
       {paneeOffe && (
         <aside

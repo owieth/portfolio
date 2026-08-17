@@ -85,14 +85,17 @@ body {
 /* Wo häre? — the one place stacking order is decided. Every z-index in the
    feature reads from here; nothing sets a bare z-* utility.
    `pfyl` sits below `panee` deliberately: a dart thrown with the settings
-   panel open flies under it, not across it. */
+   panel open flies under it, not across it. `zue` sits above `panee` just as
+   deliberately: it is the panel's own close button, so the panel must not
+   cover it. The rest of the HUD stays below, where the panel can. */
 :root {
   --z-charte: 0; /* Wandcharte — the map, and MapLibre's own controls */
-  --z-steuerig: 10; /* Zieuhilf, the HUD header, the bottom controls */
+  --z-steuerig: 10; /* Zieuhilf, the title card, the bottom controls */
   --z-pfyl: 20; /* the dart in flight */
   --z-panee: 30; /* the settings panel */
-  --z-vorhang: 40; /* Wurfbuech's dialog backdrop */
-  --z-dialog: 50; /* Wurfbuech's dialog */
+  --z-zue: 40; /* the ☰/✕ toggle that opens and closes the panel */
+  --z-vorhang: 50; /* Wurfbuech's dialog backdrop */
+  --z-dialog: 60; /* Wurfbuech's dialog */
 }
 
 /* Wo häre? — a landed dart, left behind on the map by an earlier throw. */
