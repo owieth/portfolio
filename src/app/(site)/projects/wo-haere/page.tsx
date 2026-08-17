@@ -301,7 +301,8 @@ export default function WoHaereCaseStudy() {
           swisstopo&rsquo;s search API and were then verified against the
           Gemeinde layer and the elevation API — a wrong coordinate cannot
           survive an elevation check, which is how a football stadium in Thun
-          stopped impersonating the Stockhorn summit.
+          stopped impersonating the Stockhorn summit. A second script re-runs
+          that check against every coordinate on the list.
         </P>
         <P>
           A dart that lands more than 8 km from any curated spot falls back to

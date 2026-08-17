@@ -4,7 +4,8 @@
  * Every coordinate came out of swisstopo's SearchServer and was then checked
  * against the Gemeinde layer and the elevation API — a wrong coordinate cannot
  * survive an elevation check, which is how a football stadium in Thun stopped
- * masquerading as the Stockhorn summit. See scripts/coords.mjs.
+ * masquerading as the Stockhorn summit. See scripts/wo-haere-coords.mjs,
+ * which re-runs that check against the elevations in wo-haere-hoechi.json.
  *
  * When a dart lands within NOECHI_KM of one of these, the card uses its blurb.
  * Anything else falls back to the plain municipality name from swisstopo, so
