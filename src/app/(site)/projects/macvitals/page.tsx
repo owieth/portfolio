@@ -37,11 +37,11 @@ export default function MacVitalsCaseStudy() {
           <h1 className="text-4xl font-medium text-balance italic sm:text-5xl">
             {project.title}
           </h1>
-          <span className="text-sm text-muted tabular-nums">
+          <span className="text-muted text-sm tabular-nums">
             {project.year}
           </span>
         </div>
-        <p className="text-pretty text-muted italic">
+        <p className="text-muted text-pretty italic">
           Every number is a syscall it makes itself.
         </p>
         <P>
@@ -50,7 +50,7 @@ export default function MacVitalsCaseStudy() {
           no server — it is a thin skin over a pile of Mach and IOKit calls, and
           most of the work was in finding out what to call.
         </P>
-        <p className="text-sm text-muted">{project.stack.join(' · ')}</p>
+        <p className="text-muted text-sm">{project.stack.join(' · ')}</p>
         <ProjectLinks links={project.links} className="mt-2" />
       </header>
 
@@ -59,7 +59,7 @@ export default function MacVitalsCaseStudy() {
         width={project.cover.width}
         height={project.cover.height}
         alt={project.cover.alt}
-        className="mt-12 w-full rounded-lg border border-foreground/20"
+        className="border-foreground/20 mt-12 w-full rounded-lg border"
         priority
       />
 
@@ -121,9 +121,9 @@ export default function MacVitalsCaseStudy() {
           ]}
         />
         <P>Three things that only show up once you call them:</P>
-        <ul className="flex list-disc flex-col gap-2 pl-5 text-pretty text-muted marker:text-foreground/30">
+        <ul className="text-muted marker:text-foreground/30 flex list-disc flex-col gap-2 pl-5 text-pretty">
           <li>
-            <strong className="font-medium text-foreground">
+            <strong className="text-foreground font-medium">
               You own the memory.
             </strong>{' '}
             <code>host_processor_info</code> allocates the array it hands back
@@ -132,7 +132,7 @@ export default function MacVitalsCaseStudy() {
             it.
           </li>
           <li>
-            <strong className="font-medium text-foreground">
+            <strong className="text-foreground font-medium">
               Swift cannot call one of them.
             </strong>{' '}
             <code>mach_task_self()</code> is a C macro rather than a function,
@@ -142,7 +142,7 @@ export default function MacVitalsCaseStudy() {
             SMC driver expects.
           </li>
           <li>
-            <strong className="font-medium text-foreground">
+            <strong className="text-foreground font-medium">
               The first reading is always wrong.
             </strong>{' '}
             CPU usage is a delta between two samples of cumulative tick
@@ -165,7 +165,7 @@ export default function MacVitalsCaseStudy() {
         <P>
           That yields every key the machine has, of every kind. Narrowing it to
           temperatures is done the only way available:{' '}
-          <strong className="font-medium text-foreground">
+          <strong className="text-foreground font-medium">
             keep the keys that start with T, read each one, and keep it only if
             the number that comes back is between 0 and 150 °C.
           </strong>{' '}
@@ -226,11 +226,11 @@ export default function MacVitalsCaseStudy() {
         <P>
           The screenshot below is the fallback doing its job. On the M1 Max
           these shots came from, the sweep keeps{' '}
-          <strong className="font-medium text-foreground">227 sensors</strong> — far
-          more than 63 labels can cover — so the prefix rule files them under
-          CPU and the list shows their raw four-character keys, unchanged, all
-          reading within a couple of degrees of each other. It is not pretty,
-          and it is more honest than inventing names for keys nobody has
+          <strong className="text-foreground font-medium">227 sensors</strong> —
+          far more than 63 labels can cover — so the prefix rule files them
+          under CPU and the list shows their raw four-character keys, unchanged,
+          all reading within a couple of degrees of each other. It is not
+          pretty, and it is more honest than inventing names for keys nobody has
           documented.
         </P>
         <Popover shot={project.screenshots[1]} />
@@ -336,9 +336,9 @@ export default function MacVitalsCaseStudy() {
           Most of what the app shows is a number the kernel already knows,
           copied. Three are not, and it is worth naming which.
         </P>
-        <ul className="flex list-disc flex-col gap-2 pl-5 text-pretty text-muted marker:text-foreground/30">
+        <ul className="text-muted marker:text-foreground/30 flex list-disc flex-col gap-2 pl-5 text-pretty">
           <li>
-            <strong className="font-medium text-foreground">
+            <strong className="text-foreground font-medium">
               Memory pressure is a ratio.
             </strong>{' '}
             The app calls it critical above 90% and a warning above 75%, where
@@ -351,7 +351,7 @@ export default function MacVitalsCaseStudy() {
             fires on a threshold the app chose, not on anything the kernel said.
           </li>
           <li>
-            <strong className="font-medium text-foreground">
+            <strong className="text-foreground font-medium">
               The default gateway is scraped.
             </strong>{' '}
             Every other number here is a syscall. This one runs{' '}
@@ -363,7 +363,7 @@ export default function MacVitalsCaseStudy() {
             process list forks one every tick.
           </li>
           <li>
-            <strong className="font-medium text-foreground">
+            <strong className="text-foreground font-medium">
               Battery health is simply wrong.
             </strong>{' '}
             It divides <code>MaxCapacity</code> by <code>DesignCapacity</code>{' '}
@@ -375,7 +375,7 @@ export default function MacVitalsCaseStudy() {
             the sum becomes 100 divided by a four-figure mA·h number, the clamp
             guards a case that can no longer happen, and the app reports a
             healthy battery as{' '}
-            <strong className="font-medium text-foreground">1%</strong>.
+            <strong className="text-foreground font-medium">1%</strong>.
           </li>
         </ul>
         <P>
@@ -451,7 +451,7 @@ export default function MacVitalsCaseStudy() {
         </P>
       </Section>
 
-      <div className="mt-16 border-t border-foreground/20 pt-8">
+      <div className="border-foreground/20 mt-16 border-t pt-8">
         <ProjectLinks links={project.links} />
       </div>
     </article>

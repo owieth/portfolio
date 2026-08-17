@@ -14,7 +14,7 @@ export default function NotFound() {
         <p className="text-muted">This page could not be found.</p>
         <Link
           href="/"
-          className="border-b border-line text-muted transition-colors hover:border-foreground hover:text-foreground"
+          className="border-line text-muted hover:border-foreground hover:text-foreground border-b transition-colors"
         >
           Go back home
         </Link>
