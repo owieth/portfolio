@@ -5,6 +5,7 @@ import {
   himmurichtig,
   isInChBbox,
   isWasser,
+  snapToGrid,
   type LatLon,
 } from '@/lib/wo-haere/geo/ch';
 
@@ -92,8 +93,13 @@ async function fetchHoechi(lon: number, lat: number): Promise<number | null> {
  *   - a current record        -> a real Swiss municipality (or a Swiss lake)
  *   - historical records only -> border water such as the French part of Léman
  *   - nothing at all          -> abroad
+ *
+ * The point is snapped to the grid first: this is the only place the app talks
+ * to swisstopo, so snapping here keeps every upstream URL cache-aligned and
+ * stops a caller from walking coordinates to generate unbounded requests.
  */
-export async function resolveHit(point: LatLon): Promise<Wurf> {
+export async function resolveHit(rawPoint: LatLon): Promise<Wurf> {
+  const point = snapToGrid(rawPoint);
   const { lat, lon } = point;
 
   if (!isInChBbox(point)) {
