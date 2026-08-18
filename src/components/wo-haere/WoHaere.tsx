@@ -19,10 +19,13 @@ import Yschtellige from '@/components/wo-haere/Yschtellige';
 import Zieuhilf from '@/components/wo-haere/Zieuhilf';
 // Attribution is not rendered here: maplibre shows it from the source specs
 // (© swisstopo on the raster source, OpenFreeMap/OSM from the world style).
+import { track } from '@/lib/analytics/track';
 import {
   AKTIONE,
   APP,
+  AUI_KANTOEN,
   FAEHLER,
+  PFYLSORTE,
   YSCHTELLIGE as YTEXT,
 } from '@/lib/wo-haere/data/bern';
 import { cn } from '@/lib/wo-haere/cn';
@@ -101,8 +104,42 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
         isPreich,
       };
       merkWurf(eintrag);
+
+      // Milestones fire on the state transition this throw causes, read from the
+      // pre-throw snapshot rather than a render-derived flag that would misfire
+      // when the settings pane mounts.
+      const vorherKantoene = gsammleteKantöne(wurfbuech);
+      if (
+        wurf.art === 'preich' &&
+        wurf.kanton &&
+        !vorherKantoene.has(wurf.kanton)
+      ) {
+        const cantonsCollected = vorherKantoene.size + 1;
+        track({
+          name: 'canton_collected',
+          canton: wurf.kanton,
+          cantons_collected: cantonsCollected,
+        });
+        if (cantonsCollected === AUI_KANTOEN.length) {
+          track({
+            name: 'all_cantons_collected',
+            throw_count: wurfbuech.length + 1,
+          });
+        }
+      }
+
+      const neuiZahl = wurfbuech.length + 1;
+      for (const sorte of PFYLSORTE) {
+        if (sorte.abNWuerf > 0 && sorte.abNWuerf === neuiZahl) {
+          track({
+            name: 'dart_skin_unlocked',
+            dart_skin: sorte.id,
+            threshold: sorte.abNWuerf,
+          });
+        }
+      }
     },
-    [merkWurf, yschtellige.ton],
+    [merkWurf, wurfbuech, yschtellige.ton],
   );
 
   const holResultat = useCallback(
@@ -207,31 +244,56 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
     const url = `${window.location.origin}${PLAY_PATH}?wurf=${formatWurf({ lat, lon })}`;
     const daten = { title: APP.name, text: APP.tagline, url };
 
+    track({ name: 'share_attempt' });
+
     // navigator.share spends the transient activation from the button press,
     // so nothing may be awaited before it.
     if (navigator.canShare?.(daten)) {
       try {
         await navigator.share(daten);
         setTeiletext(AKTIONE.gteilt);
+        track({ name: 'share_result', share_method: 'native', outcome: 'shared' });
         return;
       } catch (error) {
         // Dismissing the sheet is a choice, not a failure. Anything else
         // falls through to the clipboard.
-        if (error instanceof Error && error.name === 'AbortError') return;
+        if (error instanceof Error && error.name === 'AbortError') {
+          track({
+            name: 'share_result',
+            share_method: 'native',
+            outcome: 'dismissed',
+          });
+          return;
+        }
       }
     }
 
     // navigator.clipboard is undefined outside a secure context.
     if (!navigator.clipboard) {
       setTeiletext(AKTIONE.nidTeilt);
+      track({
+        name: 'share_result',
+        share_method: 'clipboard',
+        outcome: 'unsupported',
+      });
       return;
     }
 
     try {
       await navigator.clipboard.writeText(url);
       setTeiletext(AKTIONE.kopiert);
+      track({
+        name: 'share_result',
+        share_method: 'clipboard',
+        outcome: 'copied',
+      });
     } catch {
       setTeiletext(AKTIONE.nidTeilt);
+      track({
+        name: 'share_result',
+        share_method: 'clipboard',
+        outcome: 'failed',
+      });
     }
   }, [resultat]);
 
