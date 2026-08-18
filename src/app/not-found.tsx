@@ -1,3 +1,4 @@
+import PageNotFoundTracker from '@/components/analytics/PageNotFoundTracker';
 import SiteChrome from '@/components/SiteChrome';
 import Link from 'next/link';
 
@@ -9,6 +10,7 @@ import Link from 'next/link';
 export default function NotFound() {
   return (
     <SiteChrome>
+      <PageNotFoundTracker />
       <div className="flex flex-col items-center gap-4">
         <h1 className="text-4xl font-medium">404</h1>
         <p className="text-muted">This page could not be found.</p>
