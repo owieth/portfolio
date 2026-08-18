@@ -1,5 +1,6 @@
 import AnalyticsScripts from '@/components/analytics/AnalyticsScripts';
 import PageViewTracker from '@/components/analytics/PageViewTracker';
+import UserPropertiesTracker from '@/components/analytics/UserPropertiesTracker';
 import { SITE_URL } from '@/lib/site';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
@@ -101,6 +102,7 @@ export default function RootLayout({
         />
         {children}
         <PageViewTracker />
+        <UserPropertiesTracker />
         <Analytics />
         <SpeedInsights />
       </body>
