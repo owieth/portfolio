@@ -2,6 +2,7 @@
 
 import { motion, useReducedMotion } from 'motion/react';
 
+import { track } from '@/lib/analytics/track';
 import {
   AKTIONE,
   DERNAEBE,
@@ -119,7 +120,10 @@ export default function Resultatcharte({
       <div className="mt-5 flex flex-wrap gap-2">
         <button
           type="button"
-          onClick={onNomau}
+          onClick={() => {
+            track({ name: 'result_action', action: 'again' });
+            onNomau();
+          }}
           className={cn(
             'rounded-full bg-red-600 px-5 py-2 font-bold text-white',
             'transition-transform duration-150 ease-out active:scale-95',
@@ -132,14 +136,20 @@ export default function Resultatcharte({
           <>
             <button
               type="button"
-              onClick={onZeig}
+              onClick={() => {
+                track({ name: 'result_action', action: 'show_on_map' });
+                onZeig();
+              }}
               className="rounded-full border border-stone-300 px-5 py-2 font-medium text-stone-800 transition-colors duration-150 ease-out hover:bg-stone-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 dark:border-stone-600 dark:text-stone-100 dark:hover:bg-stone-800"
             >
               {AKTIONE.ufDCharte}
             </button>
             <button
               type="button"
-              onClick={onTeile}
+              onClick={() => {
+                track({ name: 'result_action', action: 'share' });
+                onTeile();
+              }}
               className="rounded-full border border-stone-300 px-5 py-2 font-medium text-stone-800 transition-colors duration-150 ease-out hover:bg-stone-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 dark:border-stone-600 dark:text-stone-100 dark:hover:bg-stone-800"
             >
               {teiletext}
