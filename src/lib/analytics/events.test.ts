@@ -24,6 +24,48 @@ describe('isValidEvent', () => {
     expect(isValidEvent({ name: 'page_view', page_path: '/' })).toBe(true);
   });
 
+  it('accepts the link, nav and 404 events', () => {
+    const events: AnalyticsEvent[] = [
+      {
+        name: 'outbound_click',
+        link_url: 'https://github.com/owieth',
+        link_text: 'GitHub',
+        link_domain: 'github.com',
+      },
+      {
+        name: 'internal_link_click',
+        link_url: 'https://olivierwinkler.com/projects',
+        link_text: 'Projects',
+        link_domain: 'olivierwinkler.com',
+      },
+      {
+        name: 'nav_click',
+        link_url: 'https://olivierwinkler.com/',
+        link_text: 'Home',
+        nav_location: 'header',
+      },
+      {
+        name: 'project_cta_click',
+        project_slug: 'macvitals',
+        cta_label: 'Source',
+      },
+      {
+        name: 'download_click',
+        project_slug: 'macvitals',
+        link_url: 'https://github.com/owieth/MacVitals/releases/latest',
+      },
+      {
+        name: 'citation_click',
+        link_url: 'https://example.com/paper',
+        link_text: 'the paper',
+        link_domain: 'example.com',
+      },
+      { name: 'page_not_found', page_path: '/nope', referrer: '' },
+    ];
+
+    for (const event of events) expect(isValidEvent(event)).toBe(true);
+  });
+
   it('rejects a name longer than the limit', () => {
     const event = {
       name: 'x'.repeat(MAX_EVENT_NAME_LENGTH + 1),
