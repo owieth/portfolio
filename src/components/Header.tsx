@@ -1,8 +1,10 @@
 'use client';
 
+import { track } from '@/lib/analytics/track';
+import { handledMarker, linkFields } from '@/lib/analytics/links';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { type ReactNode } from 'react';
+import { type MouseEvent, type ReactNode } from 'react';
 
 const navigation = [
   { name: 'Home', href: '/' },
@@ -23,6 +25,16 @@ const NavItem = ({
   // A prefix match so /projects/wo-haere keeps Projects highlighted; '/' would
   // otherwise prefix-match everything, so it stays exact.
   const isActive = href === '/' ? pathname === href : pathname.startsWith(href);
+
+  const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    const anchor = event.currentTarget;
+    const { link_url, link_text } = linkFields(
+      anchor.href,
+      anchor.textContent ?? '',
+    );
+
+    track({ name: 'nav_click', link_url, link_text, nav_location: 'header' });
+  };
 
   const styles = {
     link: ({ isActive }: { isActive: boolean }) =>
@@ -58,7 +70,12 @@ const NavItem = ({
 
   return (
     <li className={className}>
-      <Link href={href} className={styles.link({ isActive })}>
+      <Link
+        href={href}
+        className={styles.link({ isActive })}
+        onClick={handleClick}
+        {...handledMarker}
+      >
         {children}
         {isActive && <span className={styles.activeLink} />}
       </Link>
