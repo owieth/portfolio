@@ -2,6 +2,8 @@ import type { Screenshot } from '@/data/projects';
 import Image from 'next/image';
 import type { ReactNode } from 'react';
 
+export { A } from './Citation';
+
 export const Section = ({
   title,
   children,
@@ -17,24 +19,6 @@ export const Section = ({
 
 export const P = ({ children }: { children: ReactNode }) => (
   <p className="text-muted text-pretty">{children}</p>
-);
-
-/** Citations mid-sentence. Links that are calls to action belong in Project.links. */
-export const A = ({
-  href,
-  children,
-}: {
-  href: string;
-  children: ReactNode;
-}) => (
-  <a
-    href={href}
-    target="_blank"
-    rel="noopener noreferrer"
-    className="border-line hover:border-foreground hover:text-foreground border-b transition-colors"
-  >
-    {children}
-  </a>
 );
 
 export const Table = ({
