@@ -2,6 +2,7 @@
 
 import { AlertDialog } from '@base-ui/react/alert-dialog';
 
+import { track } from '@/lib/analytics/track';
 import { WURFBUECH as TEXT, kantonsName } from '@/lib/wo-haere/data/bern';
 import { cn } from '@/lib/wo-haere/cn';
 import type { WurfEintrag } from '@/lib/wo-haere/types';
@@ -39,7 +40,13 @@ export default function Wurfbuech({
               <li key={eintrag.id}>
                 <button
                   type="button"
-                  onClick={() => onZeig(eintrag)}
+                  onClick={() => {
+                    track({
+                      name: 'throw_log_entry_click',
+                      art: eintrag.wurf.art,
+                    });
+                    onZeig(eintrag);
+                  }}
                   className="flex w-full items-baseline justify-between gap-2 py-1.5 text-left text-sm hover:text-red-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 dark:hover:text-red-500"
                 >
                   <span className="truncate text-stone-800 dark:text-stone-200">
@@ -88,7 +95,13 @@ export default function Wurfbuech({
                     Nei
                   </AlertDialog.Close>
                   <AlertDialog.Close
-                    onClick={onLeere}
+                    onClick={() => {
+                      track({
+                        name: 'throw_log_cleared',
+                        entry_count: wurfbuech.length,
+                      });
+                      onLeere();
+                    }}
                     className="rounded-full bg-red-600 px-4 py-1.5 text-sm font-bold text-white hover:bg-red-700"
                   >
                     {TEXT.jaLeere}
