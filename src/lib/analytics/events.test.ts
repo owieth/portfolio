@@ -79,6 +79,40 @@ describe('isValidEvent', () => {
     ).toBe(true);
   });
 
+  it('accepts the wo-haere throw funnel events', () => {
+    const events: AnalyticsEvent[] = [
+      { name: 'share_attempt' },
+      { name: 'share_result', share_method: 'native', outcome: 'shared' },
+      { name: 'share_result', share_method: 'native', outcome: 'dismissed' },
+      { name: 'share_result', share_method: 'clipboard', outcome: 'copied' },
+      { name: 'share_result', share_method: 'clipboard', outcome: 'unsupported' },
+      { name: 'share_result', share_method: 'clipboard', outcome: 'failed' },
+      { name: 'result_action', action: 'again' },
+      { name: 'result_action', action: 'show_on_map' },
+      { name: 'result_action', action: 'share' },
+      { name: 'setting_changed', setting_name: 'view', setting_value: 'aaflug' },
+      {
+        name: 'setting_changed',
+        setting_name: 'throw_style',
+        setting_value: 'sufer',
+      },
+      {
+        name: 'setting_changed',
+        setting_name: 'dart_skin',
+        setting_value: 'alphorn',
+      },
+      { name: 'setting_changed', setting_name: 'sound', setting_value: 'off' },
+      { name: 'throw_log_entry_click', art: 'preich' },
+      { name: 'throw_log_entry_click', art: 'dernaebe' },
+      { name: 'throw_log_cleared', entry_count: 12 },
+      { name: 'canton_collected', canton: 'BE', cantons_collected: 1 },
+      { name: 'all_cantons_collected', throw_count: 42 },
+      { name: 'dart_skin_unlocked', dart_skin: 'alphorn', threshold: 30 },
+    ];
+
+    for (const event of events) expect(isValidEvent(event)).toBe(true);
+  });
+
   it('rejects a name longer than the limit', () => {
     const event = {
       name: 'x'.repeat(MAX_EVENT_NAME_LENGTH + 1),

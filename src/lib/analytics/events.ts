@@ -67,6 +67,59 @@ export type WebVitalsEvent = {
   page_path: string;
 };
 
+/**
+ * wo-haere client throw funnel. Mirrors the server `*_server` funnel without the
+ * suffix (those belong to the server layer). Param values keep the game's raw
+ * Berndeutsch ids so they read the same as everywhere else in the feature.
+ */
+export type ShareAttemptEvent = {
+  name: 'share_attempt';
+};
+
+export type ShareResultEvent = {
+  name: 'share_result';
+  share_method: 'native' | 'clipboard';
+  outcome: 'shared' | 'dismissed' | 'copied' | 'unsupported' | 'failed';
+};
+
+export type ResultActionEvent = {
+  name: 'result_action';
+  action: 'again' | 'show_on_map' | 'share';
+};
+
+export type SettingChangedEvent = {
+  name: 'setting_changed';
+  setting_name: 'view' | 'throw_style' | 'dart_skin' | 'sound';
+  setting_value: string;
+};
+
+export type ThrowLogEntryClickEvent = {
+  name: 'throw_log_entry_click';
+  art: 'preich' | 'dernaebe';
+};
+
+export type ThrowLogClearedEvent = {
+  name: 'throw_log_cleared';
+  entry_count: number;
+};
+
+export type CantonCollectedEvent = {
+  name: 'canton_collected';
+  canton: string;
+  cantons_collected: number;
+};
+
+export type AllCantonsCollectedEvent = {
+  name: 'all_cantons_collected';
+  throw_count: number;
+};
+
+export type DartSkinUnlockedEvent = {
+  name: 'dart_skin_unlocked';
+  dart_skin: string;
+  threshold: number;
+};
+
 export type AnalyticsEvent =
   | PageViewEvent
   | OutboundClickEvent
@@ -76,7 +129,16 @@ export type AnalyticsEvent =
   | DownloadClickEvent
   | CitationClickEvent
   | PageNotFoundEvent
-  | WebVitalsEvent;
+  | WebVitalsEvent
+  | ShareAttemptEvent
+  | ShareResultEvent
+  | ResultActionEvent
+  | SettingChangedEvent
+  | ThrowLogEntryClickEvent
+  | ThrowLogClearedEvent
+  | CantonCollectedEvent
+  | AllCantonsCollectedEvent
+  | DartSkinUnlockedEvent;
 
 /**
  * GA4 silently drops an event whose name exceeds 40 characters or that carries
