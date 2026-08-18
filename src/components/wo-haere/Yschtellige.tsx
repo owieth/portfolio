@@ -2,6 +2,7 @@
 
 import { Switch } from '@base-ui/react/switch';
 
+import { track } from '@/lib/analytics/track';
 import Wahl, { type WahlOption } from '@/components/wo-haere/Wahl';
 import {
   AASICHTE,
@@ -50,13 +51,27 @@ export default function Yschtellige({
         label={TEXT.aasicht}
         wert={wert.aasicht}
         optione={AASICHT_OPTIONE}
-        onWahl={aasicht => onÄndere({ aasicht })}
+        onWahl={aasicht => {
+          track({
+            name: 'setting_changed',
+            setting_name: 'view',
+            setting_value: aasicht,
+          });
+          onÄndere({ aasicht });
+        }}
       />
       <Wahl
         label={TEXT.wurfart}
         wert={wert.wurfart}
         optione={WURFART_OPTIONE}
-        onWahl={wurfart => onÄndere({ wurfart })}
+        onWahl={wurfart => {
+          track({
+            name: 'setting_changed',
+            setting_name: 'throw_style',
+            setting_value: wurfart,
+          });
+          onÄndere({ wurfart });
+        }}
       />
 
       {offeniSorte.length > 1 && (
@@ -67,7 +82,14 @@ export default function Yschtellige({
             id: s.id as PfylsorteId,
             name: `${s.emoji} ${s.name}`,
           }))}
-          onWahl={pfylsorte => onÄndere({ pfylsorte })}
+          onWahl={pfylsorte => {
+            track({
+              name: 'setting_changed',
+              setting_name: 'dart_skin',
+              setting_value: pfylsorte,
+            });
+            onÄndere({ pfylsorte });
+          }}
         />
       )}
 
@@ -77,7 +99,14 @@ export default function Yschtellige({
         </span>
         <Switch.Root
           checked={wert.ton}
-          onCheckedChange={ton => onÄndere({ ton })}
+          onCheckedChange={ton => {
+            track({
+              name: 'setting_changed',
+              setting_name: 'sound',
+              setting_value: ton ? 'on' : 'off',
+            });
+            onÄndere({ ton });
+          }}
           className={cn(
             'relative h-6 w-11 shrink-0 rounded-full bg-stone-300 transition-colors duration-150 ease-out',
             'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600',
