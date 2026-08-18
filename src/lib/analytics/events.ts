@@ -58,6 +58,15 @@ export type PageNotFoundEvent = {
   referrer: string;
 };
 
+export type WebVitalsEvent = {
+  name: 'web_vitals';
+  metric_name: string;
+  metric_value: number;
+  metric_rating: 'good' | 'needs-improvement' | 'poor';
+  metric_id: string;
+  page_path: string;
+};
+
 export type AnalyticsEvent =
   | PageViewEvent
   | OutboundClickEvent
@@ -66,7 +75,8 @@ export type AnalyticsEvent =
   | ProjectCtaClickEvent
   | DownloadClickEvent
   | CitationClickEvent
-  | PageNotFoundEvent;
+  | PageNotFoundEvent
+  | WebVitalsEvent;
 
 /**
  * GA4 silently drops an event whose name exceeds 40 characters or that carries
