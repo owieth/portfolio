@@ -66,6 +66,40 @@ describe('isValidEvent', () => {
     for (const event of events) expect(isValidEvent(event)).toBe(true);
   });
 
+  it('accepts the wo-haere throw funnel events', () => {
+    const events: AnalyticsEvent[] = [
+      { name: 'throw_started', input_method: 'drag' },
+      { name: 'throw_input_method', input_method: 'fling' },
+      { name: 'throw_input_method', input_method: 'tap' },
+      { name: 'throw_input_method', input_method: 'keyboard' },
+      { name: 'throw_abandoned', input_method: 'drag' },
+      {
+        name: 'throw_completed',
+        outcome: 'preich',
+        throw_quality: 'sufer',
+        canton: 'BE',
+        municipality: 'Bern',
+        elevation: 542,
+        distance_km: 0,
+        bearing: 'N',
+        water: false,
+      },
+      {
+        name: 'throw_completed',
+        outcome: 'dernaebe',
+        throw_quality: 'chnorz',
+        miss_reason: 'usland',
+      },
+      { name: 'throw_off_map' },
+      { name: 'throw_api_error', status: 500 },
+      { name: 'shared_throw_opened' },
+      { name: 'panel_toggle', open: true },
+      { name: 'map_engaged' },
+    ];
+
+    for (const event of events) expect(isValidEvent(event)).toBe(true);
+  });
+
   it('accepts the seeded web_vitals event', () => {
     expect(
       isValidEvent({
@@ -79,7 +113,7 @@ describe('isValidEvent', () => {
     ).toBe(true);
   });
 
-  it('accepts the wo-haere throw funnel events', () => {
+  it('accepts the wo-haere share, settings and collection events', () => {
     const events: AnalyticsEvent[] = [
       { name: 'share_attempt' },
       { name: 'share_result', share_method: 'native', outcome: 'shared' },

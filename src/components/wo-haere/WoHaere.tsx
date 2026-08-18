@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useCallback, useRef, useState } from 'react';
 
+import { track } from '@/lib/analytics/track';
 import Pfyl from '@/components/wo-haere/Pfyl';
 import Resultatcharte, {
   type Resultat,
@@ -19,7 +20,6 @@ import Yschtellige from '@/components/wo-haere/Yschtellige';
 import Zieuhilf from '@/components/wo-haere/Zieuhilf';
 // Attribution is not rendered here: maplibre shows it from the source specs
 // (© swisstopo on the raster source, OpenFreeMap/OSM from the world style).
-import { track } from '@/lib/analytics/track';
 import {
   AKTIONE,
   APP,
@@ -66,6 +66,9 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
   const [ziel, setZiel] = useState<{ x: number; y: number } | null>(null);
   const [wurfNr, setWurfNr] = useState(0);
   const [stil, setStil] = useState<WurfStil>('sufer');
+  // The throw's own style, captured at launch so the completion event can carry
+  // it once the API resolves — a ref so `zeigResultat` need not depend on it.
+  const stilRef = useRef<WurfStil>('sufer');
   const [wartendOrt, setWartendOrt] = useState<LatLon | null>(null);
   const [resultat, setResultat] = useState<Resultat | null>(null);
   const [laufend, setLaufend] = useState(false);
@@ -104,6 +107,27 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
         isPreich,
       };
       merkWurf(eintrag);
+
+      track(
+        wurf.art === 'preich'
+          ? {
+              name: 'throw_completed',
+              outcome: 'preich',
+              throw_quality: stilRef.current,
+              canton: wurf.kanton,
+              municipality: wurf.gmeind,
+              elevation: wurf.hoechi,
+              distance_km: wurf.distanzKm,
+              bearing: wurf.richtig,
+              water: wurf.wasser,
+            }
+          : {
+              name: 'throw_completed',
+              outcome: 'dernaebe',
+              throw_quality: stilRef.current,
+              miss_reason: wurf.grund,
+            },
+      );
 
       // Milestones fire on the state transition this throw causes, read from the
       // pre-throw snapshot rather than a render-derived flag that would misfire
@@ -152,8 +176,14 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
         });
         if (!res.ok) throw new Error(String(res.status));
         zeigResultat((await res.json()) as Wurf, ort);
-      } catch {
+      } catch (error) {
         setFähler(true);
+        const status =
+          error instanceof Error ? Number.parseInt(error.message, 10) : NaN;
+        track({
+          name: 'throw_api_error',
+          status: Number.isNaN(status) ? null : status,
+        });
       } finally {
         setLaufend(false);
       }
@@ -172,6 +202,7 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
       setTeiletext(AKTIONE.teile);
       setWurfNr(n => n + 1);
       setStil(wurfStil);
+      stilRef.current = wurfStil;
 
       const container = handle.container();
 
@@ -215,6 +246,7 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
       });
       if (yschtellige.ton) tonDernaebe();
       setLaufend(false);
+      track({ name: 'throw_off_map' });
       return;
     }
 
@@ -228,6 +260,7 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
    */
   const charteZwaeg = useCallback(() => {
     if (!startWurf) return;
+    track({ name: 'shared_throw_opened' });
     const handle = charteRef.current;
     handle?.zeigOrt(startWurf);
     setWurfNr(n => n + 1);
@@ -366,7 +399,10 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
           type="button"
           aria-label={YTEXT.titu}
           aria-expanded={paneeOffe}
-          onClick={() => setPaneeOffe(o => !o)}
+          onClick={() => {
+            track({ name: 'panel_toggle', open: !paneeOffe });
+            setPaneeOffe(o => !o);
+          }}
           className="pointer-events-auto grid size-10 place-items-center rounded-xl bg-white/90 text-lg shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 dark:bg-stone-900/90"
         >
           {paneeOffe ? '✕' : '☰'}
