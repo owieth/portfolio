@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { track } from '@/lib/analytics/track';
 import { AKTIONE, WURFARTE } from '@/lib/wo-haere/data/bern';
 import { cn } from '@/lib/wo-haere/cn';
 import { startZieh, whoosh, type ZiehTon } from '@/lib/wo-haere/ton';
@@ -74,6 +75,9 @@ export default function Wurfsteuerig({
 
   const art = wurfart === 'schlüder' ? ZUG_ART.schlüder : ZUG_ART.zieh;
 
+  // The pointer-drag path serves both drag modes; the mode names the method.
+  const dragMethod = wurfart === 'schlüder' ? 'fling' : 'drag';
+
   /** The dart's resting spot, in map-container pixels. */
   const startPixel = useCallback(() => {
     const h = handleRef.current?.getBoundingClientRect();
@@ -112,8 +116,9 @@ export default function Wurfsteuerig({
       setChraft(0);
       // The pointer press is the gesture that lets audio start at all.
       if (ton) ziehTonRef.current = startZieh();
+      track({ name: 'throw_started', input_method: dragMethod });
     },
-    [gsperrt, startPixel, ton],
+    [dragMethod, gsperrt, startPixel, ton],
   );
 
   const bewege = useCallback(
@@ -151,12 +156,16 @@ export default function Wurfsteuerig({
     if (!zug) return;
 
     const v = vorschau(zug, art);
-    if (!v.gnue) return;
+    if (!v.gnue) {
+      track({ name: 'throw_abandoned', input_method: dragMethod });
+      return;
+    }
 
     const erg = zugZieu(zug, art, nöieWind(), brettRadius());
     if (ton) whoosh(v.chraft, erg.stil === 'chnorz');
+    track({ name: 'throw_input_method', input_method: dragMethod });
     onWurf(erg);
-  }, [art, brettRadius, onWurf, onZug, ton, tonUs, zieht]);
+  }, [art, brettRadius, dragMethod, onWurf, onZug, ton, tonUs, zieht]);
 
   if (wurfart === 'tipp') {
     return (
@@ -167,6 +176,7 @@ export default function Wurfsteuerig({
           onClick={() => {
             const erg = tippZieu(nöieWind());
             if (ton) whoosh(0.7, erg.stil === 'chnorz');
+            track({ name: 'throw_input_method', input_method: 'tap' });
             onWurf(erg);
           }}
           className={cn(
@@ -214,6 +224,7 @@ export default function Wurfsteuerig({
             brettRadius(),
           );
           if (ton) whoosh(0.57, erg.stil === 'chnorz');
+          track({ name: 'throw_input_method', input_method: 'keyboard' });
           onWurf(erg);
         }}
         className={cn(
