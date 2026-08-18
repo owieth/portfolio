@@ -34,6 +34,7 @@ const Footer = () => (
           <Column>
             <FooterLabel>Resources</FooterLabel>
             <CustomLink link="/design">Design</CustomLink>
+            <CustomLink link="/privacy">Privacy</CustomLink>
           </Column>
         </div>
       </nav>
