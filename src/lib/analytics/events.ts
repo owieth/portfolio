@@ -12,7 +12,16 @@ export type PageViewEvent = {
   page_title?: string;
 };
 
-export type AnalyticsEvent = PageViewEvent;
+export type WebVitalsEvent = {
+  name: 'web_vitals';
+  metric_name: string;
+  metric_value: number;
+  metric_rating: 'good' | 'needs-improvement' | 'poor';
+  metric_id: string;
+  page_path: string;
+};
+
+export type AnalyticsEvent = PageViewEvent | WebVitalsEvent;
 
 /**
  * GA4 silently drops an event whose name exceeds 40 characters or that carries

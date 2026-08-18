@@ -24,6 +24,19 @@ describe('isValidEvent', () => {
     expect(isValidEvent({ name: 'page_view', page_path: '/' })).toBe(true);
   });
 
+  it('accepts the seeded web_vitals event', () => {
+    expect(
+      isValidEvent({
+        name: 'web_vitals',
+        metric_name: 'CLS',
+        metric_value: 70,
+        metric_rating: 'good',
+        metric_id: 'v5-1700000000000-1234567890123',
+        page_path: '/',
+      }),
+    ).toBe(true);
+  });
+
   it('rejects a name longer than the limit', () => {
     const event = {
       name: 'x'.repeat(MAX_EVENT_NAME_LENGTH + 1),
