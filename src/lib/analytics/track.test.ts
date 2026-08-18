@@ -76,4 +76,17 @@ describe('track', () => {
 
     expect(window.dataLayer).toHaveLength(2);
   });
+
+  it('tags the event as internal traffic when the flag is set', async () => {
+    enableAnalytics();
+    grantConsent();
+    vi.stubGlobal('window', { localStorage: { getItem: () => '1' } });
+    const track = await importTrack();
+
+    track(pageView);
+
+    expect(window.dataLayer).toEqual([
+      { event: 'page_view', page_path: '/', traffic_type: 'internal' },
+    ]);
+  });
 });
