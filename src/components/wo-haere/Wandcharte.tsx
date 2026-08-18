@@ -11,6 +11,7 @@ import {
 import { Map as MlMap, Marker, type StyleSpecification } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
+import { track } from '@/lib/analytics/track';
 import { CH_BOUNDS, type LatLon } from '@/lib/wo-haere/geo/ch';
 import {
   CHARTE_STYLE,
@@ -81,6 +82,8 @@ export default function Wandcharte({
   const mapRef = useRef<MlMap | null>(null);
   const markerRef = useRef<Marker[]>([]);
   const rotationRef = useRef<number | null>(null);
+  // First user touch of the globe, tracked once for the component's lifetime.
+  const hasEngagedRef = useRef(false);
   const styleModeRef = useRef<StyleMode>(
     aasicht === 'charte' ? 'papier' : 'wäut',
   );
@@ -99,6 +102,16 @@ export default function Wandcharte({
       rotationRef.current = null;
     }
   }, []);
+
+  // The first mousedown/touchstart/wheel that halts the idle spin: a genuine
+  // user engagement, reported once. `stopRotation` also fires programmatically
+  // (zeigOrt, view changes, cleanup), so tracking lives here, not in it.
+  const engage = useCallback(() => {
+    stopRotation();
+    if (hasEngagedRef.current) return;
+    hasEngagedRef.current = true;
+    track({ name: 'map_engaged' });
+  }, [stopRotation]);
 
   /** Slow idle spin on the globe, paused as soon as the user grabs it. */
   const startRotation = useCallback(
@@ -219,9 +232,9 @@ export default function Wandcharte({
       syncStyle();
     };
     map.on('style.load', onStyleLoad);
-    map.on('mousedown', stopRotation);
-    map.on('touchstart', stopRotation);
-    map.on('wheel', stopRotation);
+    map.on('mousedown', engage);
+    map.on('touchstart', engage);
+    map.on('wheel', engage);
     map.once('load', () => onZwaegRef.current?.());
 
     return () => {
@@ -233,7 +246,7 @@ export default function Wandcharte({
       if (ctxRef.current === ctx) ctxRef.current = null;
     };
     // The map is created once; the view mode is read from a ref.
-  }, [stopRotation, syncStyle]);
+  }, [engage, stopRotation, syncStyle]);
 
   // Move the camera when the view mode changes.
   useEffect(() => {
