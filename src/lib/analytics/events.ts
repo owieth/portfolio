@@ -1,3 +1,6 @@
+import type { DernaebeGrund } from '@/lib/wo-haere/geo/resolveHit';
+import type { WurfStil } from '@/lib/wo-haere/throw/mechanics';
+
 /**
  * The event contract. Every later analytics layer adds a member to this
  * discriminated union rather than inventing its own push shape, so the whole
@@ -67,6 +70,73 @@ export type WebVitalsEvent = {
   page_path: string;
 };
 
+/**
+ * The Wo häre? throw funnel. The client is the single source of truth for these
+ * — the server layer emits `_server`-suffixed names so nothing double-counts.
+ *
+ * `input_method` names the throw mechanism: `tap` is the tipp-mode button,
+ * `drag` and `fling` are the two pointer-drag modes (zieh / schlüder), and
+ * `keyboard` is the Enter/Space fallback. `throw_started` and `throw_abandoned`
+ * only exist on the pointer-drag path, so they carry `drag` | `fling` only.
+ */
+export type ThrowInputMethod = 'drag' | 'tap' | 'fling' | 'keyboard';
+
+export type ThrowStartedEvent = {
+  name: 'throw_started';
+  input_method: 'drag' | 'fling';
+};
+
+export type ThrowInputMethodEvent = {
+  name: 'throw_input_method';
+  input_method: ThrowInputMethod;
+};
+
+export type ThrowAbandonedEvent = {
+  name: 'throw_abandoned';
+  input_method: 'drag' | 'fling';
+};
+
+/**
+ * The geography `zeigResultat()` already has in hand. A `preich` hit carries the
+ * full place; a `dernaebe` miss carries only why it missed (abroad vs border
+ * water). `throw_quality` is the throw's own style, independent of where it
+ * landed.
+ */
+export type ThrowCompletedEvent = {
+  name: 'throw_completed';
+  outcome: 'preich' | 'dernaebe';
+  throw_quality: WurfStil;
+  canton?: string;
+  municipality?: string;
+  elevation?: number | null;
+  distance_km?: number;
+  bearing?: string;
+  water?: boolean;
+  miss_reason?: DernaebeGrund;
+};
+
+export type ThrowOffMapEvent = {
+  name: 'throw_off_map';
+};
+
+export type ThrowApiErrorEvent = {
+  name: 'throw_api_error';
+  status?: number | null;
+};
+
+export type SharedThrowOpenedEvent = {
+  name: 'shared_throw_opened';
+};
+
+export type PanelToggleEvent = {
+  name: 'panel_toggle';
+  open: boolean;
+};
+
+export type MapEngagedEvent = {
+  name: 'map_engaged';
+};
+
 export type AnalyticsEvent =
   | PageViewEvent
   | OutboundClickEvent
@@ -76,7 +146,16 @@ export type AnalyticsEvent =
   | DownloadClickEvent
   | CitationClickEvent
   | PageNotFoundEvent
-  | WebVitalsEvent;
+  | WebVitalsEvent
+  | ThrowStartedEvent
+  | ThrowInputMethodEvent
+  | ThrowAbandonedEvent
+  | ThrowCompletedEvent
+  | ThrowOffMapEvent
+  | ThrowApiErrorEvent
+  | SharedThrowOpenedEvent
+  | PanelToggleEvent
+  | MapEngagedEvent;
 
 /**
  * GA4 silently drops an event whose name exceeds 40 characters or that carries
