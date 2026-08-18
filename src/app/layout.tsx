@@ -1,5 +1,6 @@
 import AnalyticsScripts from '@/components/analytics/AnalyticsScripts';
 import CookieNotice from '@/components/analytics/CookieNotice';
+import OutboundLinkDelegate from '@/components/analytics/OutboundLinkDelegate';
 import PageViewTracker from '@/components/analytics/PageViewTracker';
 import WebVitalsTracker from '@/components/analytics/WebVitalsTracker';
 import { SITE_URL } from '@/lib/site';
@@ -103,6 +104,7 @@ export default function RootLayout({
         />
         {children}
         <CookieNotice />
+        <OutboundLinkDelegate />
         <PageViewTracker />
         <WebVitalsTracker />
         <Analytics />
