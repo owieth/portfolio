@@ -1,4 +1,5 @@
 import AnalyticsScripts from '@/components/analytics/AnalyticsScripts';
+import CookieNotice from '@/components/analytics/CookieNotice';
 import OutboundLinkDelegate from '@/components/analytics/OutboundLinkDelegate';
 import PageViewTracker from '@/components/analytics/PageViewTracker';
 import WebVitalsTracker from '@/components/analytics/WebVitalsTracker';
@@ -102,6 +103,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         {children}
+        <CookieNotice />
         <OutboundLinkDelegate />
         <PageViewTracker />
         <WebVitalsTracker />
