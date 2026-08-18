@@ -1,3 +1,4 @@
+import CookieNotice from '@/components/analytics/CookieNotice';
 import { SITE_URL } from '@/lib/site';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
@@ -97,6 +98,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         {children}
+        <CookieNotice />
         <Analytics />
         <SpeedInsights />
       </body>
