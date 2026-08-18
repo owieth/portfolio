@@ -1,4 +1,5 @@
 import AnalyticsScripts from '@/components/analytics/AnalyticsScripts';
+import OutboundLinkDelegate from '@/components/analytics/OutboundLinkDelegate';
 import PageViewTracker from '@/components/analytics/PageViewTracker';
 import { SITE_URL } from '@/lib/site';
 import { Analytics } from '@vercel/analytics/react';
@@ -100,6 +101,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         {children}
+        <OutboundLinkDelegate />
         <PageViewTracker />
         <Analytics />
         <SpeedInsights />
