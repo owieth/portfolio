@@ -2,6 +2,7 @@ import AnalyticsScripts from '@/components/analytics/AnalyticsScripts';
 import CookieNotice from '@/components/analytics/CookieNotice';
 import OutboundLinkDelegate from '@/components/analytics/OutboundLinkDelegate';
 import PageViewTracker from '@/components/analytics/PageViewTracker';
+import UserPropertiesTracker from '@/components/analytics/UserPropertiesTracker';
 import WebVitalsTracker from '@/components/analytics/WebVitalsTracker';
 import { SITE_URL } from '@/lib/site';
 import { Analytics } from '@vercel/analytics/react';
@@ -106,6 +107,7 @@ export default function RootLayout({
         <CookieNotice />
         <OutboundLinkDelegate />
         <PageViewTracker />
+        <UserPropertiesTracker />
         <WebVitalsTracker />
         <Analytics />
         <SpeedInsights />

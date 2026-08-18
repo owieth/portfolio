@@ -1,6 +1,7 @@
 import { isAnalyticsEnabled } from '@/lib/analytics/config';
 import { resolveConsent } from '@/lib/analytics/consent';
 import { isValidEvent, type AnalyticsEvent } from '@/lib/analytics/events';
+import { isInternalTraffic } from '@/lib/analytics/internal-traffic';
 
 declare global {
   interface Window {
@@ -32,11 +33,18 @@ export const track = (event: AnalyticsEvent): void => {
   if (typeof window === 'undefined') return;
 
   if (process.env.NODE_ENV !== 'production' && !isValidEvent(event)) {
-    console.warn('[analytics] event exceeds GA4 limits, will be dropped', event);
+    console.warn(
+      '[analytics] event exceeds GA4 limits, will be dropped',
+      event,
+    );
   }
 
   const { name, ...params } = event;
 
   window.dataLayer ??= [];
-  window.dataLayer.push({ event: name, ...params });
+  window.dataLayer.push({
+    event: name,
+    ...params,
+    ...(isInternalTraffic() && { traffic_type: 'internal' }),
+  });
 };
