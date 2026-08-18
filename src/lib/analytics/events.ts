@@ -12,7 +12,71 @@ export type PageViewEvent = {
   page_title?: string;
 };
 
-export type AnalyticsEvent = PageViewEvent;
+export type OutboundClickEvent = {
+  name: 'outbound_click';
+  link_url: string;
+  link_text: string;
+  link_domain: string;
+};
+
+export type InternalLinkClickEvent = {
+  name: 'internal_link_click';
+  link_url: string;
+  link_text: string;
+  link_domain: string;
+};
+
+export type NavClickEvent = {
+  name: 'nav_click';
+  link_url: string;
+  link_text: string;
+  nav_location: 'header' | 'footer';
+};
+
+export type ProjectCtaClickEvent = {
+  name: 'project_cta_click';
+  project_slug: string;
+  cta_label: string;
+};
+
+export type DownloadClickEvent = {
+  name: 'download_click';
+  project_slug: string;
+  link_url: string;
+};
+
+export type CitationClickEvent = {
+  name: 'citation_click';
+  link_url: string;
+  link_text: string;
+  link_domain: string;
+};
+
+export type PageNotFoundEvent = {
+  name: 'page_not_found';
+  page_path: string;
+  referrer: string;
+};
+
+export type WebVitalsEvent = {
+  name: 'web_vitals';
+  metric_name: string;
+  metric_value: number;
+  metric_rating: 'good' | 'needs-improvement' | 'poor';
+  metric_id: string;
+  page_path: string;
+};
+
+export type AnalyticsEvent =
+  | PageViewEvent
+  | OutboundClickEvent
+  | InternalLinkClickEvent
+  | NavClickEvent
+  | ProjectCtaClickEvent
+  | DownloadClickEvent
+  | CitationClickEvent
+  | PageNotFoundEvent
+  | WebVitalsEvent;
 
 /**
  * GA4 silently drops an event whose name exceeds 40 characters or that carries

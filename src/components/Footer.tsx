@@ -17,9 +17,13 @@ const Footer = () => (
         <div className="grid grid-cols-4 items-start gap-8 py-16 sm:grid-cols-8 lg:grid-cols-12">
           <Column>
             <FooterLabel>Pages</FooterLabel>
-            <CustomLink link="/">Home</CustomLink>
-            <CustomLink link="/projects">Projects</CustomLink>
-            {/* <CustomLink link="/gallery">Gallery</CustomLink> */}
+            <CustomLink link="/" nav>
+              Home
+            </CustomLink>
+            <CustomLink link="/projects" nav>
+              Projects
+            </CustomLink>
+            {/* <CustomLink link="/gallery" nav>Gallery</CustomLink> */}
           </Column>
 
           <Column>
@@ -34,6 +38,7 @@ const Footer = () => (
           <Column>
             <FooterLabel>Resources</FooterLabel>
             <CustomLink link="/design">Design</CustomLink>
+            <CustomLink link="/privacy">Privacy</CustomLink>
           </Column>
         </div>
       </nav>
