@@ -1,4 +1,7 @@
+import AnalyticsScripts from '@/components/analytics/AnalyticsScripts';
 import CookieNotice from '@/components/analytics/CookieNotice';
+import PageViewTracker from '@/components/analytics/PageViewTracker';
+import WebVitalsTracker from '@/components/analytics/WebVitalsTracker';
 import { SITE_URL } from '@/lib/site';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
@@ -92,6 +95,7 @@ export default function RootLayout({
 
   return (
     <html lang="en">
+      <AnalyticsScripts />
       <body className={`${GeistSans.variable} ${GeistMono.variable} font-sans`}>
         <script
           type="application/ld+json"
@@ -99,6 +103,8 @@ export default function RootLayout({
         />
         {children}
         <CookieNotice />
+        <PageViewTracker />
+        <WebVitalsTracker />
         <Analytics />
         <SpeedInsights />
       </body>

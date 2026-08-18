@@ -1,6 +1,13 @@
 'use client';
 
-import { denyAll, grantAll, readConsent } from '@/lib/analytics/consent';
+import {
+  ALL_DENIED,
+  GRANTED_DEFAULT,
+  isPrivacySignalOn,
+  readConsentCookie,
+  writeConsentCookie,
+  type ConsentState,
+} from '@/lib/analytics/consent';
 import { cn } from '@/lib/wo-haere/cn';
 import { Toast } from '@base-ui/react/toast';
 import Link from 'next/link';
@@ -9,17 +16,30 @@ import { useEffect, useRef } from 'react';
 const NOTICE_ID = 'ow-consent-notice';
 
 /**
- * Shows the notice once, only when no choice is stored in the `ow_consent`
- * cookie. `timeout: 0` keeps it up until the visitor acts; `priority: 'low'`
- * lets Base UI announce it politely (equivalent to `aria-live="polite"`), so no
- * second live region is added.
+ * Persists the visitor's choice and pushes a Consent Mode update so GA4 reacts
+ * within the same page view — the `beforeInteractive` bootstrap only sets the
+ * initial default.
+ */
+const applyConsent = (state: ConsentState): void => {
+  writeConsentCookie(state);
+  window.gtag?.('consent', 'update', state);
+};
+
+/**
+ * Shows the notice once — skipped when a prior choice is stored in `ow_consent`
+ * or a browser privacy signal (GPC/DNT) already forces an opt-out. `timeout: 0`
+ * keeps it up until the visitor acts; `priority: 'low'` lets Base UI announce it
+ * politely (equivalent to `aria-live="polite"`), so no second live region is
+ * added.
  */
 function ConsentTrigger() {
   const manager = Toast.useToastManager();
   const shown = useRef(false);
 
   useEffect(() => {
-    if (shown.current || readConsent() !== null) return;
+    if (shown.current || isPrivacySignalOn() || readConsentCookie() !== null) {
+      return;
+    }
     shown.current = true;
     manager.add({
       id: NOTICE_ID,
@@ -52,7 +72,7 @@ function ConsentToasts() {
         <button
           type="button"
           onClick={() => {
-            grantAll();
+            applyConsent(GRANTED_DEFAULT);
             close(toast.id);
           }}
           className="bg-foreground text-background rounded-full px-4 py-1.5 text-sm font-medium hover:opacity-90"
@@ -62,7 +82,7 @@ function ConsentToasts() {
         <button
           type="button"
           onClick={() => {
-            denyAll();
+            applyConsent(ALL_DENIED);
             close(toast.id);
           }}
           className="border-line hover:border-foreground rounded-full border px-4 py-1.5 text-sm font-medium"
