@@ -44,7 +44,11 @@ export default function WoHaereCaseStudy() {
           component in here would land ~250KB gz of maplibre on a page that is
           mostly prose.
         */}
-        <ProjectLinks links={project.links} className="mt-2" />
+        <ProjectLinks
+          links={project.links}
+          slug={project.slug}
+          className="mt-2"
+        />
       </header>
 
       <Image
@@ -319,7 +323,7 @@ export default function WoHaereCaseStudy() {
       </Section>
 
       <div className="border-foreground/20 mt-16 border-t pt-8">
-        <ProjectLinks links={project.links} />
+        <ProjectLinks links={project.links} slug={project.slug} />
       </div>
     </article>
   );
