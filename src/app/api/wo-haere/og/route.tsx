@@ -1,5 +1,6 @@
 import { ImageResponse } from 'next/og';
 
+import { trackServer } from '@/lib/analytics/server/track-server';
 import { APP, RESULTAT, kantonsName } from '@/lib/wo-haere/data/bern';
 import { resolveHit } from '@/lib/wo-haere/geo/resolveHit';
 import { noechschtsZiu } from '@/lib/wo-haere/reactions';
@@ -10,15 +11,18 @@ export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
 export async function GET(request: Request) {
+  const cookieHeader = request.headers.get('cookie');
   const wurfParam = parseWurf(new URL(request.url).searchParams.get('wurf'));
 
   let titu: string = APP.name;
   let underTitu: string = APP.tagline;
   let zeile = '';
+  let resolved = false;
 
   if (wurfParam) {
     try {
       const wurf = await resolveHit(wurfParam);
+      resolved = wurf.art === 'preich';
       if (wurf.art === 'preich') {
         const nz = noechschtsZiu(wurfParam);
         titu = nz?.ziu.name ?? wurf.gmeind;
@@ -35,6 +39,14 @@ export async function GET(request: Request) {
       // Fall back to the generic card rather than failing the image.
     }
   }
+
+  // Fires on every request, so crawlers and unfurl bots inflate it; most such
+  // hits carry no `_ga` cookie and land as `client_source: 'synthetic'`. Read
+  // it as a noisy share-reach proxy, not a clean count.
+  trackServer(
+    { name: 'og_unfurl_server', has_wurf: Boolean(wurfParam), resolved },
+    cookieHeader,
+  );
 
   return new ImageResponse(
     <div
