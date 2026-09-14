@@ -15,7 +15,7 @@
     "simulate:wo-haere": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/wo-haere-simulate.mjs"
   },
   "dependencies": {
-    "@base-ui/react": "1.7.0",
+    "@base-ui/react": "1.8.0",
     "@next/third-parties": "16.3.4",
     "@vercel/analytics": "2.0.1",
     "@vercel/speed-insights": "2.0.0",
