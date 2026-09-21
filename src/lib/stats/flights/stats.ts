@@ -10,6 +10,7 @@ import type {
   CountryVisit,
   Flight,
   FlightLeg,
+  FlightSuperlatives,
   FlightTotals,
   ManufacturerUsage,
   RouteRank,
@@ -302,4 +303,72 @@ export function countryVisits(legs: FlightLeg[]): CountryVisit[] {
     (x, y) =>
       y.visits - x.visits || x.country.code.localeCompare(y.country.code),
   );
+}
+
+/**
+ * A total order on the flight itself, earliest first: the day it was flown,
+ * then its designator. Nothing here reads a distance — this is only ever the
+ * tie-break under one.
+ */
+const byFlight = (x: FlightLeg, y: FlightLeg): number =>
+  x.flight.flownOn.localeCompare(y.flight.flownOn) ||
+  `${x.flight.airline} ${x.flight.flightNumber}`.localeCompare(
+    `${y.flight.airline} ${y.flight.flightNumber}`,
+  );
+
+/**
+ * Whether `leg` beats `best`, with `direction` saying which end is winning:
+ * `1` for the longest, `-1` for the shortest.
+ *
+ * The tie-break is load-bearing rather than defensive. `BSL -> AMS` and
+ * `AMS -> BSL` are both in the seed and both 560.8 km — and *exactly* so, not
+ * nearly: `centralAngle` is symmetric term by term in its two arguments, so the
+ * two directions of a route come out bit-identical. The shortest flight is a
+ * real tie.
+ *
+ * The obvious way to settle it — whichever row turned up first — answers
+ * differently depending on who is asking. `loadFlights` orders newest first and
+ * `seed.fixture.ts` reads oldest first, so the page and its test would disagree
+ * about which of the two Basel legs is the shortest. Ordering on the flight
+ * instead is what makes them agree.
+ *
+ * `byFlight` runs the same way at both ends, deliberately: a tie answers with
+ * the flight taken first whichever end of the log you are standing at.
+ */
+const beats = (leg: FlightLeg, best: FlightLeg, direction: 1 | -1): boolean => {
+  const byDistance = (leg.distanceKm - best.distanceKm) * direction;
+
+  return byDistance > 0 || (byDistance === 0 && byFlight(leg, best) < 0);
+};
+
+/**
+ * The longest and shortest flight — the two superlatives Flighty leads with,
+ * and the only figures on the page that name one flight rather than summarising
+ * every flight.
+ *
+ * One pass holding two running bests rather than a sort. A sort would have to
+ * take opposite ends of the array for the two answers, which silently inverts
+ * the tie-break at one of them: the first of a tied group and the last of it
+ * are different flights.
+ *
+ * The seed's longest is the New York leg and not the Boston one, 6,309 km
+ * against 6,010. That is the open jaw showing up in the numbers rather than a
+ * rounding artefact — out to Boston and back from New York really are two
+ * different distances.
+ */
+export function flightSuperlatives(legs: FlightLeg[]): FlightSuperlatives {
+  let longest: FlightLeg | null = null;
+  let shortest: FlightLeg | null = null;
+
+  for (const leg of legs) {
+    if (!longest || beats(leg, longest, 1)) {
+      longest = leg;
+    }
+
+    if (!shortest || beats(leg, shortest, -1)) {
+      shortest = leg;
+    }
+  }
+
+  return { longest, shortest };
 }

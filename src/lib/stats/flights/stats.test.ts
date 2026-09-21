@@ -9,6 +9,7 @@ import {
   aircraftUsage,
   airportVisits,
   countryVisits,
+  flightSuperlatives,
   flightTotals,
   manufacturerMix,
   rankAirlines,
@@ -411,5 +412,58 @@ describe('countryVisits', () => {
 
   it('answers with nothing for no legs', () => {
     expect(countryVisits([])).toEqual([]);
+  });
+});
+
+describe('flightSuperlatives', () => {
+  const { longest, shortest } = flightSuperlatives(SEED_LEGS);
+
+  it('picks the longest and shortest flight of the seed', () => {
+    // The longest is the New York leg, not the Boston one — the open jaw makes
+    // the two transatlantic legs genuinely different lengths.
+    expect(longest?.from).toBe(AIRPORTS.JFK);
+    expect(longest?.to).toBe(AIRPORTS.ZRH);
+    expect(longest?.flight.flightNumber).toBe('17');
+    expect(longest?.distanceKm).toBeCloseTo(6309.3, 1);
+
+    expect(shortest?.from).toBe(AIRPORTS.BSL);
+    expect(shortest?.to).toBe(AIRPORTS.AMS);
+    expect(shortest?.flight.flightNumber).toBe('1982');
+    expect(shortest?.distanceKm).toBeCloseTo(560.8, 1);
+  });
+
+  it('has a real tie to break at the short end', () => {
+    // Not `toBeCloseTo`: `centralAngle` is symmetric in its arguments, so the
+    // two directions of the Basel route come out bit-identical. This is what
+    // the tie-break below exists for.
+    const basel = SEED_LEGS.filter(({ from, to }) =>
+      [from.iata, to.iata].every(iata => iata === 'AMS' || iata === 'BSL'),
+    );
+
+    expect(basel).toHaveLength(2);
+    expect(basel[0].distanceKm).toBe(basel[1].distanceKm);
+  });
+
+  it('breaks a distance tie on the day flown rather than on input order', () => {
+    // `loadFlights` orders newest first and this fixture reads oldest first, so
+    // an insertion-order tie-break would make the page and this test disagree
+    // about which Basel leg is the shortest.
+    const reversed = flightSuperlatives([...SEED_LEGS].reverse());
+
+    expect(reversed.shortest?.flight.id).toBe(shortest?.flight.id);
+    expect(reversed.longest?.flight.id).toBe(longest?.flight.id);
+  });
+
+  it('answers with the same flight twice for a log of one', () => {
+    const only = leg('ZRH', 'BER', 650);
+
+    expect(flightSuperlatives([only])).toEqual({
+      longest: only,
+      shortest: only,
+    });
+  });
+
+  it('answers with nothing for no legs', () => {
+    expect(flightSuperlatives([])).toEqual({ longest: null, shortest: null });
   });
 });
