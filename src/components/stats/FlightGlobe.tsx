@@ -23,6 +23,11 @@ import { globeStyle } from '@/lib/stats/maplibre/styles';
 import { formatDistanceKm } from '@/lib/stats/flights/format';
 import { greatCirclePath } from '@/lib/stats/flights/geo';
 import { airportVisits, rankRoutes } from '@/lib/stats/flights/stats';
+import {
+  AIRPORT_VISIT_TIERS,
+  ROUTE_FLIGHT_TIERS,
+  stepExpression,
+} from '@/lib/stats/flights/tiers';
 import type { FlightLeg } from '@/lib/stats/flights/types';
 import { prefersReducedMotion } from '@/lib/wo-haere/motion';
 
@@ -148,21 +153,15 @@ function buildScene(legs: FlightLeg[]): Scene {
     }),
   );
 
-  // Flighty's scale: once, a handful, a lot. Absolute rather than interpolated
-  // against the observed maximum, so a route keeps the weight it has earned
-  // instead of being rescaled by every flight added after it. The tiers are
-  // there to make a once-flown route findable, not to be proportional — which
-  // is also why the 10+ stop stays even though no line reaches it yet.
-  const lineWidth: Expression = ['step', ['get', 'flights'], 1, 2, 2.25, 10, 4];
-  const circleRadius: Expression = [
-    'step',
-    ['get', 'visits'],
-    2.5,
-    2,
-    4,
-    10,
-    6.5,
-  ];
+  // The tiers themselves live in `tiers.ts`, because the passport share card
+  // resolves the same steps in plain JavaScript and the two renderers have to
+  // agree about what "a lot" means. `tiers.test.ts` pins these expressions to
+  // the literals that used to sit here.
+  const lineWidth = stepExpression('flights', ROUTE_FLIGHT_TIERS) as Expression;
+  const circleRadius = stepExpression(
+    'visits',
+    AIRPORT_VISIT_TIERS,
+  ) as Expression;
 
   return {
     lineWidth,
