@@ -50,6 +50,18 @@ export interface Airline {
   onColour: string;
 }
 
+/**
+ * A type of aeroplane. Keyed in the registry on the string already stored in
+ * `flights.aircraft`, so `icao` is the value rather than the key — see the
+ * docblock in `aircraft.ts` for why both are worth carrying.
+ */
+export interface Aircraft {
+  name: string;
+  manufacturer: string;
+  /** ICAO Doc 8643 type designator, four characters. */
+  icao: string;
+}
+
 export interface Flight {
   id: string;
   /** `YYYY-MM-DD`. The column is a `date`, so there is no time and no zone. */
