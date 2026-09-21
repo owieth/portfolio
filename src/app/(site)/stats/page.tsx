@@ -160,6 +160,7 @@ export default async function StatsPage() {
           <Stat
             label="Around the Earth"
             value={`${timesAroundTheEarth.toFixed(2)}x`}
+            hint={`One lap is ${formatDistanceKm(EARTH_CIRCUMFERENCE_KM)}`}
           />
         </dl>
       </Section>
