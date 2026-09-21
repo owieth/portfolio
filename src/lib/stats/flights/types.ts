@@ -35,6 +35,21 @@ export interface Country {
   name: string;
 }
 
+/**
+ * A carrier. No logo field, and deliberately: airline logos are registered
+ * trademarks, and every free set is either unlicensed or explicitly disclaims
+ * the marks it ships. The brand colour with the IATA code set in type on it is
+ * the version that infringes nothing — see the docblock in `airlines.ts`.
+ */
+export interface Airline {
+  iata: string;
+  name: string;
+  /** Uppercase `#RRGGBB`. */
+  colour: string;
+  /** Whichever of white or black clears WCAG AA against `colour`. */
+  onColour: string;
+}
+
 export interface Flight {
   id: string;
   /** `YYYY-MM-DD`. The column is a `date`, so there is no time and no zone. */
