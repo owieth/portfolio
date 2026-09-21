@@ -2,6 +2,7 @@ import 'server-only';
 
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
+import type { Database } from '@/lib/supabase/database.types';
 import {
   SUPABASE_PUBLISHABLE_KEY,
   SUPABASE_URL,
@@ -26,15 +27,20 @@ import {
  * persistence on, which on a server with no `localStorage` falls back to memory
  * storage and can start a refresh ticker for a session that will never exist.
  *
- * Untyped for now — `createClient<Database>` arrives alongside the generated
- * types once there is a schema to generate them from.
+ * `Database` is generated from the schema, never hand-written:
+ *
+ *   supabase gen types typescript --local > src/lib/supabase/database.types.ts
+ *
+ * Regenerate whenever a migration lands. Without the generic, `data` comes back
+ * effectively untyped and the pure derivations downstream have no enforced
+ * input contract.
  */
-let client: SupabaseClient | null = null;
+let client: SupabaseClient<Database> | null = null;
 
-export const getSupabaseClient = (): SupabaseClient | null => {
+export const getSupabaseClient = (): SupabaseClient<Database> | null => {
   if (!isSupabaseEnabled) return null;
 
-  client ??= createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+  client ??= createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
     auth: {
       persistSession: false,
       autoRefreshToken: false,
