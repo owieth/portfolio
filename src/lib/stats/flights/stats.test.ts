@@ -1,9 +1,11 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { AIRPORTS } from '@/lib/stats/flights/airports';
+import { COUNTRIES } from '@/lib/stats/flights/countries';
 import { SEED } from '@/lib/stats/flights/seed.fixture';
 import {
   airportVisits,
+  countryVisits,
   flightTotals,
   rankRoutes,
   toLegs,
@@ -211,5 +213,59 @@ describe('airportVisits', () => {
       ['BOS', 1],
       ['JFK', 1],
     ]);
+  });
+});
+
+describe('countryVisits', () => {
+  it('counts the same endpoints airportVisits does', () => {
+    // The two have to agree: 52 endpoints across 26 legs, and Switzerland on
+    // 22 of them (Zurich 20, Geneva 2).
+    const visits = countryVisits(SEED_LEGS);
+    const total = visits.reduce((sum, { visits: n }) => sum + n, 0);
+
+    expect(total).toBe(52);
+    expect(visits[0]).toMatchObject({ visits: 22 });
+    expect(visits[0].country).toBe(COUNTRIES.CH);
+  });
+
+  it('orders by visits, then by code', () => {
+    // This is the order the flag row renders in, so it is the order under test.
+    expect(
+      countryVisits(SEED_LEGS).map(({ country, visits }) => [
+        country.code,
+        visits,
+      ]),
+    ).toEqual([
+      ['CH', 22],
+      ['GB', 8],
+      ['AT', 4],
+      ['NO', 4],
+      ['DE', 2],
+      ['ES', 2],
+      ['FR', 2],
+      ['GR', 2],
+      ['NL', 2],
+      ['PT', 2],
+      ['US', 2],
+    ]);
+  });
+
+  it('counts a domestic leg twice', () => {
+    // Endpoint appearances, not legs touching the country — the same rule
+    // `airportVisits` uses for a turnaround.
+    expect(countryVisits([leg('ZRH', 'GVA', 224.3)])).toEqual([
+      { country: COUNTRIES.CH, visits: 2 },
+    ]);
+  });
+
+  it('follows the registry rather than the city', () => {
+    // EuroAirport is in Basel and in France, and the count follows the code.
+    expect(
+      countryVisits([leg('AMS', 'BSL', 560.8)]).map(({ country }) => country),
+    ).toEqual([COUNTRIES.FR, COUNTRIES.NL]);
+  });
+
+  it('answers with nothing for no legs', () => {
+    expect(countryVisits([])).toEqual([]);
   });
 });
