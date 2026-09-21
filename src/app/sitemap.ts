@@ -1,5 +1,6 @@
 import { projects } from '@/data/projects';
 import { SITE_LAST_MODIFIED, SITE_URL } from '@/lib/site';
+import { isStatsEnabled } from '@/lib/stats/config';
 import type { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -16,12 +17,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'monthly',
       priority: 0.9,
     },
-    {
-      url: `${SITE_URL}/stats`,
-      lastModified: SITE_LAST_MODIFIED,
-      changeFrequency: 'monthly',
-      priority: 0.9,
-    },
+    // Hidden rather than absent: the route stays reachable, it is just not
+    // advertised while the flights are mocked. `as const` for the same reason
+    // the spread below needs it.
+    ...(isStatsEnabled
+      ? [
+          {
+            url: `${SITE_URL}/stats`,
+            lastModified: SITE_LAST_MODIFIED,
+            changeFrequency: 'monthly' as const,
+            priority: 0.9,
+          },
+        ]
+      : []),
     // Case studies only. A project's own interactive route — /projects/wo-haere/play
     // — is the thing itself rather than a document, so there is nothing stable on it
     // to index. `as const` is load-bearing: the return-type annotation does not reach

@@ -1,5 +1,6 @@
 'use client';
 
+import { isStatsEnabled } from '@/lib/stats/config';
 import { track } from '@/lib/analytics/track';
 import { handledMarker, linkFields } from '@/lib/analytics/links';
 import Link from 'next/link';
@@ -9,7 +10,7 @@ import { type MouseEvent, type ReactNode } from 'react';
 const navigation = [
   { name: 'Home', href: '/' },
   { name: 'Projects', href: '/projects' },
-  { name: 'Stats', href: '/stats' },
+  ...(isStatsEnabled ? [{ name: 'Stats', href: '/stats' }] : []),
   // { name: 'Gallery', href: '/gallery' },
 ];
 
