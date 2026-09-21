@@ -1,0 +1,14 @@
+# Supply-chain hardening. No `packages:` key on purpose — this is a single-package
+# repo and the file exists only because pnpm reads these settings from nowhere else.
+
+# Quarantine every release for its first seven days, so a compromised publish has
+# to survive a week of public scrutiny before it can enter the lockfile. The cost
+# is that Dependabot bumps of fresh releases fail to install until they age out.
+minimumReleaseAge: 10080
+
+# Refuse transitive dependencies resolved from git, file or tarball URLs; those
+# bypass the registry and its provenance entirely.
+blockExoticSubdeps: true
+
+# Reject a package whose signature trust level drops between resolutions.
+trustPolicy: no-downgrade
