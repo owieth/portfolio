@@ -23,8 +23,16 @@ export interface Airport {
   name: string;
   city: string;
   country: string;
+  /** ISO 3166-1 alpha-2, and a key into `COUNTRIES`. */
+  countryCode: string;
   lat: number;
   lon: number;
+}
+
+export interface Country {
+  /** ISO 3166-1 alpha-2, uppercase. */
+  code: string;
+  name: string;
 }
 
 export interface Flight {

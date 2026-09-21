@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { AIRPORTS, airport } from '@/lib/stats/flights/airports';
+import { country } from '@/lib/stats/flights/countries';
 
 const ENTRIES = Object.entries(AIRPORTS);
 
@@ -28,10 +29,32 @@ describe('AIRPORTS', () => {
     expect(countries.size).toBe(11);
   });
 
+  it('gives every entry a well-formed alpha-2 country code', () => {
+    for (const [code, entry] of ENTRIES) {
+      expect(entry.countryCode, code).toMatch(/^[A-Z]{2}$/);
+    }
+  });
+
+  it('agrees with the country registry on every code', () => {
+    // `satisfies Record<string, Airport>` types `country` and `countryCode` as
+    // two independent strings, so an entry can name Switzerland and carry `FR`
+    // and still compile. This is the only thing that says they must agree.
+    for (const [code, entry] of ENTRIES) {
+      expect(country(entry.countryCode)?.name, code).toBe(entry.country);
+    }
+  });
+
+  it('spans the same eleven countries by code as by name', () => {
+    const codes = new Set(ENTRIES.map(([, entry]) => entry.countryCode));
+
+    expect(codes.size).toBe(11);
+  });
+
   it('puts EuroAirport in France', () => {
     // Deliberate, and the one entry someone will eventually "fix". Basel's
     // airport sits on French soil under joint Franco-Swiss operation.
     expect(AIRPORTS.BSL.country).toBe('France');
+    expect(AIRPORTS.BSL.countryCode).toBe('FR');
   });
 
   it('keeps every coordinate on the globe', () => {
