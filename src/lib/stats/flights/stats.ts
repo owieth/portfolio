@@ -10,7 +10,10 @@ import type {
   CountryVisit,
   Flight,
   FlightLeg,
+  FlightSuperlatives,
   FlightTotals,
+  HaulBand,
+  HaulBandKey,
   ManufacturerUsage,
   RouteRank,
 } from '@/lib/stats/flights/types';
@@ -302,4 +305,132 @@ export function countryVisits(legs: FlightLeg[]): CountryVisit[] {
     (x, y) =>
       y.visits - x.visits || x.country.code.localeCompare(y.country.code),
   );
+}
+
+/**
+ * A total order on the flight itself, earliest first: the day it was flown,
+ * then its designator. Nothing here reads a distance — this is only ever the
+ * tie-break under one.
+ */
+const byFlight = (x: FlightLeg, y: FlightLeg): number =>
+  x.flight.flownOn.localeCompare(y.flight.flownOn) ||
+  `${x.flight.airline} ${x.flight.flightNumber}`.localeCompare(
+    `${y.flight.airline} ${y.flight.flightNumber}`,
+  );
+
+/**
+ * Whether `leg` beats `best`, with `direction` saying which end is winning:
+ * `1` for the longest, `-1` for the shortest.
+ *
+ * The tie-break is load-bearing rather than defensive. `BSL -> AMS` and
+ * `AMS -> BSL` are both in the seed and both 560.8 km — and *exactly* so, not
+ * nearly: `centralAngle` is symmetric term by term in its two arguments, so the
+ * two directions of a route come out bit-identical. The shortest flight is a
+ * real tie.
+ *
+ * The obvious way to settle it — whichever row turned up first — answers
+ * differently depending on who is asking. `loadFlights` orders newest first and
+ * `seed.fixture.ts` reads oldest first, so the page and its test would disagree
+ * about which of the two Basel legs is the shortest. Ordering on the flight
+ * instead is what makes them agree.
+ *
+ * `byFlight` runs the same way at both ends, deliberately: a tie answers with
+ * the flight taken first whichever end of the log you are standing at.
+ */
+const beats = (leg: FlightLeg, best: FlightLeg, direction: 1 | -1): boolean => {
+  const byDistance = (leg.distanceKm - best.distanceKm) * direction;
+
+  return byDistance > 0 || (byDistance === 0 && byFlight(leg, best) < 0);
+};
+
+/**
+ * The longest and shortest flight — the two superlatives Flighty leads with,
+ * and the only figures on the page that name one flight rather than summarising
+ * every flight.
+ *
+ * One pass holding two running bests rather than a sort. A sort would have to
+ * take opposite ends of the array for the two answers, which silently inverts
+ * the tie-break at one of them: the first of a tied group and the last of it
+ * are different flights.
+ *
+ * The seed's longest is the New York leg and not the Boston one, 6,309 km
+ * against 6,010. That is the open jaw showing up in the numbers rather than a
+ * rounding artefact — out to Boston and back from New York really are two
+ * different distances.
+ */
+export function flightSuperlatives(legs: FlightLeg[]): FlightSuperlatives {
+  let longest: FlightLeg | null = null;
+  let shortest: FlightLeg | null = null;
+
+  for (const leg of legs) {
+    if (!longest || beats(leg, longest, 1)) {
+      longest = leg;
+    }
+
+    if (!shortest || beats(leg, shortest, -1)) {
+      shortest = leg;
+    }
+  }
+
+  return { longest, shortest };
+}
+
+/**
+ * Flighty's own definition of long haul, copied rather than invented:
+ * https://flighty.com/help/terminology
+ */
+const LONG_HAUL_KM = 3940;
+
+/**
+ * Ours, and with no authority behind it at all — said out loud because the
+ * number above has some and this one does not. It sits roughly where a European
+ * hop stops being a hop: Zurich–Lisbon at 1,724 km is a different afternoon
+ * from Zurich–Berlin at 650.
+ */
+const MEDIUM_HAUL_KM = 1500;
+
+const BANDS = [
+  { key: 'short', label: 'short haul' },
+  { key: 'medium', label: 'medium haul' },
+  { key: 'long', label: 'long haul' },
+] as const satisfies readonly { key: HaulBandKey; label: string }[];
+
+/**
+ * Which band a distance falls in. Closed on the left and open on the right at
+ * both boundaries, so a flight of exactly 3,940 km is medium haul rather than
+ * long — Flighty's number is where long haul *starts above*, and a threshold
+ * that changes its answer at the threshold is the one thing worth testing here.
+ */
+const band = (distanceKm: number): HaulBandKey => {
+  if (distanceKm > LONG_HAUL_KM) return 'long';
+  if (distanceKm >= MEDIUM_HAUL_KM) return 'medium';
+
+  return 'short';
+};
+
+/**
+ * The log split into three distance bands.
+ *
+ * Flighty splits `domestic / international / long haul`, and that does not
+ * survive this data: `BSL` is EuroAirport, which the registry places in France,
+ * so every one of the 26 flights is international and the three numbers would
+ * read `0 / 26 / 2`. A zero renders as a bug rather than as a fact. Reinstate
+ * the real split once there is a domestic flight to put in it.
+ *
+ * The one derivation on this page that is *not* ranked. The bands have a
+ * natural order and the bar draws them left to right, so sorting by count would
+ * break the axis it is read along.
+ *
+ * All three bands come back even when empty, for the same reason: a
+ * distribution has a fixed shape, and whether a zero is worth drawing is the
+ * caller's decision rather than this function's.
+ */
+export function haulMix(legs: FlightLeg[]): HaulBand[] {
+  const counts: Record<HaulBandKey, number> = { short: 0, medium: 0, long: 0 };
+
+  for (const { distanceKm } of legs) {
+    counts[band(distanceKm)] += 1;
+  }
+
+  return BANDS.map(({ key, label }) => ({ key, label, flights: counts[key] }));
 }

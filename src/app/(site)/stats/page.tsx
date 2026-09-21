@@ -1,8 +1,9 @@
 import CustomLink from '@/components/Link';
-import { P, Section, Table } from '@/components/projects/Prose';
+import { A, P, Section, Table } from '@/components/projects/Prose';
 import AirlineChip from '@/components/stats/AirlineChip';
 import CountryFlags from '@/components/stats/CountryFlags';
 import FlightGlobe from '@/components/stats/FlightGlobe';
+import HaulMix from '@/components/stats/HaulMix';
 import { aircraft as aircraftType } from '@/lib/stats/flights/aircraft';
 import { airline } from '@/lib/stats/flights/airlines';
 import { formatDistanceKm, formatDuration } from '@/lib/stats/flights/format';
@@ -10,12 +11,14 @@ import { EARTH_CIRCUMFERENCE_KM } from '@/lib/stats/flights/geo';
 import { loadFlights } from '@/lib/stats/flights/query';
 import {
   aircraftUsage,
+  flightSuperlatives,
   flightTotals,
   manufacturerMix,
   rankAirlines,
   rankRoutes,
   toLegs,
 } from '@/lib/stats/flights/stats';
+import type { FlightLeg } from '@/lib/stats/flights/types';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -77,6 +80,19 @@ const Named = ({ code, name }: { code: string; name?: string }) => (
   </>
 );
 
+/**
+ * A superlative the way Flighty writes one: the route as the headline, then the
+ * flight that happens to hold the record underneath it. The route is the thing
+ * worth reading — which flight number carried it is the footnote.
+ */
+const Superlative = ({ label, leg }: { label: string; leg: FlightLeg }) => (
+  <Stat
+    label={label}
+    value={`${leg.from.iata} → ${leg.to.iata}`}
+    hint={`${leg.flight.airline} ${leg.flight.flightNumber} · ${formatDistanceKm(leg.distanceKm)}`}
+  />
+);
+
 const Page = ({ children }: { children: React.ReactNode }) => (
   <div className="w-full max-w-3xl">
     <h1 className="text-4xl font-medium text-balance italic sm:text-5xl">
@@ -108,6 +124,7 @@ export default async function StatsPage() {
   const routes = rankRoutes(legs);
   const airlines = rankAirlines(legs);
   const aircraftTypes = aircraftUsage(legs);
+  const { longest, shortest } = flightSuperlatives(legs);
   const manufacturers = manufacturerMix(aircraftTypes);
   const timesAroundTheEarth = totals.distanceKm / EARTH_CIRCUMFERENCE_KM;
 
@@ -143,8 +160,45 @@ export default async function StatsPage() {
           <Stat
             label="Around the Earth"
             value={`${timesAroundTheEarth.toFixed(2)}x`}
+            hint={`One lap is ${formatDistanceKm(EARTH_CIRCUMFERENCE_KM)}`}
           />
         </dl>
+      </Section>
+
+      {longest && shortest && (
+        <Section title="Longest and shortest">
+          <P>
+            The longest is the New York leg and not the Boston one. That is the
+            open jaw showing up in the numbers rather than a rounding artefact —
+            out to Boston and back from New York really are two different
+            distances.
+          </P>
+          {/*
+            One column until `sm`, unlike the Totals grid. These two carry a
+            subtitle and a route rather than a bare numeral, and `JFK → ZRH` at
+            `text-2xl` does not fit the 120px column a two-up grid leaves at
+            320px — it wraps after the arrow.
+          */}
+          <dl className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
+            <Superlative label="Longest" leg={longest} />
+            <Superlative label="Shortest" leg={shortest} />
+          </dl>
+        </Section>
+      )}
+
+      <Section title="Haul mix">
+        <P>
+          Distance bands rather than Flighty&rsquo;s domestic, international and
+          long haul. Every flight here is international — Basel is EuroAirport,
+          which is on French soil, so even Basel to Amsterdam is — and a
+          domestic count of zero reads as a bug rather than as a fact. Long haul
+          starts above 3&rsquo;940 km because{' '}
+          <A href="https://flighty.com/help/terminology">
+            that is where Flighty puts it
+          </A>
+          . The 1&rsquo;500 km line under it is mine and has nothing behind it.
+        </P>
+        <HaulMix legs={legs} />
       </Section>
 
       <Section title="Top routes">
