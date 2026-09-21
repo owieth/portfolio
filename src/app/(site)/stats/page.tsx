@@ -1,5 +1,6 @@
 import CustomLink from '@/components/Link';
 import { P, Section, Table } from '@/components/projects/Prose';
+import CountryFlags from '@/components/stats/CountryFlags';
 import FlightGlobe from '@/components/stats/FlightGlobe';
 import { formatDistanceKm, formatDuration } from '@/lib/stats/flights/format';
 import { EARTH_CIRCUMFERENCE_KM } from '@/lib/stats/flights/geo';
@@ -82,6 +83,7 @@ export default async function StatsPage() {
       </p>
 
       <FlightGlobe legs={legs} />
+      <CountryFlags legs={legs} />
 
       <Section title="Totals">
         <dl className="grid grid-cols-2 gap-x-8 gap-y-6 sm:grid-cols-3">

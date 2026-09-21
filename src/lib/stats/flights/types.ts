@@ -115,3 +115,9 @@ export interface AirportVisit {
   /** Times the airport appears as an endpoint, so a turnaround counts twice. */
   visits: number;
 }
+
+export interface CountryVisit {
+  country: Country;
+  /** Endpoint appearances, so a domestic hop counts its country twice. */
+  visits: number;
+}

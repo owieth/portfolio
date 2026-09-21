@@ -1,7 +1,9 @@
 import { airport } from '@/lib/stats/flights/airports';
+import { country } from '@/lib/stats/flights/countries';
 import { greatCircleDistanceKm } from '@/lib/stats/flights/geo';
 import type {
   AirportVisit,
+  CountryVisit,
   Flight,
   FlightLeg,
   FlightTotals,
@@ -138,5 +140,44 @@ export function airportVisits(legs: FlightLeg[]): AirportVisit[] {
   return [...visits.values()].sort(
     (x, y) =>
       y.visits - x.visits || x.airport.iata.localeCompare(y.airport.iata),
+  );
+}
+
+/**
+ * The same endpoint appearances as `airportVisits`, folded onto the country,
+ * so a Zurich–Geneva hop counts Switzerland twice. Both functions therefore
+ * describe the same 52 endpoints, and the flag row cannot disagree with the
+ * globe about how much of the map is Swiss.
+ *
+ * Ordered by visits, then by code, which is the order the flag row reads in:
+ * most flown first. Alphabetical was the alternative and says nothing — every
+ * other list on the page is ranked.
+ *
+ * The null branch stays quiet, unlike the one in `toLegs`. A country code that
+ * the registry has never heard of is unreachable from outside: the airports
+ * are a closed set and `countries.test.ts` fails the moment one of their codes
+ * is missing here.
+ */
+export function countryVisits(legs: FlightLeg[]): CountryVisit[] {
+  const visits = new Map<string, CountryVisit>();
+
+  for (const { countryCode } of legs.flatMap(({ from, to }) => [from, to])) {
+    const visit = visits.get(countryCode);
+
+    if (visit) {
+      visit.visits += 1;
+      continue;
+    }
+
+    const visited = country(countryCode);
+
+    if (visited) {
+      visits.set(countryCode, { country: visited, visits: 1 });
+    }
+  }
+
+  return [...visits.values()].sort(
+    (x, y) =>
+      y.visits - x.visits || x.country.code.localeCompare(y.country.code),
   );
 }
