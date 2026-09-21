@@ -1,11 +1,17 @@
 import CustomLink from '@/components/Link';
 import { P, Section, Table } from '@/components/projects/Prose';
+import AirlineChip from '@/components/stats/AirlineChip';
 import CountryFlags from '@/components/stats/CountryFlags';
 import FlightGlobe from '@/components/stats/FlightGlobe';
 import { formatDistanceKm, formatDuration } from '@/lib/stats/flights/format';
 import { EARTH_CIRCUMFERENCE_KM } from '@/lib/stats/flights/geo';
 import { loadFlights } from '@/lib/stats/flights/query';
-import { flightTotals, rankRoutes, toLegs } from '@/lib/stats/flights/stats';
+import {
+  flightTotals,
+  rankAirlines,
+  rankRoutes,
+  toLegs,
+} from '@/lib/stats/flights/stats';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -73,6 +79,7 @@ export default async function StatsPage() {
 
   const totals = flightTotals(legs);
   const routes = rankRoutes(legs);
+  const airlines = rankAirlines(legs);
   const timesAroundTheEarth = totals.distanceKm / EARTH_CIRCUMFERENCE_KM;
 
   return (
@@ -114,6 +121,25 @@ export default async function StatsPage() {
             `${route.a.city} · ${route.b.city}`,
             route.flights,
             formatDistanceKm(route.distanceKm),
+          ])}
+        />
+      </Section>
+
+      <Section title="Top airlines">
+        <P>
+          The colour is the carrier&rsquo;s own and the code is its IATA one. No
+          logos — those are trademarks, and every free set of them either
+          carries no licence or disclaims the marks it ships.
+        </P>
+        <Table
+          head={['Airline', 'Flights', 'Distance']}
+          rows={airlines.map(({ code, airline, flights, distanceKm }) => [
+            <span key={code} className="flex items-center gap-2">
+              <AirlineChip code={code} airline={airline} />
+              {airline?.name ?? code}
+            </span>,
+            flights,
+            formatDistanceKm(distanceKm),
           ])}
         />
       </Section>
