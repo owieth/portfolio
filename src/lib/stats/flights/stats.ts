@@ -11,6 +11,7 @@ import type {
   Flight,
   FlightLeg,
   FlightTotals,
+  ManufacturerUsage,
   RouteRank,
 } from '@/lib/stats/flights/types';
 
@@ -203,6 +204,43 @@ export function aircraftUsage(legs: FlightLeg[]): AircraftUsage[] {
 
   return [...types.values()].sort(
     (x, y) => y.flights - x.flights || x.key.localeCompare(y.key),
+  );
+}
+
+/**
+ * Who built them, rolled up off `aircraftUsage` rather than off the legs. The
+ * mix is a second reading of the same numbers, so deriving it from the same
+ * array is what stops it from disagreeing with the table above it on the page.
+ *
+ * A type the registry does not know carries no manufacturer and contributes
+ * nothing, so the mix can total fewer flights than the log does. A percentage
+ * therefore has to be taken against the mix's own total and not against
+ * `flightTotals`, or it silently under-reports every share.
+ */
+export function manufacturerMix(usage: AircraftUsage[]): ManufacturerUsage[] {
+  const makers = new Map<string, ManufacturerUsage>();
+
+  for (const { aircraft: type, flights } of usage) {
+    if (!type) {
+      continue;
+    }
+
+    const maker = makers.get(type.manufacturer);
+
+    if (maker) {
+      maker.flights += flights;
+      continue;
+    }
+
+    makers.set(type.manufacturer, {
+      manufacturer: type.manufacturer,
+      flights,
+    });
+  }
+
+  return [...makers.values()].sort(
+    (x, y) =>
+      y.flights - x.flights || x.manufacturer.localeCompare(y.manufacturer),
   );
 }
 

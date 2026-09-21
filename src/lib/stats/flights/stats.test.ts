@@ -10,6 +10,7 @@ import {
   airportVisits,
   countryVisits,
   flightTotals,
+  manufacturerMix,
   rankAirlines,
   rankRoutes,
   toLegs,
@@ -293,6 +294,34 @@ describe('aircraftUsage', () => {
     expect(aircraftUsage([flown('LX', 'Concorde')])).toEqual([
       { key: 'Concorde', aircraft: null, flights: 1 },
     ]);
+  });
+});
+
+describe('manufacturerMix', () => {
+  it('rolls the seed up onto who built them', () => {
+    expect(
+      manufacturerMix(aircraftUsage(SEED_LEGS)).map(
+        ({ manufacturer, flights }) => [manufacturer, flights],
+      ),
+    ).toEqual([
+      ['Airbus', 23],
+      ['Embraer', 2],
+      ['Boeing', 1],
+    ]);
+  });
+
+  it('contributes nothing for a type the registry does not know', () => {
+    // Which is why the page takes its percentage against this total and not
+    // against the flight count: the two are allowed to differ.
+    const mix = manufacturerMix(
+      aircraftUsage([flown('LX', 'Concorde'), flown('LX', 'A320')]),
+    );
+
+    expect(mix).toEqual([{ manufacturer: 'Airbus', flights: 1 }]);
+  });
+
+  it('answers with nothing for no types', () => {
+    expect(manufacturerMix([])).toEqual([]);
   });
 });
 
