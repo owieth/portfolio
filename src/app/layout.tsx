@@ -99,9 +99,17 @@ export default function RootLayout({
     <html lang="en">
       <AnalyticsScripts />
       <body className={`${GeistSans.variable} ${GeistMono.variable} font-sans`}>
+        {/* Every value above is a module literal, so nothing here can carry a
+            `</script>`. Escaping `<` anyway costs nothing and keeps that true
+            if the graph ever grows a field fed from outside. */}
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(jsonLd)
+              .replace(/</g, '\\u003c')
+              .replace(/>/g, '\\u003e')
+              .replace(/&/g, '\\u0026'),
+          }}
         />
         {children}
         <CookieNotice />
