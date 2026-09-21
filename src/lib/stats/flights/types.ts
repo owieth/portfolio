@@ -101,6 +101,41 @@ export interface RouteRank {
   distanceKm: number;
 }
 
+/**
+ * One carrier, resolved against the registry where it knows it.
+ *
+ * `code` is the raw `flights.airline` value rather than `airline.iata`, because
+ * it is the one field that survives a carrier the registry has never heard of —
+ * and it is what the ranking falls back to, both as the label and as the last
+ * term of the sort.
+ */
+export interface AirlineRank {
+  code: string;
+  /** Null for a carrier outside the registry. The flights still count. */
+  airline: Airline | null;
+  flights: number;
+  /** Summed across every flight the carrier operated. */
+  distanceKm: number;
+}
+
+/**
+ * One type of aeroplane, keyed on the raw `flights.aircraft` string the way
+ * `AIRCRAFT` itself is. No distance: an aircraft type is a thing you sat in,
+ * not a thing you flew between, and the ranking reads by count.
+ */
+export interface AircraftUsage {
+  key: string;
+  /** Null for a type outside the registry. The flights still count. */
+  aircraft: Aircraft | null;
+  flights: number;
+}
+
+/** The types rolled up onto who built them. */
+export interface ManufacturerUsage {
+  manufacturer: string;
+  flights: number;
+}
+
 export interface FlightTotals {
   flights: number;
   distanceKm: number;
