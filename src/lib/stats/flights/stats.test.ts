@@ -1,10 +1,12 @@
 import { describe, expect, it, vi } from 'vitest';
 
+import { AIRCRAFT } from '@/lib/stats/flights/aircraft';
 import { AIRLINES } from '@/lib/stats/flights/airlines';
 import { AIRPORTS } from '@/lib/stats/flights/airports';
 import { COUNTRIES } from '@/lib/stats/flights/countries';
 import { SEED } from '@/lib/stats/flights/seed.fixture';
 import {
+  aircraftUsage,
   airportVisits,
   countryVisits,
   flightTotals,
@@ -249,6 +251,47 @@ describe('rankAirlines', () => {
     expect(first).toMatchObject({ code: 'LX', flights: 1 });
     expect(rankAirlines([flown('ZZ', 'A320')])).toEqual([
       { code: 'ZZ', airline: null, flights: 1, distanceKm: 100 },
+    ]);
+  });
+});
+
+describe('aircraftUsage', () => {
+  const used = aircraftUsage(SEED_LEGS);
+
+  it('ranks the seed and resolves the type', () => {
+    expect(used.map(({ key, flights }) => [key, flights])).toEqual([
+      ['A320', 8],
+      ['A220-300', 6],
+      ['A320neo', 6],
+      ['A220-100', 2],
+      ['E190', 2],
+      ['A330-300', 1],
+      ['B777-300ER', 1],
+    ]);
+
+    expect(used[0].aircraft).toBe(AIRCRAFT.A320);
+    expect(used.reduce((sum, { flights }) => sum + flights, 0)).toBe(26);
+  });
+
+  it('breaks a count tie on the key rather than on insertion order', () => {
+    // A220-300 and A320neo are both on six flights, and the marketing names
+    // sort the way strings do — not the way the rows arrived.
+    const backwards = aircraftUsage([...SEED_LEGS].reverse());
+
+    expect(used.map(({ key }) => key)).toEqual(backwards.map(({ key }) => key));
+  });
+
+  it('leaves out a flight whose type was never recorded', () => {
+    // `flights.aircraft` is nullable. "Unknown" is not a type of aeroplane and
+    // has no place in a distribution of them.
+    expect(aircraftUsage([flown('LX', null), flown('LX', 'A320')])).toEqual([
+      { key: 'A320', aircraft: AIRCRAFT.A320, flights: 1 },
+    ]);
+  });
+
+  it('ranks a type the registry does not know rather than dropping it', () => {
+    expect(aircraftUsage([flown('LX', 'Concorde')])).toEqual([
+      { key: 'Concorde', aircraft: null, flights: 1 },
     ]);
   });
 });

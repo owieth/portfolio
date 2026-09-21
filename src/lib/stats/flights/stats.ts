@@ -1,8 +1,10 @@
+import { aircraft } from '@/lib/stats/flights/aircraft';
 import { airline } from '@/lib/stats/flights/airlines';
 import { airport } from '@/lib/stats/flights/airports';
 import { country } from '@/lib/stats/flights/countries';
 import { greatCircleDistanceKm } from '@/lib/stats/flights/geo';
 import type {
+  AircraftUsage,
   AirlineRank,
   AirportVisit,
   CountryVisit,
@@ -162,6 +164,45 @@ export function rankAirlines(legs: FlightLeg[]): AirlineRank[] {
       y.flights - x.flights ||
       y.distanceKm - x.distanceKm ||
       x.code.localeCompare(y.code),
+  );
+}
+
+/**
+ * Types of aeroplane, ranked by flights.
+ *
+ * Two absences, and they mean different things. `flight.aircraft` being null
+ * is a flight whose type was never recorded, and it is left out entirely —
+ * "unknown" is not a type of aeroplane and does not belong in a distribution
+ * of them. `aircraft()` returning null is a type that exists but that
+ * `aircraft.ts` has not been told about, and it ranks on its raw string.
+ *
+ * Count then key, with no distance term: `A220-300` and `A320neo` are tied at
+ * six in the seed, and the key is what settles them.
+ */
+export function aircraftUsage(legs: FlightLeg[]): AircraftUsage[] {
+  const types = new Map<string, AircraftUsage>();
+
+  for (const { flight } of legs) {
+    if (!flight.aircraft) {
+      continue;
+    }
+
+    const type = types.get(flight.aircraft);
+
+    if (type) {
+      type.flights += 1;
+      continue;
+    }
+
+    types.set(flight.aircraft, {
+      key: flight.aircraft,
+      aircraft: aircraft(flight.aircraft),
+      flights: 1,
+    });
+  }
+
+  return [...types.values()].sort(
+    (x, y) => y.flights - x.flights || x.key.localeCompare(y.key),
   );
 }
 
