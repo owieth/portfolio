@@ -172,3 +172,18 @@ export interface FlightSuperlatives {
   longest: FlightLeg | null;
   shortest: FlightLeg | null;
 }
+
+/**
+ * A distance band. Not Flighty's `domestic / international / long haul`: every
+ * flight in this log is international — `BSL` is EuroAirport, which the
+ * registry places in France — so that split would read `0 / 26 / 2`, and a zero
+ * renders as a bug rather than as a fact. See `haulMix`.
+ */
+export type HaulBandKey = 'short' | 'medium' | 'long';
+
+export interface HaulBand {
+  key: HaulBandKey;
+  /** `short haul`. The bands are a closed set of three, so the label rides along. */
+  label: string;
+  flights: number;
+}
