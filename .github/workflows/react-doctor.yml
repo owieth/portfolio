@@ -40,5 +40,5 @@ jobs:
           version: 0.9.14
           # The whole project on every run, not only what the pull request changed.
           scope: full
-          # Advisory: report the findings, never fail the check.
-          blocking: none
+          # The backlog is clear, so a new error fails the check.
+          blocking: error
