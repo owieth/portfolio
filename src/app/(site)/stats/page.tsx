@@ -7,7 +7,9 @@ import { formatDistanceKm, formatDuration } from '@/lib/stats/flights/format';
 import { EARTH_CIRCUMFERENCE_KM } from '@/lib/stats/flights/geo';
 import { loadFlights } from '@/lib/stats/flights/query';
 import {
+  aircraftUsage,
   flightTotals,
+  manufacturerMix,
   rankAirlines,
   rankRoutes,
   toLegs,
@@ -43,10 +45,21 @@ const DATE = new Intl.DateTimeFormat('en-GB', {
 const formatFlownOn = (flownOn: string) =>
   DATE.format(new Date(`${flownOn}T00:00:00Z`));
 
-const Stat = ({ label, value }: { label: string; value: string }) => (
+const Stat = ({
+  label,
+  value,
+  hint,
+}: {
+  label: string;
+  value: string;
+  hint?: string;
+}) => (
   <div>
     <dt className="text-muted text-sm">{label}</dt>
-    <dd className="mt-1 text-2xl font-medium tabular-nums">{value}</dd>
+    <dd className="mt-1 text-2xl font-medium tabular-nums">
+      {value}
+      {hint && <span className="text-muted block text-sm">{hint}</span>}
+    </dd>
   </div>
 );
 
@@ -80,7 +93,18 @@ export default async function StatsPage() {
   const totals = flightTotals(legs);
   const routes = rankRoutes(legs);
   const airlines = rankAirlines(legs);
+  const aircraftTypes = aircraftUsage(legs);
+  const manufacturers = manufacturerMix(aircraftTypes);
   const timesAroundTheEarth = totals.distanceKm / EARTH_CIRCUMFERENCE_KM;
+
+  // Both can be empty where `legs` is not: `aircraft` is a nullable column, so
+  // a log of flights whose type was never recorded has no types to rank, and
+  // types the registry has not been told about roll up to no manufacturer.
+  const [mostFlown] = aircraftTypes;
+  const [leadingManufacturer] = manufacturers;
+  // Against the mix's own total rather than `totals.flights`, for that second
+  // reason — otherwise the share silently under-reports.
+  const typed = manufacturers.reduce((sum, { flights }) => sum + flights, 0);
 
   return (
     <Page>
@@ -143,6 +167,43 @@ export default async function StatsPage() {
           ])}
         />
       </Section>
+
+      {mostFlown && (
+        <Section title="Aircraft">
+          <dl>
+            <Stat
+              label="Most flown"
+              value={mostFlown.aircraft?.name ?? mostFlown.key}
+              hint={[
+                mostFlown.aircraft?.manufacturer,
+                `${mostFlown.flights} flights`,
+              ]
+                .filter(Boolean)
+                .join(' · ')}
+            />
+          </dl>
+          <Table
+            head={['Aircraft', 'Flights']}
+            rows={aircraftTypes.map(({ key, aircraft, flights }) => [
+              aircraft?.name ?? key,
+              flights,
+            ])}
+          />
+          {leadingManufacturer && (
+            <p className="text-muted text-sm tabular-nums">
+              {manufacturers
+                .map(
+                  ({ manufacturer, flights }) => `${manufacturer} ${flights}`,
+                )
+                .join(' · ')}
+              {' — '}
+              {Math.round((leadingManufacturer.flights / typed) * 100)}%{' '}
+              {leadingManufacturer.manufacturer}, which is what flying out of
+              Zurich looks like.
+            </p>
+          )}
+        </Section>
+      )}
 
       <Section title="Flight log">
         <Table
