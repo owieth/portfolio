@@ -9,6 +9,7 @@ import { type MouseEvent, type ReactNode } from 'react';
 const navigation = [
   { name: 'Home', href: '/' },
   { name: 'Projects', href: '/projects' },
+  { name: 'Stats', href: '/stats' },
   // { name: 'Gallery', href: '/gallery' },
 ];
 

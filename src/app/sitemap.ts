@@ -16,6 +16,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'monthly',
       priority: 0.9,
     },
+    {
+      url: `${SITE_URL}/stats`,
+      lastModified: SITE_LAST_MODIFIED,
+      changeFrequency: 'monthly',
+      priority: 0.9,
+    },
     // Case studies only. A project's own interactive route — /projects/wo-haere/play
     // — is the thing itself rather than a document, so there is nothing stable on it
     // to index. `as const` is load-bearing: the return-type annotation does not reach
