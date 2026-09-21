@@ -3,6 +3,8 @@ import { P, Section, Table } from '@/components/projects/Prose';
 import AirlineChip from '@/components/stats/AirlineChip';
 import CountryFlags from '@/components/stats/CountryFlags';
 import FlightGlobe from '@/components/stats/FlightGlobe';
+import { aircraft as aircraftType } from '@/lib/stats/flights/aircraft';
+import { airline } from '@/lib/stats/flights/airlines';
 import { formatDistanceKm, formatDuration } from '@/lib/stats/flights/format';
 import { EARTH_CIRCUMFERENCE_KM } from '@/lib/stats/flights/geo';
 import { loadFlights } from '@/lib/stats/flights/query';
@@ -61,6 +63,18 @@ const Stat = ({
       {hint && <span className="text-muted block text-sm">{hint}</span>}
     </dd>
   </div>
+);
+
+/**
+ * A log cell that keeps its code and gains its name: `LX 316` stays the thing
+ * you scan for, because it is what is on the boarding pass, and `Swiss` sits
+ * under it in the body colour the table already uses.
+ */
+const Named = ({ code, name }: { code: string; name?: string }) => (
+  <>
+    <span className="text-foreground">{code}</span>
+    {name && <span className="mt-0.5 block text-xs">{name}</span>}
+  </>
 );
 
 const Page = ({ children }: { children: React.ReactNode }) => (
@@ -211,8 +225,20 @@ export default async function StatsPage() {
           rows={legs.map(({ flight, from, to }) => [
             formatFlownOn(flight.flownOn),
             `${from.iata} → ${to.iata}`,
-            `${flight.airline} ${flight.flightNumber}`,
-            flight.aircraft ?? '—',
+            <Named
+              key="flight"
+              code={`${flight.airline} ${flight.flightNumber}`}
+              name={airline(flight.airline)?.name}
+            />,
+            flight.aircraft ? (
+              <Named
+                key="aircraft"
+                code={flight.aircraft}
+                name={aircraftType(flight.aircraft)?.name}
+              />
+            ) : (
+              '—'
+            ),
             formatDuration(flight.durationMinutes),
           ])}
         />
