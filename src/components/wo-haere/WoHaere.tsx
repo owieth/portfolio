@@ -1,44 +1,29 @@
 'use client';
 
-import Link from 'next/link';
+import { LazyMotion, domAnimation } from 'motion/react';
 import { useCallback, useRef, useState } from 'react';
 
 import { track } from '@/lib/analytics/track';
+import Chopf from '@/components/wo-haere/Chopf';
+import Panee from '@/components/wo-haere/Panee';
+import PaneeKnopf from '@/components/wo-haere/PaneeKnopf';
 import Pfyl from '@/components/wo-haere/Pfyl';
-import Resultatcharte, {
-  type Resultat,
-} from '@/components/wo-haere/Resultatcharte';
-import Stampecharte from '@/components/wo-haere/Stampecharte';
+import type { Resultat } from '@/components/wo-haere/Resultatcharte';
+import Underleischte from '@/components/wo-haere/Underleischte';
 import Wandcharte, {
   type WandcharteHandle,
 } from '@/components/wo-haere/Wandcharte';
-import Wurfbuech from '@/components/wo-haere/Wurfbuech';
-import Wurfsteuerig, {
-  type ZugStand,
-} from '@/components/wo-haere/Wurfsteuerig';
-import Yschtellige from '@/components/wo-haere/Yschtellige';
+import type { ZugStand } from '@/components/wo-haere/Wurfsteuerig';
 import Zieuhilf from '@/components/wo-haere/Zieuhilf';
 // Attribution is not rendered here: maplibre shows it from the source specs
 // (© swisstopo on the raster source, OpenFreeMap/OSM from the world style).
-import {
-  AKTIONE,
-  APP,
-  AUI_KANTOEN,
-  FAEHLER,
-  PFYLSORTE,
-  YSCHTELLIGE as YTEXT,
-} from '@/lib/wo-haere/data/bern';
-import { cn } from '@/lib/wo-haere/cn';
 import type { LatLon } from '@/lib/wo-haere/geo/ch';
 import type { Wurf } from '@/lib/wo-haere/geo/resolveHit';
 import { noechschtsZiu, reaktion } from '@/lib/wo-haere/reactions';
-import {
-  CASE_STUDY_PATH,
-  PLAY_PATH,
-  WURF_ENDPOINT,
-} from '@/lib/wo-haere/routes';
-import { formatWurf } from '@/lib/wo-haere/wurfParam';
+import { WURF_ENDPOINT } from '@/lib/wo-haere/routes';
+import { spurWurf } from '@/lib/wo-haere/spurWurf';
 import { gsammleteKantöne, useWoHaere } from '@/lib/wo-haere/store';
+import { useTeile } from '@/lib/wo-haere/useTeile';
 import {
   chueglogge,
   dernaebe as tonDernaebe,
@@ -69,13 +54,20 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
   // The throw's own style, captured at launch so the completion event can carry
   // it once the API resolves — a ref so `zeigResultat` need not depend on it.
   const stilRef = useRef<WurfStil>('sufer');
-  const [wartendOrt, setWartendOrt] = useState<LatLon | null>(null);
+  // Where the dart is headed, captured at launch and read back once the flight
+  // animation completes — a ref for the same reason as `stilRef`: nothing
+  // renders it, so committing it would only re-render the whole game.
+  const wartendOrtRef = useRef<LatLon | null>(null);
   const [resultat, setResultat] = useState<Resultat | null>(null);
   const [laufend, setLaufend] = useState(false);
   const [fähler, setFähler] = useState(false);
-  const [teiletext, setTeiletext] = useState<string>(AKTIONE.teile);
   const [paneeOffe, setPaneeOffe] = useState(false);
   const [zug, setZug] = useState<ZugStand | null>(null);
+  const {
+    teiletext,
+    teile,
+    zrugg: teiletextZrugg,
+  } = useTeile(resultat?.wurf ?? null);
 
   const zeigResultat = useCallback(
     (wurf: Wurf, ort: LatLon) => {
@@ -108,60 +100,7 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
       };
       merkWurf(eintrag);
 
-      track(
-        wurf.art === 'preich'
-          ? {
-              name: 'throw_completed',
-              outcome: 'preich',
-              throw_quality: stilRef.current,
-              canton: wurf.kanton,
-              municipality: wurf.gmeind,
-              elevation: wurf.hoechi,
-              distance_km: wurf.distanzKm,
-              bearing: wurf.richtig,
-              water: wurf.wasser,
-            }
-          : {
-              name: 'throw_completed',
-              outcome: 'dernaebe',
-              throw_quality: stilRef.current,
-              miss_reason: wurf.grund,
-            },
-      );
-
-      // Milestones fire on the state transition this throw causes, read from the
-      // pre-throw snapshot rather than a render-derived flag that would misfire
-      // when the settings pane mounts.
-      const vorherKantoene = gsammleteKantöne(wurfbuech);
-      if (
-        wurf.art === 'preich' &&
-        wurf.kanton &&
-        !vorherKantoene.has(wurf.kanton)
-      ) {
-        const cantonsCollected = vorherKantoene.size + 1;
-        track({
-          name: 'canton_collected',
-          canton: wurf.kanton,
-          cantons_collected: cantonsCollected,
-        });
-        if (cantonsCollected === AUI_KANTOEN.length) {
-          track({
-            name: 'all_cantons_collected',
-            throw_count: wurfbuech.length + 1,
-          });
-        }
-      }
-
-      const neuiZahl = wurfbuech.length + 1;
-      for (const sorte of PFYLSORTE) {
-        if (sorte.abNWuerf > 0 && sorte.abNWuerf === neuiZahl) {
-          track({
-            name: 'dart_skin_unlocked',
-            dart_skin: sorte.id,
-            threshold: sorte.abNWuerf,
-          });
-        }
-      }
+      spurWurf({ wurf, stil: stilRef.current, vorher: wurfbuech });
     },
     [merkWurf, wurfbuech, yschtellige.ton],
   );
@@ -199,7 +138,7 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
 
       setResultat(null);
       setFähler(false);
-      setTeiletext(AKTIONE.teile);
+      teiletextZrugg();
       setWurfNr(n => n + 1);
       setStil(wurfStil);
       stilRef.current = wurfStil;
@@ -208,7 +147,7 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
 
       if (zieu.kind === 'pixel') {
         const ort = handle.pixelZuOrt(zieu.x, zieu.y);
-        setWartendOrt(ort);
+        wartendOrtRef.current = ort;
         setZiel({ x: zieu.x, y: zieu.y });
         setLaufend(true);
         return;
@@ -227,17 +166,19 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
         p.x <= rect.width &&
         p.y <= rect.height;
 
-      setWartendOrt(zieu.ort);
+      wartendOrtRef.current = zieu.ort;
       setZiel(sichtbar ? p : mitti(container));
       setLaufend(true);
     },
-    [laufend],
+    [laufend, teiletextZrugg],
   );
 
   const gladet = useCallback(() => {
     if (yschtellige.ton) thwack();
 
-    if (!wartendOrt) {
+    const ort = wartendOrtRef.current;
+
+    if (!ort) {
       setResultat({
         wurf: { art: 'dernaebe', grund: 'nid_uf_der_charte', lat: 0, lon: 0 },
         ziu: null,
@@ -250,8 +191,8 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
       return;
     }
 
-    void holResultat(wartendOrt);
-  }, [holResultat, wartendOrt, yschtellige.ton]);
+    void holResultat(ort);
+  }, [holResultat, yschtellige.ton]);
 
   /**
    * A shared ?wurf= link replays that throw once the map is able to project
@@ -264,171 +205,65 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
     const handle = charteRef.current;
     handle?.zeigOrt(startWurf);
     setWurfNr(n => n + 1);
-    setWartendOrt(startWurf);
+    wartendOrtRef.current = startWurf;
     setZiel(
       handle?.ortZuPixel(startWurf) ?? mitti(handle?.container() ?? null),
     );
     setLaufend(true);
   }, [startWurf]);
 
-  const teile = useCallback(async () => {
-    if (resultat?.wurf.art !== 'preich') return;
-    const { lat, lon } = resultat.wurf;
-    const url = `${window.location.origin}${PLAY_PATH}?wurf=${formatWurf({ lat, lon })}`;
-    const daten = { title: APP.name, text: APP.tagline, url };
-
-    track({ name: 'share_attempt' });
-
-    // navigator.share spends the transient activation from the button press,
-    // so nothing may be awaited before it.
-    if (navigator.canShare?.(daten)) {
-      try {
-        await navigator.share(daten);
-        setTeiletext(AKTIONE.gteilt);
-        track({ name: 'share_result', share_method: 'native', outcome: 'shared' });
-        return;
-      } catch (error) {
-        // Dismissing the sheet is a choice, not a failure. Anything else
-        // falls through to the clipboard.
-        if (error instanceof Error && error.name === 'AbortError') {
-          track({
-            name: 'share_result',
-            share_method: 'native',
-            outcome: 'dismissed',
-          });
-          return;
-        }
-      }
-    }
-
-    // navigator.clipboard is undefined outside a secure context.
-    if (!navigator.clipboard) {
-      setTeiletext(AKTIONE.nidTeilt);
-      track({
-        name: 'share_result',
-        share_method: 'clipboard',
-        outcome: 'unsupported',
-      });
-      return;
-    }
-
-    try {
-      await navigator.clipboard.writeText(url);
-      setTeiletext(AKTIONE.kopiert);
-      track({
-        name: 'share_result',
-        share_method: 'clipboard',
-        outcome: 'copied',
-      });
-    } catch {
-      setTeiletext(AKTIONE.nidTeilt);
-      track({
-        name: 'share_result',
-        share_method: 'clipboard',
-        outcome: 'failed',
-      });
-    }
-  }, [resultat]);
-
   const gsammlet = gsammleteKantöne(wurfbuech);
 
   return (
-    // gsw is the ISO code for Swiss German — the whole interface is
-    // Berndeutsch. <html lang> cannot vary per route under one root layout,
-    // so the override lives here.
-    <main
-      lang="gsw-CH"
-      data-panee-offe={paneeOffe || undefined}
-      className="relative h-dvh w-full overflow-hidden bg-stone-800"
-    >
-      <div className="absolute inset-0">
-        <Wandcharte
-          ref={charteRef}
-          aasicht={yschtellige.aasicht}
-          wuerf={wurfbuech}
-          onZwaeg={charteZwaeg}
-        />
-        {zug && (
-          <Zieuhilf
-            vo={zug.vo}
-            zeiger={zug.zeiger}
-            ziel={zug.ziel}
-            chraft={zug.chraft}
-            gnue={zug.gnue}
-            sigma={zug.sigma}
+    // `strict` makes the full `motion` component throw, so the split cannot
+    // silently regress: Pfyl and Resultatcharte, the only animated descendants,
+    // both import `m` from motion/react-m. domAnimation, not domMax — neither
+    // pans, drags, nor layout-animates.
+    <LazyMotion features={domAnimation} strict>
+      {/* gsw is the ISO code for Swiss German — the whole interface is
+          Berndeutsch. <html lang> cannot vary per route under one root layout,
+          so the override lives here. */}
+      <main
+        lang="gsw-CH"
+        data-panee-offe={paneeOffe || undefined}
+        className="relative h-dvh w-full overflow-hidden bg-stone-800"
+      >
+        <div className="absolute inset-0">
+          <Wandcharte
+            ref={charteRef}
+            aasicht={yschtellige.aasicht}
+            wuerf={wurfbuech}
+            onZwaeg={charteZwaeg}
           />
-        )}
-        <Pfyl
-          key={wurfNr}
-          ziel={ziel}
-          sorte={yschtellige.pfylsorte}
-          stil={stil}
-          onGladet={gladet}
-        />
-      </div>
-
-      <header
-        className="pointer-events-none absolute inset-x-0 top-0 z-(--z-steuerig) flex items-start p-4"
-        style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}
-      >
-        <div className="pointer-events-auto rounded-xl bg-white/90 px-3 py-2 shadow-lg dark:bg-stone-900/90">
-          <h1 className="text-lg leading-none font-black text-stone-900 dark:text-white">
-            {APP.name}
-          </h1>
-          <p className="mt-0.5 text-xs text-pretty text-stone-600 dark:text-stone-400">
-            {APP.tagline}
-          </p>
-          {/* Full-bleed means no site chrome, so this is the only way out. */}
-          <Link
-            href={CASE_STUDY_PATH}
-            className="mt-1 inline-block text-xs text-stone-500 underline underline-offset-2 hover:text-stone-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 dark:text-stone-400 dark:hover:text-white"
-          >
-            ← {AKTIONE.zrugg}
-          </Link>
-        </div>
-      </header>
-
-      {/* Lives outside the header, on its own layer: this is the panel's own
-          close button, so the panel has to stay off it. The rest of the header
-          keeps the layer the panel is free to cover. */}
-      <div
-        className="pointer-events-none absolute inset-x-0 top-0 z-(--z-zue) flex justify-end p-4"
-        style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}
-      >
-        <button
-          type="button"
-          aria-label={YTEXT.titu}
-          aria-expanded={paneeOffe}
-          onClick={() => {
-            track({ name: 'panel_toggle', open: !paneeOffe });
-            setPaneeOffe(o => !o);
-          }}
-          className="pointer-events-auto grid size-10 place-items-center rounded-xl bg-white/90 text-lg shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 dark:bg-stone-900/90"
-        >
-          {paneeOffe ? '✕' : '☰'}
-        </button>
-      </div>
-
-      {paneeOffe && (
-        <aside
-          className={cn(
-            'absolute top-0 right-0 z-(--z-panee) flex h-dvh w-[min(20rem,100vw)] flex-col gap-5',
-            'overflow-y-auto border-l border-stone-300 bg-white/97 p-4 shadow-2xl',
-            'dark:border-stone-700 dark:bg-stone-900/97',
+          {zug && (
+            <Zieuhilf
+              vo={zug.vo}
+              zeiger={zug.zeiger}
+              ziel={zug.ziel}
+              chraft={zug.chraft}
+              gnue={zug.gnue}
+              sigma={zug.sigma}
+            />
           )}
-          style={{
-            paddingTop: 'max(4.5rem, calc(env(safe-area-inset-top) + 3.5rem))',
-            paddingBottom: 'max(1rem, env(safe-area-inset-bottom))',
-          }}
-        >
-          <Yschtellige
-            wert={yschtellige}
-            aazahlWuerf={wurfbuech.length}
-            onÄndere={ändere}
+          <Pfyl
+            key={wurfNr}
+            ziel={ziel}
+            sorte={yschtellige.pfylsorte}
+            stil={stil}
+            onGladet={gladet}
           />
-          <Stampecharte gsammlet={gsammlet} />
-          <Wurfbuech
+        </div>
+
+        <Chopf />
+
+        <PaneeKnopf offe={paneeOffe} onWächsle={setPaneeOffe} />
+
+        {paneeOffe && (
+          <Panee
+            yschtellige={yschtellige}
             wurfbuech={wurfbuech}
+            gsammlet={gsammlet}
+            onÄndere={ändere}
             onLeere={leereWurfbuech}
             onZeig={eintrag => {
               charteRef.current?.zeigOrt({
@@ -438,58 +273,34 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
               setPaneeOffe(false);
             }}
           />
-        </aside>
-      )}
-
-      <div
-        className="pointer-events-none absolute inset-x-0 bottom-0 z-(--z-steuerig) flex flex-col items-center gap-3 p-4"
-        style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}
-      >
-        {fähler && (
-          <div
-            role="alert"
-            className="pointer-events-auto w-full max-w-md rounded-xl border border-red-300 bg-white/95 p-4 shadow-xl dark:border-red-800 dark:bg-stone-900/95"
-          >
-            <h2 className="font-bold text-red-700 dark:text-red-500">
-              {FAEHLER.titu}
-            </h2>
-            <p className="mt-1 text-sm text-pretty text-stone-700 dark:text-stone-300">
-              {FAEHLER.swisstopo}
-            </p>
-          </div>
         )}
 
-        {resultat ? (
-          <Resultatcharte
-            resultat={resultat}
-            teiletext={teiletext}
-            onNomau={() => {
-              setResultat(null);
-              setZiel(null);
-              setWartendOrt(null);
-            }}
-            onTeile={teile}
-            onZeig={() => {
-              if (resultat.wurf.art !== 'preich') return;
-              charteRef.current?.zeigOrt({
-                lat: resultat.wurf.lat,
-                lon: resultat.wurf.lon,
-              });
-            }}
-          />
-        ) : (
-          <Wurfsteuerig
-            wurfart={yschtellige.wurfart}
-            gsperrt={laufend}
-            ton={yschtellige.ton}
-            charteRect={() =>
-              charteRef.current?.container()?.getBoundingClientRect() ?? null
-            }
-            onWurf={wurf}
-            onZug={setZug}
-          />
-        )}
-      </div>
-    </main>
+        <Underleischte
+          yschtellige={yschtellige}
+          resultat={resultat}
+          teiletext={teiletext}
+          fähler={fähler}
+          laufend={laufend}
+          charteRect={() =>
+            charteRef.current?.container()?.getBoundingClientRect() ?? null
+          }
+          onWurf={wurf}
+          onZug={setZug}
+          onNomau={() => {
+            setResultat(null);
+            setZiel(null);
+            wartendOrtRef.current = null;
+          }}
+          onTeile={teile}
+          onZeig={() => {
+            if (resultat?.wurf.art !== 'preich') return;
+            charteRef.current?.zeigOrt({
+              lat: resultat.wurf.lat,
+              lon: resultat.wurf.lon,
+            });
+          }}
+        />
+      </main>
+    </LazyMotion>
   );
 }
