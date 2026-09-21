@@ -1,7 +1,9 @@
+import { airline } from '@/lib/stats/flights/airlines';
 import { airport } from '@/lib/stats/flights/airports';
 import { country } from '@/lib/stats/flights/countries';
 import { greatCircleDistanceKm } from '@/lib/stats/flights/geo';
 import type {
+  AirlineRank,
   AirportVisit,
   CountryVisit,
   Flight,
@@ -119,6 +121,47 @@ export function rankRoutes(legs: FlightLeg[]): RouteRank[] {
       y.flights - x.flights ||
       y.distanceKm - x.distanceKm ||
       x.key.localeCompare(y.key),
+  );
+}
+
+/**
+ * Carriers, ranked by flights and then by how far those flights went.
+ *
+ * Grouped on the raw `flights.airline` value rather than on a resolved
+ * registry entry, so a carrier nobody has added to `airlines.ts` yet still
+ * ranks — with `airline: null` and the caller rendering the bare code. Unlike
+ * an airport missing from its registry, this makes no total wrong: the flight
+ * happened, its distance is already known, and only its name is missing.
+ *
+ * The same three-term sort as `rankRoutes`, for the same reason. `OS` and `BA`
+ * are tied at four flights in the seed, so without the distance term the order
+ * would depend on which row Postgres handed over first.
+ */
+export function rankAirlines(legs: FlightLeg[]): AirlineRank[] {
+  const carriers = new Map<string, AirlineRank>();
+
+  for (const { flight, distanceKm } of legs) {
+    const carrier = carriers.get(flight.airline);
+
+    if (carrier) {
+      carrier.flights += 1;
+      carrier.distanceKm += distanceKm;
+      continue;
+    }
+
+    carriers.set(flight.airline, {
+      code: flight.airline,
+      airline: airline(flight.airline),
+      flights: 1,
+      distanceKm,
+    });
+  }
+
+  return [...carriers.values()].sort(
+    (x, y) =>
+      y.flights - x.flights ||
+      y.distanceKm - x.distanceKm ||
+      x.code.localeCompare(y.code),
   );
 }
 
