@@ -42,7 +42,7 @@ const PATHS_LAYER_ID = 'flight-paths';
 const DOTS_LAYER_ID = 'airport-dots';
 /**
  * Invisible, and the only things a tap is ever tested against. The drawn line
- * is 1.2px at its thinnest and the drawn dot barely wider, which is a target
+ * is 1px at its thinnest and the drawn dot barely wider, which is a target
  * nobody can hit on a phone — so the pointer gets its own geometry, sized for
  * a fingertip rather than for the eye.
  */
@@ -148,32 +148,20 @@ function buildScene(legs: FlightLeg[]): Scene {
     }),
   );
 
-  // `interpolate` throws on stops that do not ascend, which is exactly what a
-  // log where every route was flown once would produce. The floor of 2 keeps
-  // the expression valid; nothing in the data can then reach the upper stop,
-  // so every line comes out at the thin end, which is the honest answer.
-  const maxFlights = Math.max(2, ...routes.map(route => route.flights));
-  const maxVisits = Math.max(2, ...visits.map(visit => visit.visits));
-
-  // Thickness reads flight count, so the London runs look like the lines they
-  // are; radius reads visits the same way.
-  const lineWidth: Expression = [
-    'interpolate',
-    ['linear'],
-    ['get', 'flights'],
-    1,
-    1.2,
-    maxFlights,
-    3.5,
-  ];
+  // Flighty's scale: once, a handful, a lot. Absolute rather than interpolated
+  // against the observed maximum, so a route keeps the weight it has earned
+  // instead of being rescaled by every flight added after it. The tiers are
+  // there to make a once-flown route findable, not to be proportional — which
+  // is also why the 10+ stop stays even though no line reaches it yet.
+  const lineWidth: Expression = ['step', ['get', 'flights'], 1, 2, 2.25, 10, 4];
   const circleRadius: Expression = [
-    'interpolate',
-    ['linear'],
+    'step',
     ['get', 'visits'],
-    1,
     2.5,
-    maxVisits,
-    6,
+    2,
+    4,
+    10,
+    6.5,
   ];
 
   return {
