@@ -1,12 +1,17 @@
 import { describe, expect, it, vi } from 'vitest';
 
+import { AIRCRAFT } from '@/lib/stats/flights/aircraft';
+import { AIRLINES } from '@/lib/stats/flights/airlines';
 import { AIRPORTS } from '@/lib/stats/flights/airports';
 import { COUNTRIES } from '@/lib/stats/flights/countries';
 import { SEED } from '@/lib/stats/flights/seed.fixture';
 import {
+  aircraftUsage,
   airportVisits,
   countryVisits,
   flightTotals,
+  manufacturerMix,
+  rankAirlines,
   rankRoutes,
   toLegs,
 } from '@/lib/stats/flights/stats';
@@ -39,6 +44,20 @@ const leg = (
   from: AIRPORTS[from],
   to: AIRPORTS[to],
   distanceKm,
+});
+
+/**
+ * The same leg, with the two fields the carrier and type rankings read. `leg`
+ * pins `SEED_FLIGHTS[0]`, which is an LX A320, so a tie-break test needs to be
+ * able to say otherwise.
+ */
+const flown = (
+  airline: string,
+  aircraft: string | null,
+  distanceKm = 100,
+): FlightLeg => ({
+  ...leg('ZRH', 'BER', distanceKm),
+  flight: { ...SEED_FLIGHTS[0], airline, aircraft },
 });
 
 describe('toLegs', () => {
@@ -178,6 +197,131 @@ describe('rankRoutes', () => {
       'VIE-ZRH',
       'AMS-BSL',
     ]);
+  });
+});
+
+describe('rankAirlines', () => {
+  const ranked = rankAirlines(SEED_LEGS);
+
+  it('ranks the seed and resolves the carrier', () => {
+    expect(ranked.map(({ code, flights }) => [code, flights])).toEqual([
+      ['LX', 14],
+      ['OS', 4],
+      ['BA', 4],
+      ['SK', 2],
+      ['KL', 2],
+    ]);
+
+    expect(ranked[0].airline).toBe(AIRLINES.LX);
+    expect(ranked.reduce((sum, { flights }) => sum + flights, 0)).toBe(26);
+  });
+
+  it('sums the distance the carrier flew', () => {
+    // These have to add up to the same 36'253.8 the totals do, or the table
+    // and the Totals grid are describing different logs.
+    expect(ranked[0].distanceKm).toBeCloseTo(24_780.7, 1);
+    expect(
+      ranked.reduce((sum, { distanceKm }) => sum + distanceKm, 0),
+    ).toBeCloseTo(36_253.8, 1);
+  });
+
+  it('breaks the four-flight tie on distance, not on insertion order', () => {
+    // OS and BA are both on four flights in the seed. OS goes first because
+    // Rhodes is further than London, and it does so either way round.
+    const backwards = rankAirlines([...SEED_LEGS].reverse());
+
+    expect(ranked.map(({ code }) => code)).toEqual(
+      backwards.map(({ code }) => code),
+    );
+    expect(ranked[1].distanceKm).toBeGreaterThan(ranked[2].distanceKm);
+  });
+
+  it('falls back to the code when distance ties too', () => {
+    const forwards = rankAirlines([flown('OS', 'A320'), flown('BA', 'A320')]);
+    const backwards = rankAirlines([flown('BA', 'A320'), flown('OS', 'A320')]);
+
+    expect(forwards.map(({ code }) => code)).toEqual(['BA', 'OS']);
+    expect(backwards.map(({ code }) => code)).toEqual(['BA', 'OS']);
+  });
+
+  it('ranks a carrier the registry does not know rather than dropping it', () => {
+    // Nothing about the flight is wrong, only its name is missing — so unlike
+    // an unknown airport this must not take the skip-and-warn path.
+    const [first] = rankAirlines([flown('ZZ', 'A320'), flown('LX', 'A320')]);
+
+    expect(first).toMatchObject({ code: 'LX', flights: 1 });
+    expect(rankAirlines([flown('ZZ', 'A320')])).toEqual([
+      { code: 'ZZ', airline: null, flights: 1, distanceKm: 100 },
+    ]);
+  });
+});
+
+describe('aircraftUsage', () => {
+  const used = aircraftUsage(SEED_LEGS);
+
+  it('ranks the seed and resolves the type', () => {
+    expect(used.map(({ key, flights }) => [key, flights])).toEqual([
+      ['A320', 8],
+      ['A220-300', 6],
+      ['A320neo', 6],
+      ['A220-100', 2],
+      ['E190', 2],
+      ['A330-300', 1],
+      ['B777-300ER', 1],
+    ]);
+
+    expect(used[0].aircraft).toBe(AIRCRAFT.A320);
+    expect(used.reduce((sum, { flights }) => sum + flights, 0)).toBe(26);
+  });
+
+  it('breaks a count tie on the key rather than on insertion order', () => {
+    // A220-300 and A320neo are both on six flights, and the marketing names
+    // sort the way strings do — not the way the rows arrived.
+    const backwards = aircraftUsage([...SEED_LEGS].reverse());
+
+    expect(used.map(({ key }) => key)).toEqual(backwards.map(({ key }) => key));
+  });
+
+  it('leaves out a flight whose type was never recorded', () => {
+    // `flights.aircraft` is nullable. "Unknown" is not a type of aeroplane and
+    // has no place in a distribution of them.
+    expect(aircraftUsage([flown('LX', null), flown('LX', 'A320')])).toEqual([
+      { key: 'A320', aircraft: AIRCRAFT.A320, flights: 1 },
+    ]);
+  });
+
+  it('ranks a type the registry does not know rather than dropping it', () => {
+    expect(aircraftUsage([flown('LX', 'Concorde')])).toEqual([
+      { key: 'Concorde', aircraft: null, flights: 1 },
+    ]);
+  });
+});
+
+describe('manufacturerMix', () => {
+  it('rolls the seed up onto who built them', () => {
+    expect(
+      manufacturerMix(aircraftUsage(SEED_LEGS)).map(
+        ({ manufacturer, flights }) => [manufacturer, flights],
+      ),
+    ).toEqual([
+      ['Airbus', 23],
+      ['Embraer', 2],
+      ['Boeing', 1],
+    ]);
+  });
+
+  it('contributes nothing for a type the registry does not know', () => {
+    // Which is why the page takes its percentage against this total and not
+    // against the flight count: the two are allowed to differ.
+    const mix = manufacturerMix(
+      aircraftUsage([flown('LX', 'Concorde'), flown('LX', 'A320')]),
+    );
+
+    expect(mix).toEqual([{ manufacturer: 'Airbus', flights: 1 }]);
+  });
+
+  it('answers with nothing for no types', () => {
+    expect(manufacturerMix([])).toEqual([]);
   });
 });
 

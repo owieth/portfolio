@@ -1,12 +1,17 @@
+import { aircraft } from '@/lib/stats/flights/aircraft';
+import { airline } from '@/lib/stats/flights/airlines';
 import { airport } from '@/lib/stats/flights/airports';
 import { country } from '@/lib/stats/flights/countries';
 import { greatCircleDistanceKm } from '@/lib/stats/flights/geo';
 import type {
+  AircraftUsage,
+  AirlineRank,
   AirportVisit,
   CountryVisit,
   Flight,
   FlightLeg,
   FlightTotals,
+  ManufacturerUsage,
   RouteRank,
 } from '@/lib/stats/flights/types';
 
@@ -119,6 +124,123 @@ export function rankRoutes(legs: FlightLeg[]): RouteRank[] {
       y.flights - x.flights ||
       y.distanceKm - x.distanceKm ||
       x.key.localeCompare(y.key),
+  );
+}
+
+/**
+ * Carriers, ranked by flights and then by how far those flights went.
+ *
+ * Grouped on the raw `flights.airline` value rather than on a resolved
+ * registry entry, so a carrier nobody has added to `airlines.ts` yet still
+ * ranks — with `airline: null` and the caller rendering the bare code. Unlike
+ * an airport missing from its registry, this makes no total wrong: the flight
+ * happened, its distance is already known, and only its name is missing.
+ *
+ * The same three-term sort as `rankRoutes`, for the same reason. `OS` and `BA`
+ * are tied at four flights in the seed, so without the distance term the order
+ * would depend on which row Postgres handed over first.
+ */
+export function rankAirlines(legs: FlightLeg[]): AirlineRank[] {
+  const carriers = new Map<string, AirlineRank>();
+
+  for (const { flight, distanceKm } of legs) {
+    const carrier = carriers.get(flight.airline);
+
+    if (carrier) {
+      carrier.flights += 1;
+      carrier.distanceKm += distanceKm;
+      continue;
+    }
+
+    carriers.set(flight.airline, {
+      code: flight.airline,
+      airline: airline(flight.airline),
+      flights: 1,
+      distanceKm,
+    });
+  }
+
+  return [...carriers.values()].sort(
+    (x, y) =>
+      y.flights - x.flights ||
+      y.distanceKm - x.distanceKm ||
+      x.code.localeCompare(y.code),
+  );
+}
+
+/**
+ * Types of aeroplane, ranked by flights.
+ *
+ * Two absences, and they mean different things. `flight.aircraft` being null
+ * is a flight whose type was never recorded, and it is left out entirely —
+ * "unknown" is not a type of aeroplane and does not belong in a distribution
+ * of them. `aircraft()` returning null is a type that exists but that
+ * `aircraft.ts` has not been told about, and it ranks on its raw string.
+ *
+ * Count then key, with no distance term: `A220-300` and `A320neo` are tied at
+ * six in the seed, and the key is what settles them.
+ */
+export function aircraftUsage(legs: FlightLeg[]): AircraftUsage[] {
+  const types = new Map<string, AircraftUsage>();
+
+  for (const { flight } of legs) {
+    if (!flight.aircraft) {
+      continue;
+    }
+
+    const type = types.get(flight.aircraft);
+
+    if (type) {
+      type.flights += 1;
+      continue;
+    }
+
+    types.set(flight.aircraft, {
+      key: flight.aircraft,
+      aircraft: aircraft(flight.aircraft),
+      flights: 1,
+    });
+  }
+
+  return [...types.values()].sort(
+    (x, y) => y.flights - x.flights || x.key.localeCompare(y.key),
+  );
+}
+
+/**
+ * Who built them, rolled up off `aircraftUsage` rather than off the legs. The
+ * mix is a second reading of the same numbers, so deriving it from the same
+ * array is what stops it from disagreeing with the table above it on the page.
+ *
+ * A type the registry does not know carries no manufacturer and contributes
+ * nothing, so the mix can total fewer flights than the log does. A percentage
+ * therefore has to be taken against the mix's own total and not against
+ * `flightTotals`, or it silently under-reports every share.
+ */
+export function manufacturerMix(usage: AircraftUsage[]): ManufacturerUsage[] {
+  const makers = new Map<string, ManufacturerUsage>();
+
+  for (const { aircraft: type, flights } of usage) {
+    if (!type) {
+      continue;
+    }
+
+    const maker = makers.get(type.manufacturer);
+
+    if (maker) {
+      maker.flights += flights;
+      continue;
+    }
+
+    makers.set(type.manufacturer, {
+      manufacturer: type.manufacturer,
+      flights,
+    });
+  }
+
+  return [...makers.values()].sort(
+    (x, y) =>
+      y.flights - x.flights || x.manufacturer.localeCompare(y.manufacturer),
   );
 }
 
