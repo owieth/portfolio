@@ -16,6 +16,7 @@ import type {
   Point,
 } from 'geojson';
 
+import { ensureMaplibreWorker } from '@/lib/maplibre/worker';
 import { greatCirclePath } from '@/lib/stats/flights/geo';
 import { airportVisits, rankRoutes } from '@/lib/stats/flights/stats';
 import type { FlightLeg } from '@/lib/stats/flights/types';
@@ -246,6 +247,7 @@ export default function FlightGlobe({ legs }: { legs: FlightLeg[] }) {
     };
 
     const build = () => {
+      ensureMaplibreWorker();
       map = new MlMap({
         container,
         style: styleUrl(),

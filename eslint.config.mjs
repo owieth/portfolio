@@ -6,5 +6,12 @@ export default defineConfig([
   ...nextVitals,
   ...nextTs,
   { settings: { react: { version: '19.2' } } },
-  globalIgnores(['.next/**', 'out/**', 'build/**', 'next-env.d.ts']),
+  globalIgnores([
+    '.next/**',
+    'out/**',
+    'build/**',
+    'next-env.d.ts',
+    // Copied verbatim out of node_modules by scripts/maplibre-worker.mjs.
+    'public/maplibre/**',
+  ]),
 ]);

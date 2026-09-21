@@ -31,3 +31,6 @@ npm-debug.log*
 next-env.d.ts
 .env*
 !.env.example
+
+# maplibre worker, copied out of node_modules by scripts/maplibre-worker.mjs
+/public/maplibre
