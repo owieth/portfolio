@@ -156,3 +156,19 @@ export interface CountryVisit {
   /** Endpoint appearances, so a domestic hop counts its country twice. */
   visits: number;
 }
+
+/**
+ * The longest and shortest flight in the log — the pair Flighty leads its stats
+ * with, and the only two numbers on the page that name a single flight rather
+ * than summarising all of them.
+ *
+ * `FlightLeg` rather than a flattened shape: the caller already knows how to
+ * read one, and the distance is on it.
+ *
+ * Both are null only for an empty log. There is no state where one exists and
+ * the other does not, and a log of one flight answers with it twice.
+ */
+export interface FlightSuperlatives {
+  longest: FlightLeg | null;
+  shortest: FlightLeg | null;
+}
