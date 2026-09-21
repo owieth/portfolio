@@ -30,7 +30,7 @@ export default async function DesignPage() {
       { name: 'design_fetch_failed_server', status: res.status },
       cookieHeader,
     );
-    notFound();
+    return notFound();
   }
 
   const markdown = await res.text();

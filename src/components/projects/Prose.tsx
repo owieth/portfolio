@@ -21,13 +21,17 @@ export const P = ({ children }: { children: ReactNode }) => (
   <p className="text-muted text-pretty">{children}</p>
 );
 
-export const Table = ({
-  head,
-  rows,
-}: {
-  head: string[];
-  rows: ReactNode[][];
-}) => (
+/**
+ * A row carries its own id because cells are arbitrary `ReactNode`s — nothing
+ * stable can be derived from them, and the caller always knows what makes the
+ * row unique.
+ */
+export interface Row {
+  id: string;
+  cells: ReactNode[];
+}
+
+export const Table = ({ head, rows }: { head: string[]; rows: Row[] }) => (
   <div className="overflow-x-auto">
     <table className="w-full min-w-md border-collapse text-left text-sm">
       <thead>
@@ -40,10 +44,13 @@ export const Table = ({
         </tr>
       </thead>
       <tbody className="text-muted tabular-nums">
-        {rows.map((row, i) => (
-          <tr key={i} className="border-foreground/10 border-b">
-            {row.map((cell, j) => (
-              <td key={j} className="py-2 pr-4 align-top">
+        {rows.map(row => (
+          <tr key={row.id} className="border-foreground/10 border-b">
+            {row.cells.map((cell, i) => (
+              <td
+                key={`${row.id}-${head[i] ?? i}`}
+                className="py-2 pr-4 align-top"
+              >
                 {cell}
               </td>
             ))}

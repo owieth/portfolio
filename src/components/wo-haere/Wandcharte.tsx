@@ -231,16 +231,25 @@ export default function Wandcharte({
       ctx.styleZwaeg = true;
       syncStyle();
     };
+    const onLoad = () => onZwaegRef.current?.();
     map.on('style.load', onStyleLoad);
     map.on('mousedown', engage);
     map.on('touchstart', engage);
     map.on('wheel', engage);
-    map.once('load', () => onZwaegRef.current?.());
+    map.once('load', onLoad);
 
     return () => {
       stopRotation();
       for (const m of markerRef.current) m.remove();
       markerRef.current = [];
+      // `map.remove()` drops every listener with the instance, so the `off`
+      // calls are redundant at runtime — they are here so the effect visibly
+      // releases what it registered.
+      map.off('style.load', onStyleLoad);
+      map.off('mousedown', engage);
+      map.off('touchstart', engage);
+      map.off('wheel', engage);
+      map.off('load', onLoad);
       map.remove();
       mapRef.current = null;
       if (ctxRef.current === ctx) ctxRef.current = null;

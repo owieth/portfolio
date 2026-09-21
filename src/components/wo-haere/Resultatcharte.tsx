@@ -1,6 +1,7 @@
 'use client';
 
-import { motion, useReducedMotion } from 'motion/react';
+import { useReducedMotion } from 'motion/react';
+import * as m from 'motion/react-m';
 
 import { track } from '@/lib/analytics/track';
 import {
@@ -39,7 +40,7 @@ export default function Resultatcharte({
   const { wurf, ziu, reaktion, isPreich } = resultat;
 
   return (
-    <motion.section
+    <m.section
       aria-live="polite"
       initial={reduced ? { opacity: 0 } : { opacity: 0, y: 12, scale: 0.98 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -157,6 +158,6 @@ export default function Resultatcharte({
           </>
         )}
       </div>
-    </motion.section>
+    </m.section>
   );
 }

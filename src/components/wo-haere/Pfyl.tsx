@@ -1,7 +1,8 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { motion, useReducedMotion } from 'motion/react';
+import { useReducedMotion } from 'motion/react';
+import * as m from 'motion/react-m';
 
 import { PFYLSORTE, type PfylsorteId } from '@/lib/wo-haere/data/bern';
 import type { WurfStil } from '@/lib/wo-haere/throw/mechanics';
@@ -87,6 +88,62 @@ function bahnFür(ziel: { x: number; y: number }, stil: WurfStil): Bahn {
   };
 }
 
+type Ziel = { x: number; y: number };
+
+/** How hard the dart shivers once it is stuck in. */
+const wobbleFür = (stil: WurfStil) =>
+  stil === 'chnorz' ? [0, -22, 15, -8, 0] : [0, -14, 9, -4, 0];
+
+/** Where the dart sits on the first frame. */
+const aafangFür = (ziel: Ziel, bahn: Bahn, reduced: boolean) =>
+  reduced
+    ? { opacity: 0, x: ziel.x, y: ziel.y, scale: 1, rotate: 0 }
+    : {
+        opacity: 1,
+        x: bahn.x[0],
+        y: bahn.y[0],
+        scale: bahn.scale[0],
+        rotate: 0,
+      };
+
+/** The flight itself, then the shiver once it has landed. */
+const zuegFür = (
+  ziel: Ziel,
+  bahn: Bahn,
+  stil: WurfStil,
+  reduced: boolean,
+  gladet: boolean,
+) => {
+  if (gladet) {
+    return {
+      opacity: 1,
+      x: ziel.x,
+      y: ziel.y,
+      scale: 1,
+      rotate: reduced ? 0 : wobbleFür(stil).map(w => bahn.ligt + w),
+    };
+  }
+
+  if (reduced) return { opacity: 1, x: ziel.x, y: ziel.y, scale: 1, rotate: 0 };
+
+  return {
+    opacity: 1,
+    x: bahn.x,
+    y: bahn.y,
+    scale: bahn.scale,
+    rotate: bahn.rotate,
+  };
+};
+
+const tempoFür = (bahn: Bahn, reduced: boolean, gladet: boolean) =>
+  gladet
+    ? { duration: reduced ? 0 : 0.38, ease: 'easeOut' as const }
+    : {
+        duration: reduced ? 0.12 : bahn.dauer,
+        ease: 'easeOut' as const,
+        times: reduced ? undefined : bahn.times,
+      };
+
 export default function Pfyl({ ziel, sorte, stil, onGladet }: PfylProps) {
   const reduced = useReducedMotion();
   const [gladet, setGladet] = useState(false);
@@ -100,50 +157,15 @@ export default function Pfyl({ ziel, sorte, stil, onGladet }: PfylProps) {
 
   if (!ziel || !bahn) return null;
 
-  const wobble = stil === 'chnorz' ? [0, -22, 15, -8, 0] : [0, -14, 9, -4, 0];
-
+  // No `will-change` class: Motion sets the hint for the duration of the
+  // animation and drops it again, where a static one would keep the layer
+  // alive for as long as the dart stays stuck in the map.
   return (
-    <motion.div
-      className="pointer-events-none absolute top-0 left-0 z-(--z-pfyl) will-change-transform"
-      initial={
-        reduced
-          ? { opacity: 0, x: ziel.x, y: ziel.y, scale: 1, rotate: 0 }
-          : {
-              opacity: 1,
-              x: bahn.x[0],
-              y: bahn.y[0],
-              scale: bahn.scale[0],
-              rotate: 0,
-            }
-      }
-      animate={
-        gladet
-          ? {
-              opacity: 1,
-              x: ziel.x,
-              y: ziel.y,
-              scale: 1,
-              rotate: reduced ? 0 : wobble.map(w => bahn.ligt + w),
-            }
-          : reduced
-            ? { opacity: 1, x: ziel.x, y: ziel.y, scale: 1, rotate: 0 }
-            : {
-                opacity: 1,
-                x: bahn.x,
-                y: bahn.y,
-                scale: bahn.scale,
-                rotate: bahn.rotate,
-              }
-      }
-      transition={
-        gladet
-          ? { duration: reduced ? 0 : 0.38, ease: 'easeOut' }
-          : {
-              duration: reduced ? 0.12 : bahn.dauer,
-              ease: 'easeOut',
-              times: reduced ? undefined : bahn.times,
-            }
-      }
+    <m.div
+      className="pointer-events-none absolute top-0 left-0 z-(--z-pfyl)"
+      initial={aafangFür(ziel, bahn, Boolean(reduced))}
+      animate={zuegFür(ziel, bahn, stil, Boolean(reduced), gladet)}
+      transition={tempoFür(bahn, Boolean(reduced), gladet)}
       onAnimationComplete={() => {
         if (gladet) return;
         setGladet(true);
@@ -154,6 +176,6 @@ export default function Pfyl({ ziel, sorte, stil, onGladet }: PfylProps) {
       <span className="block -translate-x-1/2 -translate-y-[90%] text-3xl select-none">
         {EMOJI[sorte] ?? '🎯'}
       </span>
-    </motion.div>
+    </m.div>
   );
 }

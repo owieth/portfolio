@@ -209,11 +209,14 @@ export default async function StatsPage() {
         </P>
         <Table
           head={['Route', 'Flights', 'Distance']}
-          rows={routes.map(route => [
-            `${route.a.city} · ${route.b.city}`,
-            route.flights,
-            formatDistanceKm(route.distanceKm),
-          ])}
+          rows={routes.map(route => ({
+            id: `${route.a.iata}-${route.b.iata}`,
+            cells: [
+              `${route.a.city} · ${route.b.city}`,
+              route.flights,
+              formatDistanceKm(route.distanceKm),
+            ],
+          }))}
         />
       </Section>
 
@@ -225,14 +228,17 @@ export default async function StatsPage() {
         </P>
         <Table
           head={['Airline', 'Flights', 'Distance']}
-          rows={airlines.map(({ code, airline, flights, distanceKm }) => [
-            <span key={code} className="flex items-center gap-2">
-              <AirlineChip code={code} airline={airline} />
-              {airline?.name ?? code}
-            </span>,
-            flights,
-            formatDistanceKm(distanceKm),
-          ])}
+          rows={airlines.map(({ code, airline, flights, distanceKm }) => ({
+            id: code,
+            cells: [
+              <span key={code} className="flex items-center gap-2">
+                <AirlineChip code={code} airline={airline} />
+                {airline?.name ?? code}
+              </span>,
+              flights,
+              formatDistanceKm(distanceKm),
+            ],
+          }))}
         />
       </Section>
 
@@ -252,10 +258,10 @@ export default async function StatsPage() {
           </dl>
           <Table
             head={['Aircraft', 'Flights']}
-            rows={aircraftTypes.map(({ key, aircraft, flights }) => [
-              aircraft?.name ?? key,
-              flights,
-            ])}
+            rows={aircraftTypes.map(({ key, aircraft, flights }) => ({
+              id: key,
+              cells: [aircraft?.name ?? key, flights],
+            }))}
           />
           {leadingManufacturer && (
             <p className="text-muted text-sm tabular-nums">
@@ -276,25 +282,28 @@ export default async function StatsPage() {
       <Section title="Flight log">
         <Table
           head={['Date', 'Route', 'Flight', 'Aircraft', 'Duration']}
-          rows={legs.map(({ flight, from, to }) => [
-            formatFlownOn(flight.flownOn),
-            `${from.iata} → ${to.iata}`,
-            <Named
-              key="flight"
-              code={`${flight.airline} ${flight.flightNumber}`}
-              name={airline(flight.airline)?.name}
-            />,
-            flight.aircraft ? (
+          rows={legs.map(({ flight, from, to }) => ({
+            id: flight.id,
+            cells: [
+              formatFlownOn(flight.flownOn),
+              `${from.iata} → ${to.iata}`,
               <Named
-                key="aircraft"
-                code={flight.aircraft}
-                name={aircraftType(flight.aircraft)?.name}
-              />
-            ) : (
-              '—'
-            ),
-            formatDuration(flight.durationMinutes),
-          ])}
+                key="flight"
+                code={`${flight.airline} ${flight.flightNumber}`}
+                name={airline(flight.airline)?.name}
+              />,
+              flight.aircraft ? (
+                <Named
+                  key="aircraft"
+                  code={flight.aircraft}
+                  name={aircraftType(flight.aircraft)?.name}
+                />
+              ) : (
+                '—'
+              ),
+              formatDuration(flight.durationMinutes),
+            ],
+          }))}
         />
       </Section>
     </Page>

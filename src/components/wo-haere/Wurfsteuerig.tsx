@@ -59,7 +59,7 @@ export default function Wurfsteuerig({
 }: WurfsteuerigProps) {
   const [chraft, setChraft] = useState(0);
   const [zieht, setZieht] = useState(false);
-  const handleRef = useRef<HTMLDivElement>(null);
+  const handleRef = useRef<HTMLButtonElement>(null);
   const startRef = useRef<{ x: number; y: number } | null>(null);
   const voRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const letschtRef = useRef<Zug | null>(null);
@@ -106,7 +106,7 @@ export default function Wurfsteuerig({
   }, []);
 
   const aafah = useCallback(
-    (e: React.PointerEvent<HTMLDivElement>) => {
+    (e: React.PointerEvent<HTMLButtonElement>) => {
       if (gsperrt) return;
       e.currentTarget.setPointerCapture(e.pointerId);
       startRef.current = { x: e.clientX, y: e.clientY };
@@ -122,7 +122,7 @@ export default function Wurfsteuerig({
   );
 
   const bewege = useCallback(
-    (e: React.PointerEvent<HTMLDivElement>) => {
+    (e: React.PointerEvent<HTMLButtonElement>) => {
       if (!zieht) return;
       const zug = zugVo(e.clientX, e.clientY);
       if (!zug) return;
@@ -201,10 +201,9 @@ export default function Wurfsteuerig({
       {/* Grab the dart and drag: direction aims, length is the force. Pointer
           capture means the drag continues anywhere on screen, so the map keeps
           its own panning outside this handle. */}
-      <div
+      <button
         ref={handleRef}
-        role="button"
-        tabIndex={0}
+        type="button"
         aria-label={hiuf}
         aria-disabled={gsperrt}
         onPointerDown={aafah}
@@ -215,6 +214,8 @@ export default function Wurfsteuerig({
           if (gsperrt) return;
           if (e.key !== 'Enter' && e.key !== ' ') return;
           // Keyboard fallback: a straight, medium-force throw up the map.
+          // `preventDefault` also stops the button's synthetic click, so the
+          // throw fires once per press.
           e.preventDefault();
           const vo = startPixel();
           const erg = zugZieu(
@@ -245,7 +246,7 @@ export default function Wurfsteuerig({
             {Math.round(chraft * 100)}%
           </span>
         )}
-      </div>
+      </button>
 
       <div
         className="h-2 w-40 overflow-hidden rounded-full bg-stone-300/80 dark:bg-stone-700/80"

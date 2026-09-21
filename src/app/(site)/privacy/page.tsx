@@ -45,21 +45,30 @@ export default function PrivacyPage() {
         <Table
           head={['Cookie', 'Set by', 'Purpose']}
           rows={[
-            [
-              <code key="ga">_ga</code>,
-              'Google Analytics',
-              'Distinguishes one visitor from another.',
-            ],
-            [
-              <code key="gaid">_ga_&lt;id&gt;</code>,
-              'Google Analytics',
-              'Keeps session state for a single property.',
-            ],
-            [
-              <code key="ow">ow_consent</code>,
-              'This site',
-              'Remembers your analytics choice so the notice appears once.',
-            ],
+            {
+              id: '_ga',
+              cells: [
+                <code key="ga">_ga</code>,
+                'Google Analytics',
+                'Distinguishes one visitor from another.',
+              ],
+            },
+            {
+              id: '_ga_id',
+              cells: [
+                <code key="gaid">_ga_&lt;id&gt;</code>,
+                'Google Analytics',
+                'Keeps session state for a single property.',
+              ],
+            },
+            {
+              id: 'ow_consent',
+              cells: [
+                <code key="ow">ow_consent</code>,
+                'This site',
+                'Remembers your analytics choice so the notice appears once.',
+              ],
+            },
           ]}
         />
         <P>

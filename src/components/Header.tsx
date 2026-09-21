@@ -93,8 +93,8 @@ const Navigation = () => {
   return (
     <nav>
       <ul className={styles.bar}>
-        {navigation.map((item, i) => (
-          <NavItem key={i} href={item.href}>
+        {navigation.map(item => (
+          <NavItem key={item.href} href={item.href}>
             {item.name}
           </NavItem>
         ))}
