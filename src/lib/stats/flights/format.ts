@@ -3,19 +3,40 @@
  * rule: a distance and a block time.
  *
  * `de-CH` for the grouping, matching the only other formatted number on the
- * site (`Resultatcharte.tsx`). Naming the locale rather than letting `Intl`
- * pick also settles it between Node and the browser, which need not agree on
- * a default.
+ * site (`Resultatcharte.tsx`).
  */
 
 const KM = new Intl.NumberFormat('de-CH', { maximumFractionDigits: 0 });
+
+/**
+ * The Swiss thousands separator, pinned rather than taken from the formatter.
+ *
+ * CLDR 48 changed de-CH's group separator from U+2019 to a plain apostrophe,
+ * so which one `Intl` answers with is a property of the ICU the runtime
+ * happens to ship rather than of the locale:
+ *
+ *   Node 24.12  ICU 77.1  CLDR 47  ->  36’254
+ *   Node 22.23  ICU 78.2  CLDR 48  ->  36'254
+ *
+ * A server and a browser of different vintages will disagree the same way,
+ * and this string is server-rendered and then hydrated, so leaving it to the
+ * runtime is a hydration mismatch waiting on the wrong pair of versions.
+ *
+ * U+2019 because it is the typographically correct Swiss form; flipping this
+ * constant is the whole of the change if the plain apostrophe is preferred.
+ */
+const GROUP_SEPARATOR = '\u2019';
 
 const MINUTES_PER_HOUR = 60;
 const MINUTES_PER_DAY = 1440;
 
 /** Whole kilometres — a great-circle estimate does not earn a decimal. */
 export function formatDistanceKm(km: number): string {
-  return `${KM.format(Math.round(km))} km`;
+  const grouped = KM.formatToParts(Math.round(km))
+    .map(part => (part.type === 'group' ? GROUP_SEPARATOR : part.value))
+    .join('');
+
+  return `${grouped} km`;
 }
 
 /**

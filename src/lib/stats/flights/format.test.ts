@@ -32,9 +32,27 @@ describe('formatDuration', () => {
 
 describe('formatDistanceKm', () => {
   it('groups thousands the Swiss way', () => {
-    // The separator de-CH emits is U+2019, a right single quotation mark, not
-    // an ASCII apostrophe. Written as an escape so a copy-paste cannot lie.
+    // The separator is U+2019, a right single quotation mark, not an ASCII
+    // apostrophe.
     expect(formatDistanceKm(36_253.8)).toBe('36’254 km');
+  });
+
+  it('pins the separator rather than inheriting it from the runtime', () => {
+    // CLDR 48 changed de-CH's group separator from U+2019 to a plain
+    // apostrophe, so Intl answers differently depending on the ICU the
+    // runtime ships — Node 24.12 is on CLDR 47 and Node 22.23 on CLDR 48,
+    // which is how this first surfaced: green locally, red in CI. The page
+    // is server-rendered and then hydrated, so a separator that tracks the
+    // runtime is a hydration mismatch waiting on the wrong pair.
+    const fromRuntime = new Intl.NumberFormat('de-CH', {
+      maximumFractionDigits: 0,
+    }).format(36_254);
+
+    expect(formatDistanceKm(36_253.8)).not.toContain(String.fromCharCode(39));
+    expect(formatDistanceKm(36_253.8)).toContain(String.fromCharCode(8217));
+    // Holds whether or not this runtime's ICU agrees with the pin, so the
+    // test cannot go green for the wrong reason on a future Node.
+    expect(fromRuntime.replace(/['’]/g, '!')).toBe('36!254');
   });
 
   it('rounds to whole kilometres', () => {
