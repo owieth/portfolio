@@ -1,8 +1,9 @@
 import CustomLink from '@/components/Link';
-import { P, Section, Table } from '@/components/projects/Prose';
+import { A, P, Section, Table } from '@/components/projects/Prose';
 import AirlineChip from '@/components/stats/AirlineChip';
 import CountryFlags from '@/components/stats/CountryFlags';
 import FlightGlobe from '@/components/stats/FlightGlobe';
+import HaulMix from '@/components/stats/HaulMix';
 import { aircraft as aircraftType } from '@/lib/stats/flights/aircraft';
 import { airline } from '@/lib/stats/flights/airlines';
 import { formatDistanceKm, formatDuration } from '@/lib/stats/flights/format';
@@ -183,6 +184,21 @@ export default async function StatsPage() {
           </dl>
         </Section>
       )}
+
+      <Section title="Haul mix">
+        <P>
+          Distance bands rather than Flighty&rsquo;s domestic, international and
+          long haul. Every flight here is international — Basel is EuroAirport,
+          which is on French soil, so even Basel to Amsterdam is — and a
+          domestic count of zero reads as a bug rather than as a fact. Long haul
+          starts above 3&rsquo;940 km because{' '}
+          <A href="https://flighty.com/help/terminology">
+            that is where Flighty puts it
+          </A>
+          . The 1&rsquo;500 km line under it is mine and has nothing behind it.
+        </P>
+        <HaulMix legs={legs} />
+      </Section>
 
       <Section title="Top routes">
         <P>
