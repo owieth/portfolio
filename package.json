@@ -7,6 +7,7 @@
     "build": "node scripts/maplibre-worker.mjs && next build",
     "start": "next start",
     "lint": "eslint",
+    "react-doctor": "react-doctor",
     "test": "vitest run",
     "test:watch": "vitest",
     "prettier": "prettier --write .",
@@ -43,6 +44,7 @@
     "postcss": "8.5.28",
     "prettier": "3.9.8",
     "prettier-plugin-tailwindcss": "0.8.1",
+    "react-doctor": "0.9.14",
     "tailwindcss": "4.3.3",
     "typescript": "6.0.3",
     "vitest": "5.0.1"

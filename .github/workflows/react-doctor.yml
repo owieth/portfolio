@@ -1,0 +1,44 @@
+# React Doctor: security, performance, correctness, accessibility, bundle-size,
+# and architecture checks for React.
+#
+# These settings were written by `react-doctor ci config`. Run it again to change them.
+# Docs: https://www.react.doctor/ci
+
+name: React Doctor
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+    branches: ['main']
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+  statuses: write
+
+concurrency:
+  group: react-doctor-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  react-doctor:
+    runs-on: ubuntu-latest
+    steps:
+      # fetch-depth: 0 gives React Doctor the full git history it needs to find
+      # the merge base with the target branch. Without it a shallow checkout has
+      # no merge base and the action warns that it cannot compare against base.
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: millionco/react-doctor@v2
+        with:
+          # Pinned to the devDependency in package.json so CI and `pnpm doctor`
+          # report the same score.
+          version: 0.9.14
+          # The whole project on every run, not only what the pull request changed.
+          scope: full
+          # Advisory: report the findings, never fail the check.
+          blocking: none
