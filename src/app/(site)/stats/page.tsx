@@ -1,5 +1,6 @@
 import CustomLink from '@/components/Link';
 import { P, Section, Table } from '@/components/projects/Prose';
+import FlightGlobe from '@/components/stats/FlightGlobe';
 import { formatDistanceKm, formatDuration } from '@/lib/stats/flights/format';
 import { EARTH_CIRCUMFERENCE_KM } from '@/lib/stats/flights/geo';
 import { loadFlights } from '@/lib/stats/flights/query';
@@ -79,6 +80,8 @@ export default async function StatsPage() {
         Every flight I have taken, the routes I keep repeating, and how far it
         all adds up to.
       </p>
+
+      <FlightGlobe legs={legs} />
 
       <Section title="Totals">
         <dl className="grid grid-cols-2 gap-x-8 gap-y-6 sm:grid-cols-3">
