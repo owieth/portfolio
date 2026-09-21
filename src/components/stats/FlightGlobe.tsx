@@ -19,6 +19,7 @@ import type {
 } from 'geojson';
 
 import { ensureMaplibreWorker } from '@/lib/maplibre/worker';
+import { globeStyle } from '@/lib/stats/maplibre/styles';
 import { formatDistanceKm } from '@/lib/stats/flights/format';
 import { greatCirclePath } from '@/lib/stats/flights/geo';
 import { airportVisits, rankRoutes } from '@/lib/stats/flights/stats';
@@ -34,15 +35,6 @@ import { prefersReducedMotion } from '@/lib/wo-haere/motion';
  * moved — `CookieNotice` already reaches for `cn` the same way, and promoting
  * either into a shared `src/lib/` is its own change.
  */
-
-/**
- * Same host as the `liberty` style wo häre? uses, so the Report-Only CSP in
- * `next.config.js` needs no new `connect-src` entry.
- */
-const STYLE_URL = {
-  light: 'https://tiles.openfreemap.org/styles/positron',
-  dark: 'https://tiles.openfreemap.org/styles/dark',
-} as const;
 
 const FLIGHTS_SOURCE_ID = 'flights';
 const AIRPORTS_SOURCE_ID = 'airports';
@@ -402,7 +394,7 @@ export default function FlightGlobe({ legs }: { legs: FlightLeg[] }) {
     // is no class or cookie the server could match and a branch in JSX would
     // hydrate wrong.
     const dark = window.matchMedia('(prefers-color-scheme: dark)');
-    const styleUrl = () => STYLE_URL[dark.matches ? 'dark' : 'light'];
+    const styleFor = () => globeStyle(dark.matches ? 'dark' : 'light');
 
     const stopSpin = () => {
       if (frame === null) return;
@@ -442,19 +434,17 @@ export default function FlightGlobe({ legs }: { legs: FlightLeg[] }) {
     };
 
     /**
-     * `setProjection`, `addSource` and `addLayer` all throw "Style is not done
-     * loading" before the style is ready, so they live here rather than beside
-     * the constructor — and `isStyleLoaded()` is not a reliable gate, see the
-     * docblock on `Wandcharte.syncStyle`.
+     * `addSource` and `addLayer` both throw "Style is not done loading" before
+     * the style is ready, so they live here rather than beside the constructor
+     * — and `isStyleLoaded()` is not a reliable gate, see the docblock on
+     * `Wandcharte.syncStyle`. The projection needs no such call: it is declared
+     * in the style itself.
      *
      * Every call is guarded, because `transformStyle` carries the sources and
      * layers across a theme swap and `style.load` fires again afterwards.
      */
     const onStyleLoad = () => {
       if (!map) return;
-      if (map.getProjection()?.type !== 'globe') {
-        map.setProjection({ type: 'globe' });
-      }
       for (const [id, source] of Object.entries(scene.sources)) {
         if (!map.getSource(id)) map.addSource(id, source);
       }
@@ -473,10 +463,8 @@ export default function FlightGlobe({ legs }: { legs: FlightLeg[] }) {
       ensureMaplibreWorker();
       map = new MlMap({
         container,
-        style: styleUrl(),
-        // `MapOptions` has no `projection`, so one mercator frame before
-        // `style.load` is unavoidable. This framing makes it unremarkable, and
-        // puts the Atlantic — where most of the arcs are — front and centre.
+        style: styleFor(),
+        // The Atlantic, where most of the arcs are, front and centre.
         center: [-20, 40],
         zoom: 1.5,
         // Not `cooperativeGestures`: it sets `touch-action: pan-x pan-y` and
@@ -535,24 +523,22 @@ export default function FlightGlobe({ legs }: { legs: FlightLeg[] }) {
 
     /**
      * A bare `setStyle` takes the diff path, which removes every source and
-     * layer the incoming style does not declare — both of ours — and, because
-     * neither OpenFreeMap style carries a `projection`, applies an eager
-     * `setProjection(undefined)` that flattens the globe to mercator.
-     * `transformStyle` runs before the diff, so nothing is ever removed.
+     * layer the incoming style does not declare — both of ours.
+     * `transformStyle` runs before the diff instead, so nothing is removed and
+     * the paths never blink.
      *
-     * The default `diff: true` stays: the two styles share their sprite and
-     * glyphs, so the swap is layer-only, and the diff explicitly skips the
-     * camera.
+     * The default `diff: true` stays: the two schemes differ only in their
+     * paint, so the swap costs three `setPaintProperty` calls and no tile is
+     * refetched.
      */
     const transformStyle: TransformStyleFunction = (_previous, next) => ({
       ...next,
-      projection: { type: 'globe' },
       sources: { ...next.sources, ...scene.sources },
       layers: [...next.layers, ...scene.layers],
     });
 
     const onThemeChange = () => {
-      map?.setStyle(styleUrl(), { transformStyle });
+      map?.setStyle(styleFor(), { transformStyle });
     };
     dark.addEventListener('change', onThemeChange);
 
