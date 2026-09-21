@@ -12,6 +12,7 @@
     "test:watch": "vitest",
     "prettier": "prettier --write .",
     "og:world": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/og-world.mjs",
+    "og:flags": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/og-flags.mjs",
     "vocab:wo-haere": "node scripts/wo-haere-vocab.mjs",
     "coords:wo-haere": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/wo-haere-coords.mjs",
     "simulate:wo-haere": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/wo-haere-simulate.mjs"
