@@ -12,6 +12,8 @@ import type {
   FlightLeg,
   FlightSuperlatives,
   FlightTotals,
+  HaulBand,
+  HaulBandKey,
   ManufacturerUsage,
   RouteRank,
 } from '@/lib/stats/flights/types';
@@ -371,4 +373,64 @@ export function flightSuperlatives(legs: FlightLeg[]): FlightSuperlatives {
   }
 
   return { longest, shortest };
+}
+
+/**
+ * Flighty's own definition of long haul, copied rather than invented:
+ * https://flighty.com/help/terminology
+ */
+const LONG_HAUL_KM = 3940;
+
+/**
+ * Ours, and with no authority behind it at all — said out loud because the
+ * number above has some and this one does not. It sits roughly where a European
+ * hop stops being a hop: Zurich–Lisbon at 1,724 km is a different afternoon
+ * from Zurich–Berlin at 650.
+ */
+const MEDIUM_HAUL_KM = 1500;
+
+const BANDS = [
+  { key: 'short', label: 'short haul' },
+  { key: 'medium', label: 'medium haul' },
+  { key: 'long', label: 'long haul' },
+] as const satisfies readonly { key: HaulBandKey; label: string }[];
+
+/**
+ * Which band a distance falls in. Closed on the left and open on the right at
+ * both boundaries, so a flight of exactly 3,940 km is medium haul rather than
+ * long — Flighty's number is where long haul *starts above*, and a threshold
+ * that changes its answer at the threshold is the one thing worth testing here.
+ */
+const band = (distanceKm: number): HaulBandKey => {
+  if (distanceKm > LONG_HAUL_KM) return 'long';
+  if (distanceKm >= MEDIUM_HAUL_KM) return 'medium';
+
+  return 'short';
+};
+
+/**
+ * The log split into three distance bands.
+ *
+ * Flighty splits `domestic / international / long haul`, and that does not
+ * survive this data: `BSL` is EuroAirport, which the registry places in France,
+ * so every one of the 26 flights is international and the three numbers would
+ * read `0 / 26 / 2`. A zero renders as a bug rather than as a fact. Reinstate
+ * the real split once there is a domestic flight to put in it.
+ *
+ * The one derivation on this page that is *not* ranked. The bands have a
+ * natural order and the bar draws them left to right, so sorting by count would
+ * break the axis it is read along.
+ *
+ * All three bands come back even when empty, for the same reason: a
+ * distribution has a fixed shape, and whether a zero is worth drawing is the
+ * caller's decision rather than this function's.
+ */
+export function haulMix(legs: FlightLeg[]): HaulBand[] {
+  const counts: Record<HaulBandKey, number> = { short: 0, medium: 0, long: 0 };
+
+  for (const { distanceKm } of legs) {
+    counts[band(distanceKm)] += 1;
+  }
+
+  return BANDS.map(({ key, label }) => ({ key, label, flights: counts[key] }));
 }

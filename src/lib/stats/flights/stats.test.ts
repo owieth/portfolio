@@ -11,6 +11,7 @@ import {
   countryVisits,
   flightSuperlatives,
   flightTotals,
+  haulMix,
   manufacturerMix,
   rankAirlines,
   rankRoutes,
@@ -465,5 +466,60 @@ describe('flightSuperlatives', () => {
 
   it('answers with nothing for no legs', () => {
     expect(flightSuperlatives([])).toEqual({ longest: null, shortest: null });
+  });
+});
+
+describe('haulMix', () => {
+  const mix = haulMix(SEED_LEGS);
+
+  it('bands the seed', () => {
+    // 20 short: LHR-ZRH 787.6 x6, OSL-ZRH 1425.0 x4, BCN-ZRH 856.5 x2,
+    // GVA-LHR 753.7 x2, BER-ZRH 650.0 x2, VIE-ZRH 603.2 x2, AMS-BSL 560.8 x2.
+    // 4 medium: LIS-ZRH 1723.9 x2, RHO-VIE 1606.3 x2.
+    // 2 long: JFK-ZRH 6309.3, BOS-ZRH 6010.2.
+    expect(mix.map(({ key, flights }) => [key, flights])).toEqual([
+      ['short', 20],
+      ['medium', 4],
+      ['long', 2],
+    ]);
+  });
+
+  it('sums to the flight count', () => {
+    // The bands are a partition, not a selection: every leg lands in exactly
+    // one, so the mix can never quietly under-report the way the manufacturer
+    // mix can.
+    expect(mix.reduce((sum, { flights }) => sum + flights, 0)).toBe(
+      flightTotals(SEED_LEGS).flights,
+    );
+  });
+
+  it('keeps the boundaries closed on the left and open on the right', () => {
+    // 3,940 km is where long haul starts *above*, so a leg sitting exactly on
+    // Flighty's number is medium. Same rule one band down.
+    const CASES = [
+      [1499.9, 'short'],
+      [1500, 'medium'],
+      [3940, 'medium'],
+      [3940.1, 'long'],
+    ] as const;
+
+    for (const [distanceKm, expected] of CASES) {
+      const banded = haulMix([leg('ZRH', 'BER', distanceKm)]).filter(
+        ({ flights }) => flights > 0,
+      );
+
+      expect(
+        banded.map(({ key }) => key),
+        `${distanceKm}`,
+      ).toEqual([expected]);
+    }
+  });
+
+  it('answers with three empty bands for no legs', () => {
+    expect(haulMix([]).map(({ key, flights }) => [key, flights])).toEqual([
+      ['short', 0],
+      ['medium', 0],
+      ['long', 0],
+    ]);
   });
 });
