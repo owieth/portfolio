@@ -15,6 +15,13 @@ import type { Airport } from '@/lib/stats/flights/types';
  * truths pinned in `geo.test.ts` exactly at R = 6371.0088 km — ZRH-LHR 787.6,
  * ZRH-JFK 6309.3, GVA-LHR 753.7 — so a bad digit here fails there.
  *
+ * `countryCode` is ISO 3166-1 alpha-2 and a key into `countries.ts`. Eleven
+ * lines written by hand: filtering the public-domain OurAirports dump
+ * (https://ourairports.com/data/, regenerated nightly) down to our codes comes
+ * to about 1.7 KB, but it is a build script plus a CSV parser to obtain one
+ * field for thirteen rows. Worth revisiting the day hand-editing this registry
+ * is the bottleneck.
+ *
  * Flying somewhere new is one entry here alongside the new row in Supabase.
  */
 export const AIRPORTS = {
@@ -23,6 +30,7 @@ export const AIRPORTS = {
     name: 'Zurich',
     city: 'Zurich',
     country: 'Switzerland',
+    countryCode: 'CH',
     lat: 47.4647,
     lon: 8.5492,
   },
@@ -31,16 +39,20 @@ export const AIRPORTS = {
     name: 'Geneva',
     city: 'Geneva',
     country: 'Switzerland',
+    countryCode: 'CH',
     lat: 46.2381,
     lon: 6.1089,
   },
   BSL: {
     iata: 'BSL',
     name: 'EuroAirport Basel-Mulhouse-Freiburg',
-    // France, not Switzerland. EuroAirport sits on French soil under joint
-    // operation, and the country count should say so rather than round it.
     city: 'Basel',
+    // France, not Switzerland — both fields. EuroAirport sits on French soil
+    // under joint operation, and the country count should say so rather than
+    // round it. Flipping one of these two and not the other is what
+    // `airports.test.ts` compares them against `COUNTRIES` to catch.
     country: 'France',
+    countryCode: 'FR',
     lat: 47.5896,
     lon: 7.5299,
   },
@@ -49,6 +61,7 @@ export const AIRPORTS = {
     name: 'London Heathrow',
     city: 'London',
     country: 'United Kingdom',
+    countryCode: 'GB',
     lat: 51.47,
     lon: -0.4543,
   },
@@ -57,6 +70,7 @@ export const AIRPORTS = {
     name: 'Oslo Gardermoen',
     city: 'Oslo',
     country: 'Norway',
+    countryCode: 'NO',
     lat: 60.1939,
     lon: 11.1004,
   },
@@ -65,6 +79,7 @@ export const AIRPORTS = {
     name: 'Boston Logan',
     city: 'Boston',
     country: 'United States',
+    countryCode: 'US',
     lat: 42.3656,
     lon: -71.0096,
   },
@@ -73,6 +88,7 @@ export const AIRPORTS = {
     name: 'John F. Kennedy',
     city: 'New York',
     country: 'United States',
+    countryCode: 'US',
     lat: 40.6413,
     lon: -73.7781,
   },
@@ -81,6 +97,7 @@ export const AIRPORTS = {
     name: 'Vienna',
     city: 'Vienna',
     country: 'Austria',
+    countryCode: 'AT',
     lat: 48.1103,
     lon: 16.5697,
   },
@@ -89,6 +106,7 @@ export const AIRPORTS = {
     name: 'Rhodes Diagoras',
     city: 'Rhodes',
     country: 'Greece',
+    countryCode: 'GR',
     lat: 36.4054,
     lon: 28.0862,
   },
@@ -97,6 +115,7 @@ export const AIRPORTS = {
     name: 'Amsterdam Schiphol',
     city: 'Amsterdam',
     country: 'Netherlands',
+    countryCode: 'NL',
     lat: 52.3105,
     lon: 4.7683,
   },
@@ -105,6 +124,7 @@ export const AIRPORTS = {
     name: 'Barcelona El Prat',
     city: 'Barcelona',
     country: 'Spain',
+    countryCode: 'ES',
     lat: 41.2971,
     lon: 2.0785,
   },
@@ -113,6 +133,7 @@ export const AIRPORTS = {
     name: 'Lisbon Humberto Delgado',
     city: 'Lisbon',
     country: 'Portugal',
+    countryCode: 'PT',
     lat: 38.7756,
     lon: -9.1354,
   },
@@ -121,6 +142,7 @@ export const AIRPORTS = {
     name: 'Berlin Brandenburg',
     city: 'Berlin',
     country: 'Germany',
+    countryCode: 'DE',
     lat: 52.3667,
     lon: 13.5033,
   },

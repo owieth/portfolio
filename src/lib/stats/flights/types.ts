@@ -23,8 +23,43 @@ export interface Airport {
   name: string;
   city: string;
   country: string;
+  /** ISO 3166-1 alpha-2, and a key into `COUNTRIES`. */
+  countryCode: string;
   lat: number;
   lon: number;
+}
+
+export interface Country {
+  /** ISO 3166-1 alpha-2, uppercase. */
+  code: string;
+  name: string;
+}
+
+/**
+ * A carrier. No logo field, and deliberately: airline logos are registered
+ * trademarks, and every free set is either unlicensed or explicitly disclaims
+ * the marks it ships. The brand colour with the IATA code set in type on it is
+ * the version that infringes nothing — see the docblock in `airlines.ts`.
+ */
+export interface Airline {
+  iata: string;
+  name: string;
+  /** Uppercase `#RRGGBB`. */
+  colour: string;
+  /** Whichever of white or black clears WCAG AA against `colour`. */
+  onColour: string;
+}
+
+/**
+ * A type of aeroplane. Keyed in the registry on the string already stored in
+ * `flights.aircraft`, so `icao` is the value rather than the key — see the
+ * docblock in `aircraft.ts` for why both are worth carrying.
+ */
+export interface Aircraft {
+  name: string;
+  manufacturer: string;
+  /** ICAO Doc 8643 type designator, four characters. */
+  icao: string;
 }
 
 export interface Flight {
