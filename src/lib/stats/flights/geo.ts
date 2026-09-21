@@ -23,6 +23,13 @@ export interface GeoPoint {
 /** IUGG mean Earth radius. The 0.0088 is worth about a metre transatlantic. */
 const EARTH_RADIUS_KM = 6371.0088;
 
+/**
+ * The great circle all the way round, from the same radius as everything else
+ * here — so "0.91x around the Earth" on /stats divides `greatCircleDistanceKm`
+ * by its own sphere rather than by a textbook 40 075 that disagrees with it.
+ */
+export const EARTH_CIRCUMFERENCE_KM = 2 * Math.PI * EARTH_RADIUS_KM;
+
 const DEFAULT_SEGMENTS = 64;
 
 const toRad = (deg: number) => (deg * Math.PI) / 180;

@@ -35,6 +35,23 @@ import {
  * effectively untyped and the pure derivations downstream have no enforced
  * input contract.
  */
+
+/**
+ * One hour, the same window `@/app/(site)/design/page.tsx` uses for its GitHub
+ * read, so the site has one caching idiom rather than two.
+ *
+ * It is attached here rather than as a segment-level `export const revalidate`
+ * on the page, because `supabase-js` takes no per-query cache option — it calls
+ * `fetch` internally, and the only seam is the client's `global.fetch`. That
+ * turns out to be the better place anyway: the cache belongs to the query, so a
+ * second section on /stats with its own data gets its own window instead of
+ * inheriting the route's.
+ *
+ * Next has not cached `fetch` by default since 15, so this has to be explicit.
+ * Only GET is cacheable, which every PostgREST read through this client is.
+ */
+const REVALIDATE_SECONDS = 3600;
+
 let client: SupabaseClient<Database> | null = null;
 
 export const getSupabaseClient = (): SupabaseClient<Database> | null => {
@@ -45,6 +62,17 @@ export const getSupabaseClient = (): SupabaseClient<Database> | null => {
       persistSession: false,
       autoRefreshToken: false,
       detectSessionInUrl: false,
+    },
+    global: {
+      fetch: (input, init) =>
+        fetch(input, {
+          ...init,
+          // Cleared rather than spread through: Next refuses an explicit
+          // `cache` alongside `next.revalidate`, and `supabase-js` sets
+          // `cache: 'no-store'` on some paths.
+          cache: undefined,
+          next: { revalidate: REVALIDATE_SECONDS },
+        }),
     },
   });
 

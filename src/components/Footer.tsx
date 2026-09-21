@@ -1,3 +1,4 @@
+import { isStatsEnabled } from '@/lib/stats/config';
 import { ReactNode } from 'react';
 import Clock from './Clock';
 import CustomLink from './Link';
@@ -23,6 +24,11 @@ const Footer = () => (
             <CustomLink link="/projects" nav>
               Projects
             </CustomLink>
+            {isStatsEnabled && (
+              <CustomLink link="/stats" nav>
+                Stats
+              </CustomLink>
+            )}
             {/* <CustomLink link="/gallery" nav>Gallery</CustomLink> */}
           </Column>
 
