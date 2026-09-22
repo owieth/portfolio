@@ -24,6 +24,10 @@ describe('main', () => {
     ['an unknown source', ['build', '--source', 'sbb']],
     // The mirror serves one current feed; a year would imply a selector.
     ['a year against the mirror', ['build', '--source', 'geops', '--year', '2026']],
+    // recon takes the same flags as build and has to reject them the same way,
+    // rather than reaching the network and failing there.
+    ['a bad source under recon', ['recon', '--source', 'sbb']],
+    ['a bad year under recon', ['recon', '--year', '1998']],
   ];
 
   it.each(REJECTED)('returns 1 for %s', async (_label, argv) => {
@@ -40,5 +44,13 @@ describe('main', () => {
 
   it('runs diff without touching the network', async () => {
     await expect(main(['diff'])).resolves.toBe(0);
+  });
+
+  it('offers recon in the usage', async () => {
+    await main([]);
+
+    expect(process.stderr.write).toHaveBeenCalledWith(
+      expect.stringContaining('pnpm recon:data'),
+    );
   });
 });

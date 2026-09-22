@@ -7,6 +7,7 @@
     "build": "node scripts/maplibre-worker.mjs && next build",
     "build:data": "node rail/src/cli.ts build",
     "diff:data": "node rail/src/cli.ts diff",
+    "recon:data": "node rail/src/cli.ts recon",
     "start": "next start",
     "lint": "eslint",
     "react-doctor": "react-doctor",

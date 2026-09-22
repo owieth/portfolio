@@ -15,6 +15,7 @@
  *   pnpm build:data --year 2027
  *   pnpm build:data --source geops
  *   pnpm diff:data
+ *   pnpm recon:data
  *
  * Exit codes: 0 done, 1 the command line was wrong, 2 a step failed.
  */
@@ -23,17 +24,20 @@ import { parseArgs } from 'node:util';
 
 import { fetchFeed } from './fetch.ts';
 import { FETCH_FLAGS, parseFetchOptions } from './fetch/options.ts';
-import type { FlagValue } from './fetch/options.ts';
+import type { FetchOptions, FlagValue } from './fetch/options.ts';
+import { recon } from './recon.ts';
 
-const COMMANDS = ['build', 'diff'] as const;
+const COMMANDS = ['build', 'diff', 'recon'] as const;
 
 type Command = (typeof COMMANDS)[number];
 
 const USAGE = `usage: pnpm build:data [--year <year>] [--source opentransportdata|geops]
        pnpm diff:data
+       pnpm recon:data [--year <year>] [--source opentransportdata|geops]
 
   build   regenerate lines.csv, line_stops.csv, lines.json, lines.geojson and REPORT.md
   diff    compare the generated artifacts against the committed ones
+  recon   profile the feed into RECON.md, before anything models it
 
   --year    timetable year to build; defaults to the one in force today
   --source  where to get the feed; the geops mirror is opt-in, never automatic`;
@@ -50,7 +54,14 @@ function isCommand(value: string | undefined): value is Command {
   return COMMANDS.includes(value as Command);
 }
 
-async function build(values: Record<string, FlagValue>): Promise<number> {
+/**
+ * Both feed-reading commands take the same flags and fail the same two ways, so
+ * the parse and the error handling live here once rather than in each of them.
+ */
+async function withFeedOptions(
+  values: Record<string, FlagValue>,
+  run: (options: FetchOptions) => Promise<void>,
+): Promise<number> {
   const options = parseFetchOptions(values);
 
   if (!options.ok) {
@@ -59,12 +70,8 @@ async function build(values: Record<string, FlagValue>): Promise<number> {
     return 1;
   }
 
-  // The remaining steps land as their own modules here and are called from this
-  // function, in order: allowlist, stations, ingest, calendar, patterns, regions,
-  // merge, naming, sequence, seasonal, overpass, match, emit, report.
   try {
-    const feed = await fetchFeed(options.value, log);
-    log(`feed ${feed.id} is ready; no further steps are implemented yet`);
+    await run(options.value);
   } catch (error) {
     log(error instanceof Error ? error.message : String(error));
 
@@ -76,6 +83,22 @@ async function build(values: Record<string, FlagValue>): Promise<number> {
   }
 
   return 0;
+}
+
+function build(values: Record<string, FlagValue>): Promise<number> {
+  // The remaining steps land as their own modules here and are called from this
+  // function, in order: allowlist, stations, ingest, calendar, patterns, regions,
+  // merge, naming, sequence, seasonal, overpass, match, emit, report.
+  return withFeedOptions(values, async options => {
+    const feed = await fetchFeed(options, log);
+    log(`feed ${feed.id} is ready; no further steps are implemented yet`);
+  });
+}
+
+function profile(values: Record<string, FlagValue>): Promise<number> {
+  return withFeedOptions(values, async options => {
+    await recon(options, log);
+  });
 }
 
 function diff(): number {
@@ -105,7 +128,11 @@ export async function main(argv: string[]): Promise<number> {
     return 1;
   }
 
-  return command === 'build' ? build(values) : diff();
+  if (command === 'diff') {
+    return diff();
+  }
+
+  return command === 'build' ? build(values) : profile(values);
 }
 
 // Guarded so a test can import `main` without the module running a pipeline as
