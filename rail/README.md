@@ -8,7 +8,8 @@ stable list of the things you can actually ride, plus the geometry to draw them.
 Everything is rebuilt by one command and the results are committed, so the list
 is reviewable and diffable from one December to the next.
 
-The fetch step is implemented. The rest land one by one.
+The fetch step is implemented, and the feed has been profiled — see
+[`RECON.md`](RECON.md). The rest land one by one.
 
 ## What counts as a line
 
@@ -24,21 +25,34 @@ with every feed regeneration. Ids are built from the region and the number,
 Basel, Luzern, St. Gallen and Vaud, and without it the merge would fuse six
 unrelated lines into one.
 
-Lines with no public number — most narrow-gauge, rack and funicular services
-carry only a category — are named from operator, category and terminals, as in
-`RhB R Landquart-Davos Platz`. Those names are flagged in the report for a hand
-check.
+Lines with no public number — a quarter of the candidate routes, every funicular
+among them — are named from operator, category and terminals, as in
+`RhB R Landquart-Davos Platz`. There is no field to fall back to instead:
+`route_long_name` is empty on all 5,170 routes in the feed and `trip_short_name`
+is the train number, one per departure. Those names are flagged in the report
+for a hand check.
 
 ## What is included and excluded
 
 The principle: on a rail it is in, on a rope it is out. Funiculars run on rails
 and count.
 
-- **Included** — `route_type` 100 to 117, which covers IC, IR, RE, R, S-Bahn,
-  EC, PE and the rack railways, plus funiculars (1400, `route_desc` `FUN`).
-- **Excluded** — buses (2xx and 7xx), trams (900), metro (401), boats (1000),
-  aerial lifts and gondolas (1300), lifts (1303), taxis, and `EXT` special-event
-  trains.
+The lists are written in `route_desc`, not `route_type`. The recon found that
+`route_desc` is the finer of the two and that each of its codes maps to exactly
+one `route_type`, so a `route_type` rule cannot express the include list — 102
+is IC, EC, ICE and RJX at once, and 117 is `EXT`, which the range 100–117 would
+have included and the exclusion below would never have caught.
+
+- **Included** — `IC`, `EC`, `ICE`, `RJX`, `IR`, `PE`, `S`, `SN`, `R`, `RE`,
+  `NJ`, `CC` and `ZUG` — all within `route_type` 100 to 116 — plus funiculars
+  (`FUN`, 1400).
+- **Excluded** — `EXT` special-event trains (117), buses (`B`, `EV`, `EXB`,
+  `BN`, `BP`, `RUB` — 2xx and 7xx), trams (`T`, 900), metro (`M`, 401), boats
+  (`BAT`, `FAE`, 1000), aerial lifts and gondolas (`PB`, `GB`, `SL`, 1300),
+  lifts (`ASC`, 1303) and taxis (`TX`, 1500).
+- **Undecided** — the foreign categories `TER`, `TGV` and `RB`, 260 routes of
+  French and German regional and high-speed services. "Every Swiss train line"
+  is not "every line in the feed", and where that cut falls is #468's call.
 
 Both lists are **verified against the feed before they are used**, not assumed.
 A `route_type` the pipeline does not recognise is counted and reported rather
@@ -60,9 +74,12 @@ than silently dropped, so a new code appearing in a future feed is visible.
   committed artifacts and the December diff would show a wall of changes that
   look like timetable changes and are not.
 - **Geometry — the Overpass API against OpenStreetMap**, `route=train` and
-  `route=funicular` relations within Switzerland. GTFS `shapes.txt` is checked
-  first; if it covers most lines, OSM becomes the fallback rather than the
-  primary source.
+  `route=funicular` relations within Switzerland. **The only source there is.**
+  Neither the official feed nor the geOps mirror ships a `shapes.txt` — checked,
+  not assumed — so OSM is the primary geometry source with nothing behind it.
+  The BAV's `ch.bav.schienennetz` layer has the geometry but is keyed on a BAV
+  line number the GTFS feed does not publish, which is a join nobody can make
+  today.
 
 ### What the portal actually does
 
@@ -123,6 +140,7 @@ pnpm install
 pnpm build:data
 pnpm build:data --year 2027     # the next timetable, once the portal publishes it
 pnpm build:data --source geops  # when the official portal is down
+pnpm recon:data                 # regenerate RECON.md from the feed
 ```
 
 A run writes the five committed artifacts at the top of this directory, and the
@@ -181,6 +199,7 @@ actually does something.
 ```
 rail/
 ├── README.md         this file
+├── RECON.md          what the feed was found to contain, before modelling
 ├── src/              the pipeline; src/cli.ts is the entry point
 ├── data/             committed lookups and seed files, reviewed by hand
 └── data/raw/         the feed and Overpass cache, gitignored and disposable
@@ -189,6 +208,13 @@ rail/
 The generated artifacts — `lines.csv`, `line_stops.csv`, `lines.json`,
 `lines.geojson` and `REPORT.md` — land at the top of this directory and are
 committed.
+
+`RECON.md` sits next to them but is not one of them. `pnpm build:data` does not
+write it and nothing downstream reads it: it is what the feed was found to
+contain before any of this was modelled, regenerated on demand by
+`pnpm recon:data` and committed so the answers stay next to the code that trusts
+them. It names the publication it describes and reads nothing from the clock, so
+rerunning it against the same feed produces the same bytes.
 
 ## Later: checking in to the train I am on
 
