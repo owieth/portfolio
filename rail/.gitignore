@@ -1,0 +1,5 @@
+# GTFS downloads, Overpass responses and the DuckDB working file, all written by
+# `pnpm build:data`. Regenerable, large, and never reviewed. The directory itself
+# is tracked through .gitkeep so a fresh clone has somewhere to write.
+data/raw/*
+!data/raw/.gitkeep
