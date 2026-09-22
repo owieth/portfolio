@@ -37,6 +37,7 @@
     "tailwind-merge": "3.7.0"
   },
   "devDependencies": {
+    "@duckdb/node-api": "1.5.5-r.5",
     "@tailwindcss/postcss": "4.3.3",
     "@types/geojson": "7946.0.16",
     "@types/node": "26.6.2",
