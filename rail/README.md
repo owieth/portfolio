@@ -8,8 +8,7 @@ stable list of the things you can actually ride, plus the geometry to draw them.
 Everything is rebuilt by one command and the results are committed, so the list
 is reviewable and diffable from one December to the next.
 
-Nothing here is implemented yet. This is the skeleton and the command; the steps
-land one by one.
+The fetch step is implemented. The rest land one by one.
 
 ## What counts as a line
 
@@ -50,20 +49,53 @@ than silently dropped, so a new code appearing in a future feed is visible.
 - **Timetable — the official Swiss GTFS Static feed.**
   [`timetable-2026-gtfs2020`](https://data.opentransportdata.swiss/en/dataset/timetable-2026-gtfs2020)
   and [`timetable-2027-gtfs2020`](https://data.opentransportdata.swiss/en/dataset/timetable-2027-gtfs2020),
-  one dataset per timetable year, republished frequently within the year. Two
-  things that cost time if you rediscover them: the portal host is
-  `data.opentransportdata.swiss` and the bare `opentransportdata.swiss/en/dataset/…`
-  **404**s, and the documented CKAN JSON API at `/api/3/action/package_show`
-  currently answers **403** to an unauthenticated client, so resolving the
-  download URL needs an API key or the dataset page itself.
+  one dataset per timetable year, republished every few days within the year.
+  The current download URL is resolved at runtime, because it changes with every
+  regeneration.
 - **Mirror — [gtfs.geops.ch](https://gtfs.geops.ch/).** geOps converts the
   official publication to GTFS daily and offers `dl/gtfs_complete.zip` plus
   per-mode splits, including `dl/gtfs_train.zip` and `dl/gtfs_funicular.zip`.
-  The fallback for when the official portal is down.
+  It is **opt-in through `--source geops`, never an automatic fallback**: geOps
+  re-derives the feed with its own ids, so a silent switch would rewrite the
+  committed artifacts and the December diff would show a wall of changes that
+  look like timetable changes and are not.
 - **Geometry — the Overpass API against OpenStreetMap**, `route=train` and
   `route=funicular` relations within Switzerland. GTFS `shapes.txt` is checked
   first; if it covers most lines, OSM becomes the fallback rather than the
   primary source.
+
+### What the portal actually does
+
+Everything below cost time to find out and none of it is in the documentation.
+
+- The portal host is `data.opentransportdata.swiss`. The bare
+  `opentransportdata.swiss/en/dataset/…` **404**s.
+- The documented CKAN JSON API is unusable: `/api/3/action/package_show` answers
+  **403** from nginx to every unauthenticated client, browser `User-Agent` or
+  not — the whole `/api/` path is blocked. **The DCAT serialisations of the same
+  dataset are public**, though: `…/en/dataset/<id>.jsonld`, `.rdf`, `.xml` and
+  `.ttl` all answer 200, and `.jsonld` needs no extra parser. That is what the
+  pipeline reads. It **308**s to `/dataset_series/<id>.jsonld` — these are
+  DCAT-AP dataset *series* — so the redirect has to be followed.
+- Inside the catalogue: `@graph` is unordered and the first distribution in the
+  live 2026 response was ten months old; `dct:identifier` spells the date two
+  ways in one series (`GTFS_FP2026_20260919.zip` and `GTFS_FP2026_2025-06-23.zip`);
+  `dcat:byteSize` is absent on some distributions; and `dct:license` differs
+  between distributions of the same dataset. Recency therefore comes from
+  `dct:issued` and nothing else.
+- The download URL **302**s to a Cloudflare R2 presigned URL with
+  `X-Amz-Expires=60`, and **`HEAD` against it answers 403** because the signature
+  is method-scoped — the usual HEAD-for-the-ETag cache probe is impossible. A
+  ranged GET works, and Node's `fetch` does forward `If-None-Match` across that
+  cross-origin redirect. The pipeline needs neither: the CKAN resource uuid is
+  immutable per publication, which is a stronger check than an ETag and costs no
+  request.
+- `dct:temporal` gives the timetable period: 2026 runs 2025-12-14 to 2026-12-12,
+  2027 starts 2026-12-13. Both start on the **second Sunday of December**, which
+  is the rule `--year` defaults on.
+- The mirror is the opposite shape. `gtfs_complete.zip` is one mutable, undated
+  URL rebuilt daily, so ETag and Last-Modified are its only version signal — but
+  `HEAD` works there and a conditional GET answers 304 as it should.
 
 ## Licensing and attribution
 
@@ -89,11 +121,37 @@ repo's existing pnpm setup, with DuckDB embedded through `@duckdb/node-api`.
 ```sh
 pnpm install
 pnpm build:data
+pnpm build:data --year 2027     # the next timetable, once the portal publishes it
+pnpm build:data --source geops  # when the official portal is down
 ```
 
 A run writes the five committed artifacts at the top of this directory, and the
 download cache under `data/raw/`, which is gitignored. A run never writes to
 Supabase.
+
+### Caching
+
+Each feed lands in its own directory, named for the publication it came from:
+
+```
+data/raw/otd-fp2026-20260919/
+├── gtfs.zip    the archive as published
+├── gtfs/       its members, unpacked
+└── feed.json   provenance — written last, so its presence means the rest is complete
+```
+
+A second run resolves the catalogue, recognises the publication it already has,
+and downloads nothing. `feed.json` records the resolved URL, the CKAN resource
+uuid, the publication timestamp, the sha256 of the archive and when it was
+fetched — enough to say exactly which feed an artifact was built from, which is
+the question that matters when a line disappears between two Decembers. It also
+separates `fetchedAt` from `checkedAt`, so a cache hit does not make the record
+claim the bytes are newer than they are.
+
+Budget about 256 MB per archive and several gigabytes unpacked — `stop_times.txt`
+alone is over 3 GB. Older feeds are reported after a download but never deleted
+automatically; `rm -rf data/raw/<feed-id>` when you are done with one, which also
+forces the next run to fetch it again.
 
 ## Relationship to Supabase
 
