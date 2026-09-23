@@ -3,7 +3,16 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import { writeSeed } from './dbseed.ts';
+import { SEED_SQL, renderSeedFrom, writeSeed } from './dbseed.ts';
+
+describe('the committed seed', () => {
+  it('is what the committed CSVs generate', async () => {
+    const { sql } = await renderSeedFrom();
+
+    // A failure here means the CSVs changed without the seed: run pnpm seed:data.
+    expect(await readFile(SEED_SQL, 'utf8')).toBe(sql);
+  });
+});
 
 describe('writeSeed', () => {
   let dir: string;
