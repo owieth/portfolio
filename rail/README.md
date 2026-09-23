@@ -166,9 +166,10 @@ Each feed lands in its own directory, named for the publication it came from:
 
 ```
 data/raw/otd-fp2026-20260919/
-├── gtfs.zip    the archive as published
-├── gtfs/       its members, unpacked
-└── feed.json   provenance — written last, so its presence means the rest is complete
+├── gtfs.zip      the archive as published
+├── gtfs/         its members, unpacked
+├── rail.duckdb   the ingested stop times, written by the build
+└── feed.json     provenance — written last, so its presence means the rest is complete
 ```
 
 A second run resolves the catalogue, recognises the publication it already has,
@@ -183,6 +184,23 @@ Budget about 256 MB per archive and several gigabytes unpacked — `stop_times.t
 alone is over 3 GB. Older feeds are reported after a download but never deleted
 automatically; `rm -rf data/raw/<feed-id>` when you are done with one, which also
 forces the next run to fetch it again.
+
+`rail.duckdb` is the same kind of thing: a cache, never reviewed, always safe to
+delete. It holds `stop_times.txt` narrowed to the five columns a line is made of
+— trip, sequence, stop, and the two flags that mark a stop the train passes
+without serving — sorted into trip order, so the four later steps that walk a
+trip's stops query a table instead of re-parsing gigabytes of CSV apiece. A run
+that finds it still answers for the CSV on disk leaves it alone; `--force`
+rebuilds it.
+
+The ingest pins DuckDB's buffer pool to 2 GB and gives it somewhere to spill, so
+what it costs is a property of the feed rather than of the machine — the default
+is 80% of whatever RAM the machine has, which would make the same run mean
+something different on every laptop. The 2026 feed turns 3.0 GB of
+`stop_times.txt` into 432 MB of table in about 7 seconds, at a peak of 3 GB
+resident: the buffer pool is the 2 GB of it, and the CSV reader and Node account
+for the rest. The run log prints the wall time and the peak it actually reached,
+so a feed that outgrows this is visible rather than mysterious.
 
 ## Relationship to Supabase
 

@@ -14,6 +14,7 @@
  *   pnpm build:data
  *   pnpm build:data --year 2027
  *   pnpm build:data --source geops
+ *   pnpm build:data --force
  *   pnpm diff:data
  *   pnpm recon:data
  *
@@ -26,6 +27,8 @@ import { allowRoutes } from './allowlist.ts';
 import { fetchFeed } from './fetch.ts';
 import { FETCH_FLAGS, parseFetchOptions } from './fetch/options.ts';
 import type { FetchOptions, FlagValue } from './fetch/options.ts';
+import { ingestStopTimes } from './ingest.ts';
+import { INGEST_FLAGS, parseIngestOptions } from './ingest/options.ts';
 import { recon } from './recon.ts';
 import { resolveStations } from './stations.ts';
 
@@ -33,7 +36,7 @@ const COMMANDS = ['build', 'diff', 'recon'] as const;
 
 type Command = (typeof COMMANDS)[number];
 
-const USAGE = `usage: pnpm build:data [--year <year>] [--source opentransportdata|geops]
+const USAGE = `usage: pnpm build:data [--year <year>] [--source opentransportdata|geops] [--force]
        pnpm diff:data
        pnpm recon:data [--year <year>] [--source opentransportdata|geops]
 
@@ -42,7 +45,8 @@ const USAGE = `usage: pnpm build:data [--year <year>] [--source opentransportdat
   recon   profile the feed into RECON.md, before anything models it
 
   --year    timetable year to build; defaults to the one in force today
-  --source  where to get the feed; the geops mirror is opt-in, never automatic`;
+  --source  where to get the feed; the geops mirror is opt-in, never automatic
+  --force   re-read stop_times.txt even when the feed's store already answers for it`;
 
 /**
  * Progress goes to stderr so stdout stays clean for an artifact that a future
@@ -89,20 +93,23 @@ async function withFeedOptions(
 
 function build(values: Record<string, FlagValue>): Promise<number> {
   // The remaining steps land as their own modules here and are called from this
-  // function, in order: ingest, calendar, patterns, regions, merge, naming,
-  // sequence, seasonal, overpass, match, emit, report.
+  // function, in order: calendar, patterns, regions, merge, naming, sequence,
+  // seasonal, overpass, match, emit, report.
   return withFeedOptions(values, async options => {
     const feed = await fetchFeed(options, log);
     const allowed = await allowRoutes(feed.gtfsDir, log);
 
-    // Sequential although the two steps do not depend on each other yet. Each
-    // one narrates itself to stderr and the log is read top to bottom, so
-    // running them together would interleave two reports into neither. They
-    // read 5,170 and 104,262 rows; there is no wall clock here worth buying.
+    // Sequential although the first three steps do not depend on each other yet.
+    // Each one narrates itself to stderr and the log is read top to bottom, so
+    // running them together would interleave three reports into none. The first
+    // two read 5,170 and 104,262 rows; the third reads several gigabytes and is
+    // the one thing here that would rather have the memory to itself.
     // react-doctor-disable-next-line react-doctor/server-sequential-independent-await
     const resolved = await resolveStations(feed.gtfsDir, log);
+    const ingested = await ingestStopTimes(feed.dir, log, parseIngestOptions(values));
+
     log(
-      `${allowed.routes.length} routes and ${resolved.stations.length} stations are ready; no further steps are implemented yet`,
+      `${allowed.routes.length} routes, ${resolved.stations.length} stations and ${ingested.rows} stop times are ready; no further steps are implemented yet`,
     );
   });
 }
@@ -128,7 +135,7 @@ export async function main(argv: string[]): Promise<number> {
   // values are consumed correctly, and validates them itself.
   const { positionals, values } = parseArgs({
     args: argv,
-    options: { ...FETCH_FLAGS },
+    options: { ...FETCH_FLAGS, ...INGEST_FLAGS },
     strict: false,
     allowPositionals: true,
   });
