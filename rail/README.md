@@ -507,6 +507,90 @@ is part of OSM's IC 3 to Chur. Nine are funiculars. The other 67 are numbered
 lines that OSM does not have, or has only in part. Of the 868 relations still in use, 89 matched
 no line. Almost all of those run abroad.
 
+## True termini
+
+A line's termini are the two ends of its trunk: the first stop of its canonical
+sequence and the last stop before the branch blocks. They are Swiss by
+construction, because the patterns stop at the border. That is right for the
+checklist, since the Swiss stops are what you can tick off. For a train that
+runs abroad, though, the termini give where it leaves the country and not where
+it goes. The `EC6` would read as Basel SBB to Brig.
+
+So every line also gets its **true termini**, read again from `stop_times` with
+nothing cut off. The rule is applied to each Swiss terminus on its own. Take the
+trips whose Swiss end on that side is the terminus. Their true terminus is the
+station they really end at most often, weighted by the days they run, which is
+the same busiest-wins rule that picks the backbone. A stop the train only passes
+does not count. When most of those trips end in Switzerland, or none end at that
+terminus at all, the true terminus is the Swiss one. A tie goes to the lower
+Didok number. A line seeded by hand has the same termini twice.
+
+The 2026 feed has 60 international lines. The `EC6` runs on to Domodossola, the
+`TGV 622E` from Vallorbe to Paris Gare de Lyon, and the RE from Boncourt to
+Delle. The true terminus goes only as far as the feed carries the trip, and the
+feed does not always carry it all the way. Its ECs to Milano end at
+Como S. Giovanni or Domodossola, the first stop in Italy, so that is where their
+true terminus is. No other source is used to correct them. The name is the
+station's name as `stops.txt` has it, since the stations step keeps only the
+Swiss ones.
+
+## The artifacts
+
+The build writes three files at the top of this directory. `lines.csv` has one
+row per line, and `line_stops.csv` has one row per stop of a line. `lines.json`
+holds the same records with the stops nested inside each line, for a reader that
+wants one file instead of a join. The field names are the same in all three, and
+they are the column names of `rail_lines` and `rail_line_stops`.
+
+| `lines.csv`             |                                                                          |
+| ----------------------- | ------------------------------------------------------------------------ |
+| `id`                    | the stable id, `fernverkehr:IR35`                                        |
+| `display_name`          | the number, or the derived name                                          |
+| `category`              | the feed's `route_desc` code                                             |
+| `network_region`        | the region slug, the part of the id before the colon                     |
+| `operators`             | every operator that runs it, by the feed's name                          |
+| `terminal_a`, `_b`      | the ends of the trunk, in sequence order                                 |
+| `true_terminal_a`, `_b` | where the trains beyond each end really end; see above                   |
+| `route_ids`             | the feed's `route_id`s, renumbered by every feed, empty on a seeded line |
+| `seasonal`              | runs in fewer than two thirds of the feed year's weeks                   |
+| `trips_per_week`        | departures in the reference week                                         |
+| `has_geometry`          | whether `lines.geojson` draws it                                         |
+
+| `line_stops.csv` |                                                               |
+| ---------------- | ------------------------------------------------------------- |
+| `line_id`        | the line's `id`                                               |
+| `sequence`       | from 1, in canonical order: the trunk, then each branch block |
+| `stop_name`      | the station's name                                            |
+| `sloid`, `didok` | the Swiss Location ID and the Didok/UIC number                |
+| `lat`, `lon`     | the station's position                                        |
+| `via`            | `backbone`, `extension`, `detour` or `branch`                 |
+| `junction`       | the Didok number of the stop it was placed against            |
+
+The issue asked for the columns up to `lon`. `via` and `junction` are there as
+well because without them a branch block reads as if the trunk carried on: the
+`S12`'s Hettlingen would look like the stop after Wil SG. A seeded line's stops
+are all `backbone`, in the running order they were written in.
+
+The CSVs are RFC 4180, UTF-8 with no byte-order mark, and have `\n` line ends and
+a header row. A field is quoted only when it holds a comma, a quote or a line
+break. An empty field is null, which is what Postgres `copy … csv` reads it as:
+a seeded line's `seasonal` and `trips_per_week`, a station with no SLOID or
+position, the `junction` of a backbone stop. The lists in `operators` and
+`route_ids` are joined with `;`, sorted by code unit. A value that contains a
+`;` stops the build, because it would read back as two.
+
+Two runs over the same feed write the same bytes. Lines are sorted by id and
+stops by sequence, both compared by code unit. Every record is built field by
+field, so nothing depends on insertion order, the locale or the clock, and the
+log prints a sha256 fingerprint of each file. `lines.json` is checked against
+[`lines.schema.json`](lines.schema.json) (JSON Schema 2020-12, through Ajv)
+before anything is written, and the CSVs are flattened from the same records.
+The build also checks what the schema cannot express, that every id is unique
+and that every stop row names a line in `lines.csv`. A failed check writes
+nothing, so the committed files never end up half replaced.
+
+The 2026 feed gives 532 lines and 6,080 line stops.
+
 ## Data sources
 
 - **Timetable — the official Swiss GTFS Static feed.**
@@ -687,6 +771,7 @@ actually does something.
 rail/
 ├── README.md         this file
 ├── RECON.md          what the feed was found to contain, before modelling
+├── lines.schema.json the JSON Schema lines.json is checked against, written by hand
 ├── src/              the pipeline; src/cli.ts is the entry point
 ├── data/             committed lookups and seed files, reviewed by hand
 └── data/raw/         the feed and Overpass cache, gitignored and disposable
