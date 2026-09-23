@@ -21,9 +21,47 @@ the feed.
 
 `route_id` is never the identity and never appears in an id, because it changes
 with every feed regeneration. Ids are built from the region and the number,
-`s-bahn-zuerich:S1`. The region is load-bearing: `S1` exists in Zürich, Bern,
-Basel, Luzern, St. Gallen and Vaud, and without it the merge would fuse six
-unrelated lines into one.
+`s-bahn-zuerich:S1`. The region is load-bearing: the 2026 feed has an `S1` in
+Basel, Bern, Luzern, St. Gallen and Chur, three of them SBB's, and without it the
+merge would fuse five unrelated lines into one.
+
+## Network regions
+
+The feed publishes no network, so the region is derived from where a route
+stops. The rules are data, in [`data/regions.json`](data/regions.json): a
+`regions` map from slug to display name, and an ordered `rules` list, tried top
+to bottom until one matches. A rule is any combination of
+
+- `categories` — the route's category is one of these,
+- `agencies` — its operator is one of these, by `agency_id`,
+- `lines` — its `route_short_name` is one of these,
+- `serves` — it stops at one of these stations, by Didok number,
+
+and files the route under `region`, or, with `"byOperator": true`, under its
+operator's slug. A station the train passes without stopping does not count as
+served. `note` is free text for the reviewer, since JSON has no comments.
+
+```json
+{
+  "region": "s-bahn-basel",
+  "serves": [{ "didok": "8500010", "name": "Basel SBB" }],
+  "note": "Before Aargau, because Basel's S1 runs on to Brugg AG."
+}
+```
+
+Order is the whole design. Anchors are a network's own hubs, and a station two
+networks share is either left out or given to whichever rule comes first, with a
+`note` saying why. Long-distance categories share one national region;
+funiculars, rack railways, metre-gauge operators and the German networks are
+filed under their operator on purpose — each is its own number space.
+
+Adding a region is an edit to the file and nothing else: declare the slug, add a
+rule where it belongs in the order, rerun `pnpm build:data`. The names next to
+each Didok number and `agency_id` are checked against the feed, so a typo in an
+id is reported rather than silently anchoring the wrong station. The run also
+reports any rule that matched nothing — a stale rule after a timetable change —
+and every route no rule placed. Those fall back to their operator's slug and
+are listed, because a route in the wrong region merges into the wrong line.
 
 Lines with no public number — a quarter of the candidate routes, every funicular
 among them — are named from operator, category and terminals, as in

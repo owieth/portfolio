@@ -32,6 +32,7 @@ import { ingestStopTimes } from './ingest.ts';
 import { INGEST_FLAGS, parseIngestOptions } from './ingest/options.ts';
 import { derivePatterns } from './patterns.ts';
 import { recon } from './recon.ts';
+import { assignRegions } from './regions.ts';
 import { resolveStations } from './stations.ts';
 
 const COMMANDS = ['build', 'diff', 'recon'] as const;
@@ -95,8 +96,8 @@ async function withFeedOptions(
 
 function build(values: Record<string, FlagValue>): Promise<number> {
   // The remaining steps land as their own modules here and are called from this
-  // function, in order: regions, merge, naming, sequence, seasonal, overpass,
-  // match, emit, report.
+  // function, in order: merge, naming, sequence, seasonal, overpass, match, emit,
+  // report.
   return withFeedOptions(values, async options => {
     const feed = await fetchFeed(options, log);
     const allowed = await allowRoutes(feed.gtfsDir, log);
@@ -118,9 +119,13 @@ function build(values: Record<string, FlagValue>): Promise<number> {
       routeIds: allowed.routes.map(route => route.routeId),
       didoks: resolved.stations.map(station => station.didok),
     });
+    // Reads the stop times table the ingest wrote, through the same one-writer
+    // DuckDB file the two steps above hold in turn.
+    // react-doctor-disable-next-line react-doctor/server-sequential-independent-await
+    const regioned = await assignRegions(feed.dir, allowed.routes, log);
 
     log(
-      `${allowed.routes.length} routes, ${resolved.stations.length} stations, ${ingested.rows} stop times, ${calendar.serviceDays} service days and ${patterns.patterns.length} stop patterns are ready; no further steps are implemented yet`,
+      `${allowed.routes.length} routes in ${regioned.regions.length} regions, ${resolved.stations.length} stations, ${ingested.rows} stop times, ${calendar.serviceDays} service days and ${patterns.patterns.length} stop patterns are ready; no further steps are implemented yet`,
     );
   });
 }
