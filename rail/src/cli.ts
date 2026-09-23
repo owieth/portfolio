@@ -16,6 +16,7 @@
  *   pnpm build:data --source geops
  *   pnpm build:data --force
  *   pnpm diff:data
+ *   pnpm diff:data --base HEAD~1
  *   pnpm recon:data
  *
  * Exit codes: 0 done, 1 the command line was wrong, 2 a step failed.
@@ -25,6 +26,8 @@ import { parseArgs } from 'node:util';
 
 import { allowRoutes } from './allowlist.ts';
 import { expandCalendar } from './calendar.ts';
+import { diffArtifacts } from './diff.ts';
+import { DIFF_FLAGS, parseDiffOptions } from './diff/options.ts';
 import { emitArtifacts } from './emit.ts';
 import { fetchFeed } from './fetch.ts';
 import { FETCH_FLAGS, parseFetchOptions } from './fetch/options.ts';
@@ -54,16 +57,17 @@ const COMMANDS = ['build', 'diff', 'recon'] as const;
 type Command = (typeof COMMANDS)[number];
 
 const USAGE = `usage: pnpm build:data [--year <year>] [--source opentransportdata|geops] [--force]
-       pnpm diff:data
+       pnpm diff:data [--base <git ref>]
        pnpm recon:data [--year <year>] [--source opentransportdata|geops]
 
   build   regenerate lines.csv, line_stops.csv, lines.json, lines.geojson and REPORT.md
-  diff    compare the generated artifacts against the committed ones
+  diff    compare the generated lines.csv and line_stops.csv against the committed ones
   recon   profile the feed into RECON.md, before anything models it
 
   --year    timetable year to build; defaults to the one in force today
   --source  where to get the feed; the geops mirror is opt-in, never automatic
-  --force   re-read stop_times.txt even when the feed's store already answers for it`;
+  --force   re-read stop_times.txt even when the feed's store already answers for it
+  --base    the commit diff reads the committed files at; defaults to HEAD`;
 
 /**
  * Progress goes to stderr so stdout stays clean for an artifact that a future
@@ -216,8 +220,24 @@ function profile(values: Record<string, FlagValue>): Promise<number> {
   });
 }
 
-function diff(): number {
-  log('no artifacts to diff yet; nothing to do');
+/** The summary goes to stdout, so it can be piped into a pull request. */
+async function diff(values: Record<string, FlagValue>): Promise<number> {
+  const options = parseDiffOptions(values);
+
+  if (!options.ok) {
+    log(options.error);
+    process.stderr.write(`${USAGE}\n`);
+    return 1;
+  }
+
+  try {
+    const { markdown } = await diffArtifacts(options.value, log);
+    process.stdout.write(markdown);
+  } catch (error) {
+    logFailure(error);
+    return 2;
+  }
+
   return 0;
 }
 
@@ -231,7 +251,7 @@ export async function main(argv: string[]): Promise<number> {
   // values are consumed correctly, and validates them itself.
   const { positionals, values } = parseArgs({
     args: argv,
-    options: { ...FETCH_FLAGS, ...INGEST_FLAGS },
+    options: { ...FETCH_FLAGS, ...INGEST_FLAGS, ...DIFF_FLAGS },
     strict: false,
     allowPositionals: true,
   });
@@ -244,7 +264,7 @@ export async function main(argv: string[]): Promise<number> {
   }
 
   if (command === 'diff') {
-    return diff();
+    return diff(values);
   }
 
   return command === 'build' ? build(values) : profile(values);
