@@ -77,6 +77,14 @@ function isCommand(value: string | undefined): value is Command {
   return COMMANDS.includes(value as Command);
 }
 
+function logFailure(error: unknown): void {
+  log(error instanceof Error ? error.message : String(error));
+
+  if (error instanceof Error && error.cause !== undefined) {
+    log(`  caused by: ${error.cause}`);
+  }
+}
+
 /**
  * Both feed-reading commands take the same flags and fail the same two ways, so
  * the parse and the error handling live here once rather than in each of them.
@@ -96,12 +104,7 @@ async function withFeedOptions(
   try {
     await run(options.value);
   } catch (error) {
-    log(error instanceof Error ? error.message : String(error));
-
-    if (error instanceof Error && error.cause !== undefined) {
-      log(`  caused by: ${error.cause}`);
-    }
-
+    logFailure(error);
     return 2;
   }
 
