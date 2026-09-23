@@ -8,8 +8,8 @@ stable list of the things you can actually ride, plus the geometry to draw them.
 Everything is rebuilt by one command and the results are committed, so the list
 is reviewable and diffable from one December to the next.
 
-The fetch step is implemented, and the feed has been profiled — see
-[`RECON.md`](RECON.md). The rest land one by one.
+Every step below is implemented, and the feed was profiled before any of them
+was modelled — see [`RECON.md`](RECON.md).
 
 ## What counts as a line
 
