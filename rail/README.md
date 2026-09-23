@@ -775,6 +775,7 @@ pnpm build:data --source geops  # when the official portal is down
 pnpm diff:data                  # what the build changed against the committed CSVs
 pnpm diff:data --base HEAD~1    # the same, against another commit's snapshot
 pnpm recon:data                 # regenerate RECON.md from the feed
+pnpm seed:data                  # regenerate supabase/seeds/rail.sql from the CSVs
 ```
 
 A run writes the five committed artifacts at the top of this directory, and the
