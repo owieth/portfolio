@@ -30,6 +30,7 @@ import { FETCH_FLAGS, parseFetchOptions } from './fetch/options.ts';
 import type { FetchOptions, FlagValue } from './fetch/options.ts';
 import { ingestStopTimes } from './ingest.ts';
 import { INGEST_FLAGS, parseIngestOptions } from './ingest/options.ts';
+import { matchLines } from './match.ts';
 import { mergeLines } from './merge.ts';
 import { nameLines } from './naming.ts';
 import { loadOperators } from './naming/operators.ts';
@@ -104,7 +105,7 @@ async function withFeedOptions(
 
 function build(values: Record<string, FlagValue>): Promise<number> {
   // The remaining steps land as their own modules here and are called from this
-  // function, in order: match, emit, report.
+  // function, in order: emit, report.
   return withFeedOptions(values, async options => {
     const feed = await fetchFeed(options, log);
     const allowed = await allowRoutes(feed.gtfsDir, log);
@@ -131,13 +132,14 @@ function build(values: Record<string, FlagValue>): Promise<number> {
     // react-doctor-disable-next-line react-doctor/server-sequential-independent-await
     const regioned = await assignRegions(feed.dir, allowed.routes, log);
     const merged = mergeLines(regioned.routes, patterns.patterns, log);
+    const operators = await loadOperators();
     const named = nameLines(
       {
         lines: merged.lines,
         routes: regioned.routes,
         patterns: patterns.patterns,
         stations: resolved.stations,
-        operators: await loadOperators(),
+        operators,
       },
       log,
     );
@@ -156,14 +158,18 @@ function build(values: Record<string, FlagValue>): Promise<number> {
       },
       log,
     );
-    // Last, although it reads nothing the steps above wrote: the match step it
+    // Late, although it reads nothing the steps above wrote: the match step it
     // feeds needs their lines, and a cold cache here waits minutes on Overpass,
     // which is better spent after the feed has been shown to build.
     // react-doctor-disable-next-line react-doctor/server-sequential-independent-await
     const osm = await fetchOsmRelations(log);
+    const matched = matchLines(
+      { lines: seasonal.lines, relations: osm.relations, stations: resolved.stations, operators },
+      log,
+    );
 
     log(
-      `${seasonal.lines.length} lines, ${named.derived} of them with derived names and ${seeded.manual} seeded by hand, ${sequenced.branched.length} with branches and ${seasonal.seasonal.length} seasonal, from ${allowed.routes.length} routes in ${regioned.regions.length} regions, ${resolved.stations.length} stations, ${ingested.rows} stop times, ${calendar.serviceDays} service days, ${patterns.patterns.length} stop patterns and ${osm.relations.length} OSM route relations are ready; no further steps are implemented yet`,
+      `${seasonal.lines.length} lines, ${named.derived} of them with derived names and ${seeded.manual} seeded by hand, ${sequenced.branched.length} with branches and ${seasonal.seasonal.length} seasonal, ${seasonal.lines.length - matched.unmatched.length} with geometry, from ${allowed.routes.length} routes in ${regioned.regions.length} regions, ${resolved.stations.length} stations, ${ingested.rows} stop times, ${calendar.serviceDays} service days, ${patterns.patterns.length} stop patterns and ${osm.relations.length} OSM route relations are ready; no further steps are implemented yet`,
     );
   });
 }
