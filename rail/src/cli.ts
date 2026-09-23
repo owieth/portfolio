@@ -30,6 +30,7 @@ import { FETCH_FLAGS, parseFetchOptions } from './fetch/options.ts';
 import type { FetchOptions, FlagValue } from './fetch/options.ts';
 import { ingestStopTimes } from './ingest.ts';
 import { INGEST_FLAGS, parseIngestOptions } from './ingest/options.ts';
+import { mergeLines } from './merge.ts';
 import { derivePatterns } from './patterns.ts';
 import { recon } from './recon.ts';
 import { assignRegions } from './regions.ts';
@@ -96,7 +97,7 @@ async function withFeedOptions(
 
 function build(values: Record<string, FlagValue>): Promise<number> {
   // The remaining steps land as their own modules here and are called from this
-  // function, in order: merge, naming, sequence, seasonal, overpass, match, emit,
+  // function, in order: naming, sequence, seasonal, overpass, match, emit,
   // report.
   return withFeedOptions(values, async options => {
     const feed = await fetchFeed(options, log);
@@ -123,9 +124,10 @@ function build(values: Record<string, FlagValue>): Promise<number> {
     // DuckDB file the two steps above hold in turn.
     // react-doctor-disable-next-line react-doctor/server-sequential-independent-await
     const regioned = await assignRegions(feed.dir, allowed.routes, log);
+    const merged = mergeLines(regioned.routes, patterns.patterns, log);
 
     log(
-      `${allowed.routes.length} routes in ${regioned.regions.length} regions, ${resolved.stations.length} stations, ${ingested.rows} stop times, ${calendar.serviceDays} service days and ${patterns.patterns.length} stop patterns are ready; no further steps are implemented yet`,
+      `${merged.lines.length} lines from ${allowed.routes.length} routes in ${regioned.regions.length} regions, ${resolved.stations.length} stations, ${ingested.rows} stop times, ${calendar.serviceDays} service days and ${patterns.patterns.length} stop patterns are ready; no further steps are implemented yet`,
     );
   });
 }
