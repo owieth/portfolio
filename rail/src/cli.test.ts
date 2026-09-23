@@ -18,7 +18,7 @@ describe('main', () => {
 
   const REJECTED: [string, string[]][] = [
     ['no command', []],
-    ['an unknown command', ['seed']],
+    ['an unknown command', ['deploy']],
     ['a year that predates the published feeds', ['build', '--year', '2019']],
     ['a year that is not a year', ['build', '--year', 'twenty']],
     ['an unknown source', ['build', '--source', 'sbb']],
@@ -36,7 +36,7 @@ describe('main', () => {
   });
 
   it('prints the usage when the command line is wrong', async () => {
-    await main(['seed']);
+    await main(['deploy']);
 
     expect(process.stderr.write).toHaveBeenCalledWith(
       expect.stringContaining('usage: pnpm build:data'),
