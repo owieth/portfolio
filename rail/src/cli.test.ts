@@ -29,6 +29,8 @@ describe('main', () => {
     ['a bad source under recon', ['recon', '--source', 'sbb']],
     ['a bad year under recon', ['recon', '--year', '1998']],
     ['--base without a ref', ['diff', '--base']],
+    ['--apply with a value', ['reconcile', '--apply=no']],
+    ['--dir without a path', ['reconcile', '--dir']],
   ];
 
   it.each(REJECTED)('returns 1 for %s', async (_label, argv) => {
