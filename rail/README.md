@@ -923,7 +923,8 @@ dry-run before applying it.
    with no OSM match, and the names to check. An unrecognised `route_desc` or a
    doubted station in the feed checks means a step needs a code change before
    the snapshot is worth committing.
-6. **Commit the snapshot.** Commit the five artifacts alone, as
+6. **Commit the snapshot.** Run `pnpm seed:data`, then commit the five
+   artifacts and `supabase/seeds/rail.sql` alone, as
    `chore(rail): commit the 2027 snapshot`, and paste the output of
    `pnpm diff:data` into the pull request. `--base` repeats the diff against
    any other commit afterwards, for example `pnpm diff:data --base HEAD~1`.
