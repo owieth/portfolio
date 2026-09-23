@@ -772,6 +772,8 @@ pnpm install
 pnpm build:data
 pnpm build:data --year 2027     # the next timetable, once the portal publishes it
 pnpm build:data --source geops  # when the official portal is down
+pnpm diff:data                  # what the build changed against the committed CSVs
+pnpm diff:data --base HEAD~1    # the same, against another commit's snapshot
 pnpm recon:data                 # regenerate RECON.md from the feed
 ```
 
