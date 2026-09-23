@@ -1,6 +1,7 @@
-import { mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { RAIL_DIR } from './paths.ts';
@@ -56,5 +57,37 @@ describe.skipIf(DATABASE_URL === undefined)('reconcileFeed against the seeded da
     expect(plan.lines.updates).toEqual([]);
     expect(plan.lines.flagged).toEqual([]);
     expect(markdown).toContain('Nothing to write.');
+  });
+});
+
+const SOURCES = fileURLToPath(new URL('./', import.meta.url));
+const MIGRATIONS = fileURLToPath(new URL('../../supabase/migrations/', import.meta.url));
+const RECONCILE_MIGRATIONS = /_(flag_missing_rail_rows|track_rail_line_edits)\.sql$/;
+
+/**
+ * The issue's third acceptance check, kept true by a test rather than by care:
+ * nothing the reconcile runs can remove a row. It reads the sources and the
+ * migrations rather than trusting a mock, because a mock would only see the
+ * statements someone thought to route through it.
+ */
+describe('the reconcile', () => {
+  const REMOVES = /\bdelete\s+from\b|\btruncate\b|\.delete\(/i;
+
+  it('never issues a delete', async () => {
+    const files = [
+      join(SOURCES, 'reconcile.ts'),
+      ...(await readdir(join(SOURCES, 'reconcile')))
+        .filter(file => file.endsWith('.ts') && !file.endsWith('.test.ts'))
+        .map(file => join(SOURCES, 'reconcile', file)),
+      ...(await readdir(MIGRATIONS))
+        .filter(file => RECONCILE_MIGRATIONS.test(file))
+        .map(file => join(MIGRATIONS, file)),
+    ];
+
+    expect(files.length).toBeGreaterThan(6);
+
+    for (const file of files) {
+      expect(await readFile(file, 'utf8'), file).not.toMatch(REMOVES);
+    }
   });
 });
