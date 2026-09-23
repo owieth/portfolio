@@ -101,8 +101,9 @@ function patternsByRoute(patterns: readonly Pattern[]): Map<string, Pattern[]> {
 function assertComplete(line: FeedLine, sequence: readonly SequenceStop[]): void {
   const placed = sequence.map(stop => stop.didok);
   const unique = new Set(placed);
+  const expected = new Set(line.stations);
   const missing = line.stations.filter(didok => !unique.has(didok));
-  const extra = [...unique].filter(didok => !line.stations.includes(didok));
+  const extra = [...unique].filter(didok => !expected.has(didok));
 
   if (missing.length > 0 || extra.length > 0 || unique.size !== placed.length) {
     throw new Error(
