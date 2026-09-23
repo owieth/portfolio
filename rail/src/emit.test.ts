@@ -174,6 +174,32 @@ describe('emitArtifacts', () => {
       /^wrote 3 lines, 8 line stops and 2 line shapes, validated against lines\.schema\.json — fingerprints lines\.csv [0-9a-f]{16}, line_stops\.csv [0-9a-f]{16}, lines\.json [0-9a-f]{16}, lines\.geojson [0-9a-f]{16}$/,
     );
   });
+
+  it('hands verify the finished records, in id order', async () => {
+    const verified: string[] = [];
+
+    await emitArtifacts({ lines: LINES, stations: STATIONS, attribution: ATTRIBUTION }, log, {
+      dir: await outputDir(),
+      verify: records => verified.push(...records.map(record => record.id)),
+    });
+
+    expect(verified).toEqual([EC.id, GELMERBAHN.id, S12.id].sort());
+  });
+
+  it('writes nothing when verify throws', async () => {
+    const dir = await outputDir();
+
+    await expect(
+      emitArtifacts({ lines: LINES, stations: STATIONS, attribution: ATTRIBUTION }, log, {
+        dir,
+        verify: () => {
+          throw new Error('IC1: expected fernverkehr:IC1, but there is no line fernverkehr:IC1');
+        },
+      }),
+    ).rejects.toThrow('IC1: expected fernverkehr:IC1');
+    expect(await readdir(dir)).toEqual([]);
+    expect(logged).toEqual([]);
+  });
 });
 
 describe('renderArtifacts', () => {

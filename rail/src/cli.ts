@@ -45,6 +45,7 @@ import { flagSeasonal } from './seasonal.ts';
 import { seedLines } from './seed.ts';
 import { loadFunicularSeed } from './seed/funiculars.ts';
 import { sequenceLines } from './sequence.ts';
+import { assertSpotChecks } from './spotcheck.ts';
 import { resolveStations } from './stations.ts';
 import { findTermini } from './termini.ts';
 
@@ -180,6 +181,7 @@ function build(values: Record<string, FlagValue>): Promise<number> {
     const emitted = await emitArtifacts(
       { lines: termini.lines, stations: resolved.stations, attribution: osm.attribution },
       log,
+      { verify: assertSpotChecks },
     );
     // After the emit, so a build whose checks failed leaves the committed report
     // as it was, next to the files it describes.
