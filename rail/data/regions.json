@@ -1,0 +1,306 @@
+{
+  "regions": {
+    "fernverkehr": "Long distance",
+    "s-bahn-vorarlberg": "S-Bahn Vorarlberg and Liechtenstein",
+    "s-bahn-schaffhausen": "S-Bahn Schaffhausen",
+    "s-bahn-basel": "S-Bahn Basel (TNW)",
+    "s-bahn-st-gallen": "S-Bahn St. Gallen (Ostwind)",
+    "s-bahn-zuerich": "S-Bahn Zürich (ZVV)",
+    "seehas": "Seehas and Hegau",
+    "s-bahn-bern": "S-Bahn Bern (Libero)",
+    "berner-oberland": "Berner Oberland",
+    "s-bahn-luzern": "S-Bahn Luzern and Zug",
+    "s-bahn-aargau": "S-Bahn Aargau",
+    "solothurn": "Solothurn and Oberaargau",
+    "rer-fribourg": "RER Fribourg | Freiburg",
+    "leman-express": "Léman Express and Genève",
+    "arc-jurassien": "Neuchâtel and the Jura bernois",
+    "jura": "Jura",
+    "rer-vaud": "RER Vaud",
+    "valais": "Valais (RegionAlps)",
+    "tilo": "Ticino and Lombardy (TILO)"
+  },
+  "rules": [
+    {
+      "region": "fernverkehr",
+      "categories": ["IC", "EC", "ICE", "TGV", "RJX", "IR", "NJ", "PE"],
+      "note": "Long-distance numbers are national: there is one IC5 and one IR35, wherever they run."
+    },
+    {
+      "byOperator": true,
+      "categories": ["FUN", "CC"],
+      "note": "A funicular or a rack railway is one operator's one line, and its own network."
+    },
+    {
+      "region": "s-bahn-vorarlberg",
+      "agencies": [
+        { "id": "81____", "name": "Österreichische Bundesbahnen" },
+        { "id": "817000", "name": "NeTS Planung ÖBB" }
+      ],
+      "note": "ÖBB's S2 and S3 reach Buchs SG and St. Margrethen, where the St. Gallen anchors would otherwise claim them."
+    },
+    {
+      "byOperator": true,
+      "agencies": [
+        { "id": "800693", "name": "DB Regio AG Baden-Württemberg" },
+        { "id": "06____", "name": "DB Regio AG Baden-Württemberg" },
+        { "id": "80_VHB", "name": "FPLAN VHB SBP" },
+        { "id": "807000", "name": "NeTS Planung DB" },
+        { "id": "3000", "name": "Publikation nur Kursbuch/Plakat" }
+      ],
+      "note": "German regional networks number their own lines; none of them is a Swiss network."
+    },
+    {
+      "region": "rer-fribourg",
+      "lines": ["R39"],
+      "serves": [{ "didok": "8504070", "name": "Montbovon" }],
+      "note": "TPF and MOB share the R39 at Montbovon. Without this, MOB's half would be filed under MOB by the next rule and the line would split in two."
+    },
+    {
+      "byOperator": true,
+      "agencies": [
+        { "id": "72", "name": "Rhätische Bahn" },
+        { "id": "93", "name": "Matterhorn Gotthard Bahn (bvz)" },
+        { "id": "48", "name": "Matterhorn Gotthard Bahn (fo)" },
+        { "id": "64", "name": "Montreux-Oberland Bernois" },
+        { "id": "23", "name": "Transports Publics du Chablais" },
+        { "id": "32", "name": "Lauterbrunnen-Mürren" },
+        { "id": "43", "name": "Chemins de fer du Jura" },
+        { "id": "97", "name": "Transports Vallée de Joux-Yverdon-Ste-Croix" },
+        { "id": "29", "name": "Transports de la région Morges-Bière-Cossonay" },
+        { "id": "66", "name": "Compagnie du chemin de fer Nyon - St-Cergue - Morez" },
+        { "id": "7258", "name": "Chemin de fer Nyon - St-Cergue - Morez Ersatzverkehr" },
+        { "id": "55", "name": "Lausanne-Echallens-Bercher" },
+        { "id": "42", "name": "Montreux-Vevey-Riviera (cev)" },
+        { "id": "131", "name": "Montreux-Vevey-Riviera (mtgn)" },
+        { "id": "49", "name": "Ferrovie Autolinee Regionali Ticinesi" },
+        { "id": "61", "name": "Transports de Martigny et Régions (mc)" },
+        { "id": "803", "name": "VerticAlp Vallée du Trient SA" },
+        { "id": "44", "name": "Transports Publics Neuchâtelois SA (cmn)" },
+        { "id": "73", "name": "Transports Publics Neuchâtelois SA (rvt)" },
+        { "id": "371", "name": "Société coopérative du Chemin de fer - Musée Blonay-Chamby" },
+        { "id": "9014", "name": "Verein Dampfbahn Bern" },
+        { "id": "3271", "name": "Association neuchâteloise des Amis du Tramway ANAT" }
+      ],
+      "note": "Metre-gauge and heritage operators number their lines within their own network — RhB's R1 is not the Vaud R1, and never shares a track with it."
+    },
+    {
+      "region": "s-bahn-schaffhausen",
+      "lines": ["S62", "SN62", "S64", "S65", "SN65", "62N"],
+      "note": "Schaffhausen numbers its lines in the sixties. Every one of its stations is also on a Zürich or Ostwind line, so the number is what tells them apart."
+    },
+    {
+      "region": "s-bahn-basel",
+      "serves": [
+        { "didok": "8500010", "name": "Basel SBB" },
+        { "didok": "8500090", "name": "Basel Bad Bf" },
+        { "didok": "8014431", "name": "Basel Bad Bf" },
+        { "didok": "8500023", "name": "Liestal" },
+        { "didok": "8500026", "name": "Sissach" },
+        { "didok": "8500113", "name": "Laufen" },
+        { "didok": "8500301", "name": "Rheinfelden" },
+        { "didok": "8014441", "name": "Lörrach Hbf" }
+      ],
+      "note": "Before Aargau, because Basel's S1 runs on to Brugg AG."
+    },
+    {
+      "region": "s-bahn-zuerich",
+      "agencies": [{ "id": "65", "name": "THURBO" }],
+      "lines": ["S24"],
+      "note": "Thurbo runs the Weinfelden–Frauenfeld short workings of ZVV's S24, which never reach a Zürich anchor. The Appenzeller Bahnen S24 is a different line."
+    },
+    {
+      "region": "s-bahn-zuerich",
+      "lines": ["S36"],
+      "serves": [{ "didok": "8014474", "name": "Waldshut" }],
+      "note": "SBB's Koblenz–Waldshut short workings of Thurbo's S36, which would otherwise land in Aargau through Koblenz. The BLS S36 at Lyss is a different line."
+    },
+    {
+      "region": "s-bahn-zuerich",
+      "categories": ["S", "SN"],
+      "serves": [
+        { "didok": "8503000", "name": "Zürich HB" },
+        { "didok": "8503003", "name": "Zürich Stadelhofen" },
+        { "didok": "8503006", "name": "Zürich Oerlikon" },
+        { "didok": "8506000", "name": "Winterthur" }
+      ],
+      "note": "An S-Bahn line through Zürich or Winterthur is a ZVV line, even one that runs on to Romanshorn — the Appenzeller Bahnen S23 is a different line from the SBB one. Regional expresses are left to the next rules, so the Zürich–St. Gallen RE13 stays with Thurbo's half of it."
+    },
+    {
+      "region": "s-bahn-st-gallen",
+      "agencies": [{ "id": "22", "name": "Appenzeller Bahnen (ab)" }],
+      "note": "Every Appenzeller Bahnen line is an Ostwind line, including the S15 from Frauenfeld to Wil that touches none of the anchors below."
+    },
+    {
+      "region": "s-bahn-st-gallen",
+      "serves": [
+        { "didok": "8506302", "name": "St. Gallen" },
+        { "didok": "8506121", "name": "Romanshorn" },
+        { "didok": "8506131", "name": "Kreuzlingen" },
+        { "didok": "8506311", "name": "Rorschach" },
+        { "didok": "8506314", "name": "St. Margrethen SG" },
+        { "didok": "8509411", "name": "Sargans" },
+        { "didok": "8509404", "name": "Buchs SG" },
+        { "didok": "8506200", "name": "Wattwil" },
+        { "didok": "8506290", "name": "Herisau" },
+        { "didok": "8506319", "name": "Altstätten SG" },
+        { "didok": "8503116", "name": "Uznach" },
+        { "didok": "8503118", "name": "Benken SG" }
+      ],
+      "note": "Before Zürich, so the regional expresses from Zürich to St. Gallen and Romanshorn are filed with the network they serve. Wil, Frauenfeld, Weinfelden, Glarus and Ziegelbrücke are left out on purpose: Zürich S-Bahn lines end there."
+    },
+    {
+      "region": "s-bahn-zuerich",
+      "serves": [
+        { "didok": "8503000", "name": "Zürich HB" },
+        { "didok": "8503006", "name": "Zürich Oerlikon" },
+        { "didok": "8503003", "name": "Zürich Stadelhofen" },
+        { "didok": "8503020", "name": "Zürich Hardbrücke" },
+        { "didok": "8503001", "name": "Zürich Altstetten" },
+        { "didok": "8503016", "name": "Zürich Flughafen" },
+        { "didok": "8506000", "name": "Winterthur" },
+        { "didok": "8503125", "name": "Uster" },
+        { "didok": "8503123", "name": "Wetzikon ZH" },
+        { "didok": "8503508", "name": "Dietikon" },
+        { "didok": "8503400", "name": "Bülach" },
+        { "didok": "8503206", "name": "Wädenswil" },
+        { "didok": "8503283", "name": "Einsiedeln" },
+        { "didok": "8503221", "name": "Siebnen-Wangen" },
+        { "didok": "8503209", "name": "Pfäffikon SZ" }
+      ]
+    },
+    {
+      "region": "seehas",
+      "serves": [
+        { "didok": "8014586", "name": "Konstanz" },
+        { "didok": "8014558", "name": "Singen (Hohentwiel)" }
+      ],
+      "note": "SBB GmbH's German lines around Konstanz and Singen, after St. Gallen so Thurbo's Konstanz services stay Ostwind."
+    },
+    {
+      "region": "s-bahn-bern",
+      "serves": [
+        { "didok": "8507000", "name": "Bern" },
+        { "didok": "8507100", "name": "Thun" },
+        { "didok": "8508005", "name": "Burgdorf" },
+        { "didok": "8504414", "name": "Lyss" },
+        { "didok": "8508202", "name": "Konolfingen" },
+        { "didok": "8507076", "name": "Belp" },
+        { "didok": "8508054", "name": "Worblaufen" },
+        { "didok": "8508267", "name": "Ramsei" }
+      ],
+      "note": "Langnau i.E. is left out: Luzern's S6 ends there."
+    },
+    {
+      "region": "berner-oberland",
+      "serves": [
+        { "didok": "8507483", "name": "Spiez" },
+        { "didok": "8507492", "name": "Interlaken Ost" },
+        { "didok": "8507493", "name": "Interlaken West" },
+        { "didok": "8508308", "name": "Meiringen" }
+      ],
+      "note": "Its own number space: the Spiez–Interlaken RE9 is not the Bern–Neuchâtel RE9."
+    },
+    {
+      "region": "s-bahn-luzern",
+      "serves": [
+        { "didok": "8505000", "name": "Luzern" },
+        { "didok": "8502204", "name": "Zug" },
+        { "didok": "8505004", "name": "Arth-Goldau" },
+        { "didok": "8508215", "name": "Wolhusen" },
+        { "didok": "8508295", "name": "Willisau" },
+        { "didok": "8508391", "name": "Stans" },
+        { "didok": "8508314", "name": "Sarnen" }
+      ],
+      "note": "Luzern and Zug share one number space — their S1 is one line. Rotkreuz is left out: Aargau's S26 ends there."
+    },
+    {
+      "region": "s-bahn-aargau",
+      "serves": [
+        { "didok": "8502113", "name": "Aarau" },
+        { "didok": "8500309", "name": "Brugg AG" },
+        { "didok": "8502119", "name": "Lenzburg" },
+        { "didok": "8502213", "name": "Wohlen AG" },
+        { "didok": "8502215", "name": "Muri AG" },
+        { "didok": "8500329", "name": "Koblenz" }
+      ]
+    },
+    {
+      "region": "solothurn",
+      "serves": [
+        { "didok": "8500207", "name": "Solothurn" },
+        { "didok": "8500212", "name": "Oensingen" },
+        { "didok": "8508100", "name": "Langenthal" }
+      ],
+      "note": "After Bern, Luzern and Aargau, whose lines end at all three."
+    },
+    {
+      "region": "rer-fribourg",
+      "serves": [
+        { "didok": "8504100", "name": "Fribourg/Freiburg" },
+        { "didok": "8504086", "name": "Bulle" }
+      ]
+    },
+    {
+      "region": "leman-express",
+      "serves": [
+        { "didok": "8501008", "name": "Genève" },
+        { "didok": "8516273", "name": "Genève-Eaux-Vives" },
+        { "didok": "8774549", "name": "Annemasse" }
+      ]
+    },
+    {
+      "region": "arc-jurassien",
+      "serves": [
+        { "didok": "8504221", "name": "Neuchâtel" },
+        { "didok": "8504314", "name": "La Chaux-de-Fonds" },
+        { "didok": "8504316", "name": "Le Locle" },
+        { "didok": "8504304", "name": "Sonceboz-Sombeval" },
+        { "didok": "8504300", "name": "Biel/Bienne" },
+        { "didok": "8500105", "name": "Moutier" }
+      ],
+      "note": "Before Vaud, because the R13 from Biel runs on to Yverdon."
+    },
+    {
+      "region": "jura",
+      "serves": [
+        { "didok": "8500109", "name": "Delémont" },
+        { "didok": "8500126", "name": "Porrentruy" }
+      ]
+    },
+    {
+      "region": "rer-vaud",
+      "serves": [
+        { "didok": "8501120", "name": "Lausanne" },
+        { "didok": "8501118", "name": "Renens VD" },
+        { "didok": "8501037", "name": "Morges" },
+        { "didok": "8501200", "name": "Vevey" },
+        { "didok": "8504200", "name": "Yverdon-les-Bains" },
+        { "didok": "8501400", "name": "Aigle" },
+        { "didok": "8504014", "name": "Palézieux" }
+      ]
+    },
+    {
+      "region": "valais",
+      "serves": [
+        { "didok": "8501500", "name": "Martigny" },
+        { "didok": "8501403", "name": "St-Maurice" },
+        { "didok": "8501421", "name": "Monthey" },
+        { "didok": "8501506", "name": "Sion" },
+        { "didok": "8501605", "name": "Visp" },
+        { "didok": "8501609", "name": "Brig" }
+      ]
+    },
+    {
+      "region": "tilo",
+      "serves": [
+        { "didok": "8505213", "name": "Bellinzona" },
+        { "didok": "8505300", "name": "Lugano" },
+        { "didok": "8505391", "name": "Lugano FLP" },
+        { "didok": "8505400", "name": "Locarno" },
+        { "didok": "8505305", "name": "Mendrisio" },
+        { "didok": "8505307", "name": "Chiasso" }
+      ]
+    }
+  ]
+}
