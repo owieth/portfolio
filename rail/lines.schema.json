@@ -1,0 +1,177 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/owieth/portfolio/blob/main/rail/lines.schema.json",
+  "title": "Swiss rail lines",
+  "description": "lines.json as pnpm build:data writes it. lines.csv and line_stops.csv are the same records flattened: a line's operators and route_ids joined with ';', its stops one row each with the line's id in front.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["lines"],
+  "properties": {
+    "lines": {
+      "description": "Ordered by id, compared by UTF-16 code unit.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/line" }
+    }
+  },
+  "$defs": {
+    "didok": {
+      "description": "Didok number, which is also the UIC number: seven digits, the first two the country.",
+      "type": "string",
+      "pattern": "^[0-9]{7}$"
+    },
+    "text": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^\\S(.*\\S)?$"
+    },
+    "listItem": {
+      "description": "One value of a list, which the CSVs join with ';', so it cannot hold one.",
+      "$ref": "#/$defs/text",
+      "type": "string",
+      "pattern": "^[^;]*$"
+    },
+    "line": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "display_name",
+        "category",
+        "network_region",
+        "operators",
+        "terminal_a",
+        "terminal_b",
+        "true_terminal_a",
+        "true_terminal_b",
+        "route_ids",
+        "seasonal",
+        "trips_per_week",
+        "has_geometry",
+        "stops"
+      ],
+      "properties": {
+        "id": {
+          "description": "Region, colon, line number or category and terminals. Stable across feeds.",
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*:[A-Za-z0-9._:-]+$"
+        },
+        "display_name": { "$ref": "#/$defs/text" },
+        "category": {
+          "description": "The feed's route_desc code.",
+          "enum": [
+            "ZUG",
+            "TGV",
+            "IC",
+            "EC",
+            "ICE",
+            "RJX",
+            "IR",
+            "NJ",
+            "R",
+            "RE",
+            "RB",
+            "PE",
+            "S",
+            "SN",
+            "CC",
+            "FUN"
+          ]
+        },
+        "network_region": {
+          "description": "The region slug, the part of the id before the colon.",
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "operators": {
+          "description": "Every operator that runs the line, by the feed's name, ordered by code unit.",
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/listItem" }
+        },
+        "terminal_a": {
+          "description": "Name of the first stop of the trunk. Swiss.",
+          "$ref": "#/$defs/text"
+        },
+        "terminal_b": {
+          "description": "Name of the last stop of the trunk. Swiss.",
+          "$ref": "#/$defs/text"
+        },
+        "true_terminal_a": {
+          "description": "Where the trains beyond terminal_a really end, abroad for an international line; otherwise terminal_a.",
+          "$ref": "#/$defs/text"
+        },
+        "true_terminal_b": {
+          "description": "Where the trains beyond terminal_b really end, abroad for an international line; otherwise terminal_b.",
+          "$ref": "#/$defs/text"
+        },
+        "route_ids": {
+          "description": "The feed's route_ids merged into the line. Renumbered by every feed, so never an identity. Empty on a hand-seeded line.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/listItem" }
+        },
+        "seasonal": {
+          "description": "Runs in fewer than two thirds of the feed year's weeks. Null on a hand-seeded line.",
+          "type": ["boolean", "null"]
+        },
+        "trips_per_week": {
+          "description": "Departures in the reference week. Null on a hand-seeded line.",
+          "type": ["integer", "null"],
+          "minimum": 0
+        },
+        "has_geometry": {
+          "description": "Whether lines.geojson draws the line.",
+          "type": "boolean"
+        },
+        "stops": {
+          "description": "The canonical sequence: the trunk in running order, then each branch block.",
+          "type": "array",
+          "minItems": 2,
+          "items": { "$ref": "#/$defs/stop" }
+        }
+      }
+    },
+    "stop": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sequence",
+        "stop_name",
+        "sloid",
+        "didok",
+        "lat",
+        "lon",
+        "via",
+        "junction"
+      ],
+      "properties": {
+        "sequence": {
+          "description": "Position in the canonical sequence, from 1 without gaps.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "stop_name": { "$ref": "#/$defs/text" },
+        "sloid": {
+          "description": "Swiss Location ID, null where the feed gives none.",
+          "type": ["string", "null"],
+          "pattern": "^ch:1:sloid:[0-9]+$"
+        },
+        "didok": {
+          "description": "Null only for a hand-seeded stop the service-point register does not know.",
+          "anyOf": [{ "$ref": "#/$defs/didok" }, { "type": "null" }]
+        },
+        "lat": { "type": ["number", "null"], "minimum": -90, "maximum": 90 },
+        "lon": { "type": ["number", "null"], "minimum": -180, "maximum": 180 },
+        "via": {
+          "description": "How the stop got its place in the sequence.",
+          "enum": ["backbone", "extension", "detour", "branch"]
+        },
+        "junction": {
+          "description": "The stop it was placed against: where a detour left, the end an extension continues, where a branch block starts. Null on the backbone.",
+          "anyOf": [{ "$ref": "#/$defs/didok" }, { "type": "null" }]
+        }
+      }
+    }
+  }
+}
