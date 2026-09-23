@@ -39,6 +39,8 @@ import { fetchOsmRelations } from './overpass.ts';
 import { derivePatterns } from './patterns.ts';
 import { recon } from './recon.ts';
 import { assignRegions } from './regions.ts';
+import { loadRules } from './regions/rules.ts';
+import { reportFeed, writeReport } from './report.ts';
 import { flagSeasonal } from './seasonal.ts';
 import { seedLines } from './seed.ts';
 import { loadFunicularSeed } from './seed/funiculars.ts';
@@ -106,8 +108,6 @@ async function withFeedOptions(
 }
 
 function build(values: Record<string, FlagValue>): Promise<number> {
-  // The remaining step lands as its own module here and is called from this
-  // function, last: the report.
   return withFeedOptions(values, async options => {
     const feed = await fetchFeed(options, log);
     const allowed = await allowRoutes(feed.gtfsDir, log);
@@ -181,9 +181,26 @@ function build(values: Record<string, FlagValue>): Promise<number> {
       { lines: termini.lines, stations: resolved.stations, attribution: osm.attribution },
       log,
     );
+    // After the emit, so a build whose checks failed leaves the committed report
+    // as it was, next to the files it describes.
+    await writeReport(
+      {
+        feed: reportFeed(feed.record),
+        osmBase: osm.attribution.osmBase,
+        lines: termini.lines,
+        regionNames: (await loadRules()).regions,
+        stations: resolved.stations,
+        unmatched: matched.unmatched,
+        suspect: merged.suspect,
+        inFeed: seeded.inFeed,
+        misplaced: resolved.misplaced,
+        unknownRoutes: allowed.unknown,
+      },
+      log,
+    );
 
     log(
-      `${emitted.lines} lines written with ${emitted.stops} stops between them — ${named.derived} with derived names and ${seeded.manual} seeded by hand, ${sequenced.branched.length} with branches, ${seasonal.seasonal.length} seasonal, ${termini.international.length} international and ${emitted.features} with geometry, from ${allowed.routes.length} routes in ${regioned.regions.length} regions, ${resolved.stations.length} stations, ${ingested.rows} stop times, ${calendar.serviceDays} service days, ${patterns.patterns.length} stop patterns and ${osm.relations.length} OSM route relations; REPORT.md is not implemented yet`,
+      `${emitted.lines} lines written with ${emitted.stops} stops between them — ${named.derived} with derived names and ${seeded.manual} seeded by hand, ${sequenced.branched.length} with branches, ${seasonal.seasonal.length} seasonal, ${termini.international.length} international and ${emitted.features} with geometry, from ${allowed.routes.length} routes in ${regioned.regions.length} regions, ${resolved.stations.length} stations, ${ingested.rows} stop times, ${calendar.serviceDays} service days, ${patterns.patterns.length} stop patterns and ${osm.relations.length} OSM route relations`,
     );
   });
 }
