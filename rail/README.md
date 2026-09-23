@@ -536,11 +536,12 @@ Swiss ones.
 
 ## The artifacts
 
-The build writes three files at the top of this directory. `lines.csv` has one
+The build writes four files at the top of this directory. `lines.csv` has one
 row per line, and `line_stops.csv` has one row per stop of a line. `lines.json`
 holds the same records with the stops nested inside each line, for a reader that
 wants one file instead of a join. The field names are the same in all three, and
-they are the column names of `rail_lines` and `rail_line_stops`.
+they are the column names of `rail_lines` and `rail_line_stops`. `lines.geojson`
+is the map: see [below](#the-map-geometry).
 
 | `lines.csv`             |                                                                          |
 | ----------------------- | ------------------------------------------------------------------------ |
@@ -579,6 +580,42 @@ position, the `junction` of a backbone stop. The lists in `operators` and
 `route_ids` are joined with `;`, sorted by code unit. A value that contains a
 `;` stops the build, because it would read back as two.
 
+### The map geometry
+
+`lines.geojson` is an RFC 7946 FeatureCollection with one feature for every line
+that has `has_geometry`. Each feature is a MultiLineString in WGS84, `[lon, lat]`,
+with its `properties` keyed like `lines.json`:
+
+| `properties`     |                                                              |
+| ---------------- | ------------------------------------------------------------ |
+| `id`             | the line's `id`, which joins to `lines.json` and `lines.csv` |
+| `display_name`   | as in `lines.csv`                                            |
+| `category`       | as in `lines.csv`                                            |
+| `network_region` | as in `lines.csv`                                            |
+| `match_rule`     | `ref`, `operator` or `endpoints`; see the match step         |
+| `confidence`     | the share of the line's stations the shape reaches           |
+| `osm_relations`  | the OSM relation ids it was drawn from, ascending            |
+
+A line that no relation draws has no feature at all, rather than an empty one.
+`REPORT.md` lists those lines and why each has no shape. The build stops if a
+feature names a line `lines.json` does not have, or if a feature and
+`has_geometry` disagree.
+
+Coordinates are rounded to five decimals, about a metre here, which is finer
+than OSM maps a track. Points that rounding makes equal are collapsed into one,
+and nothing else is simplified. The file is written with one feature per line
+of text, so a diff shows which lines changed shape instead of a wall of
+coordinates. The collection carries the OSM attribution as a foreign member,
+`attribution`, with the OSM timestamp of each Overpass answer, so the licence
+travels with the file.
+
+The 2026 file has 318 features and 830,016 positions, and is 15.8 MB. A
+relation that crosses the border is kept whole, so 13 lines draw well beyond
+Switzerland. The night train from Zürich to Budapest and Zagreb alone is
+1.1 MB.
+
+### Determinism
+
 Two runs over the same feed write the same bytes. Lines are sorted by id and
 stops by sequence, both compared by code unit. Every record is built field by
 field, so nothing depends on insertion order, the locale or the clock, and the
@@ -589,7 +626,7 @@ The build also checks what the schema cannot express, that every id is unique
 and that every stop row names a line in `lines.csv`. A failed check writes
 nothing, so the committed files never end up half replaced.
 
-The 2026 feed gives 532 lines and 6,080 line stops.
+The 2026 feed gives 532 lines, 6,080 line stops and 318 line shapes.
 
 ## Data sources
 

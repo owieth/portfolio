@@ -4,9 +4,16 @@
  * step before it, and two copies of that would drift.
  */
 
+import { OSM_ATTRIBUTION } from '../overpass/attribution.ts';
+import type { Attribution } from '../overpass/attribution.ts';
 import type { SequenceStop } from '../sequence/order.ts';
 import type { Station } from '../stations.ts';
 import type { TerminiLine } from '../termini.ts';
+
+export const ATTRIBUTION: Attribution = {
+  ...OSM_ATTRIBUTION,
+  osmBase: { train: '2026-09-21T08:00:00Z', funicular: '2026-09-21T08:05:00Z' },
+};
 
 export const STATIONS: Station[] = [
   {
@@ -85,8 +92,23 @@ export const S12 = {
   seasonal: false,
   tripsPerWeek: 406,
   hasGeometry: true,
-  geometry: { type: 'MultiLineString', coordinates: [] },
-  match: { rule: 'ref', confidence: 1, relations: [1] },
+  geometry: {
+    type: 'MultiLineString',
+    coordinates: [
+      [
+        [8.20884123, 47.48086049],
+        [8.46512678, 47.43817731],
+        [8.72381832, 47.50033303],
+        [8.72381829, 47.50033298],
+        [9.04781204, 47.46350107],
+      ],
+      [
+        [8.72381832, 47.50033303],
+        [8.63275601, 47.69828389],
+      ],
+    ],
+  },
+  match: { rule: 'ref', confidence: 1, relations: [101, 42] },
   termini: [
     { didok: '8500309', name: 'Brugg AG' },
     { didok: '8506206', name: 'Wil SG' },

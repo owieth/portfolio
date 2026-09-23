@@ -106,8 +106,8 @@ async function withFeedOptions(
 }
 
 function build(values: Record<string, FlagValue>): Promise<number> {
-  // The remaining steps land as their own modules here and are called from this
-  // function, in order: geometry, report.
+  // The remaining step lands as its own module here and is called from this
+  // function, last: the report.
   return withFeedOptions(values, async options => {
     const feed = await fetchFeed(options, log);
     const allowed = await allowRoutes(feed.gtfsDir, log);
@@ -177,10 +177,13 @@ function build(values: Record<string, FlagValue>): Promise<number> {
       { lines: matched.lines, stations: resolved.stations },
       log,
     );
-    const emitted = await emitArtifacts({ lines: termini.lines, stations: resolved.stations }, log);
+    const emitted = await emitArtifacts(
+      { lines: termini.lines, stations: resolved.stations, attribution: osm.attribution },
+      log,
+    );
 
     log(
-      `${emitted.lines} lines written with ${emitted.stops} stops between them — ${named.derived} with derived names and ${seeded.manual} seeded by hand, ${sequenced.branched.length} with branches, ${seasonal.seasonal.length} seasonal, ${termini.international.length} international and ${seasonal.lines.length - matched.unmatched.length} with geometry, from ${allowed.routes.length} routes in ${regioned.regions.length} regions, ${resolved.stations.length} stations, ${ingested.rows} stop times, ${calendar.serviceDays} service days, ${patterns.patterns.length} stop patterns and ${osm.relations.length} OSM route relations; lines.geojson and REPORT.md are not implemented yet`,
+      `${emitted.lines} lines written with ${emitted.stops} stops between them — ${named.derived} with derived names and ${seeded.manual} seeded by hand, ${sequenced.branched.length} with branches, ${seasonal.seasonal.length} seasonal, ${termini.international.length} international and ${emitted.features} with geometry, from ${allowed.routes.length} routes in ${regioned.regions.length} regions, ${resolved.stations.length} stations, ${ingested.rows} stop times, ${calendar.serviceDays} service days, ${patterns.patterns.length} stop patterns and ${osm.relations.length} OSM route relations; REPORT.md is not implemented yet`,
     );
   });
 }
