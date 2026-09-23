@@ -27,6 +27,7 @@ import { fetchFeed } from './fetch.ts';
 import { FETCH_FLAGS, parseFetchOptions } from './fetch/options.ts';
 import type { FetchOptions, FlagValue } from './fetch/options.ts';
 import { recon } from './recon.ts';
+import { resolveStations } from './stations.ts';
 
 const COMMANDS = ['build', 'diff', 'recon'] as const;
 
@@ -88,12 +89,21 @@ async function withFeedOptions(
 
 function build(values: Record<string, FlagValue>): Promise<number> {
   // The remaining steps land as their own modules here and are called from this
-  // function, in order: stations, ingest, calendar, patterns, regions, merge,
-  // naming, sequence, seasonal, overpass, match, emit, report.
+  // function, in order: ingest, calendar, patterns, regions, merge, naming,
+  // sequence, seasonal, overpass, match, emit, report.
   return withFeedOptions(values, async options => {
     const feed = await fetchFeed(options, log);
     const allowed = await allowRoutes(feed.gtfsDir, log);
-    log(`${allowed.routes.length} routes are ready; no further steps are implemented yet`);
+
+    // Sequential although the two steps do not depend on each other yet. Each
+    // one narrates itself to stderr and the log is read top to bottom, so
+    // running them together would interleave two reports into neither. They
+    // read 5,170 and 104,262 rows; there is no wall clock here worth buying.
+    // react-doctor-disable-next-line react-doctor/server-sequential-independent-await
+    const resolved = await resolveStations(feed.gtfsDir, log);
+    log(
+      `${allowed.routes.length} routes and ${resolved.stations.length} stations are ready; no further steps are implemented yet`,
+    );
   });
 }
 
