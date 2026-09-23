@@ -63,10 +63,10 @@ const USAGE = `usage: pnpm build:data [--year <year>] [--source opentransportdat
        pnpm recon:data [--year <year>] [--source opentransportdata|geops]
        pnpm seed:data
 
-  build   regenerate lines.csv, line_stops.csv, lines.json, lines.geojson and REPORT.md
-  diff    compare the generated lines.csv and line_stops.csv against the committed ones
-  recon   profile the feed into RECON.md, before anything models it
-  seed    write supabase/seeds/rail.sql from the committed lines.csv and line_stops.csv
+  build      regenerate lines.csv, line_stops.csv, lines.json, lines.geojson and REPORT.md
+  diff       compare the generated lines.csv and line_stops.csv against the committed ones
+  recon      profile the feed into RECON.md, before anything models it
+  seed       write supabase/seeds/rail.sql from the committed lines.csv and line_stops.csv
 
   --year    timetable year to build; defaults to the one in force today
   --source  where to get the feed; the geops mirror is opt-in, never automatic
