@@ -98,6 +98,46 @@ written down as a date, so it means the same thing every December, and it is
 defined once, in `src/calendar/week.ts` — the calendar step returns it, and
 nothing downstream picks its own.
 
+## Stop patterns
+
+A line is not one list of stops. It has short-turns, branches, and trains that
+skip stations at some hours, and "which segments of this line have I ridden"
+only stays answerable if all of them survive until the step that builds the
+canonical sequence. So the pipeline records every distinct **stop pattern** each
+route runs: the ordered list of stations one of its trips serves.
+
+- **Stations, not platforms.** A stop becomes its `parent_station`, the same
+  collapse the stations step makes. Two trips that differ only in the track they
+  use are one pattern.
+- **Served stops only.** A stop the train passes without serving (pickup and
+  drop-off both `1`) is not a place you can ride to, so it is left out.
+- **Swiss stations only.** An EC to Milano is its Swiss stops. A trip left with
+  fewer than two has nothing to ride and makes no pattern. 113 allowed routes in
+  the 2026 feed come out with none, almost all of them TGV, DB Regio and ÖBB
+  services that reach a border station and no further. That is the geographic
+  cut `routes.txt` could not make.
+- **Direction counts.** Brugg to Schaffhausen and Schaffhausen to Brugg are two
+  patterns. Merging the two directions is the line's job, not the pattern's.
+
+A pattern's identity is the first 16 hex characters of the sha256 of its station
+list, space-joined Didok numbers. That is a function of the stops and nothing
+else, so the same stops in the same order hash the same in every feed. The
+`trip_id` and `service_id` the patterns are counted from are never stored,
+because both are renumbered at every regeneration. The build fails if two lists
+ever share a hash, rather than trusting 64 bits.
+
+Each pattern carries two counts: `trips`, the trips that serve exactly that list,
+and `runs`, the same trips weighted by the days each one runs in the feed year.
+`runs` is the one to rank by. A pattern with forty `trip_id`s that each run on
+one Saturday is rarer than a pattern with one `trip_id` that runs every day.
+
+The 2026 feed gives 6,178 patterns over 563 routes. The SBB `S12` shows what they
+are for: it runs Brugg AG to Winterthur, and from there either to Schaffhausen or
+to Wil SG. From Brugg it has seven patterns ending at one of those three
+stations, and 31 in all once the reverse direction and the turnbacks are
+counted. The log prints a fingerprint over every pattern and both of its counts,
+so two runs over the same feed can be compared by reading one line of each.
+
 ## Data sources
 
 - **Timetable — the official Swiss GTFS Static feed.**
@@ -195,7 +235,7 @@ Each feed lands in its own directory, named for the publication it came from:
 data/raw/otd-fp2026-20260919/
 ├── gtfs.zip      the archive as published
 ├── gtfs/         its members, unpacked
-├── rail.duckdb   the ingested stop times and service days, written by the build
+├── rail.duckdb   the ingested stop times, service days and stop patterns, written by the build
 └── feed.json     provenance — written last, so its presence means the rest is complete
 ```
 
@@ -221,8 +261,9 @@ that finds it still answers for the CSV on disk leaves it alone; `--force`
 rebuilds it.
 
 It also holds `service_days`, the calendar expanded into one row per service per
-day it runs — see below. That one is rebuilt on every run: it takes about ten
-seconds, which is not worth a cache check.
+day it runs, and `patterns`, every distinct stop list each route runs — see
+above. Both are rebuilt on every run: they take about ten seconds and two, which
+is not worth a cache check.
 
 The ingest pins DuckDB's buffer pool to 2 GB and gives it somewhere to spill, so
 what it costs is a property of the feed rather than of the machine — the default
