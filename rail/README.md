@@ -284,6 +284,65 @@ stations, and 31 in all once the reverse direction and the turnbacks are
 counted. The log prints a fingerprint over every pattern and both of its counts,
 so two runs over the same feed can be compared by reading one line of each.
 
+## Canonical stop sequence
+
+The map draws a line through its stops and the checklist lists them, so every
+line also gets one ordered list of its stations, its **canonical sequence**,
+built from all the patterns of every route merged into it. The patterns stay on
+the line next to it, each pooled across routes by hash and marked `reversed`
+when it runs against the sequence. That keeps the ridden-segments question
+answerable. The rules live in `src/sequence/order.ts`, and every awkward case
+has a written rule rather than whatever a sort happens to do:
+
+1. **Backbone.** The most common longest pattern: the most stations, then the
+   most `runs`, then the most trips, then the lowest hash. It is turned so its
+   lower Didok terminal comes first, the same rule the merge step uses for
+   terminals, so both directions give one sequence. The `IC1` comes out
+   Genève-Aéroport (`8501026`) to St. Gallen (`8506302`).
+2. **Turning the rest.** Every other pattern, busiest first, runs either with
+   the stops already placed or against them. A pattern that nothing placed can
+   decide waits until the others have been placed. Such a pattern shares one
+   station or none with the line, or agrees and disagrees in equal measure. If
+   it still cannot be decided, it runs outward from its one shared station, or
+   takes the backbone's rule.
+3. **Placing new stops.** Each run of stations the sequence does not have yet
+   goes next to the placed stations either side of it:
+   - **Detour**: between two trunk stops. A branch that leaves and rejoins
+     lands here, and so does a stop only some trains serve. When the two trunk
+     stops are adjacent, the position is exact. When the trunk has stops
+     between them that the detour skips, the patterns do not say where it
+     rejoins those stops, so it goes in the gap where it adds the least
+     distance by station coordinates. With a missing coordinate or a tie, it
+     goes just before the stop where it rejoins. That is how the `IC2`'s
+     Flüelen, on the old Gotthard line, lands between Arth-Goldau and Altdorf
+     rather than after Biasca.
+   - **Extension**: off either end of the trunk, continuing it.
+   - **Branch**: off anywhere else, as a block of its own after the trunk, read
+     outward from the station it leaves at. The trunk is never split. A
+     short-turn that ends at a station the trunk does not serve is a one-stop
+     branch, even when that station lies on the trunk's track. Nothing in the
+     patterns says where it goes: the `IC1` trains that start at Romont FR give
+     a one-stop branch from Fribourg.
+4. **Disagreement.** The order already placed never changes. A pattern that
+   runs placed stops in another order loses to the busier one, is listed as a
+   conflict, and its new stops hang off the last placed stop before them.
+5. **Loops.** A station that a pattern comes back to keeps its first visit, and
+   the line is listed.
+
+Every stop carries `via`, which is one of `backbone`, `extension`, `detour` or
+`branch`. It also carries `junction`, the station it was placed against: where
+the detour left, the end the extension continues, or where the branch block
+starts. So a branch's stops are all there, and their position is documented on
+each one. The SBB `S12` comes out as Brugg AG to Wil SG, then Hettlingen through
+Schaffhausen as a branch block from Winterthur.
+
+The build stops if a sequence does not hold exactly the line's stations. A line
+seeded by hand already lists its stops in running order and is left as it is.
+The log lists branched lines, conflicts and loops, with a fingerprint over every
+sequence and pattern. The 2026 feed gives 74 lines with a branch and 85 with a
+detour. Only two lines have conflicts, both TPC lines where some trains serve
+Le Sépey and Les Planches in the other order, and three lines have loops.
+
 ## Data sources
 
 - **Timetable — the official Swiss GTFS Static feed.**
