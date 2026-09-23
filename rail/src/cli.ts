@@ -18,6 +18,7 @@
  *   pnpm diff:data
  *   pnpm diff:data --base HEAD~1
  *   pnpm recon:data
+ *   pnpm seed:data
  *
  * Exit codes: 0 done, 1 the command line was wrong, 2 a step failed.
  */
@@ -26,6 +27,7 @@ import { parseArgs } from 'node:util';
 
 import { allowRoutes } from './allowlist.ts';
 import { expandCalendar } from './calendar.ts';
+import { writeSeed } from './dbseed.ts';
 import { diffArtifacts } from './diff.ts';
 import { DIFF_FLAGS, parseDiffOptions } from './diff/options.ts';
 import { emitArtifacts } from './emit.ts';
@@ -52,17 +54,19 @@ import { assertSpotChecks } from './spotcheck.ts';
 import { resolveStations } from './stations.ts';
 import { findTermini } from './termini.ts';
 
-const COMMANDS = ['build', 'diff', 'recon'] as const;
+const COMMANDS = ['build', 'diff', 'recon', 'seed'] as const;
 
 type Command = (typeof COMMANDS)[number];
 
 const USAGE = `usage: pnpm build:data [--year <year>] [--source opentransportdata|geops] [--force]
        pnpm diff:data [--base <git ref>]
        pnpm recon:data [--year <year>] [--source opentransportdata|geops]
+       pnpm seed:data
 
   build   regenerate lines.csv, line_stops.csv, lines.json, lines.geojson and REPORT.md
   diff    compare the generated lines.csv and line_stops.csv against the committed ones
   recon   profile the feed into RECON.md, before anything models it
+  seed    write supabase/seeds/rail.sql from the committed lines.csv and line_stops.csv
 
   --year    timetable year to build; defaults to the one in force today
   --source  where to get the feed; the geops mirror is opt-in, never automatic
@@ -241,6 +245,17 @@ async function diff(values: Record<string, FlagValue>): Promise<number> {
   return 0;
 }
 
+async function seed(): Promise<number> {
+  try {
+    await writeSeed(log);
+  } catch (error) {
+    logFailure(error);
+    return 2;
+  }
+
+  return 0;
+}
+
 /**
  * Returns the exit code instead of calling `process.exit`, so a test can assert
  * on it without catching a thrown exit.
@@ -265,6 +280,10 @@ export async function main(argv: string[]): Promise<number> {
 
   if (command === 'diff') {
     return diff(values);
+  }
+
+  if (command === 'seed') {
+    return seed();
   }
 
   return command === 'build' ? build(values) : profile(values);
