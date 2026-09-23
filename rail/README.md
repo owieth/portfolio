@@ -972,10 +972,12 @@ dry-run before applying it.
    `chore(rail): commit the 2027 snapshot`, and paste the output of
    `pnpm diff:data` into the pull request. `--base` repeats the diff against
    any other commit afterwards, for example `pnpm diff:data --base HEAD~1`.
-7. **Reconcile.** Run the reconcile from #488 in dry-run. Its inserts, updates
-   and flagged-missing lines should match the diff's added, changed and
-   removed lines, with every renumbered pair on both sides. Once they do,
-   apply it. Neither `pnpm build:data` nor `pnpm diff:data` writes to Supabase.
+7. **Reconcile.** Run `pnpm reconcile:data`, which is a dry run. Its inserts,
+   updates and flagged-missing lines should match the diff's added, changed
+   and removed lines, with every renumbered pair on both sides. Read its
+   skipped fields too: each is a hand edit the feed now disagrees with. Once
+   they match, run `pnpm reconcile:data --apply`. Neither `pnpm build:data`
+   nor `pnpm diff:data` writes to Supabase.
 
 The `Rail data` workflow in `.github/workflows/rail.yml` runs the same build
 from a fresh checkout on every pull request that touches the pipeline, and on
