@@ -9,6 +9,7 @@
     "diff:data": "node rail/src/cli.ts diff",
     "recon:data": "node rail/src/cli.ts recon",
     "seed:data": "node rail/src/cli.ts seed",
+    "reconcile:data": "node --env-file-if-exists=.env.local rail/src/cli.ts reconcile",
     "start": "next start",
     "lint": "eslint",
     "react-doctor": "react-doctor",
