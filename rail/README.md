@@ -100,12 +100,50 @@ Every sort that reaches an id compares by code unit rather than by locale, and
 the log prints a fingerprint over every line, so two runs over the same feed can
 be checked for byte-identical ids by reading one line of each.
 
-Lines with no public number — a quarter of the candidate routes, every funicular
-among them — are named from operator, category and terminals, as in
-`RhB R Landquart-Davos Platz`. There is no field to fall back to instead:
-`route_long_name` is empty on all 5,170 routes in the feed and `trip_short_name`
-is the train number, one per departure. Those names are flagged in the report
-for a hand check.
+## Naming lines that have no number
+
+A numbered line is called by its number, `IR35`, with the category in front of a
+bare one, `ICE 3`. Lines with no public number — a quarter of the candidate
+routes, and every funicular, whose BAV code nobody says out loud — are named
+from operator, category and terminals: `RhB R Davos Platz-Landquart`. There is
+no field to fall back to instead: `route_long_name` is empty on all 5,170 routes
+in the feed and `trip_short_name` is the train number, one per departure. The id
+is not touched; a name is what gets corrected by hand once the lines are in
+Postgres, and an id that moved with it would orphan what was recorded against
+it.
+
+The name is read off one of the patterns the line's routes run, and the choice
+is total, so two runs over the same feed name every line the same way:
+
+1. the longest pattern, by stations served — a line is named for where it goes,
+   not for the short-turn that runs more often;
+2. then the one with the most trips;
+3. then the lexically first pair of terminal names, first name first — so when
+   Landquart–Davos Platz and Landquart–Klosters Platz tie on both, Davos wins;
+4. then the lexically first operator.
+
+The two terminals inside the name are in lexical order too, not running order,
+so both directions give one name — which is why it is `Davos Platz-Landquart`
+and not the other way round. Every comparison is by code unit, as for the ids.
+
+A funicular is one operator's one line almost everywhere, so it is named for
+the operator alone, `Standseilbahn Polybahn`, and gains its terminals only when
+two would otherwise share a name — TPN's two in Neuchâtel, the Parsennbahn's two
+sections. `ZUG` leaves its category out, since it names none and reads as the
+city.
+
+The operator is the short form in [`data/operators.json`](data/operators.json),
+keyed by `agency_id` with the feed's name next to it, and checked against the
+feed like the region rules: `RhB` for `Rhätische Bahn`, and for a company that
+runs one funicular, the funicular's own name — `Polybahn` for
+`Poly-Bahn Zürich`. An operator missing from the file is not an error; its
+lines carry the feed's full name and the log says to add it.
+
+Every derived name is marked `nameSource: derived`, for the report to list for a
+hand check. `review` says when one needs more than a glance: `unknown-operator`
+for a full-name fallback, and `duplicate-name` for two lines that came out with
+one name — flagged, never silently renamed. The log prints a fingerprint over
+every name, the same as the merge step's over every id.
 
 ## What is included and excluded
 
@@ -137,8 +175,8 @@ knows, so this is the closest the allowlist can get — a later step with
 `ZUG` is one SNCF route of six trips. The recon read the code as literally
 "train", a category carrying no category; it is also the name of a Swiss city,
 and the feed settles neither reading. It rides on rails either way, so it is
-included and flagged in the log rather than decided by the filter — #475 has to
-name it whichever it turns out to be.
+included and flagged in the log rather than decided by the filter, and its name
+leaves the category out and works from operator and terminals alone.
 
 Both lists live in `src/allowlist/categories.ts`, transcribed from `RECON.md` §1
 and **verified against the feed before they are used**, not assumed. A
