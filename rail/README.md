@@ -663,6 +663,33 @@ nothing, so the committed files never end up half replaced.
 
 The 2026 feed gives 532 lines, 6,080 line stops and 318 line shapes.
 
+### Spot checks
+
+The schema says the files are well formed; it cannot say they are right. A
+handful of lines a broken step would get wrong, each in its own way, are
+checked by name in [`src/spotcheck.ts`](src/spotcheck.ts), on the records before
+anything is written and again in `pnpm test` against the committed `lines.json`:
+
+- the `IC1` from Genève-Aéroport to St. Gallen, and the `IR15`, with their names
+  and terminals;
+- the Zürich `S10` to Uetliberg as one line, with the TILO and St. Gallen `S10`s
+  still lines of their own;
+- both Rigi rack railways, from Vitznau and from Arth-Goldau, as two lines, and
+  none of the Rigi's aerial cableways;
+- the Pilatus rack railway, seasonal, and not its gondola;
+- the Polybahn, for the funiculars;
+- no bus, tram, metro, boat or cable car anywhere.
+
+A failure names the line and what was expected of it, `IC1: expected
+fernverkehr:IC1 from Genève-Aéroport to St. Gallen, but …`, and fails the build
+before anything is written.
+
+The Rigi check allows one line more than two: `CC 88`, the winter service from
+Vitznau to Rigi Kaltbad-First over the Vitznau line's own track, which the feed
+numbers separately. Any other Rigi Bahnen line fails it. The expectations are
+the 2026 feed's facts, not rules: when a December feed changes one for real, the
+case is edited after reading the diff.
+
 ## Data sources
 
 - **Timetable — the official Swiss GTFS Static feed.**
