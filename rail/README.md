@@ -425,6 +425,88 @@ that next to the responses, as `attribution.json`, with the OSM timestamp of
 each answer, and hands the same object on to the step that writes
 `lines.geojson`.
 
+## Matching relations to lines
+
+Nothing links a line to a relation. The feed has no OSM ids and OSM has no
+Didok-keyed list of lines, so the two are matched on what they share, by three
+rules tried strongest first. A line takes the relations of the first rule that
+draws it and never mixes two. The rules live in `src/match/rules.ts`.
+
+1. **`ref`**: the relation's `ref` is the line's number, spaces and case aside.
+   `IR 35` is the `IR35`, `ICE 3` the feed's ICE `3`, and `L1` the Léman
+   Express line the feed numbers `RL1`.
+2. **`operator`**: one of the relation's operators runs the line, and the
+   relation's first and last stops are the line's two terminals. OSM mostly
+   writes the short form, which is matched as whole words inside the feed's
+   name, so `SBB` is `Schweizerische Bundesbahnen SBB`. It is never matched as a
+   fragment of a word, so `RB` is not the `RBS`.
+3. **`endpoints`**: the relation ends at the line's two terminals, whatever its
+   tags say. This is how funiculars mapped by name only are found, like the
+   Sunnegga and the hand-seeded Gelmerbahn.
+
+Tags only nominate a relation. The feed has an `S1` in five regions and OSM has
+a relation for each, so every nomination is checked against the line's
+stations:
+
+- **Precision.** At least 80% of the relation's stops at Swiss stations have to
+  be stations of the line, within 500 m (100 m for a funicular). This is the
+  guard against the wrong line, and it is why a stop only counts at a Swiss
+  station: the bounding box of Switzerland would also count Como, Varese and
+  Konstanz, where the TILO and Thurbo lines stop more than at home. The radius
+  is that wide because a station's coordinate is its stop place, and the IR65's
+  stop at Bern is 414 m from it. Anything from 300 m to 600 m matches the same
+  lines to within one.
+- **Coverage.** Between them, a rule's relations have to pass within the same
+  distance of at least half the line's stations. The share is recorded as the
+  match's `confidence`, so a partly mapped line is drawn and marked as partial.
+  The IC5 relation stops at Lausanne while the feed's IC5 goes on to Genève,
+  which gives it 0.79.
+- **Another line's number.** A relation whose `ref` names another line is left
+  to the `ref` rule. That covers another number, like `IC 4` for the `RE48`, and
+  another category, like `ICE 20` for an unnumbered IC. The ICE from Hamburg
+  ends at Basel Bad Bf and Basel SBB like the IC between the two, but it is not
+  that line's shape. OSM's `RJ` is the feed's `RJX` and its `EN` the feed's
+  `NJ`. A number of three digits or more is a timetable field, like the BOB's
+  `R 312` for its R61, and only its category counts. When both sides have a
+  number, only the number is compared, so the MGB's `RE41` is still the feed's
+  `R41`.
+
+A relation goes to one line. When two claim it, the stronger rule wins, then
+the higher confidence, then the lower id, and the loser is tried again without
+it. The one exception is a relation whose `ref` carries several lines that each
+hold it by their own number, like the RhB's `RE24;RE4`. A relation tagged
+`state=alternate` (a diversion) or `state=connection` (a positioning run) only
+counts for a line that nothing in regular service draws, which is how the 2026
+`S41` from Fribourg to Lausanne is mapped. A `disused=yes` relation never counts.
+
+The chosen relations — both directions, and a line mapped in sections — are
+joined into one MultiLineString by a hand-rolled `linemerge` in
+`src/match/linemerge.ts`. Turf has no equivalent of `shapely.ops.linemerge`.
+Ways join where their ends share coordinates, are reversed as needed, and are
+used once even when two relations list them. A junction ends a string, and a
+gap is left open rather than bridged. A relation that crosses the border is kept
+whole.
+
+Every line comes out with `hasGeometry`, and a match of `rule`, `confidence` and
+OSM relation ids, or `null`. A line nothing draws gets no geometry and an entry
+for the report, never an empty shape. The entry says why:
+
+- `no-candidate`: no relation passed a rule.
+- `low-coverage`: relations passed but reach too little of the line.
+- `contested`: its relations went to a stronger claim.
+
+The log prints a fingerprint over every match.
+
+The miss rate is high, and it is meant to be. The 2026 feed matches 318 of its
+532 lines: 287 by `ref`, 9 by operator and 22 by endpoints, with a confidence of
+1 on 246. Of the 214 lines without geometry, 81 run in eight weeks or fewer.
+Those are construction replacements and one-off specials that OSM does not map.
+Another 57 have no number, 49 of them SBB's. OSM maps those lines numbered and
+running further than the feed's short runs: the feed's IC from Basel to Zürich
+is part of OSM's IC 3 to Chur. Nine are funiculars. The other 67 are numbered
+lines that OSM does not have, or has only in part. Of the 868 relations still in use, 89 matched
+no line. Almost all of those run abroad.
+
 ## Data sources
 
 - **Timetable — the official Swiss GTFS Static feed.**
