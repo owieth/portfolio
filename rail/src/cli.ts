@@ -36,6 +36,8 @@ import { loadOperators } from './naming/operators.ts';
 import { derivePatterns } from './patterns.ts';
 import { recon } from './recon.ts';
 import { assignRegions } from './regions.ts';
+import { seedLines } from './seed.ts';
+import { loadFunicularSeed } from './seed/funiculars.ts';
 import { resolveStations } from './stations.ts';
 
 const COMMANDS = ['build', 'diff', 'recon'] as const;
@@ -136,9 +138,10 @@ function build(values: Record<string, FlagValue>): Promise<number> {
       },
       log,
     );
+    const seeded = seedLines(named.lines, await loadFunicularSeed(), log);
 
     log(
-      `${named.lines.length} lines, ${named.derived} of them with derived names, from ${allowed.routes.length} routes in ${regioned.regions.length} regions, ${resolved.stations.length} stations, ${ingested.rows} stop times, ${calendar.serviceDays} service days and ${patterns.patterns.length} stop patterns are ready; no further steps are implemented yet`,
+      `${seeded.lines.length} lines, ${named.derived} of them with derived names and ${seeded.manual} seeded by hand, from ${allowed.routes.length} routes in ${regioned.regions.length} regions, ${resolved.stations.length} stations, ${ingested.rows} stop times, ${calendar.serviceDays} service days and ${patterns.patterns.length} stop patterns are ready; no further steps are implemented yet`,
     );
   });
 }

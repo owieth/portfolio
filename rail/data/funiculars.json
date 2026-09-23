@@ -1,0 +1,15 @@
+{
+  "funiculars": [
+    {
+      "id": "kwo-seilbahnen:FUN:8531013-8531014",
+      "name": "Gelmerbahn",
+      "operator": "KWO Seilbahnen",
+      "category": "FUN",
+      "stops": [
+        { "didok": "8531013", "name": "Handegg", "lat": 46.613585, "lon": 8.308709 },
+        { "didok": "8531014", "name": "Gelmersee", "lat": 46.614439, "lon": 8.320473 }
+      ],
+      "note": "Summer only, run by the Grimselwelt. Both stations are in the service-point register as CABLE_RAILWAY under KWO Seilbahnen, but the 2026 feed has no route between them. Coordinates are the register's."
+    }
+  ]
+}

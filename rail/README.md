@@ -145,6 +145,39 @@ for a full-name fallback, and `duplicate-name` for two lines that came out with
 one name — flagged, never silently renamed. The log prints a fingerprint over
 every name, the same as the merge step's over every id.
 
+## Funiculars the feed does not have
+
+A funicular with no tariff integration has no obligation to publish a timetable,
+and one that does not is still a line to ride. Those are written down by hand in
+[`data/funiculars.json`](data/funiculars.json), one entry per line: an id, a
+display name, the operator, the category, and the stops in running order with
+their coordinates and, where the service-point register has one, the Didok
+number. The terminals are the first and last stop rather than a field of their
+own. The id is written out, in the same shape as a feed line's, with the
+operator's slug as the region, so that it survives a stop being renamed.
+
+The seeded lines join the line set after every step that reads the feed, and
+every line comes out marked with where it came from: `source: feed` or
+`source: manual`, with `nameSource: manual` and no `route_id`s on the second
+kind. The log counts the manual lines separately, and so will the report. A
+seeded id the feed already has stops the build. A seeded stop that a feed line
+of the same category now serves is logged, so the entry comes out at the next
+December refresh rather than riding along as a second copy.
+
+The 2026 file has one entry. The recon found every privately run funicular it
+searched for in the feed, so the rest were found by cross-checking the
+service-point register's `CABLE_RAILWAY` points against the feed's 53 funicular
+routes. The only operator that came back unmatched and open to the public was
+KWO Seilbahnen's **Gelmerbahn**, Handegg to Gelmersee. Its stations are in the
+register, but the feed has no route between them. The other unmatched points are
+Zurich Airport's airside Skymetro and a handful of placeholder entries, and
+neither is a line to ride. Linth-Limmern, a power-station funicular, has no
+stop in the register at all.
+
+Like every other line, a seeded one goes into `rail_lines` when the tables are
+seeded. From then on it is edited in Postgres, and the file is a record of why it
+was added.
+
 ## What is included and excluded
 
 The principle: on a rail it is in, on a rope it is out. Funiculars run on rails
