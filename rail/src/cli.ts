@@ -38,6 +38,7 @@ import { recon } from './recon.ts';
 import { assignRegions } from './regions.ts';
 import { seedLines } from './seed.ts';
 import { loadFunicularSeed } from './seed/funiculars.ts';
+import { sequenceLines } from './sequence.ts';
 import { resolveStations } from './stations.ts';
 
 const COMMANDS = ['build', 'diff', 'recon'] as const;
@@ -101,7 +102,7 @@ async function withFeedOptions(
 
 function build(values: Record<string, FlagValue>): Promise<number> {
   // The remaining steps land as their own modules here and are called from this
-  // function, in order: sequence, seasonal, overpass, match, emit, report.
+  // function, in order: seasonal, overpass, match, emit, report.
   return withFeedOptions(values, async options => {
     const feed = await fetchFeed(options, log);
     const allowed = await allowRoutes(feed.gtfsDir, log);
@@ -139,9 +140,13 @@ function build(values: Record<string, FlagValue>): Promise<number> {
       log,
     );
     const seeded = seedLines(named.lines, await loadFunicularSeed(), log);
+    const sequenced = sequenceLines(
+      { lines: seeded.lines, patterns: patterns.patterns, stations: resolved.stations },
+      log,
+    );
 
     log(
-      `${seeded.lines.length} lines, ${named.derived} of them with derived names and ${seeded.manual} seeded by hand, from ${allowed.routes.length} routes in ${regioned.regions.length} regions, ${resolved.stations.length} stations, ${ingested.rows} stop times, ${calendar.serviceDays} service days and ${patterns.patterns.length} stop patterns are ready; no further steps are implemented yet`,
+      `${sequenced.lines.length} lines, ${named.derived} of them with derived names and ${seeded.manual} seeded by hand, ${sequenced.branched.length} with branches, from ${allowed.routes.length} routes in ${regioned.regions.length} regions, ${resolved.stations.length} stations, ${ingested.rows} stop times, ${calendar.serviceDays} service days and ${patterns.patterns.length} stop patterns are ready; no further steps are implemented yet`,
     );
   });
 }
