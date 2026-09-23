@@ -4,7 +4,7 @@ import { join } from 'node:path';
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import { openGtfs } from './db.ts';
+import { openGtfs, STORE } from './db.ts';
 
 /**
  * A two-column feed is enough here: what is being tested is the wiring — that a
@@ -72,5 +72,37 @@ describe('openGtfs', () => {
     await expect(openGtfs(join(directory, 'gone'), ['routes'])).rejects.toThrow(
       /gone is missing routes.txt/,
     );
+  });
+
+  /** The point of a store: what a step writes into it outlives the connection. */
+  it('keeps a table written into the store, and no view', async () => {
+    const store = join(directory, 'store.duckdb');
+    const written = await openGtfs(directory, ['routes'], { store });
+
+    try {
+      await written.run(
+        `create table ${STORE}.rideable as select route_id from routes`,
+      );
+    } finally {
+      written.close();
+    }
+
+    const reopened = await openGtfs(directory, [], { store });
+
+    try {
+      expect(await reopened.query(`select route_id from ${STORE}.rideable`)).toEqual([
+        { route_id: '91-3-B-j26-1' },
+      ]);
+
+      // The CSV views are scaffolding for the run that made them; a store that
+      // carried them would carry absolute paths into the next machine too.
+      expect(
+        await reopened.query(
+          `select view_name from duckdb_views() where database_name = '${STORE}'`,
+        ),
+      ).toEqual([]);
+    } finally {
+      reopened.close();
+    }
   });
 });

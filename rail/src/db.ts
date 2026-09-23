@@ -9,6 +9,13 @@
  * happen to look numeric — `route_short_name` `007` is not 7, and a `stop_id`
  * with a leading zero stops joining once DuckDB has decided it is an integer.
  * Nothing here is arithmetic, so there is no reason to infer a type at all.
+ *
+ * The database itself is in-memory and dies with the step. A step that has
+ * something worth keeping passes a `store`, which is attached as a second
+ * catalog: the views stay ephemeral, and only the tables the step writes into
+ * `store.` survive the run. The store lives inside the feed's own directory, so
+ * `rm -rf data/raw/<feed-id>` still deletes a feed and everything derived from
+ * it in one go — it is not a second lifetime to keep track of.
  */
 
 import { stat } from 'node:fs/promises';
@@ -27,9 +34,31 @@ export type GtfsFile =
   | 'stops'
   | 'trips';
 
+/**
+ * Pinned rather than left to DuckDB's default of 80% of system RAM, so ingesting
+ * the same feed costs the same on a 16 GB laptop and a 64 GB one instead of
+ * quietly becoming a different program on each. Past the ceiling DuckDB spills to
+ * `temp_directory`; it does not grow, and it does not push the machine into swap.
+ */
+const MEMORY_LIMIT = '2GB';
+
+/** The catalog name a store is attached under. */
+export const STORE = 'store';
+
+export interface GtfsOptions {
+  /**
+   * Path to a DuckDB file for tables that outlive the run, attached as `store`.
+   * Omitted means everything is in-memory, which is what the steps that only
+   * read the feed want.
+   */
+  store?: string;
+}
+
 export interface Gtfs {
   /** Rows as plain JSON values — no BigInt, no DuckDB wrappers to unwrap at the call site. */
   query<Row>(sql: string): Promise<Row[]>;
+  /** For a statement with nothing to read back — `create table`, `insert`, `attach`. */
+  run(sql: string): Promise<void>;
   close(): void;
 }
 
@@ -79,15 +108,32 @@ async function assertPresent(gtfsDir: string, files: readonly GtfsFile[]): Promi
   }
 }
 
+/**
+ * The buffer pool is only pinned when there is a store, because that is the only
+ * path that handles a file measured in gigabytes. The feed-reading steps scan
+ * tens of thousands of rows and were merged without a limit; giving them one now
+ * would be a behaviour change they did not ask for.
+ *
+ * `temp_directory` is what makes the limit survivable rather than fatal: an
+ * in-memory DuckDB has nowhere to spill until it is told where, and refuses the
+ * query instead. It sits beside the store, inside the gitignored feed directory.
+ */
+function settings(store: string | undefined): Record<string, string> {
+  return store === undefined
+    ? {}
+    : { memory_limit: MEMORY_LIMIT, temp_directory: `${store}.tmp` };
+}
+
 export async function openGtfs(
   gtfsDir: string,
   files: readonly GtfsFile[],
+  options: GtfsOptions = {},
 ): Promise<Gtfs> {
   await assertPresent(gtfsDir, files);
 
-  // In-memory: nothing here outlives the run, and a database file in data/raw/
-  // would be one more multi-gigabyte artifact to explain and clean up.
-  const instance = await DuckDBInstance.create(':memory:');
+  // In-memory: the views are scaffolding over the CSVs and nothing is gained by
+  // writing them down. What a step wants to keep goes into the attached store.
+  const instance = await DuckDBInstance.create(':memory:', settings(options.store));
   const connection: DuckDBConnection = await instance.connect();
 
   try {
@@ -96,6 +142,10 @@ export async function openGtfs(
       // only add interleaving to something with no wait in it.
       // react-doctor-disable-next-line react-doctor/async-await-in-loop
       await connection.run(view(gtfsDir, file));
+    }
+
+    if (options.store !== undefined) {
+      await connection.run(`attach ${literal(options.store)} as ${STORE}`);
     }
   } catch (error) {
     connection.closeSync();
@@ -107,6 +157,9 @@ export async function openGtfs(
     async query<Row>(sql: string): Promise<Row[]> {
       const reader = await connection.runAndReadAll(sql);
       return reader.getRowObjectsJson() as Row[];
+    },
+    async run(sql: string): Promise<void> {
+      await connection.run(sql);
     },
     close(): void {
       connection.closeSync();
