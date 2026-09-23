@@ -33,6 +33,7 @@ import { INGEST_FLAGS, parseIngestOptions } from './ingest/options.ts';
 import { mergeLines } from './merge.ts';
 import { nameLines } from './naming.ts';
 import { loadOperators } from './naming/operators.ts';
+import { fetchOsmRelations } from './overpass.ts';
 import { derivePatterns } from './patterns.ts';
 import { recon } from './recon.ts';
 import { assignRegions } from './regions.ts';
@@ -103,7 +104,7 @@ async function withFeedOptions(
 
 function build(values: Record<string, FlagValue>): Promise<number> {
   // The remaining steps land as their own modules here and are called from this
-  // function, in order: overpass, match, emit, report.
+  // function, in order: match, emit, report.
   return withFeedOptions(values, async options => {
     const feed = await fetchFeed(options, log);
     const allowed = await allowRoutes(feed.gtfsDir, log);
@@ -155,9 +156,14 @@ function build(values: Record<string, FlagValue>): Promise<number> {
       },
       log,
     );
+    // Last, although it reads nothing the steps above wrote: the match step it
+    // feeds needs their lines, and a cold cache here waits minutes on Overpass,
+    // which is better spent after the feed has been shown to build.
+    // react-doctor-disable-next-line react-doctor/server-sequential-independent-await
+    const osm = await fetchOsmRelations(log);
 
     log(
-      `${seasonal.lines.length} lines, ${named.derived} of them with derived names and ${seeded.manual} seeded by hand, ${sequenced.branched.length} with branches and ${seasonal.seasonal.length} seasonal, from ${allowed.routes.length} routes in ${regioned.regions.length} regions, ${resolved.stations.length} stations, ${ingested.rows} stop times, ${calendar.serviceDays} service days and ${patterns.patterns.length} stop patterns are ready; no further steps are implemented yet`,
+      `${seasonal.lines.length} lines, ${named.derived} of them with derived names and ${seeded.manual} seeded by hand, ${sequenced.branched.length} with branches and ${seasonal.seasonal.length} seasonal, from ${allowed.routes.length} routes in ${regioned.regions.length} regions, ${resolved.stations.length} stations, ${ingested.rows} stop times, ${calendar.serviceDays} service days, ${patterns.patterns.length} stop patterns and ${osm.relations.length} OSM route relations are ready; no further steps are implemented yet`,
     );
   });
 }
