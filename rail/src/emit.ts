@@ -60,6 +60,12 @@ export interface EmitInput {
 export interface EmitOptions {
   /** Where the four files go. The top of `rail/` unless a test says otherwise. */
   dir?: string;
+  /**
+   * A further check on the finished records, run before anything is written, so
+   * a throw leaves the committed files as they were. The build passes the spot
+   * checks; the tests pass nothing, since their fixtures are not the feed.
+   */
+  verify?: (records: readonly LineRecord[]) => void;
 }
 
 export interface Emitted {
@@ -222,9 +228,11 @@ export function renderArtifacts(input: EmitInput): Artifacts {
 export async function emitArtifacts(
   input: EmitInput,
   log: Log,
-  { dir = RAIL_DIR }: EmitOptions = {},
+  { dir = RAIL_DIR, verify }: EmitOptions = {},
 ): Promise<Emitted> {
   const { records, features, files } = renderArtifacts(input);
+
+  verify?.(records);
 
   await Promise.all(
     files.map(file => writeFile(join(dir, file.name), file.contents, 'utf8')),
