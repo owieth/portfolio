@@ -69,7 +69,7 @@ function isSource(value: string): value is Source {
 }
 
 /** Rejects a repeated or value-less flag rather than silently coercing it. */
-function single(
+export function single(
   name: string,
   value: FlagValue,
 ): { ok: true; value: string | null } | { ok: false; error: string } {
