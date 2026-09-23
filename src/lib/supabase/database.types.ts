@@ -70,6 +70,101 @@ export type Database = {
         };
         Relationships: [];
       };
+      rail_line_stops: {
+        Row: {
+          didok: string | null;
+          junction: string | null;
+          lat: number | null;
+          line_id: string;
+          lon: number | null;
+          sequence: number;
+          sloid: string | null;
+          stop_name: string;
+          via: string;
+        };
+        Insert: {
+          didok?: string | null;
+          junction?: string | null;
+          lat?: number | null;
+          line_id: string;
+          lon?: number | null;
+          sequence: number;
+          sloid?: string | null;
+          stop_name: string;
+          via: string;
+        };
+        Update: {
+          didok?: string | null;
+          junction?: string | null;
+          lat?: number | null;
+          line_id?: string;
+          lon?: number | null;
+          sequence?: number;
+          sloid?: string | null;
+          stop_name?: string;
+          via?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'rail_line_stops_line_id_fkey';
+            columns: ['line_id'];
+            isOneToOne: false;
+            referencedRelation: 'rail_lines';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      rail_lines: {
+        Row: {
+          category: string;
+          created_at: string;
+          display_name: string;
+          has_geometry: boolean;
+          id: string;
+          network_region: string;
+          operators: string[];
+          route_ids: string[];
+          seasonal: boolean | null;
+          terminal_a: string;
+          terminal_b: string;
+          trips_per_week: number | null;
+          true_terminal_a: string;
+          true_terminal_b: string;
+        };
+        Insert: {
+          category: string;
+          created_at?: string;
+          display_name: string;
+          has_geometry: boolean;
+          id: string;
+          network_region: string;
+          operators: string[];
+          route_ids?: string[];
+          seasonal?: boolean | null;
+          terminal_a: string;
+          terminal_b: string;
+          trips_per_week?: number | null;
+          true_terminal_a: string;
+          true_terminal_b: string;
+        };
+        Update: {
+          category?: string;
+          created_at?: string;
+          display_name?: string;
+          has_geometry?: boolean;
+          id?: string;
+          network_region?: string;
+          operators?: string[];
+          route_ids?: string[];
+          seasonal?: boolean | null;
+          terminal_a?: string;
+          terminal_b?: string;
+          trips_per_week?: number | null;
+          true_terminal_a?: string;
+          true_terminal_b?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: {
       [_ in never]: never;
