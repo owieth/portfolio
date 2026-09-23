@@ -33,6 +33,11 @@ export interface Gtfs {
   close(): void;
 }
 
+/** Single-quoted SQL literal. DuckDB does not treat a backslash as an escape here. */
+function literal(value: string): string {
+  return `'${value.replaceAll("'", "''")}'`;
+}
+
 /**
  * `read_csv` is given the options explicitly rather than left to sniff: the
  * sniffer samples the head of the file, and a column that is empty for the first
@@ -40,10 +45,8 @@ export interface Gtfs {
  * silently truncate.
  */
 function view(gtfsDir: string, file: GtfsFile): string {
-  const path = join(gtfsDir, `${file}.txt`).replaceAll("'", "''");
-
   return `create view ${file} as select * from read_csv(
-    '${path}',
+    ${literal(join(gtfsDir, `${file}.txt`))},
     header = true,
     all_varchar = true,
     strict_mode = false
