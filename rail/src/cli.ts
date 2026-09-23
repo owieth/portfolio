@@ -25,6 +25,7 @@ import { parseArgs } from 'node:util';
 
 import { allowRoutes } from './allowlist.ts';
 import { expandCalendar } from './calendar.ts';
+import { emitArtifacts } from './emit.ts';
 import { fetchFeed } from './fetch.ts';
 import { FETCH_FLAGS, parseFetchOptions } from './fetch/options.ts';
 import type { FetchOptions, FlagValue } from './fetch/options.ts';
@@ -43,6 +44,7 @@ import { seedLines } from './seed.ts';
 import { loadFunicularSeed } from './seed/funiculars.ts';
 import { sequenceLines } from './sequence.ts';
 import { resolveStations } from './stations.ts';
+import { findTermini } from './termini.ts';
 
 const COMMANDS = ['build', 'diff', 'recon'] as const;
 
@@ -105,7 +107,7 @@ async function withFeedOptions(
 
 function build(values: Record<string, FlagValue>): Promise<number> {
   // The remaining steps land as their own modules here and are called from this
-  // function, in order: emit, report.
+  // function, in order: geometry, report.
   return withFeedOptions(values, async options => {
     const feed = await fetchFeed(options, log);
     const allowed = await allowRoutes(feed.gtfsDir, log);
@@ -168,8 +170,17 @@ function build(values: Record<string, FlagValue>): Promise<number> {
       log,
     );
 
+    // Back into rail.duckdb once more, for the stops the patterns cut at the
+    // border, which is where an international line's true termini are.
+    const termini = await findTermini(
+      feed.dir,
+      { lines: matched.lines, stations: resolved.stations },
+      log,
+    );
+    const emitted = await emitArtifacts({ lines: termini.lines, stations: resolved.stations }, log);
+
     log(
-      `${seasonal.lines.length} lines, ${named.derived} of them with derived names and ${seeded.manual} seeded by hand, ${sequenced.branched.length} with branches and ${seasonal.seasonal.length} seasonal, ${seasonal.lines.length - matched.unmatched.length} with geometry, from ${allowed.routes.length} routes in ${regioned.regions.length} regions, ${resolved.stations.length} stations, ${ingested.rows} stop times, ${calendar.serviceDays} service days, ${patterns.patterns.length} stop patterns and ${osm.relations.length} OSM route relations are ready; no further steps are implemented yet`,
+      `${emitted.lines} lines written with ${emitted.stops} stops between them — ${named.derived} with derived names and ${seeded.manual} seeded by hand, ${sequenced.branched.length} with branches, ${seasonal.seasonal.length} seasonal, ${termini.international.length} international and ${seasonal.lines.length - matched.unmatched.length} with geometry, from ${allowed.routes.length} routes in ${regioned.regions.length} regions, ${resolved.stations.length} stations, ${ingested.rows} stop times, ${calendar.serviceDays} service days, ${patterns.patterns.length} stop patterns and ${osm.relations.length} OSM route relations; lines.geojson and REPORT.md are not implemented yet`,
     );
   });
 }

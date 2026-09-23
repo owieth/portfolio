@@ -1,0 +1,533 @@
+id,display_name,category,network_region,operators,terminal_a,terminal_b,true_terminal_a,true_terminal_b,route_ids,seasonal,trips_per_week,has_geometry
+aare-seeland-mobil-ltb:FUN-2016,Standseilbahn Vinifuni,FUN,aare-seeland-mobil-ltb,Aare Seeland mobil (ltb),Ligerz (Talstation),Prêles,Ligerz (Talstation),Prêles,93-201-6-j26-1,false,365,true
+arc-jurassien:R13,R13,R,arc-jurassien,Schweizerische Bundesbahnen SBB,Yverdon-les-Bains,Biel/Bienne,Yverdon-les-Bains,Biel/Bienne,91-13-G-j26-1,false,299,true
+arc-jurassien:R16,R16,R,arc-jurassien,Schweizerische Bundesbahnen SBB,Neuchâtel,Biel/Bienne,Neuchâtel,Biel/Bienne,91-16-G-j26-1,false,136,true
+arc-jurassien:R20,R20,R,arc-jurassien,Schweizerische Bundesbahnen SBB,La Chaux-de-Fonds,Le Locle,La Chaux-de-Fonds,Le Locle,91-20-J-j26-1,false,532,true
+arc-jurassien:R23,R23,R,arc-jurassien,Schweizerische Bundesbahnen SBB,Neuchâtel,Corcelles-Peseux,Neuchâtel,Corcelles-Peseux,91-23-E-j26-1,false,462,true
+arc-jurassien:R41,R41,R,arc-jurassien,Schweizerische Bundesbahnen SBB,Biel/Bienne,La Chaux-de-Fonds,Biel/Bienne,La Chaux-de-Fonds,91-41-E-j26-1,false,491,true
+arc-jurassien:R42,R42,R,arc-jurassien,Schweizerische Bundesbahnen SBB,Moutier,Biel/Bienne,Moutier,Biel/Bienne,91-42-E-j26-1,false,109,true
+arc-jurassien:R:8500105-8504304,SBB R Moutier-Sonceboz-Sombeval,R,arc-jurassien,Schweizerische Bundesbahnen SBB,Moutier,Sonceboz-Sombeval,Moutier,Sonceboz-Sombeval,91-5B-Y-j26-1,true,22,false
+arc-jurassien:R:8504300-8504304,SBB R Biel/Bienne-Sonceboz-Sombeval,R,arc-jurassien,Schweizerische Bundesbahnen SBB,Biel/Bienne,Sonceboz-Sombeval,Biel/Bienne,Sonceboz-Sombeval,91-5-Y-j26-1,true,0,false
+arc-jurassien:R:8504304-8504314,SBB R La Chaux-de-Fonds-Sonceboz-Sombeval,R,arc-jurassien,Schweizerische Bundesbahnen SBB,Sonceboz-Sombeval,La Chaux-de-Fonds,Sonceboz-Sombeval,La Chaux-de-Fonds,91-1F-Y-j26-1,true,0,false
+arc-jurassien:RE-N5,RE N5,RE,arc-jurassien,Schweizerische Bundesbahnen SBB,Lausanne,Biel/Bienne,Lausanne,Biel/Bienne,91-N5-j26-1,false,2,false
+arc-jurassien:RE4,RE4,RE,arc-jurassien,Schweizerische Bundesbahnen SBB,Biel/Bienne,La Chaux-de-Fonds,Biel/Bienne,La Chaux-de-Fonds,91-4-M-j26-1,false,205,true
+arc-jurassien:RE56,RE56,RE,arc-jurassien,Schweizerische Bundesbahnen SBB,Delémont,Biel/Bienne,Delémont,Biel/Bienne,91-56-B-j26-1,false,10,false
+arc-jurassien:RE6,RE6,RE,arc-jurassien,Schweizerische Bundesbahnen SBB,Neuchâtel,La Chaux-de-Fonds,Neuchâtel,La Chaux-de-Fonds,91-6-V-j26-1,false,266,true
+arc-jurassien:RE:8500128-8504300,SBB RE Biel/Bienne-Boncourt,RE,arc-jurassien,Schweizerische Bundesbahnen SBB,Boncourt,Biel/Bienne,Delle,Biel/Bienne,91-54-Y-j26-1,false,4,false
+arc-jurassien:RE:8501579-8504221,SBB RE Le Châble VS-Neuchâtel,RE,arc-jurassien,Schweizerische Bundesbahnen SBB,Le Châble VS,Neuchâtel,Le Châble VS,Neuchâtel,91-71-Y-j26-1,true,0,false
+arc-jurassien:RE:8504300-8504314,SBB RE Biel/Bienne-La Chaux-de-Fonds,RE,arc-jurassien,Schweizerische Bundesbahnen SBB,Biel/Bienne,La Chaux-de-Fonds,Biel/Bienne,La Chaux-de-Fonds,91-1X-Y-j26-1,false,5,false
+arc-jurassien:S37,S37,S,arc-jurassien,Aare Seeland mobil (bti),Biel/Bienne,Ins,Biel/Bienne,Ins,91-37-C-j26-1,false,727,true
+association-neuchateloise-des-amis-du-tramway-anat:R:8504398-8504511,ANAT R Boudry Littorail-Neuchâtel Place Pury Littorail,R,association-neuchateloise-des-amis-du-tramway-anat,Association neuchâteloise des Amis du Tramway ANAT,Neuchâtel Place Pury Littorail,Boudry Littorail,Neuchâtel Place Pury Littorail,Boudry Littorail,91-83-Y-j26-1,true,0,false
+bergbahnen-engadin-st-moritz-ag:FUN:8509270-8509271,Standseilbahn Corviglia Chantarella-St. Moritz (Standseilbahn),FUN,bergbahnen-engadin-st-moritz-ag,Bergbahnen Engadin St. Moritz AG,St. Moritz (Standseilbahn),Chantarella,St. Moritz (Standseilbahn),Chantarella,93-6Z-Y-j26-1,true,0,true
+bergbahnen-engadin-st-moritz-ag:FUN:8509271-8509273,Standseilbahn Corviglia Chantarella-Corviglia (Talstat. Piz Nair),FUN,bergbahnen-engadin-st-moritz-ag,Bergbahnen Engadin St. Moritz AG,Chantarella,Corviglia (Talstat. Piz Nair),Chantarella,Corviglia (Talstat. Piz Nair),93-76-Y-j26-1,true,0,true
+berner-oberland-bahnen:CC-68,CC 68,CC,berner-oberland-bahnen,Berner Oberland-Bahnen,Schynige Platte,Wilderswil,Schynige Platte,Wilderswil,93-68-j26-1,true,210,true
+berner-oberland:R11,R11,R,berner-oberland,BLS AG (bls),Zweisimmen,Spiez,Zweisimmen,Spiez,91-11-N-j26-1,false,266,true
+berner-oberland:R12,R12,R,berner-oberland,BLS AG (bls),Frutigen,Spiez,Frutigen,Spiez,91-12-M-j26-1,false,94,true
+berner-oberland:R61,R61,R,berner-oberland,Berner Oberland-Bahnen,Grindelwald,Interlaken Ost,Grindelwald,Interlaken Ost,91-61-j26-1,false,469,true
+berner-oberland:R62,R62,R,berner-oberland,Berner Oberland-Bahnen,Lauterbrunnen,Interlaken Ost,Lauterbrunnen,Interlaken Ost,91-62-j26-1,false,451,true
+berner-oberland:R70,R70,R,berner-oberland,Zentralbahn,Interlaken Ost,Meiringen,Interlaken Ost,Meiringen,91-70-j26-1,false,255,true
+berner-oberland:R71,R71,R,berner-oberland,Zentralbahn,Meiringen,Innertkirchen Kraftwerk (Bahn),Meiringen,Innertkirchen Kraftwerk (Bahn),91-71-j26-1,false,374,true
+berner-oberland:R:8507478-8507483,BLS R Frutigen-Spiez,R,berner-oberland,BLS AG (bls),Frutigen,Spiez,Frutigen,Spiez,91-2D-Y-j26-1,true,0,false
+berner-oberland:R:8507492-8508308,zb R Interlaken Ost-Meiringen,R,berner-oberland,Zentralbahn,Interlaken Ost,Meiringen,Interlaken Ost,Meiringen,91-W-Y-j26-1,true,0,false
+berner-oberland:R:8508308-8508359,zb R Innertkirchen Kraftwerk (Bahn)-Meiringen,R,berner-oberland,Zentralbahn,Meiringen,Innertkirchen Kraftwerk (Bahn),Meiringen,Innertkirchen Kraftwerk (Bahn),91-81-Y-j26-1,true,0,false
+berner-oberland:RE9,RE9,RE,berner-oberland,BLS AG (bls);Schweizerische Bundesbahnen SBB,Spiez,Interlaken Ost,Spiez,Interlaken Ost,91-9-H-j26-1;91-9-L-j26-1,false,125,true
+braunwald-standseilbahn:FUN-2840,Standseilbahn Braunwaldbahn,FUN,braunwald-standseilbahn,Braunwald-Standseilbahn,Linthal Braunwaldbahn (Talst.),Braunwald,Linthal Braunwaldbahn (Talst.),Braunwald,93-284-0-j26-1,false,522,true
+brienz-rothorn-bahn-ag:CC-7,CC 7,CC,brienz-rothorn-bahn-ag,Brienz Rothorn Bahn AG,Brienz BRB,Brienzer Rothorn,Brienz BRB,Brienzer Rothorn,93-7-j26-1,true,116,true
+brienz-rothorn-bahn-ag:CC-T7,CC T7,CC,brienz-rothorn-bahn-ag,Brienz Rothorn Bahn AG,Brienz BRB,Planalp,Brienz BRB,Planalp,93-T7-j26-1,true,0,false
+buergenstock-bahn-ag:FUN-2554,Standseilbahn Bürgenstock-Bahn,FUN,buergenstock-bahn-ag,Bürgenstock Bahn AG,Kehrsiten-Bürgenstock,Bürgenstock Resort,Kehrsiten-Bürgenstock,Bürgenstock Resort,93-255-4-j26-1,false,406,true
+celeriner-bergbahnen-punt-muragl-muottas-muragl:FUN:8509275-8509276,Standseilbahn Muottas Muragl,FUN,celeriner-bergbahnen-punt-muragl-muottas-muragl,Celeriner Bergbahnen - Punt Muragl-Muottas Muragl,Punt Muragl (Talstation),Muottas Muragl,Punt Muragl (Talstation),Muottas Muragl,93-6L-Y-j26-1,false,434,true
+centre-touristique-moleson:FUN-2045,Standseilbahn Moléson,FUN,centre-touristique-moleson,Centre Touristique Moléson,Plan-Francey,Moléson-sur-Gruyères (funi),Plan-Francey,Moléson-sur-Gruyères (funi),93-204-5-j26-1,false,371,false
+chemin-de-fer-nyon-st-cergue-morez-ersatzverkehr:R-EV,R EV,R,chemin-de-fer-nyon-st-cergue-morez-ersatzverkehr,Chemin de fer Nyon - St-Cergue - Morez Ersatzverkehr,"St-Cergue, gare","Nyon, gare","St-Cergue, gare","Nyon, gare",91-EV-D-j26-1,true,0,false
+chemins-de-fer-du-jura:R36,R36,R,chemins-de-fer-du-jura,Chemins de fer du Jura,Glovelier,La Chaux-de-Fonds,Glovelier,La Chaux-de-Fonds,91-36-C-j26-1,false,370,true
+chemins-de-fer-du-jura:R37,R37,R,chemins-de-fer-du-jura,Chemins de fer du Jura,Tavannes,Le Noirmont,Tavannes,Le Noirmont,91-37-D-j26-1,false,313,true
+compagnie-du-chemin-de-fer-nyon-st-cergue-morez:R55,R55,R,compagnie-du-chemin-de-fer-nyon-st-cergue-morez,Compagnie du chemin de fer Nyon - St-Cergue - Morez,Nyon,La Cure,Nyon,La Cure,91-55-D-j26-1,false,695,true
+dampfbahn-furka-bergstrecke:CC-1,CC 1,CC,dampfbahn-furka-bergstrecke,Dampfbahn Furka-Bergstrecke,Oberwald,Realp DFB,Oberwald,Realp DFB,93-1-j26-1,true,34,true
+davos-klosters-bergbahnen-dpb:FUN:8509083-8509084,Standseilbahn Parsennbahn Davos Dorf (Parsennbahn)-Höhenweg,FUN,davos-klosters-bergbahnen-dpb,Davos Klosters Bergbahnen (dpb),Davos Dorf (Parsennbahn),Höhenweg,Davos Dorf (Parsennbahn),Höhenweg,93-6W-Y-j26-1,true,0,false
+davos-klosters-bergbahnen-dpb:FUN:8509084-8509085,Standseilbahn Parsennbahn Höhenweg-Weissfluhjoch,FUN,davos-klosters-bergbahnen-dpb,Davos Klosters Bergbahnen (dpb),Höhenweg,Weissfluhjoch,Höhenweg,Weissfluhjoch,93-71-Y-j26-1,true,0,false
+db-regio-ag-baden-wuerttemberg:RE3,RE3,RE,db-regio-ag-baden-wuerttemberg,DB Regio AG Baden-Württemberg,Basel Bad Bf,Thayngen,Basel Bad Bf,Gottmadingen,91-3-N-j26-1,false,568,false
+db-regio-ag-baden-wuerttemberg:RE:8500090-8503424,DB Regio RE Basel Bad Bf-Schaffhausen,RE,db-regio-ag-baden-wuerttemberg,DB Regio AG Baden-Württemberg,Basel Bad Bf,Schaffhausen,Basel Bad Bf,Singen (Hohentwiel),91-8L-Y-j26-1,true,0,false
+dolderbahn-betriebs-ag:FUN-25,Standseilbahn Dolderbahn,FUN,dolderbahn-betriebs-ag,Dolderbahn Betriebs AG,"Zürich, Römerhof","Zürich, Dolder","Zürich, Römerhof","Zürich, Dolder",93-25-j26-1,false,1158,true
+drahtseilbahn-marzili-stadt-bern-ag:FUN-2350,Standseilbahn Marzilibahn,FUN,drahtseilbahn-marzili-stadt-bern-ag,Drahtseilbahn Marzili-Stadt Bern AG,Bern (Marzilibahn),Bern Marzili,Bern (Marzilibahn),Bern Marzili,93-235-0-j26-1,false,12390,false
+engelberg-truebsee-titlis:FUN-2533,Standseilbahn Gerschnialpbahn,FUN,engelberg-truebsee-titlis,Engelberg-Trübsee-Titlis,Gerschnialp,Engelberg (Talstation Titlis),Gerschnialp,Engelberg (Talstation Titlis),93-253-3-j26-1,false,371,true
+fernverkehr:EC3,EC3,EC,fernverkehr,Schweizerische Bundesbahnen SBB,Basel SBB,Zürich HB,Basel SBB,Zürich HB,91-3-S-j26-1,true,0,false
+fernverkehr:EC6,EC6,EC,fernverkehr,Schweizerische Bundesbahnen SBB,Basel SBB,Brig,Basel SBB,Domodossola (I),91-A00-4-j26-1,true,0,true
+fernverkehr:EC:8500010-8501609,SBB EC Basel SBB-Brig,EC,fernverkehr,Schweizerische Bundesbahnen SBB,Basel SBB,Brig,Basel SBB,Domodossola (I),91-2W-Y-j26-1,false,46,false
+fernverkehr:EC:8500010-8505307,SBB EC Basel SBB-Chiasso,EC,fernverkehr,Schweizerische Bundesbahnen SBB,Basel SBB,Chiasso,Basel SBB,Como S. Giovanni,91-3R-Y-j26-1,false,14,false
+fernverkehr:EC:8501008-8501609,SBB EC Brig-Genève,EC,fernverkehr,Schweizerische Bundesbahnen SBB,Genève-Aéroport,Brig,Genève-Aéroport,Domodossola (I),91-2O-Y-j26-1;91-7-Y-j26-1,false,56,false
+fernverkehr:EC:8503000-8505307,SBB EC Basel Bad Bf-Chiasso,EC,fernverkehr,Schweizerische Bundesbahnen SBB,Basel Bad Bf,Chiasso,Basel Bad Bf,Como S. Giovanni,91-2A-Y-j26-1,false,223,false
+fernverkehr:EC:8503000-8506302,SBB EC St. Gallen-Zürich HB,EC,fernverkehr,Schweizerische Bundesbahnen SBB,Zürich HB,St. Gallen,Zürich HB,Feldkirch,91-J-Y-j26-1,true,14,false
+fernverkehr:EC:8503000-8506314,SBB EC St. Margrethen SG-Zürich HB,EC,fernverkehr,Schweizerische Bundesbahnen SBB,Zürich HB,St. Margrethen SG,Zürich HB,Bregenz,91-2G-Y-j26-1,false,116,true
+fernverkehr:EC:8503000-8509404,SBB EC Buchs SG-Zürich HB,EC,fernverkehr,Schweizerische Bundesbahnen SBB,Zürich HB,Buchs SG,Zürich HB,Feldkirch,91-3E-Y-j26-1,false,0,false
+fernverkehr:IC1,IC1,IC,fernverkehr,Schweizerische Bundesbahnen SBB,Genève-Aéroport,St. Gallen,Genève-Aéroport,St. Gallen,91-1-D-j26-1,false,260,true
+fernverkehr:IC2,IC2,IC,fernverkehr,Schweizerische Bundesbahnen SBB,Zürich HB,Chiasso,Zürich HB,Chiasso,91-2-G-j26-1,false,149,true
+fernverkehr:IC21,IC21,IC,fernverkehr,Schweizerische Bundesbahnen SBB,Basel SBB,Chiasso,Basel SBB,Chiasso,91-21-D-j26-1,false,112,true
+fernverkehr:IC24,IC24,IC,fernverkehr,Appenzeller Bahnen (ab),Gais,Altstätten Stadt,Gais,Altstätten Stadt,91-24-K-j26-1,true,0,false
+fernverkehr:IC3,IC3,IC,fernverkehr,Schweizerische Bundesbahnen SBB,Basel SBB,Chur,Basel SBB,Chur,91-3-C-j26-1,false,429,true
+fernverkehr:IC5,IC5,IC,fernverkehr,Schweizerische Bundesbahnen SBB,Genève-Aéroport,Rorschach,Genève-Aéroport,Rorschach,91-5-A-j26-1,false,388,true
+fernverkehr:IC51,IC51,IC,fernverkehr,BLS AG (bls);Schweizerische Bundesbahnen SBB,Basel SBB,Lausanne,Basel SBB,Lausanne,91-51-B-j26-1;91-51-E-j26-1,false,364,true
+fernverkehr:IC55,IC55,IC,fernverkehr,Schweizerische Bundesbahnen SBB,Zürich HB,St. Gallen,Zürich HB,St. Gallen,91-55-G-j26-1,true,0,false
+fernverkehr:IC6,IC6,IC,fernverkehr,Schweizerische Bundesbahnen SBB,Basel SBB,Brig,Basel SBB,Brig,91-6-H-j26-1,false,201,true
+fernverkehr:IC61,IC61,IC,fernverkehr,BLS AG (bls);Schweizerische Bundesbahnen SBB,Basel SBB,Interlaken Ost,Basel SBB,Interlaken Ost,91-61-A-j26-1;91-61-D-j26-1,false,218,true
+fernverkehr:IC8,IC8,IC,fernverkehr,Schweizerische Bundesbahnen SBB,Brig,Romanshorn,Brig,Romanshorn,91-8-E-j26-1,false,189,true
+fernverkehr:IC81,IC81,IC,fernverkehr,Schweizerische Bundesbahnen SBB,Romanshorn,Interlaken Ost,Romanshorn,Interlaken Ost,91-81-A-j26-1,false,111,true
+fernverkehr:IC9,IC9,IC,fernverkehr,Schweizerische Bundesbahnen SBB,Brig,Romanshorn,Brig,Romanshorn,91-9-P-j26-1,true,0,false
+fernverkehr:IC:8500010-8500090,SBB IC Basel Bad Bf-Basel SBB,IC,fernverkehr,Schweizerische Bundesbahnen SBB,Basel SBB,Basel Bad Bf,Basel SBB,Basel Bad Bf,91-3S-Y-j26-1,true,0,false
+fernverkehr:IC:8500010-8501609,SBB IC Basel SBB-Brig,IC,fernverkehr,Schweizerische Bundesbahnen SBB,Basel SBB,Brig,Basel SBB,Brig,91-2J-Y-j26-1,true,0,false
+fernverkehr:IC:8500010-8503000,SBB IC Basel SBB-Zürich HB,IC,fernverkehr,Schweizerische Bundesbahnen SBB,Basel SBB,Zürich HB,Basel SBB,Zürich HB,91-4B-Y-j26-1;91-7Q-Y-j26-1,false,2,false
+fernverkehr:IC:8500010-8505000,SBB IC Basel SBB-Luzern,IC,fernverkehr,Schweizerische Bundesbahnen SBB,Basel SBB,Luzern,Basel SBB,Luzern,91-K-Y-j26-1,false,9,false
+fernverkehr:IC:8500218-8509000,SBB IC Chur-Olten,IC,fernverkehr,Schweizerische Bundesbahnen SBB,Olten,Chur,Olten,Chur,91-1B-Y-j26-1,true,0,false
+fernverkehr:IC:8501120-8505400,SBB IC Genève-Aéroport-Locarno,IC,fernverkehr,Schweizerische Bundesbahnen SBB,Genève-Aéroport,Locarno,Genève-Aéroport,Locarno,91-CB-Y-j26-1,false,2,false
+fernverkehr:IC:8501609-8507000,SBB IC Brig-Zürich HB,IC,fernverkehr,Schweizerische Bundesbahnen SBB,Brig,Zürich HB,Brig,Zürich HB,91-29-Y-j26-1;91-3W-Y-j26-1;91-4R-Y-j26-1,false,15,false
+fernverkehr:IC:8503000-8503421,SBB IC Jestetten-Zürich HB,IC,fernverkehr,Schweizerische Bundesbahnen SBB,Zürich HB,Jestetten,Zürich HB,Jestetten,91-1N-Y-j26-1,true,0,false
+fernverkehr:IC:8503000-8503424,SBB IC Schaffhausen-Zürich HB,IC,fernverkehr,Schweizerische Bundesbahnen SBB,Zürich HB,Schaffhausen,Zürich HB,Singen (Hohentwiel),91-19-Y-j26-1,false,236,true
+fernverkehr:IC:8503000-8504300,SBB IC Biel/Bienne-Zürich HB,IC,fernverkehr,Schweizerische Bundesbahnen SBB,Zürich HB,Biel/Bienne,Zürich HB,Biel/Bienne,91-9N-Y-j26-1,true,0,false
+fernverkehr:IC:8503000-8505300,SBB IC Lugano-Olten,IC,fernverkehr,Schweizerische Bundesbahnen SBB,Olten,Chiasso,Olten,Chiasso,91-5F-Y-j26-1,false,8,false
+fernverkehr:IC:8503000-8506302,SBB IC St. Gallen-Zürich HB,IC,fernverkehr,Schweizerische Bundesbahnen SBB,Zürich HB,St. Gallen,Zürich HB,St. Gallen,91-4E-Y-j26-1,true,0,false
+fernverkehr:IC:8503000-8507000,SBB IC Chur-Genève-Aéroport,IC,fernverkehr,Schweizerische Bundesbahnen SBB,Genève-Aéroport,Chur,Genève-Aéroport,Chur,91-2H-Y-j26-1,false,45,false
+fernverkehr:ICE-3,ICE 3,ICE,fernverkehr,Schweizerische Bundesbahnen SBB,Zürich HB,Chur,Zürich HB,Chur,91-3-P-j26-1,true,0,false
+fernverkehr:ICE:8500010-8500090,SBB ICE Basel Bad Bf-Chur,ICE,fernverkehr,Schweizerische Bundesbahnen SBB,Basel Bad Bf,Chur,Basel Bad Bf,Chur,91-N-Y-j26-1,false,224,false
+fernverkehr:ICE:8500090-8507492,SBB ICE Basel Bad Bf-Brig,ICE,fernverkehr,Schweizerische Bundesbahnen SBB,Basel Bad Bf,Brig,Basel Bad Bf,Brig,91-3-Y-j26-1,false,75,false
+fernverkehr:IR-N1,IR N1,IR,fernverkehr,Schweizerische Bundesbahnen SBB,Winterthur,Bern,Winterthur,Bern,91-N1-A-j26-1,false,4,false
+fernverkehr:IR-VAE,IR VAE,IR,fernverkehr,Schweizerische Südostbahn (sob),Luzern,St. Gallen,Luzern,St. Gallen,91-VAE-j26-1,false,299,true
+fernverkehr:IR13,IR13,IR,fernverkehr,Schweizerische Bundesbahnen SBB;Schweizerische Südostbahn (sob),Zürich HB,Chur,Zürich HB,Chur,91-13-I-j26-1;91-13-j26-1,false,520,true
+fernverkehr:IR15,IR15,IR,fernverkehr,Schweizerische Bundesbahnen SBB,Genève-Aéroport,Luzern,Genève-Aéroport,Luzern,91-15-B-j26-1,false,280,true
+fernverkehr:IR16,IR16,IR,fernverkehr,Schweizerische Bundesbahnen SBB,Zürich HB,Bern,Zürich HB,Bern,91-16-B-j26-1,false,266,true
+fernverkehr:IR17,IR17,IR,fernverkehr,BLS AG (bls);Schweizerische Bundesbahnen SBB;Schweizerische Südostbahn (sob),Olten,Bern,Olten,Bern,91-17-B-j26-1;91-17-C-j26-1;91-17-F-j26-1,false,275,true
+fernverkehr:IR26,IR26,IR,fernverkehr,Schweizerische Bundesbahnen SBB;Schweizerische Südostbahn (sob),Basel SBB,Locarno,Basel SBB,Locarno,91-26-C-j26-1;91-26-D-j26-1,false,156,true
+fernverkehr:IR27,IR27,IR,fernverkehr,Schweizerische Bundesbahnen SBB,Basel SBB,Luzern,Basel SBB,Luzern,91-27-A-j26-1,false,237,true
+fernverkehr:IR35,IR35,IR,fernverkehr,BLS AG (bls);Schweizerische Bundesbahnen SBB;Schweizerische Südostbahn (sob),Bern,Chur,Bern,Chur,91-35-A-j26-1;91-35-B-j26-1;91-35-D-j26-1,false,335,true
+fernverkehr:IR36,IR36,IR,fernverkehr,Schweizerische Bundesbahnen SBB,Basel SBB,Zürich Flughafen,Basel SBB,Zürich Flughafen,91-36-A-j26-1,false,496,true
+fernverkehr:IR37,IR37,IR,fernverkehr,Schweizerische Bundesbahnen SBB,Basel SBB,Zürich HB,Basel SBB,Zürich HB,91-37-j26-1,false,268,true
+fernverkehr:IR38,IR38,IR,fernverkehr,Rhätische Bahn,Chur,St. Moritz,Chur,St. Moritz,91-38-j26-1,false,191,true
+fernverkehr:IR46,IR46,IR,fernverkehr,Schweizerische Bundesbahnen SBB;Schweizerische Südostbahn (sob),Zürich HB,Locarno,Zürich HB,Locarno,91-46-C-j26-1;91-46-j26-1,false,138,true
+fernverkehr:IR55,IR55,IR,fernverkehr,Schweizerische Bundesbahnen SBB,Biel/Bienne,St. Gallen,Biel/Bienne,St. Gallen,91-55-C-j26-1,false,272,false
+fernverkehr:IR56,IR56,IR,fernverkehr,BLS AG (bls);Schweizerische Bundesbahnen SBB,Basel SBB,Biel/Bienne,Basel SBB,Biel/Bienne,91-56-C-j26-1;91-56-j26-1,false,252,true
+fernverkehr:IR57,IR57,IR,fernverkehr,Schweizerische Bundesbahnen SBB,Genève-Aéroport,Neuchâtel,Genève-Aéroport,Neuchâtel,91-57-A-j26-1,false,60,true
+fernverkehr:IR65,IR65,IR,fernverkehr,BLS AG (bls);Schweizerische Bundesbahnen SBB,Biel/Bienne,Bern,Biel/Bienne,Bern,91-65-C-j26-1;91-65-j26-1,false,482,true
+fernverkehr:IR66,IR66,IR,fernverkehr,BLS AG (bls),La Chaux-de-Fonds,Bern,La Chaux-de-Fonds,Bern,91-66-A-j26-1,false,276,true
+fernverkehr:IR70,IR70,IR,fernverkehr,Schweizerische Bundesbahnen SBB,Zürich HB,Luzern,Zürich HB,Luzern,91-70-A-j26-1,false,260,true
+fernverkehr:IR75,IR75,IR,fernverkehr,Schweizerische Bundesbahnen SBB,Luzern,Kreuzlingen,Luzern,Konstanz,91-75-j26-1,false,340,true
+fernverkehr:IR90,IR90,IR,fernverkehr,Schweizerische Bundesbahnen SBB,Genève-Aéroport,Brig,Genève-Aéroport,Brig,91-90-j26-1,false,256,true
+fernverkehr:IR95,IR95,IR,fernverkehr,Schweizerische Bundesbahnen SBB,Genève-Aéroport,Brig,Genève-Aéroport,Brig,91-95-j26-1,false,275,true
+fernverkehr:IR:8500010-8505000,SBB IR Lausen-Luzern,IR,fernverkehr,Schweizerische Bundesbahnen SBB,Lausen,Luzern,Lausen,Luzern,91-3M-Y-j26-1,false,2,false
+fernverkehr:IR:8500218-8507000,SOB IR Bern-Olten,IR,fernverkehr,Schweizerische Südostbahn (sob),Zürich HB,Bern,Zürich HB,Bern,91-21-Y-j26-1,true,0,false
+fernverkehr:IR:8501008-8501026,SBB IR Brig-Genève-Aéroport,IR,fernverkehr,Schweizerische Bundesbahnen SBB,Genève-Aéroport,Brig,Genève-Aéroport,Brig,91-2Q-Y-j26-1,false,40,false
+fernverkehr:IR:8501008-8501506,SBB IR Genève-Sion,IR,fernverkehr,Schweizerische Bundesbahnen SBB,Genève,Sion,Genève,Sion,91-B-Y-j26-1,false,5,false
+fernverkehr:IR:8501026-8503000,SBB IR Genève-Aéroport-Zürich HB,IR,fernverkehr,Schweizerische Bundesbahnen SBB,Genève-Aéroport,Zürich HB,Genève-Aéroport,Zürich HB,91-4C-Y-j26-1,true,0,false
+fernverkehr:IR:8503000-8505000,SBB IR Luzern-Zürich HB,IR,fernverkehr,Schweizerische Bundesbahnen SBB,Zürich HB,Luzern,Zürich HB,Luzern,91-35-Y-j26-1,false,32,false
+fernverkehr:IR:8503000-8507000,SBB IR Bern-Zürich HB,IR,fernverkehr,Schweizerische Bundesbahnen SBB,Zürich HB,Bern,Zürich HB,Bern,91-4U-Y-j26-1,false,8,false
+fernverkehr:IR:8503016-8507000,SBB IR Bern-Zürich Flughafen,IR,fernverkehr,Schweizerische Bundesbahnen SBB,Zürich Flughafen,Bern,Zürich Flughafen,Bern,91-3U-Y-j26-1,false,7,false
+fernverkehr:IR:8505000-8508399,zb IR Engelberg-Luzern,IR,fernverkehr,Zentralbahn,Luzern,Engelberg,Luzern,Engelberg,91-1J-Y-j26-1,true,0,false
+fernverkehr:IR:8505004-8505114,SOB IR Erstfeld-Luzern,IR,fernverkehr,Schweizerische Südostbahn (sob),Luzern,Erstfeld,Luzern,Erstfeld,91-39-Y-j26-1,true,0,false
+fernverkehr:IR:8505114-8505201,SOB IR Airolo-Erstfeld,IR,fernverkehr,Schweizerische Südostbahn (sob),Erstfeld,Airolo,Erstfeld,Airolo,91-8M-Y-j26-1,true,3,false
+fernverkehr:IR:8506200-8506302,SOB IR St. Gallen-Wattwil,IR,fernverkehr,Schweizerische Südostbahn (sob),Wattwil,St. Gallen,Wattwil,St. Gallen,91-7M-Y-j26-1,true,0,false
+fernverkehr:IRLEX,IRLEX,IR,fernverkehr,Zentralbahn,Luzern,Engelberg,Luzern,Engelberg,91-LEX-j26-1,false,252,true
+fernverkehr:IRLIX,IRLIX,IR,fernverkehr,Zentralbahn,Luzern,Interlaken Ost,Luzern,Interlaken Ost,91-LIX-A-j26-1,true,42,true
+fernverkehr:NJ-3,NJ 3,NJ,fernverkehr,Schweizerische Bundesbahnen SBB,Basel SBB,Zürich HB,Basel SBB,Zürich HB,91-3-Q-j26-1,true,0,false
+fernverkehr:NJ-36,NJ 36,NJ,fernverkehr,Schweizerische Bundesbahnen SBB,Basel SBB,Zürich HB,Basel SBB,Zürich HB,91-36-F-j26-1,true,0,false
+fernverkehr:NJ:8500090-8503000,SBB NJ Basel Bad Bf-Zürich HB,NJ,fernverkehr,Schweizerische Bundesbahnen SBB,Basel Bad Bf,Zürich HB,Basel Bad Bf,Zürich HB,91-2Z-Y-j26-1,false,28,false
+fernverkehr:NJ:8503000-8506314,SBB NJ St. Margrethen SG-Zürich HB,NJ,fernverkehr,Schweizerische Bundesbahnen SBB,Zürich HB,St. Margrethen SG,Zürich HB,Feldkirch,91-32-Y-j26-1,true,28,false
+fernverkehr:NJ:8503000-8509404,SBB NJ Buchs SG-Zürich HB,NJ,fernverkehr,Schweizerische Bundesbahnen SBB,Zürich HB,Buchs SG,Zürich HB,Feldkirch,91-2P-Y-j26-1,false,0,true
+fernverkehr:PE-30,PE 30,PE,fernverkehr,Montreux-Oberland Bernois,Montreux,Zweisimmen,Montreux,Zweisimmen,91-30-K-j26-1,false,147,false
+fernverkehr:PE-72,PE 72,PE,fernverkehr,Ferrovie Autolinee Regionali Ticinesi,Locarno FART,Masera,Locarno FART,Domodossola (I),91-72-A-j26-1,false,84,true
+fernverkehr:PE-BEX,PE BEX,PE,fernverkehr,Rhätische Bahn,Chur,Tirano,Chur,Tirano,91-BEX-j26-1,false,70,true
+fernverkehr:PE-GEX,PE GEX,PE,fernverkehr,Diverse INFO;Matterhorn Gotthard Bahn (fo);Rhätische Bahn,Zermatt,St. Moritz,Zermatt,St. Moritz,91-GEX-A-j26-1;91-GEX-B-j26-1;91-GEX-j26-1,false,126,true
+fernverkehr:PE-GPX,PE GPX,PE,fernverkehr,BLS AG (bls);Montreux-Oberland Bernois,Montreux,Interlaken Ost,Montreux,Interlaken Ost,91-GPX-A-j26-1;91-GPX-j26-1,false,112,true
+fernverkehr:PE-LIX,PE LIX,PE,fernverkehr,Zentralbahn,Luzern,Interlaken Ost,Luzern,Interlaken Ost,91-LIX-j26-1,false,238,true
+fernverkehr:PE:8505004-8505300,SBB PE Arth-Goldau-Lugano,PE,fernverkehr,Schweizerische Bundesbahnen SBB,Arth-Goldau,Lugano,Arth-Goldau,Lugano,91-8I-Y-j26-1,true,14,false
+fernverkehr:RJX:8503000-8506302,SBB RJX St. Margrethen SG-Zürich HB,RJX,fernverkehr,Schweizerische Bundesbahnen SBB,Zürich HB,St. Margrethen SG,Zürich HB,Feldkirch,91-8-Y-j26-1,true,42,false
+fernverkehr:RJX:8503000-8509404,SBB RJX Buchs SG-Zürich HB,RJX,fernverkehr,Schweizerische Bundesbahnen SBB,Zürich HB,Buchs SG,Zürich HB,Feldkirch,91-1V-Y-j26-1,false,0,true
+fernverkehr:TGV-612B,TGV 612B,TGV,fernverkehr,Société Nationale des Chemins de fer Français,Basel SBB,Zürich HB,Paris Gare de Lyon,Zürich HB,91-612-B-j26-1,false,63,true
+fernverkehr:TGV-622E,TGV 622E,TGV,fernverkehr,Société Nationale des Chemins de fer Français,Genève,Vallorbe,Genève,Paris Gare de Lyon,91-622-E-j26-1,false,101,true
+fernverkehr:TGV:8500010-8503000,SBB TGV Basel SBB-Zürich HB,TGV,fernverkehr,Schweizerische Bundesbahnen SBB,Basel SBB,Zürich HB,Mulhouse,Zürich HB,91-2N-Y-j26-1,false,80,false
+fernverkehr:TGV:8501008-8501103,SBB TGV Genève-Vallorbe,TGV,fernverkehr,Schweizerische Bundesbahnen SBB,Genève,Vallorbe,Genève,Vallorbe,91-8C-Y-j26-1,true,0,false
+fernverkehr:TGV:8501008-8501120,SBB TGV Genève-Lausanne,TGV,fernverkehr,Schweizerische Bundesbahnen SBB,Genève,Lausanne,Bellegarde-sur-Valserine,Lausanne,91-A-Y-j26-1,false,118,false
+fernverkehr:TGV:8501103-8501120,SBB TGV Lausanne-Vallorbe,TGV,fernverkehr,Schweizerische Bundesbahnen SBB,Vallorbe,Lausanne,Frasne,Lausanne,91-37-Y-j26-1,false,34,true
+ferrovia-monte-generoso:CC-87,CC 87,CC,ferrovia-monte-generoso,Ferrovia Monte Generoso,Capolago-Riva S. Vitale,Monte Generoso Vetta,Capolago-Riva S. Vitale,Monte Generoso Vetta,93-87-j26-1,false,98,true
+ferrovie-autolinee-regionali-ticinesi:R70,R70,R,ferrovie-autolinee-regionali-ticinesi,Ferrovie Autolinee Regionali Ticinesi,Locarno FART,Camedo,Locarno FART,Camedo,91-70-C-j26-1,false,227,true
+ferrovie-autolinee-regionali-ticinesi:RE73,RE73,RE,ferrovie-autolinee-regionali-ticinesi,Ferrovie Autolinee Regionali Ticinesi,Locarno FART,Masera,Locarno FART,Domodossola (I),91-73-j26-1,false,46,true
+funicolare-ritom-sa:FUN-2603,Standseilbahn Ritom,FUN,funicolare-ritom-sa,Funicolare Ritom SA,Piora,Piotta Centrale (funicolare),Piora,Piotta Centrale (funicolare),93-260-3-j26-1,true,182,true
+funiculaire-neuchatel-universite-neuchatel-gare:FUN-110,Standseilbahn Fun'ambule,FUN,funiculaire-neuchatel-universite-neuchatel-gare,Funiculaire Neuchâtel-Université - Neuchâtel-Gare,Neuchâtel-gare (FUNI),Neuchâtel-Université (FUNI),Neuchâtel-gare (FUNI),Neuchâtel-Université (FUNI),93-110-j26-1,false,3160,true
+funiculaire-saint-imier-mont-soleil-sa:FUN-2020,Standseilbahn Mont-Soleil,FUN,funiculaire-saint-imier-mont-soleil-sa,Funiculaire Saint-Imier-Mont-Soleil SA,St-Imier (funiculaire),Mont-Soleil (funiculaire),St-Imier (funiculaire),Mont-Soleil (funiculaire),93-202-0-j26-1,false,386,true
+funiculaire-st-luc-chandolin:FUN:8530142-8530143,Standseilbahn St-Luc-Tignousa,FUN,funiculaire-st-luc-chandolin,Funiculaire St-Luc-Chandolin,St-Luc (Tignousa),Tignousa,St-Luc (Tignousa),Tignousa,93-6N-Y-j26-1,false,252,false
+gornergratbahn:CC-48,CC 48,CC,gornergratbahn,Gornergratbahn,Zermatt GGB,Gornergrat,Zermatt GGB,Gornergrat,93-48-j26-1,false,378,true
+gurtenbahn:FUN-2351,Standseilbahn Gurtenbahn,FUN,gurtenbahn,Gurtenbahn,Wabern (Gurtenbahn),Gurten Kulm,Wabern (Gurtenbahn),Gurten Kulm,93-235-1-j26-1,false,891,true
+harderbahn:FUN-2361,Standseilbahn Harderbahn,FUN,harderbahn,Harderbahn,Interlaken Harderbahn,Harder Kulm,Interlaken Harderbahn,Harder Kulm,93-236-1-j26-1,false,350,true
+interlaken-heimwehfluh:FUN-2360,Standseilbahn Heimwehfluhbahn,FUN,interlaken-heimwehfluh,Interlaken-Heimwehfluh,Interlaken (Heimwehfluhbahn),Heimwehfluh,Interlaken (Heimwehfluhbahn),Heimwehfluh,93-236-0-j26-1,true,392,true
+jungfraubahn:CC-65,CC 65,CC,jungfraubahn,Jungfraubahn,Jungfraujoch,Kleine Scheidegg,Jungfraujoch,Kleine Scheidegg,93-65-j26-1,false,511,true
+jura:R1,R1,R,jura,Schweizerische Bundesbahnen SBB,Delémont,Boncourt,Delémont,Delle,91-1-F-j26-1,false,299,true
+jura:R11,R11,R,jura,Schweizerische Bundesbahnen SBB,Porrentruy,Boncourt,Porrentruy,Delle,91-11-G-j26-1,false,229,true
+jura:R2,R2,R,jura,Schweizerische Bundesbahnen SBB,Delémont,Bonfol,Delémont,Bonfol,91-2-Z-j26-1,false,278,true
+jura:R22,R22,R,jura,Schweizerische Bundesbahnen SBB,Porrentruy,Bonfol,Porrentruy,Bonfol,91-22-F-j26-1,false,190,true
+jura:R:8500109-8500126,SBB R Delémont-Porrentruy,R,jura,Schweizerische Bundesbahnen SBB,Delémont,Porrentruy,Delémont,Porrentruy,91-H-Y-j26-1,false,4,false
+kriens-sonnenberg-bahn:FUN-2515,Standseilbahn Sonnenbergbahn,FUN,kriens-sonnenberg-bahn,Kriens-Sonnenberg-Bahn,Kriens (Sonnenbergbahn),Sonnenberg (Kriens),Kriens (Sonnenbergbahn),Sonnenberg (Kriens),93-251-5-j26-1,false,544,true
+kwo-seilbahnen:FUN:8531013-8531014,Gelmerbahn,FUN,kwo-seilbahnen,KWO Seilbahnen,Handegg,Gelmersee,Handegg,Gelmersee,,,,true
+lausanne-echallens-bercher:R20,R20,R,lausanne-echallens-bercher,Lausanne-Echallens-Bercher,Bercher,Lausanne-Flon,Bercher,Lausanne-Flon,91-20-I-j26-1,false,944,true
+lauterbrunnen-muerren:R66,R66,R,lauterbrunnen-muerren,Lauterbrunnen-Mürren,Grütschalp,Mürren BLM,Grütschalp,Mürren BLM,91-66-j26-1,false,630,true
+leman-express:R4,R4,R,leman-express,Schweizerische Bundesbahnen SBB,Genève,Coppet,Genève,Coppet,91-4-E-j26-1,true,5,false
+leman-express:R7,R7,R,leman-express,Schweizerische Bundesbahnen SBB,Genève-Aéroport,Chêne-Bourg,Genève-Aéroport,Annemasse,91-7-P-j26-1,true,3,false
+leman-express:R:8501023-8516274,SBB R Chêne-Bourg-Coppet,R,leman-express,Schweizerische Bundesbahnen SBB,Coppet,Chêne-Bourg,Coppet,Annemasse,91-51-Y-j26-1,true,0,false
+leman-express:RE33,RE33,RE,leman-express,Schweizerische Bundesbahnen SBB,Brig,Chêne-Bourg,Brig,Annemasse,91-33-C-j26-1,false,584,true
+leman-express:RE:8501008-8501030,SBB RE Genève-Aéroport-Vevey,RE,leman-express,Schweizerische Bundesbahnen SBB,Genève-Aéroport,Montreux,Genève-Aéroport,Montreux,91-1-Y-j26-1,false,25,false
+leman-express:RL1,RL1,R,leman-express,Schweizerische Bundesbahnen SBB,Coppet,Chêne-Bourg,Coppet,Annemasse,91-L1-B-j26-1,false,150,true
+leman-express:RL2,RL2,R,leman-express,Schweizerische Bundesbahnen SBB,Coppet,Chêne-Bourg,Coppet,Annemasse,91-L2-B-j26-1,false,195,true
+leman-express:RL3,RL3,R,leman-express,Schweizerische Bundesbahnen SBB,Coppet,Chêne-Bourg,Coppet,Annemasse,91-L3-B-j26-1,false,85,true
+leman-express:RL4,RL4,R,leman-express,Schweizerische Bundesbahnen SBB,Coppet,Chêne-Bourg,Coppet,Annemasse,91-L4-A-j26-1,false,711,true
+leman-express:RL5,RL5,R,leman-express,Schweizerische Bundesbahnen SBB,La Plaine,Genève,La Plaine,Genève,91-L5-A-j26-1,false,525,true
+leman-express:RL6,RL6,R,leman-express,Schweizerische Bundesbahnen SBB,La Plaine,Genève,Pougny-Chancy,Genève,91-L6-C-j26-1,false,107,true
+leman-express:RL7,RL7,R,leman-express,Schweizerische Bundesbahnen SBB,Genève-Aéroport,Chêne-Bourg,Genève-Aéroport,Annemasse,91-L7-j26-1,false,46,true
+leman-express:SN4,SN4,SN,leman-express,Schweizerische Bundesbahnen SBB,Genève,Coppet,Genève,Coppet,91-4-I-j26-1,true,0,false
+lugano-monte-san-salvatore:FUN-2652,Standseilbahn Monte San Salvatore,FUN,lugano-monte-san-salvatore,Lugano-Monte San Salvatore,Paradiso (funicolare),Monte San Salvatore,Paradiso (funicolare),Monte San Salvatore,93-265-2-j26-1,false,276,true
+matterhorn-gotthard-bahn-bvz:R40,R40,R,matterhorn-gotthard-bahn-bvz,Matterhorn Gotthard Bahn (bvz),Täsch,Zermatt,Täsch,Zermatt,91-40-B-j26-1,false,740,true
+matterhorn-gotthard-bahn-bvz:R41,R41,R,matterhorn-gotthard-bahn-bvz,Matterhorn Gotthard Bahn (bvz),Visp,Zermatt,Visp,Zermatt,91-41-G-j26-1,false,168,true
+matterhorn-gotthard-bahn-bvz:R42,R42,R,matterhorn-gotthard-bahn-bvz,Matterhorn Gotthard Bahn (bvz),Fiesch,Zermatt,Fiesch,Zermatt,91-42-D-j26-1,false,273,true
+matterhorn-gotthard-bahn-fo:R43,R43,R,matterhorn-gotthard-bahn-fo,Matterhorn Gotthard Bahn (fo),Visp,Andermatt,Visp,Andermatt,91-43-j26-1,false,286,true
+matterhorn-gotthard-bahn-fo:R44,R44,R,matterhorn-gotthard-bahn-fo,Matterhorn Gotthard Bahn (fo),Göschenen,Realp,Göschenen,Realp,91-44-B-j26-1,false,483,true
+matterhorn-gotthard-bahn-fo:R45,R45,R,matterhorn-gotthard-bahn-fo,Matterhorn Gotthard Bahn (fo),Andermatt,Disentis/Mustér,Andermatt,Disentis/Mustér,91-45-j26-1,false,196,true
+matterhorn-gotthard-bahn-fo:R46,R46,R,matterhorn-gotthard-bahn-fo,Matterhorn Gotthard Bahn (fo),Dieni,Disentis/Mustér,Dieni,Disentis/Mustér,91-46-B-j26-1,true,0,false
+montreux-oberland-bernois:R30,R30,R,montreux-oberland-bernois,Montreux-Oberland Bernois,Montreux,Zweisimmen,Montreux,Zweisimmen,91-30-J-j26-1,false,159,true
+montreux-oberland-bernois:R31,R31,R,montreux-oberland-bernois,Montreux-Oberland Bernois,Lenk im Simmental,Zweisimmen,Lenk im Simmental,Zweisimmen,91-31-C-j26-1,false,252,true
+montreux-oberland-bernois:R32,R32,R,montreux-oberland-bernois,Montreux-Oberland Bernois,Gstaad,Lenk im Simmental,Gstaad,Lenk im Simmental,91-32-j26-1,false,103,true
+montreux-oberland-bernois:R34,R34,R,montreux-oberland-bernois,Montreux-Oberland Bernois,Montreux,Les Avants,Montreux,Les Avants,91-34-j26-1,false,203,true
+montreux-vevey-riviera-cev:R35,R35,R,montreux-vevey-riviera-cev,Montreux-Vevey-Riviera (cev),Vevey,Les Pléiades,Vevey,Les Pléiades,91-35-E-j26-1,false,632,true
+montreux-vevey-riviera-las:FUN-LAS,Standseilbahn Les Avants-Sonloup,FUN,montreux-vevey-riviera-las,Montreux-Vevey-Riviera (las),Les Avants (funi),Sonloup,Les Avants (funi),Sonloup,93-LAS-j26-1,false,952,true
+montreux-vevey-riviera-mtgn:FUN-TG,Standseilbahn Territet-Glion,FUN,montreux-vevey-riviera-mtgn,Montreux-Vevey-Riviera (mtgn),Glion (funi),Territet (funi),Glion (funi),Territet (funi),93-TG-j26-1,false,1026,true
+montreux-vevey-riviera-mtgn:R37,R37,R,montreux-vevey-riviera-mtgn,Montreux-Vevey-Riviera (mtgn),Montreux,Rochers-de-Naye,Montreux,Rochers-de-Naye,91-37-F-j26-1,false,270,true
+montreux-vevey-riviera-vcp:FUN-VCP,Standseilbahn Mont-Pèlerin,FUN,montreux-vevey-riviera-vcp,Montreux-Vevey-Riviera (vcp),Vevey (funi),Mont-Pèlerin,Vevey (funi),Mont-Pèlerin,93-VCP-j26-1,false,258,true
+muehleggbahn-ag:FUN-2710,Standseilbahn Mühleggbahn,FUN,muehleggbahn-ag,Mühleggbahn AG,"St. Gallen, Mühlegg Bergstat.","St. Gallen, Mühlegg Talstation","St. Gallen, Mühlegg Bergstat.","St. Gallen, Mühlegg Talstation",93-271-0-j26-1,false,2688,true
+niederhornbahn-ag:FUN-2355,Standseilbahn Beatenbergbahn,FUN,niederhornbahn-ag,Niederhornbahn AG,Beatenbucht (Beatenbergbahn),Beatenberg,Beatenbucht (Beatenbergbahn),Beatenberg,93-235-5-j26-1,false,510,true
+niesenbahn:FUN-2405,Standseilbahn Niesenbahn,FUN,niesenbahn,Niesenbahn,Mülenen (Niesenbahn),Niesen Kulm,Mülenen (Niesenbahn),Niesen Kulm,93-240-5-j26-1,true,283,true
+parkhotel-giessbach-ag:FUN-2470,Standseilbahn Giessbachbahn,FUN,parkhotel-giessbach-ag,Parkhotel Giessbach AG,Giessbach Hotel,Giessbach See (Talstation),Giessbach Hotel,Giessbach See (Talstation),93-247-0-j26-1,false,224,true
+pilatusbahnen:CC-R83,CC R83,CC,pilatusbahnen,Pilatusbahnen,Pilatus Kulm,Alpnachstad PB,Pilatus Kulm,Alpnachstad PB,93-R83-j26-1,true,238,true
+poly-bahn-zuerich:FUN-24,Standseilbahn Polybahn,FUN,poly-bahn-zuerich,Poly-Bahn Zürich,Zürich Central (Polybahn),Zürich Polyterrasse,Zürich Central (Polybahn),Zürich Polyterrasse,93-24-j26-1,false,2366,true
+publikation-nur-kursbuch-plakat:RE3,RE3,RE,publikation-nur-kursbuch-plakat,Publikation nur Kursbuch/Plakat,Basel Bad Bf,Schaffhausen,Basel Bad Bf,Singen (Hohentwiel),91-3-R-j26-1,false,5,false
+reichenbachfall-bahn:FUN-2475,Standseilbahn Reichenbachfallbahn,FUN,reichenbachfall-bahn,Reichenbachfall-Bahn,Willigen (Reichenbachfallbahn),Reichenbachfall,Willigen (Reichenbachfallbahn),Reichenbachfall,93-247-5-j26-1,true,476,true
+rer-fribourg:R39,R39,R,rer-fribourg,Montreux-Oberland Bernois;Transports publics fribourgeois,Zweisimmen,Bulle,Zweisimmen,Bulle,91-39-A-j26-1;91-39-j26-1,true,0,false
+rer-fribourg:R:8504086-8504100,TPF R Bulle-Fribourg/Freiburg,R,rer-fribourg,Transports publics fribourgeois,Bulle,Fribourg/Freiburg,Bulle,Fribourg/Freiburg,91-L-Y-j26-1,false,10,false
+rer-fribourg:RE-N1,RE N1,RE,rer-fribourg,Schweizerische Bundesbahnen SBB,Genève-Aéroport,Fribourg/Freiburg,Genève-Aéroport,Fribourg/Freiburg,91-N1-j26-1,false,5,false
+rer-fribourg:RE3,RE3,RE,rer-fribourg,Transports publics fribourgeois,Broc-Chocolaterie,Schmitten FR,Broc-Chocolaterie,Schmitten FR,91-3-M-j26-1,false,266,true
+rer-fribourg:RE:8501500-8501579,SBB RE Fribourg/Freiburg-Le Châble VS,RE,rer-fribourg,Schweizerische Bundesbahnen SBB,Le Châble VS,Fribourg/Freiburg,Le Châble VS,Fribourg/Freiburg,91-4N-Y-j26-1,false,8,false
+rer-fribourg:RE:8504023-8504100,SBB RE Fribourg/Freiburg-Romont FR,RE,rer-fribourg,Schweizerische Bundesbahnen SBB,Romont FR,Fribourg/Freiburg,Romont FR,Fribourg/Freiburg,91-O-Y-j26-1,true,0,false
+rer-fribourg:S20,S20,S,rer-fribourg,Transports publics fribourgeois,Fribourg/Freiburg,Neuchâtel,Fribourg/Freiburg,Neuchâtel,91-20-B-j26-1,false,271,true
+rer-fribourg:S21,S21,S,rer-fribourg,Transports publics fribourgeois,Fribourg/Freiburg,Neuchâtel,Fribourg/Freiburg,Neuchâtel,91-21-A-j26-1,false,276,true
+rer-fribourg:S30,S30,S,rer-fribourg,Schweizerische Bundesbahnen SBB,Fribourg/Freiburg,Yverdon-les-Bains,Fribourg/Freiburg,Yverdon-les-Bains,91-30-j26-1,false,629,true
+rer-fribourg:S40,S40,S,rer-fribourg,Schweizerische Bundesbahnen SBB,Lausanne,Fribourg/Freiburg,Lausanne,Fribourg/Freiburg,91-40-C-j26-1,false,280,true
+rer-fribourg:S41,S41,S,rer-fribourg,Schweizerische Bundesbahnen SBB,Lausanne,Fribourg/Freiburg,Lausanne,Fribourg/Freiburg,91-41-D-j26-1,false,287,true
+rer-fribourg:S50,S50,S,rer-fribourg,Transports publics fribourgeois,Palézieux,Allières,Palézieux,Allières,91-50-j26-1,false,375,true
+rer-fribourg:S51,S51,S,rer-fribourg,Transports publics fribourgeois,Palézieux,Gruyères,Palézieux,Gruyères,91-51-A-j26-1,false,216,true
+rer-fribourg:S:8501120-8504023,SBB S Fribourg/Freiburg-Lausanne,S,rer-fribourg,Schweizerische Bundesbahnen SBB,Lausanne,Fribourg/Freiburg,Lausanne,Fribourg/Freiburg,91-AG-Y-j26-1,true,0,false
+rer-fribourg:SN:8501120-8504100,SBB SN Fribourg/Freiburg-Lausanne,SN,rer-fribourg,Schweizerische Bundesbahnen SBB,Lausanne,Fribourg/Freiburg,Lausanne,Fribourg/Freiburg,91-2B-Y-j26-1,false,6,false
+rer-vaud:R1,R1,R,rer-vaud,Schweizerische Bundesbahnen SBB,St-Maurice,Grandson,St-Maurice,Grandson,91-1-M-j26-1,false,318,true
+rer-vaud:R2,R2,R,rer-vaud,Schweizerische Bundesbahnen SBB,Martigny,Grandson,Martigny,Grandson,91-2-R-j26-1,false,287,true
+rer-vaud:R3,R3,R,rer-vaud,Schweizerische Bundesbahnen SBB,Vallorbe,Vevey,Vallorbe,Vevey,91-3-T-j26-1,false,280,true
+rer-vaud:R4,R4,R,rer-vaud,Schweizerische Bundesbahnen SBB,Vallorbe,Vevey,Vallorbe,Vevey,91-4-L-j26-1,false,735,true
+rer-vaud:R7,R7,R,rer-vaud,Schweizerische Bundesbahnen SBB,Vevey,Romont FR,Vevey,Romont FR,91-7-N-j26-1,false,230,true
+rer-vaud:R8,R8,R,rer-vaud,Schweizerische Bundesbahnen SBB,Allaman,Payerne,Allaman,Payerne,91-8-J-j26-1,false,342,true
+rer-vaud:R9,R9,R,rer-vaud,Schweizerische Bundesbahnen SBB,Allaman,Murten/Morat,Allaman,Murten/Morat,91-9-K-j26-1,false,369,true
+rer-vaud:R:8501120-8501402,SBB R Bex-Lausanne,R,rer-vaud,Schweizerische Bundesbahnen SBB,Lausanne,Bex,Lausanne,Bex,91-3Z-Y-j26-1,true,0,false
+rer-vaud:RE-N9,RE N9,RE,rer-vaud,Schweizerische Bundesbahnen SBB,Lausanne,Sion,Lausanne,Sion,91-N9-j26-1,false,2,false
+rer-vaud:SN:8501035-8501120,SBB SN Allaman-Lausanne,SN,rer-vaud,Schweizerische Bundesbahnen SBB,Allaman,Lausanne,Allaman,Lausanne,91-3N-Y-j26-1,false,8,false
+rer-vaud:SN:8501103-8501403,SBB SN Sion-Vallorbe,SN,rer-vaud,Schweizerische Bundesbahnen SBB,Vallorbe,Sion,Vallorbe,Sion,91-41-Y-j26-1,false,8,false
+rer-vaud:SN:8501120-8504014,SBB SN Lausanne-Murten/Morat,SN,rer-vaud,Schweizerische Bundesbahnen SBB,Lausanne,Murten/Morat,Lausanne,Murten/Morat,91-4P-Y-j26-1,false,6,false
+rer-vaud:SN:8501120-8504201,SBB SN Grandson-Lausanne,SN,rer-vaud,Schweizerische Bundesbahnen SBB,Lausanne,Grandson,Lausanne,Grandson,91-49-Y-j26-1,false,8,false
+rhaetische-bahn:R1,R1,R,rhaetische-bahn,Rhätische Bahn,Davos Platz,Filisur,Davos Platz,Filisur,91-1-O-j26-1,false,180,true
+rhaetische-bahn:R11,R11,R,rhaetische-bahn,Rhätische Bahn,Davos Platz,Filisur,Davos Platz,Filisur,91-11-K-j26-1,true,38,false
+rhaetische-bahn:R15,R15,R,rhaetische-bahn,Rhätische Bahn,Pontresina,Scuol-Tarasp,Pontresina,Scuol-Tarasp,91-15-J-j26-1,false,282,true
+rhaetische-bahn:R16,R16,R,rhaetische-bahn,Rhätische Bahn,Chur,Arosa,Chur,Arosa,91-16-H-j26-1,false,242,true
+rhaetische-bahn:R19,R19,R,rhaetische-bahn,Rhätische Bahn,St. Moritz,Tirano,St. Moritz,Tirano,91-19-G-j26-1,false,158,true
+rhaetische-bahn:R2,R2,R,rhaetische-bahn,Rhätische Bahn,Landquart,Davos Platz,Landquart,Davos Platz,91-2-T-j26-1,false,49,false
+rhaetische-bahn:R24,R24,R,rhaetische-bahn,Rhätische Bahn,Landquart,Klosters Platz,Landquart,Klosters Platz,91-24-B-j26-1,false,7,false
+rhaetische-bahn:R28,R28,R,rhaetische-bahn,Rhätische Bahn,Surava,Filisur,Surava,Filisur,91-28-A-j26-1,true,140,true
+rhaetische-bahn:R38,R38,R,rhaetische-bahn,Rhätische Bahn,Chur,St. Moritz,Chur,St. Moritz,91-38-A-j26-1,false,70,false
+rhaetische-bahn:R4,R4,R,rhaetische-bahn,Rhätische Bahn,Klosters Platz,Scuol-Tarasp,Klosters Platz,Scuol-Tarasp,91-4-O-j26-1,false,71,false
+rhaetische-bahn:R7,R7,R,rhaetische-bahn,Rhätische Bahn,Chur,Disentis/Mustér,Chur,Disentis/Mustér,91-7-O-j26-1,false,13,false
+rhaetische-bahn:RE1,RE1,RE,rhaetische-bahn,Rhätische Bahn,Landquart,Davos Platz,Landquart,Davos Platz,91-1-Q-j26-1,false,11,false
+rhaetische-bahn:RE13,RE13,RE,rhaetische-bahn,Rhätische Bahn,Landquart,Klosters Platz,Landquart,Klosters Platz,91-13-C-j26-1,false,195,false
+rhaetische-bahn:RE2,RE2,RE,rhaetische-bahn,Rhätische Bahn,Landquart,Davos Platz,Landquart,Davos Platz,91-2-S-j26-1,false,21,true
+rhaetische-bahn:RE24,RE24,RE,rhaetische-bahn,Rhätische Bahn,Landquart,Klosters Platz,Landquart,Klosters Platz,91-24-H-j26-1,false,182,false
+rhaetische-bahn:RE3,RE3,RE,rhaetische-bahn,Rhätische Bahn,Landquart,St. Moritz,Landquart,St. Moritz,91-3-U-j26-1,false,193,true
+rhaetische-bahn:RE38,RE38,RE,rhaetische-bahn,Rhätische Bahn,Chur,St. Moritz,Chur,St. Moritz,91-38-B-j26-1,false,33,false
+rhaetische-bahn:RE4,RE4,RE,rhaetische-bahn,Rhätische Bahn,Landquart,Scuol-Tarasp,Landquart,Scuol-Tarasp,91-4-N-j26-1,false,196,true
+rhaetische-bahn:RE5,RE5,RE,rhaetische-bahn,Rhätische Bahn,Chur,Disentis/Mustér,Chur,Disentis/Mustér,91-5-E-j26-1,false,189,false
+rhaetische-bahn:RE6,RE6,RE,rhaetische-bahn,Rhätische Bahn,Chur,Arosa,Chur,Arosa,91-6-X-j26-1,false,12,true
+rhaetische-bahn:RE7,RE7,RE,rhaetische-bahn,Rhätische Bahn,Landquart,Disentis/Mustér,Landquart,Disentis/Mustér,91-7-M-j26-1,false,413,true
+rhaetische-bahn:RE8,RE8,RE,rhaetische-bahn,Rhätische Bahn,Chur,Thusis,Chur,Thusis,91-8-K-j26-1,false,168,true
+rhaetische-bahn:RE9,RE9,RE,rhaetische-bahn,Rhätische Bahn,St. Moritz,Tirano,St. Moritz,Tirano,91-9-M-j26-1,false,70,true
+rhaetische-bahn:S1,S1,S,rhaetische-bahn,Rhätische Bahn,Schiers,Thusis,Schiers,Thusis,91-1-G-j26-1,false,254,true
+rhaetische-bahn:S2,S2,S,rhaetische-bahn,Rhätische Bahn,Schiers,Rhäzüns,Schiers,Rhäzüns,91-2-F-j26-1,false,203,true
+rhaetische-bahn:S:8509000-8509002,RhB S Schiers-Thusis,S,rhaetische-bahn,Rhätische Bahn,Schiers,Thusis,Schiers,Thusis,91-1A-Y-j26-1,false,46,false
+rigi-bahnen-ag:CC-81,CC 81,CC,rigi-bahnen-ag,Rigi Bahnen AG,Arth-Goldau RB,Rigi Kulm,Arth-Goldau RB,Rigi Kulm,93-81-j26-1,false,146,true
+rigi-bahnen-ag:CC-82,CC 82,CC,rigi-bahnen-ag,Rigi Bahnen AG,Rigi Kulm,Vitznau,Rigi Kulm,Vitznau,93-82-j26-1,false,168,true
+rigi-bahnen-ag:CC-88,CC 88,CC,rigi-bahnen-ag,Rigi Bahnen AG,Rigi Kulm,Vitznau,Rigi Kulm,Vitznau,93-88-j26-1,false,15,false
+s-bahn-aargau:S14,S14,S,s-bahn-aargau,Aargau Verkehr AG,Schöftland,Menziken,Schöftland,Menziken,91-14-A-j26-1,false,1789,true
+s-bahn-aargau:S23,S23,S,s-bahn-aargau,Schweizerische Bundesbahnen SBB,Baden,Langenthal,Baden,Langenthal,91-23-j26-1,false,544,true
+s-bahn-aargau:S25,S25,S,s-bahn-aargau,Schweizerische Bundesbahnen SBB,Brugg AG,Muri AG,Brugg AG,Muri AG,91-25-B-j26-1,false,238,true
+s-bahn-aargau:S26,S26,S,s-bahn-aargau,Schweizerische Bundesbahnen SBB,Olten,Rotkreuz,Olten,Rotkreuz,91-26-j26-1,false,611,true
+s-bahn-aargau:S27,S27,S,s-bahn-aargau,Schweizerische Bundesbahnen SBB;THURBO,Rekingen AG,Wettingen,Rekingen AG,Wettingen,91-27-D-j26-1;91-27-j26-1,false,548,true
+s-bahn-aargau:S28,S28,S,s-bahn-aargau,Schweizerische Bundesbahnen SBB,Olten,Lenzburg,Olten,Lenzburg,91-28-j26-1,false,521,true
+s-bahn-aargau:S29,S29,S,s-bahn-aargau,Schweizerische Bundesbahnen SBB,Sursee,Baden,Sursee,Baden,91-29-j26-1,false,586,true
+s-bahn-aargau:S:8500305-8500309,SBB S Brugg AG-Frick,S,s-bahn-aargau,Schweizerische Bundesbahnen SBB,Frick,Brugg AG,Frick,Brugg AG,91-9V-Y-j26-1,true,0,false
+s-bahn-aargau:S:8500309-8502106,SBB S Brugg AG-Rotkreuz,S,s-bahn-aargau,Schweizerische Bundesbahnen SBB,Baden,Rotkreuz,Baden,Rotkreuz,91-D8-Y-j26-1,true,0,false
+s-bahn-aargau:S:8502115-8508100,SBB S Langenthal-Wildegg,S,s-bahn-aargau,Schweizerische Bundesbahnen SBB,Wildegg,Langenthal,Wildegg,Langenthal,91-75-Y-j26-1,true,0,false
+s-bahn-basel:RB-27,RB 27,RB,s-bahn-basel,Schweizerische Bundesbahnen SBB,Basel SBB,Basel Bad Bf,Basel SBB,Basel Bad Bf,91-27-C-j26-1,false,5,true
+s-bahn-basel:RE26,RE26,RE,s-bahn-basel,Schweizerische Bundesbahnen SBB,Basel SBB,Luzern,Basel SBB,Luzern,91-26-E-j26-1,true,0,false
+s-bahn-basel:RE36,RE36,RE,s-bahn-basel,Schweizerische Bundesbahnen SBB,Basel SBB,Zürich HB,Basel SBB,Zürich HB,91-36-E-j26-1,false,28,false
+s-bahn-basel:RE7,RE7,RE,s-bahn-basel,Schweizerische Bundesbahnen SBB,Basel SBB,Basel Bad Bf,Basel SBB,Basel Bad Bf,91-7-H-j26-1,false,42,true
+s-bahn-basel:RE:8500010-8502021,SBB RE Basel SBB-Emmenbrücke,RE,s-bahn-basel,Schweizerische Bundesbahnen SBB,Basel SBB,Emmenbrücke,Basel SBB,Emmenbrücke,91-98-Y-j26-1,true,0,false
+s-bahn-basel:S1,S1,S,s-bahn-basel,Schweizerische Bundesbahnen SBB,Basel SBB,Brugg AG,Basel SBB,Brugg AG,91-1-B-j26-1,false,594,true
+s-bahn-basel:S11,S11,S,s-bahn-basel,Schweizerische Bundesbahnen SBB,Basel SBB,Stein-Säckingen,Basel SBB,Stein-Säckingen,91-11-H-j26-1,false,30,true
+s-bahn-basel:S3,S3,S,s-bahn-basel,Schweizerische Bundesbahnen SBB,Porrentruy,Olten,Porrentruy,Olten,91-3-B-j26-1,false,598,true
+s-bahn-basel:S31,S31,S,s-bahn-basel,Schweizerische Bundesbahnen SBB,Basel SBB,Laufen,Basel SBB,Laufen,91-31-D-j26-1,false,30,true
+s-bahn-basel:S32,S32,S,s-bahn-basel,Schweizerische Bundesbahnen SBB,Basel SBB,Sissach,Basel SBB,Sissach,91-32-A-j26-1,false,5,true
+s-bahn-basel:S33,S33,S,s-bahn-basel,Schweizerische Bundesbahnen SBB,Basel SBB,Sissach,Basel SBB,Sissach,91-33-A-j26-1,false,396,true
+s-bahn-basel:S6,S6,S,s-bahn-basel,SBB GmbH;SBB GmbH (Grenzverkehr),Basel SBB,Riehen,Basel SBB,Zell (Wiesental),91-6-E-j26-1;91-6-M-j26-1,false,968,true
+s-bahn-basel:S9,S9,S,s-bahn-basel,Schweizerische Bundesbahnen SBB,Sissach,Olten,Sissach,Olten,91-9-F-j26-1,false,255,true
+s-bahn-basel:S:8500010-8500027,SBB S Basel SBB-Gelterkinden,S,s-bahn-basel,Schweizerische Bundesbahnen SBB,Basel SBB,Gelterkinden,Basel SBB,Gelterkinden,91-3Q-Y-j26-1,true,0,false
+s-bahn-basel:S:8500010-8500113,SBB S Basel SBB-Laufen,S,s-bahn-basel,Schweizerische Bundesbahnen SBB,Basel SBB,Laufen,Basel SBB,Laufen,91-34-Y-j26-1,true,0,false
+s-bahn-basel:S:8500010-8500305,SBB S Basel SBB-Frick,S,s-bahn-basel,Schweizerische Bundesbahnen SBB,Basel SBB,Frick,Basel SBB,Frick,91-3F-Y-j26-1,true,0,false
+s-bahn-basel:SN6,SN6,SN,s-bahn-basel,SBB GmbH (Grenzverkehr),Basel SBB,Basel Bad Bf,Basel SBB,Basel Bad Bf,91-6-Z-j26-1,false,8,false
+s-bahn-bern:RE1,RE1,RE,s-bahn-bern,BLS AG (bls),Preglia,Bern,Domodossola (I),Bern,91-1-N-j26-1,false,476,true
+s-bahn-bern:RE11,RE11,RE,s-bahn-bern,BLS AG (bls),Brig,Biel/Bienne,Brig,Biel/Bienne,91-11-O-j26-1,false,4,false
+s-bahn-bern:RE12,RE12,RE,s-bahn-bern,BLS AG (bls),Bern,Zweisimmen,Bern,Zweisimmen,91-12-D-j26-1,true,4,false
+s-bahn-bern:RE2,RE2,RE,s-bahn-bern,Transports publics fribourgeois,Broc-Chocolaterie,Bern,Broc-Chocolaterie,Bern,91-2-M-j26-1,false,273,true
+s-bahn-bern:RE5,RE5,RE,s-bahn-bern,Regionalverkehr Bern-Solothurn,Solothurn,Bern,Solothurn,Bern,91-5-O-j26-1,false,777,true
+s-bahn-bern:RE7,RE7,RE,s-bahn-bern,BLS AG (bls),Luzern,Bern,Luzern,Bern,91-7-L-j26-1,false,518,true
+s-bahn-bern:RE8,RE8,RE,s-bahn-bern,BLS AG (bls),Zweisimmen,Interlaken Ost,Zweisimmen,Interlaken Ost,91-8-L-j26-1,false,63,true
+s-bahn-bern:RE9,RE9,RE,s-bahn-bern,Schweizerische Bundesbahnen SBB,Travers,Bern,Pontarlier,Bern,91-9-N-j26-1,false,34,false
+s-bahn-bern:S1,S1,S,s-bahn-bern,BLS AG (bls),Fribourg/Freiburg,Thun,Fribourg/Freiburg,Thun,91-1-E-j26-1,false,553,true
+s-bahn-bern:S11,S11,S,s-bahn-bern,BLS AG (bls),Bern,Thun,Bern,Thun,91-11-P-j26-1,false,10,true
+s-bahn-bern:S2,S2,S,s-bahn-bern,BLS AG (bls),Laupen BE,Langnau i.E.,Laupen BE,Langnau i.E.,91-2-A-j26-1,false,566,true
+s-bahn-bern:S21,S21,S,s-bahn-bern,BLS AG (bls),Thun,Konolfingen,Thun,Konolfingen,91-21-H-j26-1,false,194,true
+s-bahn-bern:S22,S22,S,s-bahn-bern,BLS AG (bls),Bern,Langnau i.E.,Bern,Langnau i.E.,91-22-C-j26-1,false,8,true
+s-bahn-bern:S3,S3,S,s-bahn-bern,BLS AG (bls),Biel/Bienne,Belp,Biel/Bienne,Belp,91-3-F-j26-1,false,544,true
+s-bahn-bern:S31,S31,S,s-bahn-bern,BLS AG (bls),Biel/Bienne,Belp,Biel/Bienne,Belp,91-31-j26-1,false,300,true
+s-bahn-bern:S35,S35,S,s-bahn-bern,BLS AG (bls),Kerzers,Lyss,Kerzers,Lyss,91-35-F-j26-1,false,266,true
+s-bahn-bern:S36,S36,S,s-bahn-bern,BLS AG (bls),Büren an der Aare,Lyss,Büren an der Aare,Lyss,91-36-D-j26-1,false,326,true
+s-bahn-bern:S4,S4,S,s-bahn-bern,BLS AG (bls),Thun,Langnau i.E.,Thun,Langnau i.E.,91-4-C-j26-1,false,309,true
+s-bahn-bern:S41,S41,S,s-bahn-bern,BLS AG (bls),Solothurn,Thun,Solothurn,Thun,91-41-F-j26-1,false,284,true
+s-bahn-bern:S42,S42,S,s-bahn-bern,BLS AG (bls),Thun,Burgdorf,Thun,Burgdorf,91-42-C-j26-1,false,278,true
+s-bahn-bern:S44,S44,S,s-bahn-bern,BLS AG (bls),Thun,Solothurn,Thun,Solothurn,91-44-j26-1,false,847,true
+s-bahn-bern:S45,S45,S,s-bahn-bern,BLS AG (bls),Ramsei,Sumiswald-Grünen,Ramsei,Sumiswald-Grünen,91-45-A-j26-1,false,235,true
+s-bahn-bern:S46,S46,S,s-bahn-bern,BLS AG (bls),Solothurn,Ostermundigen,Solothurn,Ostermundigen,91-46-D-j26-1,false,5,true
+s-bahn-bern:S5,S5,S,s-bahn-bern,BLS AG (bls),Neuchâtel,Bern,Neuchâtel,Bern,91-5-j26-1,false,823,true
+s-bahn-bern:S52,S52,S,s-bahn-bern,BLS AG (bls),Payerne,Bern,Payerne,Bern,91-52-j26-1,false,613,false
+s-bahn-bern:S6,S6,S,s-bahn-bern,BLS AG (bls),Bern,Schwarzenburg,Bern,Schwarzenburg,91-6-F-j26-1,false,532,true
+s-bahn-bern:S7,S7,S,s-bahn-bern,Regionalverkehr Bern-Solothurn,Bern,Worb Dorf,Bern,Worb Dorf,91-7-A-j26-1,false,1309,true
+s-bahn-bern:S8,S8,S,s-bahn-bern,Regionalverkehr Bern-Solothurn,Solothurn,Bern,Solothurn,Bern,91-8-B-j26-1,false,1002,true
+s-bahn-bern:S9,S9,S,s-bahn-bern,Regionalverkehr Bern-Solothurn,Bern,Unterzollikofen,Bern,Unterzollikofen,91-9-A-j26-1,false,867,true
+s-bahn-bern:S:8504103-8507000,BLS S Bern-Flamatt,S,s-bahn-bern,BLS AG (bls),Flamatt,Bern,Flamatt,Bern,91-1D-Y-j26-1,true,0,false
+s-bahn-bern:S:8504400-8504483,BLS S Bern Brünnen Westside-Neuchâtel,S,s-bahn-bern,BLS AG (bls),Neuchâtel,Bern,Neuchâtel,Bern,91-5O-Y-j26-1,true,0,false
+s-bahn-bern:S:8508005-8508085,BLS S Aefligen-Burgdorf,S,s-bahn-bern,BLS AG (bls),Burgdorf,Aefligen,Burgdorf,Aefligen,91-28-Y-j26-1,true,0,false
+s-bahn-luzern:RE2,RE2,RE,s-bahn-luzern,Schweizerische Bundesbahnen SBB,Zug,Arth-Goldau,Zug,Arth-Goldau,91-2-P-j26-1,true,0,false
+s-bahn-luzern:RE24,RE24,RE,s-bahn-luzern,Schweizerische Bundesbahnen SBB,Olten,Luzern,Olten,Luzern,91-24-F-j26-1,false,280,true
+s-bahn-luzern:RE6,RE6,RE,s-bahn-luzern,Schweizerische Bundesbahnen SBB,Olten,Arth-Goldau,Olten,Arth-Goldau,91-6-W-j26-1,false,12,true
+s-bahn-luzern:S1,S1,S,s-bahn-luzern,Schweizerische Bundesbahnen SBB,Sursee,Baar,Sursee,Baar,91-1-A-j26-1,false,989,true
+s-bahn-luzern:S2,S2,S,s-bahn-luzern,Schweizerische Bundesbahnen SBB,Erstfeld,Baar Lindenpark,Erstfeld,Baar Lindenpark,91-2-C-j26-1,false,462,true
+s-bahn-luzern:S3,S3,S,s-bahn-luzern,Schweizerische Bundesbahnen SBB,Luzern,Erstfeld,Luzern,Erstfeld,91-3-H-j26-1,false,371,true
+s-bahn-luzern:S31,S31,S,s-bahn-luzern,Schweizerische Südostbahn (sob),Biberbrugg,Arth-Goldau,Biberbrugg,Arth-Goldau,91-31-A-j26-1,false,241,true
+s-bahn-luzern:S4,S4,S,s-bahn-luzern,Zentralbahn,Luzern,Wolfenschiessen,Luzern,Wolfenschiessen,91-4-D-j26-1,false,560,true
+s-bahn-luzern:S41,S41,S,s-bahn-luzern,Zentralbahn,Luzern,Horw,Luzern,Horw,91-41-A-j26-1,false,100,true
+s-bahn-luzern:S44,S44,S,s-bahn-luzern,Zentralbahn,Luzern,Wolfenschiessen,Luzern,Wolfenschiessen,91-44-A-j26-1,false,74,true
+s-bahn-luzern:S5,S5,S,s-bahn-luzern,Zentralbahn,Luzern,Giswil,Luzern,Giswil,91-5-D-j26-1,false,546,true
+s-bahn-luzern:S55,S55,S,s-bahn-luzern,Zentralbahn,Luzern,Sachseln,Luzern,Sachseln,91-55-j26-1,false,40,true
+s-bahn-luzern:S6,S6,S,s-bahn-luzern,BLS AG (bls),Langenthal,Luzern,Langenthal,Luzern,91-6-B-j26-1,false,822,true
+s-bahn-luzern:S7,S7,S,s-bahn-luzern,BLS AG (bls),Langenthal,Wolhusen,Langenthal,Wolhusen,91-7-D-j26-1,false,273,true
+s-bahn-luzern:S77,S77,S,s-bahn-luzern,BLS AG (bls),Luzern,Zell LU,Luzern,Zell LU,91-77-j26-1,false,75,true
+s-bahn-luzern:S9,S9,S,s-bahn-luzern,Schweizerische Bundesbahnen SBB,Lenzburg,Luzern,Lenzburg,Luzern,91-9-B-j26-1,false,594,true
+s-bahn-luzern:S99,S99,S,s-bahn-luzern,Schweizerische Bundesbahnen SBB,Hochdorf,Luzern,Hochdorf,Luzern,91-99-j26-1,false,25,true
+s-bahn-luzern:SN1,SN1,SN,s-bahn-luzern,Schweizerische Bundesbahnen SBB,Olten,Luzern,Olten,Luzern,91-1-I-j26-1,false,14,false
+s-bahn-schaffhausen:RB-62N,RB 62N,RB,s-bahn-schaffhausen,SBB GmbH,Thayngen,Herblingen,Singen (Hohentwiel),Herblingen,91-62N-j26-1,true,0,false
+s-bahn-schaffhausen:S62,S62,S,s-bahn-schaffhausen,SBB GmbH;SBB GmbH (Grenzverkehr),Schaffhausen,Thayngen,Schaffhausen,Singen (Hohentwiel),91-62-B-j26-1;91-62-C-j26-1,false,1149,true
+s-bahn-schaffhausen:S64,S64,S,s-bahn-schaffhausen,SBB GmbH (Grenzverkehr),Schaffhausen,Trasadingen,Schaffhausen,Erzingen (Baden),91-64-A-j26-1,false,518,true
+s-bahn-schaffhausen:S65,S65,S,s-bahn-schaffhausen,THURBO,Bülach,Schaffhausen,Bülach,Schaffhausen,91-65-A-j26-1,false,152,false
+s-bahn-schaffhausen:SN62,SN62,SN,s-bahn-schaffhausen,SBB GmbH (Grenzverkehr),Schaffhausen,Thayngen,Schaffhausen,Singen (Hohentwiel),91-62-A-j26-1,true,0,true
+s-bahn-schaffhausen:SN65,SN65,SN,s-bahn-schaffhausen,THURBO,Bülach,Schaffhausen,Bülach,Schaffhausen,91-65-B-j26-1,false,12,false
+s-bahn-st-gallen:RE1,RE1,RE,s-bahn-st-gallen,THURBO,Altnau,Herisau,Altnau,Herisau,91-1-P-j26-1,false,266,true
+s-bahn-st-gallen:RE13,RE13,RE,s-bahn-st-gallen,Schweizerische Bundesbahnen SBB;THURBO,Zürich HB,Sargans,Zürich HB,Sargans,91-13-F-j26-1;91-13-M-j26-1,false,50,false
+s-bahn-st-gallen:RE15,RE15,RE,s-bahn-st-gallen,Schweizerische Bundesbahnen SBB,Rapperswil SG,Chur,Rapperswil SG,Chur,91-15-L-j26-1,true,8,false
+s-bahn-st-gallen:RE35,RE35,RE,s-bahn-st-gallen,Schweizerische Südostbahn (sob),Ziegelbrücke,Chur,Ziegelbrücke,Chur,91-35-C-j26-1,true,0,false
+s-bahn-st-gallen:RE75,RE75,RE,s-bahn-st-gallen,THURBO,Zürich HB,Romanshorn,Zürich HB,Konstanz,91-75-B-j26-1,false,36,false
+s-bahn-st-gallen:RE8,RE8,RE,s-bahn-st-gallen,THURBO,Zürich HB,Romanshorn,Zürich HB,Romanshorn,91-8-N-j26-1,false,5,false
+s-bahn-st-gallen:RE:8503000-8506302,SBB RE St. Gallen-Zürich HB,RE,s-bahn-st-gallen,Schweizerische Bundesbahnen SBB,Zürich HB,St. Gallen,Zürich HB,St. Gallen,91-8G-Y-j26-1,true,0,false
+s-bahn-st-gallen:RE:8506317-8509000,Thurbo RE Chur-Heerbrugg,RE,s-bahn-st-gallen,THURBO,Heerbrugg,Chur,Heerbrugg,Chur,91-1H-Y-j26-1,true,0,false
+s-bahn-st-gallen:S1,S1,S,s-bahn-st-gallen,THURBO,Schaffhausen,Wil SG,Schaffhausen,Wil SG,91-1-C-j26-1,false,621,true
+s-bahn-st-gallen:S10,S10,S,s-bahn-st-gallen,THURBO,Romanshorn,Wil SG,Romanshorn,Wil SG,91-10-C-j26-1,false,451,true
+s-bahn-st-gallen:S12,S12,S,s-bahn-st-gallen,THURBO,Chur,Sargans,Chur,Sargans,91-12-A-j26-1,false,528,true
+s-bahn-st-gallen:S13,S13,S,s-bahn-st-gallen,THURBO,St. Margrethen SG,Sargans,St. Margrethen SG,Sargans,91-13-H-j26-1,false,11,false
+s-bahn-st-gallen:S14,S14,S,s-bahn-st-gallen,THURBO,Kreuzlingen Hafen,Wil SG,Konstanz,Wil SG,91-14-B-j26-1,false,834,false
+s-bahn-st-gallen:S15,S15,S,s-bahn-st-gallen,Appenzeller Bahnen (ab),Frauenfeld,Wil SG,Frauenfeld,Wil SG,91-15-I-j26-1,false,642,true
+s-bahn-st-gallen:S17,S17,S,s-bahn-st-gallen,Schweizerische Südostbahn (sob),Rapperswil SG,Sargans,Rapperswil SG,Sargans,91-17-M-j26-1,false,273,true
+s-bahn-st-gallen:S2,S2,S,s-bahn-st-gallen,Schweizerische Südostbahn (sob);THURBO,Nesslau-Neu St. Johann,Altstätten SG,Nesslau-Neu St. Johann,Altstätten SG,91-2-E-j26-1;91-2-K-j26-1;91-2-L-j26-1,false,294,true
+s-bahn-st-gallen:S20,S20,S,s-bahn-st-gallen,Appenzeller Bahnen (ab),Appenzell,St. Gallen,Appenzell,St. Gallen,91-20-E-j26-1,false,20,false
+s-bahn-st-gallen:S21,S21,S,s-bahn-st-gallen,Appenzeller Bahnen (ab),Appenzell,Trogen,Appenzell,Trogen,91-21-j26-1,false,560,true
+s-bahn-st-gallen:S22,S22,S,s-bahn-st-gallen,Appenzeller Bahnen (ab),Appenzell,Trogen,Appenzell,Trogen,91-22-A-j26-1,false,200,true
+s-bahn-st-gallen:S23,S23,S,s-bahn-st-gallen,Appenzeller Bahnen (ab),Gossau SG,Wasserauen,Gossau SG,Wasserauen,91-23-A-j26-1,false,442,true
+s-bahn-st-gallen:S24,S24,S,s-bahn-st-gallen,Appenzeller Bahnen (ab),Gais,Altstätten Stadt,Gais,Altstätten Stadt,91-24-A-j26-1,false,178,true
+s-bahn-st-gallen:S25,S25,S,s-bahn-st-gallen,Appenzeller Bahnen (ab),Rorschach Hafen,Heiden,Rorschach Hafen,Heiden,91-25-A-j26-1,false,220,true
+s-bahn-st-gallen:S26,S26,S,s-bahn-st-gallen,Appenzeller Bahnen (ab),Rheineck,Walzenhausen,Rheineck,Walzenhausen,91-26-B-j26-1,false,338,true
+s-bahn-st-gallen:S3,S3,S,s-bahn-st-gallen,THURBO,Weinfelden,St. Margrethen SG,Weinfelden,Lustenau,91-3-X-j26-1,true,0,false
+s-bahn-st-gallen:S4,S4,S,s-bahn-st-gallen,Schweizerische Südostbahn (sob),Rapperswil SG,Sargans,Rapperswil SG,Sargans,91-4-j26-1,false,323,true
+s-bahn-st-gallen:S44,S44,S,s-bahn-st-gallen,THURBO,Weinfelden,Kreuzlingen Hafen,Weinfelden,Kreuzlingen Hafen,91-44-C-j26-1,false,126,true
+s-bahn-st-gallen:S5,S5,S,s-bahn-st-gallen,THURBO,Weinfelden,Altstätten SG,Weinfelden,Altstätten SG,91-5-B-j26-1,false,546,true
+s-bahn-st-gallen:S6,S6,S,s-bahn-st-gallen,Schweizerische Südostbahn (sob),Rapperswil SG,Linthal,Rapperswil SG,Linthal,91-6-G-j26-1,false,281,true
+s-bahn-st-gallen:S7,S7,S,s-bahn-st-gallen,THURBO,Weinfelden,St. Margrethen SG,Weinfelden,Bregenz,91-7-B-j26-1,false,560,true
+s-bahn-st-gallen:S81,S81,S,s-bahn-st-gallen,Schweizerische Südostbahn (sob),Herisau,St. Gallen,Herisau,St. Gallen,91-81-C-j26-1,false,229,true
+s-bahn-st-gallen:S82,S82,S,s-bahn-st-gallen,THURBO,Romanshorn,St. Gallen,Romanshorn,St. Gallen,91-82-j26-1,false,110,true
+s-bahn-st-gallen:S9,S9,S,s-bahn-st-gallen,THURBO,Wattwil,Wil SG,Wattwil,Wil SG,91-9-E-j26-1,false,0,true
+s-bahn-st-gallen:S:8506121-8506131,Thurbo S St. Gallen-Steckborn,S,s-bahn-st-gallen,THURBO,Steckborn,St. Gallen,Steckborn,St. Gallen,91-CH-Y-j26-1,true,0,false
+s-bahn-st-gallen:S:8506200-8506294,SOB S Brunnadern-Neckertal-Wattwil,S,s-bahn-st-gallen,Schweizerische Südostbahn (sob),Wattwil,Brunnadern-Neckertal,Wattwil,Brunnadern-Neckertal,91-D1-Y-j26-1,true,0,false
+s-bahn-st-gallen:S:8506311-8509002,Thurbo S Landquart-Rorschach,S,s-bahn-st-gallen,THURBO,Rorschach,Landquart,Rorschach,Landquart,91-47-Y-j26-1,true,0,false
+s-bahn-st-gallen:SN44,SN44,SN,s-bahn-st-gallen,Schweizerische Südostbahn (sob),Rapperswil SG,Lichtensteig,Rapperswil SG,Lichtensteig,91-44-D-j26-1,true,0,false
+s-bahn-st-gallen:SN71,SN71,SN,s-bahn-st-gallen,THURBO,Kreuzlingen,Rorschach,Kreuzlingen,Rorschach,91-71-B-j26-1,false,8,false
+s-bahn-st-gallen:SN72,SN72,SN,s-bahn-st-gallen,THURBO,Romanshorn,Wattwil,Romanshorn,Wattwil,91-72-B-j26-1,false,14,false
+s-bahn-st-gallen:SN:8506290-8506302,Thurbo SN Herisau-St. Gallen,SN,s-bahn-st-gallen,THURBO,Herisau,St. Gallen,Herisau,St. Gallen,91-93-Y-j26-1,true,0,false
+s-bahn-zuerich:RE-N7,RE N7,RE,s-bahn-zuerich,Schweizerische Bundesbahnen SBB,Zürich HB,Luzern,Zürich HB,Luzern,91-N7-j26-1,false,16,false
+s-bahn-zuerich:RE12,RE12,RE,s-bahn-zuerich,Schweizerische Bundesbahnen SBB,Olten,Zürich HB,Olten,Zürich HB,91-12-K-j26-1,false,266,true
+s-bahn-zuerich:RE25,RE25,RE,s-bahn-zuerich,Schweizerische Bundesbahnen SBB,Zürich HB,Einsiedeln,Zürich HB,Einsiedeln,91-25-C-j26-1,true,0,false
+s-bahn-zuerich:RE35,RE35,RE,s-bahn-zuerich,Schweizerische Bundesbahnen SBB,Zürich HB,Pfäffikon SZ,Zürich HB,Pfäffikon SZ,91-35-H-j26-1,true,0,false
+s-bahn-zuerich:RE37,RE37,RE,s-bahn-zuerich,Schweizerische Bundesbahnen SBB,Olten,Zürich HB,Olten,Zürich HB,91-37-E-j26-1,false,252,false
+s-bahn-zuerich:RE48,RE48,RE,s-bahn-zuerich,Schweizerische Bundesbahnen SBB,Zürich HB,Schaffhausen,Zürich HB,Schaffhausen,91-48-j26-1,false,251,false
+s-bahn-zuerich:RE:8500218-8503000,SBB RE Aarau-Zürich HB,RE,s-bahn-zuerich,Schweizerische Bundesbahnen SBB,Olten,Zürich HB,Olten,Zürich HB,91-1G-Y-j26-1,false,15,false
+s-bahn-zuerich:RE:8502204-8503000,SBB RE Luzern-Zürich HB,RE,s-bahn-zuerich,Schweizerische Bundesbahnen SBB,Zürich HB,Luzern,Zürich HB,Luzern,91-2L-Y-j26-1,false,7,false
+s-bahn-zuerich:RE:8503000-8503283,SBB RE Einsiedeln-Zürich HB,RE,s-bahn-zuerich,Schweizerische Bundesbahnen SBB,Zürich HB,Einsiedeln,Zürich HB,Einsiedeln,91-FJ-Y-j26-1,true,0,false
+s-bahn-zuerich:RE:8503000-8503421,SBB RE Jestetten-Zürich HB,RE,s-bahn-zuerich,Schweizerische Bundesbahnen SBB,Zürich HB,Jestetten,Zürich HB,Jestetten,91-1Q-Y-j26-1,true,0,false
+s-bahn-zuerich:RE:8503000-8506000,Thurbo RE Winterthur-Zürich HB,RE,s-bahn-zuerich,THURBO,Zürich HB,Winterthur,Zürich HB,Winterthur,91-2U-Y-j26-1,false,7,false
+s-bahn-zuerich:S10,S10,S,s-bahn-zuerich,Sihltal-Zürich-Uetliberg-Bahn,Zürich HB,Uetliberg,Zürich HB,Uetliberg,91-10-A-j26-1,false,798,true
+s-bahn-zuerich:S11,S11,S,s-bahn-zuerich,Schweizerische Bundesbahnen SBB,Aarau,Wila,Aarau,Wila,91-11-A-j26-1,false,555,true
+s-bahn-zuerich:S12,S12,S,s-bahn-zuerich,Schweizerische Bundesbahnen SBB,Brugg AG,Wil SG,Brugg AG,Wil SG,91-12-j26-1,false,558,true
+s-bahn-zuerich:S13,S13,S,s-bahn-zuerich,Schweizerische Südostbahn (sob),Wädenswil,Einsiedeln,Wädenswil,Einsiedeln,91-13-A-j26-1,false,557,true
+s-bahn-zuerich:S14,S14,S,s-bahn-zuerich,Schweizerische Bundesbahnen SBB,Affoltern am Albis,Rapperswil SG,Affoltern am Albis,Rapperswil SG,91-14-C-j26-1,false,552,true
+s-bahn-zuerich:S15,S15,S,s-bahn-zuerich,Schweizerische Bundesbahnen SBB,Pfäffikon SZ,Niederweningen,Pfäffikon SZ,Niederweningen,91-15-C-j26-1,false,537,true
+s-bahn-zuerich:S16,S16,S,s-bahn-zuerich,Schweizerische Bundesbahnen SBB,Zürich Flughafen,Rapperswil SG,Zürich Flughafen,Rapperswil SG,91-16-A-j26-1,false,554,true
+s-bahn-zuerich:S17,S17,S,s-bahn-zuerich,Aargau Verkehr AG,Wohlen AG,Dietikon,Wohlen AG,Dietikon,91-17-A-j26-1,false,1070,true
+s-bahn-zuerich:S19,S19,S,s-bahn-zuerich,Schweizerische Bundesbahnen SBB,Koblenz,Pfäffikon ZH,Koblenz,Pfäffikon ZH,91-19-A-j26-1,false,300,true
+s-bahn-zuerich:S2,S2,S,s-bahn-zuerich,Schweizerische Bundesbahnen SBB,Zürich Flughafen,Ziegelbrücke,Zürich Flughafen,Ziegelbrücke,91-2-B-j26-1,false,497,true
+s-bahn-zuerich:S20,S20,S,s-bahn-zuerich,Schweizerische Bundesbahnen SBB,Zürich Hardbrücke,Uerikon,Zürich Hardbrücke,Uerikon,91-20-D-j26-1,false,35,true
+s-bahn-zuerich:S21,S21,S,s-bahn-zuerich,Schweizerische Bundesbahnen SBB,Zürich HB,Regensdorf-Watt,Zürich HB,Regensdorf-Watt,91-21-E-j26-1,false,80,true
+s-bahn-zuerich:S23,S23,S,s-bahn-zuerich,Schweizerische Bundesbahnen SBB,Zürich HB,Romanshorn,Zürich HB,Romanshorn,91-23-B-j26-1,false,45,false
+s-bahn-zuerich:S24,S24,S,s-bahn-zuerich,Schweizerische Bundesbahnen SBB;THURBO,Zug,Weinfelden,Zug,Weinfelden,91-24-E-j26-1;91-24-j26-1,false,824,true
+s-bahn-zuerich:S25,S25,S,s-bahn-zuerich,Schweizerische Bundesbahnen SBB,Zürich HB,Linthal,Zürich HB,Linthal,91-25-j26-1,false,260,true
+s-bahn-zuerich:S26,S26,S,s-bahn-zuerich,THURBO,Rüti ZH,Winterthur,Rüti ZH,Winterthur,91-26-A-j26-1,false,564,true
+s-bahn-zuerich:S27,S27,S,s-bahn-zuerich,Schweizerische Südostbahn (sob),Siebnen-Wangen,Ziegelbrücke,Siebnen-Wangen,Ziegelbrücke,91-27-B-j26-1,false,90,true
+s-bahn-zuerich:S29,S29,S,s-bahn-zuerich,THURBO,Winterthur,Stein am Rhein,Winterthur,Stein am Rhein,91-29-A-j26-1,false,541,true
+s-bahn-zuerich:S3,S3,S,s-bahn-zuerich,Schweizerische Bundesbahnen SBB,Hinwil,Bülach,Hinwil,Bülach,91-3-D-j26-1,false,536,true
+s-bahn-zuerich:S30,S30,S,s-bahn-zuerich,Schweizerische Bundesbahnen SBB;THURBO,Winterthur,Weinfelden,Winterthur,Weinfelden,91-30-A-j26-1;91-30-C-j26-1,false,324,true
+s-bahn-zuerich:S33,S33,S,s-bahn-zuerich,Schweizerische Bundesbahnen SBB,Schaffhausen,Winterthur,Schaffhausen,Winterthur,91-33-j26-1,false,266,true
+s-bahn-zuerich:S35,S35,S,s-bahn-zuerich,THURBO,Winterthur,Wil SG,Winterthur,Wil SG,91-35-j26-1,false,383,true
+s-bahn-zuerich:S36,S36,S,s-bahn-zuerich,THURBO,Koblenz,Bülach,Waldshut,Bülach,91-36-j26-1,false,257,true
+s-bahn-zuerich:S4,S4,S,s-bahn-zuerich,Sihltal-Zürich-Uetliberg-Bahn,Zürich HB,Sihlwald,Zürich HB,Sihlwald,91-4-A-j26-1,false,995,true
+s-bahn-zuerich:S40,S40,S,s-bahn-zuerich,Schweizerische Südostbahn (sob),Rapperswil SG,Einsiedeln,Rapperswil SG,Einsiedeln,91-40-j26-1,false,535,true
+s-bahn-zuerich:S41,S41,S,s-bahn-zuerich,THURBO,Bülach,Winterthur,Bülach,Winterthur,91-41-j26-1,false,553,true
+s-bahn-zuerich:S42,S42,S,s-bahn-zuerich,Schweizerische Bundesbahnen SBB;Schweizerische Südostbahn (sob),Zürich HB,Arth-Goldau,Zürich HB,Arth-Goldau,91-42-F-j26-1;91-42-j26-1,false,70,true
+s-bahn-zuerich:S5,S5,S,s-bahn-zuerich,Schweizerische Bundesbahnen SBB,Zug,Pfäffikon SZ,Zug,Pfäffikon SZ,91-5-C-j26-1,false,683,true
+s-bahn-zuerich:S6,S6,S,s-bahn-zuerich,Schweizerische Bundesbahnen SBB,Uetikon,Baden,Uetikon,Baden,91-6-D-j26-1,false,537,true
+s-bahn-zuerich:S7,S7,S,s-bahn-zuerich,Schweizerische Bundesbahnen SBB,Rapperswil SG,Winterthur,Rapperswil SG,Winterthur,91-7-C-j26-1,false,539,true
+s-bahn-zuerich:S8,S8,S,s-bahn-zuerich,Schweizerische Bundesbahnen SBB,Ziegelbrücke,Winterthur,Ziegelbrücke,Winterthur,91-8-C-j26-1,false,551,true
+s-bahn-zuerich:S9,S9,S,s-bahn-zuerich,Schweizerische Bundesbahnen SBB,Uster,Schaffhausen,Uster,Schaffhausen,91-9-D-j26-1,false,546,true
+s-bahn-zuerich:S:8502119-8503000,SBB S Lenzburg-Zürich HB,S,s-bahn-zuerich,Schweizerische Bundesbahnen SBB,Lenzburg,Zürich HB,Lenzburg,Zürich HB,91-3V-Y-j26-1,true,0,false
+s-bahn-zuerich:S:8503000-8503110,SBB S Rapperswil SG-Schaffhausen,S,s-bahn-zuerich,Schweizerische Bundesbahnen SBB,Rapperswil SG,Schaffhausen,Rapperswil SG,Schaffhausen,91-9W-Y-j26-1,false,7,false
+s-bahn-zuerich:S:8503000-8506000,SBB S Oberwinterthur-Zürich HB,S,s-bahn-zuerich,Schweizerische Bundesbahnen SBB,Zürich HB,Oberwinterthur,Zürich HB,Oberwinterthur,91-3H-Y-j26-1,false,31,false
+s-bahn-zuerich:S:8503016-8503225,SBB S Winterthur-Ziegelbrücke,S,s-bahn-zuerich,Schweizerische Bundesbahnen SBB,Ziegelbrücke,Winterthur,Ziegelbrücke,Winterthur,91-4H-Y-j26-1,false,7,false
+s-bahn-zuerich:S:8503110-8503209,SBB S Pfäffikon SZ-Rapperswil SG,S,s-bahn-zuerich,Schweizerische Bundesbahnen SBB,Rapperswil SG,Pfäffikon SZ,Rapperswil SG,Pfäffikon SZ,91-25-Y-j26-1,true,0,false
+s-bahn-zuerich:S:8503110-8503284,SOB S Biberbrugg-Rapperswil SG,S,s-bahn-zuerich,Schweizerische Südostbahn (sob),Rapperswil SG,Biberbrugg,Rapperswil SG,Biberbrugg,91-5Z-Y-j26-1,true,0,false
+s-bahn-zuerich:S:8503424-8506000,SBB S Schaffhausen-Winterthur,S,s-bahn-zuerich,Schweizerische Bundesbahnen SBB,Schaffhausen,Winterthur,Schaffhausen,Winterthur,91-4F-Y-j26-1,false,10,false
+s-bahn-zuerich:S:8506000-8506016,Thurbo S Oberwinterthur-Winterthur,S,s-bahn-zuerich,THURBO,Winterthur,Oberwinterthur,Winterthur,Oberwinterthur,91-4O-Y-j26-1,true,0,false
+s-bahn-zuerich:SN1,SN1,SN,s-bahn-zuerich,Schweizerische Bundesbahnen SBB,Olten,Oberwinterthur,Olten,Oberwinterthur,91-1-H-j26-1,false,16,false
+s-bahn-zuerich:SN11,SN11,SN,s-bahn-zuerich,Schweizerische Bundesbahnen SBB,Olten,Winterthur,Olten,Winterthur,91-11-E-j26-1,false,8,false
+s-bahn-zuerich:SN13,SN13,SN,s-bahn-zuerich,Schweizerische Südostbahn (sob),Wädenswil,Einsiedeln,Wädenswil,Einsiedeln,91-13-L-j26-1,true,0,false
+s-bahn-zuerich:SN14,SN14,SN,s-bahn-zuerich,THURBO,Winterthur,Kreuzlingen Hafen,Winterthur,Kreuzlingen Hafen,91-14-I-j26-1,false,12,false
+s-bahn-zuerich:SN21,SN21,SN,s-bahn-zuerich,THURBO,Winterthur,St. Gallen,Winterthur,St. Gallen,91-21-F-j26-1,false,16,false
+s-bahn-zuerich:SN22,SN22,SN,s-bahn-zuerich,THURBO,Winterthur,Altstätten SG,Winterthur,Altstätten SG,91-22-B-j26-1,false,12,false
+s-bahn-zuerich:SN3,SN3,SN,s-bahn-zuerich,THURBO,Winterthur,Stein am Rhein,Winterthur,Stein am Rhein,91-3-I-j26-1,false,14,false
+s-bahn-zuerich:SN30,SN30,SN,s-bahn-zuerich,THURBO,Winterthur,Romanshorn,Winterthur,Romanshorn,91-30-L-j26-1,false,14,false
+s-bahn-zuerich:SN4,SN4,SN,s-bahn-zuerich,Sihltal-Zürich-Uetliberg-Bahn,Zürich HB,Langnau-Gattikon,Zürich HB,Langnau-Gattikon,91-4-G-j26-1,false,16,true
+s-bahn-zuerich:SN40,SN40,SN,s-bahn-zuerich,Schweizerische Südostbahn (sob),Rapperswil SG,Einsiedeln,Rapperswil SG,Einsiedeln,91-40-E-j26-1,true,0,false
+s-bahn-zuerich:SN41,SN41,SN,s-bahn-zuerich,THURBO,Bülach,Winterthur,Bülach,Winterthur,91-41-C-j26-1,false,8,false
+s-bahn-zuerich:SN5,SN5,SN,s-bahn-zuerich,Schweizerische Bundesbahnen SBB,Zug,Pfäffikon SZ,Zug,Pfäffikon SZ,91-5-G-j26-1,false,32,false
+s-bahn-zuerich:SN6,SN6,SN,s-bahn-zuerich,Schweizerische Bundesbahnen SBB,Würenlos,Winterthur,Würenlos,Winterthur,91-6-I-j26-1,false,16,false
+s-bahn-zuerich:SN7,SN7,SN,s-bahn-zuerich,Schweizerische Bundesbahnen SBB,Rapperswil SG,Bassersdorf,Rapperswil SG,Bassersdorf,91-7-F-j26-1,false,16,false
+s-bahn-zuerich:SN8,SN8,SN,s-bahn-zuerich,Schweizerische Bundesbahnen SBB,Lachen SZ,Pfäffikon ZH,Lachen SZ,Pfäffikon ZH,91-8-F-j26-1,false,16,false
+s-bahn-zuerich:SN9,SN9,SN,s-bahn-zuerich,Schweizerische Bundesbahnen SBB,Uster,Bülach,Uster,Bülach,91-9-G-j26-1,false,16,false
+s-bahn-zuerich:SN:8503000-8503315,SBB SN Dielsdorf-Zürich HB,SN,s-bahn-zuerich,Schweizerische Bundesbahnen SBB,Zürich HB,Dielsdorf,Zürich HB,Dielsdorf,91-V-Y-j26-1,true,0,false
+s-bahn-zuerich:SN:8503000-8503508,SBB SN Dietikon-Zürich Stadelhofen,SN,s-bahn-zuerich,Schweizerische Bundesbahnen SBB,Zürich Stadelhofen,Dietikon,Zürich Stadelhofen,Dietikon,91-1U-Y-j26-1,true,0,false
+s-bahn-zuerich:SN:8503006-8506000,SBB SN Pfäffikon ZH-Zürich Hardbrücke,SN,s-bahn-zuerich,Schweizerische Bundesbahnen SBB,Zürich Oerlikon,Pfäffikon ZH,Zürich Oerlikon,Pfäffikon ZH,91-26-Y-j26-1,true,0,false
+saastal-bergbahnen-ag:FUN-2302,Standseilbahn Metro Alpin,FUN,saastal-bergbahnen-ag,Saastal Bergbahnen AG,Felskinn,Mittelallalin,Felskinn,Mittelallalin,93-230-A-j26-1,false,441,false
+schilthornbahn-sbm:FUN-2463,Standseilbahn Allmendhubelbahn,FUN,schilthornbahn-sbm,Schilthornbahn (sbm),Mürren (Allmendhubelbahn),Allmendhubel (Standseilbahn),Mürren (Allmendhubelbahn),Allmendhubel (Standseilbahn),93-246-3-j26-1,false,336,true
+sierre-montana-crans:FUN-2225,Standseilbahn SMC,FUN,sierre-montana-crans,Sierre-Montana-Crans,Sierre/Siders (funi),Crans-Montana gare,Sierre/Siders (funi),Crans-Montana gare,93-222-5-j26-1,false,644,true
+societa-della-funicolare-locarno-madonna-del-sasso-sa:FUN-2620,Standseilbahn Madonna del Sasso,FUN,societa-della-funicolare-locarno-madonna-del-sasso-sa,Società della Funicolare Locarno-Madonna del Sasso SA,Orselina Funicolare,Locarno Funicolare,Orselina Funicolare,Locarno Funicolare,93-262-0-j26-1,false,714,true
+societa-funicolare-cassarate-monte-bre:FUN-2653,Standseilbahn Monte Brè,FUN,societa-funicolare-cassarate-monte-bre,Società Funicolare Cassarate-Monte Brè,Cassarate,Monte Brè,Cassarate,Monte Brè,93-265-3-j26-1,false,1064,true
+societe-cooperative-du-chemin-de-fer-musee-blonay-chamby:R:8501281-8501306,Blonay-Chamby R Blonay-Chamby-Musée,R,societe-cooperative-du-chemin-de-fer-musee-blonay-chamby,Société coopérative du Chemin de fer - Musée Blonay-Chamby,Vevey,Chamby-Musée,Vevey,Chamby-Musée,91-6Z-Y-j26-1,true,32,false
+solothurn:RE55,RE55,RE,solothurn,Schweizerische Bundesbahnen SBB,Olten,Biel/Bienne,Olten,Biel/Bienne,91-55-E-j26-1,false,2,false
+solothurn:RE:8500212-8500218,SBB RE Biel/Bienne-Olten,RE,solothurn,Schweizerische Bundesbahnen SBB,Olten,Biel/Bienne,Olten,Biel/Bienne,91-FN-Y-j26-1,true,0,false
+solothurn:S11,S11,S,solothurn,Aare Seeland mobil (snb),Solothurn,Oensingen,Solothurn,Oensingen,91-11-M-j26-1,false,1003,true
+solothurn:S12,S12,S,solothurn,Aare Seeland mobil (rvo),Langenthal,St. Urban Ziegelei,Langenthal,St. Urban Ziegelei,91-12-L-j26-1,false,500,true
+solothurn:S19,S19,S,solothurn,Schweizerische Bundesbahnen SBB,Solothurn,Biel/Bienne,Solothurn,Biel/Bienne,91-19-C-j26-1,true,0,false
+solothurn:S20,S20,S,solothurn,Schweizerische Bundesbahnen SBB,Olten,Biel/Bienne,Olten,Biel/Bienne,91-20-A-j26-1,false,735,true
+solothurn:S21,S21,S,solothurn,Schweizerische Bundesbahnen SBB,Moutier,Solothurn,Moutier,Solothurn,91-21-C-j26-1,false,264,true
+solothurn:S22,S22,S,solothurn,Oensingen-Balsthal-Bahn;Schweizerische Bundesbahnen SBB,Oensingen,Balsthal,Oensingen,Balsthal,91-22-G-j26-1;91-22-j26-1,false,406,true
+solothurn:S:8500207-8500264,SBB S Oberdorf SO-Solothurn,S,solothurn,Schweizerische Bundesbahnen SBB,Solothurn,Oberdorf SO,Solothurn,Oberdorf SO,91-52-Y-j26-1,true,0,false
+solothurn:S:8500207-8508087,BLS S Solothurn-Wiler,S,solothurn,BLS AG (bls),Solothurn,Wiler,Solothurn,Wiler,91-2F-Y-j26-1,true,0,false
+solothurn:S:8500218-8504300,SBB S Biel/Bienne-Olten,S,solothurn,Schweizerische Bundesbahnen SBB,Olten,Biel/Bienne,Olten,Biel/Bienne,91-50-Y-j26-1,true,0,false
+sportbahnen-davos:FUN:8509088-8509089,Standseilbahn Schatzalpbahn,FUN,sportbahnen-davos,Sportbahnen Davos,Davos Platz Schatzalpbahn,Schatzalp,Davos Platz Schatzalpbahn,Schatzalp,93-5Y-Y-j26-1,false,714,false
+standseilbahn-schwyz-stoos-ag:FUN-2577,Standseilbahn Stoosbahn,FUN,standseilbahn-schwyz-stoos-ag,Standseilbahn Schwyz-Stoos AG,Schwyz Stoosbahn (Talstation),Stoos SZ,Schwyz Stoosbahn (Talstation),Stoos SZ,93-257-7-j26-1,false,404,true
+stanserhornbahn:FUN:8508360-8508361,Standseilbahn Stanserhornbahn,FUN,stanserhornbahn,Stanserhornbahn,Stans (Talstation Stanserhorn),Kälti,Stans (Talstation Stanserhorn),Kälti,93-8E-Y-j26-1,true,314,false
+tilo:RE80,RE80,RE,tilo,Schweizerische Bundesbahnen SBB,Chiasso,Locarno,Milano Centrale,Locarno,91-80-j26-1,false,542,true
+tilo:RE84,RE84,RE,tilo,Schweizerische Bundesbahnen SBB,Locarno,Stabio,Locarno,Milano Porta Garibaldi,91-84-j26-1,true,0,false
+tilo:RE:8505213-8505300,SBB RE Giubiasco-Mendrisio,RE,tilo,Schweizerische Bundesbahnen SBB,Bellinzona,Mendrisio,Bellinzona,Mendrisio,91-8P-Y-j26-1,false,15,false
+tilo:RE:8505213-8505404,SBB RE Bellinzona-Cadenazzo,RE,tilo,Schweizerische Bundesbahnen SBB,Bellinzona,Cadenazzo,Bellinzona,Luino (I),91-8K-Y-j26-1,true,2,false
+tilo:RE:8505307-8505400,SBB RE Chiasso-Locarno,RE,tilo,Schweizerische Bundesbahnen SBB,Chiasso,Locarno,Chiasso,Locarno,91-8X-Y-j26-1,true,0,false
+tilo:RE:8505400-8517519,SBB RE Locarno-Stabio,RE,tilo,Schweizerische Bundesbahnen SBB,Locarno,Stabio,Locarno,Milano Porta Garibaldi,91-9E-Y-j26-1,true,0,false
+tilo:S10,S10,S,tilo,Schweizerische Bundesbahnen SBB,Airolo,Chiasso,Airolo,Como Camerlata,91-10-B-j26-1,false,844,true
+tilo:S20,S20,S,tilo,Schweizerische Bundesbahnen SBB,Airolo,Locarno,Airolo,Locarno,91-20-j26-1,false,577,true
+tilo:S30,S30,S,tilo,Schweizerische Bundesbahnen SBB,Bellinzona,Colmegna,Bellinzona,Gallarate,91-30-B-j26-1,false,56,true
+tilo:S40,S40,S,tilo,Schweizerische Bundesbahnen SBB,Stabio,Chiasso,Varese,Como S. Giovanni,91-40-A-j26-1,false,360,true
+tilo:S50,S50,S,tilo,Schweizerische Bundesbahnen SBB,Mendrisio,Stabio,Mendrisio,Malpensa Aeroporto T2,91-50-A-j26-1,false,280,false
+tilo:S60,S60,S,tilo,Lugano-Ponte Tresa,Lugano FLP,Ponte Tresa,Lugano FLP,Ponte Tresa,91-60-A-j26-1,false,816,true
+tilo:S90,S90,S,tilo,Schweizerische Bundesbahnen SBB,Biasca,Mendrisio,Biasca,Mendrisio,91-90-A-j26-1,false,530,true
+tilo:S:8505305-8505307,SBB S Chiasso-Mendrisio,S,tilo,Schweizerische Bundesbahnen SBB,Mendrisio,Chiasso,Mendrisio,Milano Porta Garibaldi,91-R-Y-j26-1,false,14,false
+tilo:S:8505307-8505400,SBB S Chiasso-Locarno,S,tilo,Schweizerische Bundesbahnen SBB,Chiasso,Locarno,Chiasso,Locarno,91-5E-Y-j26-1,true,0,false
+toggenburg-bergbahnen-unterwasser:FUN-2767,Standseilbahn Iltiosbahn,FUN,toggenburg-bergbahnen-unterwasser,Toggenburg Bergbahnen Unterwasser,Unterwasser Chäserrugg Bahn,Iltios,Unterwasser Chäserrugg Bahn,Iltios,93-276-7-j26-1,false,245,true
+transports-de-la-region-morges-biere-cossonay:FUN-2003,Standseilbahn Cossonay,FUN,transports-de-la-region-morges-biere-cossonay,Transports de la Région Morges-Bière-Cossonay,Cossonay-Ville,Cossonay-Penthalaz (funi),Cossonay-Ville,Cossonay-Penthalaz (funi),93-200-3-j26-1,false,2500,true
+transports-de-la-region-morges-biere-cossonay:R56,R56,R,transports-de-la-region-morges-biere-cossonay,Transports de la région Morges-Bière-Cossonay,Morges,Bière,Morges,Bière,91-56-A-j26-1,false,424,true
+transports-de-la-region-morges-biere-cossonay:R57,R57,R,transports-de-la-region-morges-biere-cossonay,Transports de la région Morges-Bière-Cossonay,Apples,LIsle,Apples,LIsle,91-57-j26-1,false,252,true
+transports-de-martigny-et-regions-mc:R85,R85,R,transports-de-martigny-et-regions-mc,Transports de Martigny et Régions (mc),Martigny,Le Châtelard-Frontière,Martigny,Vallorcine (F),91-85-j26-1,false,290,false
+transports-publics-du-chablais:R70,R70,R,transports-publics-du-chablais,Transports Publics du Chablais,Aigle,Leysin-Grand-Hôtel,Aigle,Leysin-Grand-Hôtel,91-70-B-j26-1,false,300,true
+transports-publics-du-chablais:R71,R71,R,transports-publics-du-chablais,Transports Publics du Chablais,Aigle,Les Diablerets,Aigle,Les Diablerets,91-71-A-j26-1,false,252,true
+transports-publics-du-chablais:R72,R72,R,transports-publics-du-chablais,Transports Publics du Chablais,Aigle,Champéry,Aigle,Champéry,91-72-j26-1,false,474,true
+transports-publics-du-chablais:R74,R74,R,transports-publics-du-chablais,Transports Publics du Chablais,Bex,Col-de-Bretaye,Bex,Col-de-Bretaye,91-74-j26-1,false,178,true
+transports-publics-fribourgeois:FUN-2030,Standseilbahn Neuveville-St-Pierre,FUN,transports-publics-fribourgeois,Transports publics fribourgeois,Fribourg-Neuveville/Motta,Fribourg-St-Pierre,Fribourg-Neuveville/Motta,Fribourg-St-Pierre,93-203-0-j26-1,false,0,true
+transports-publics-neuchatelois-sa-cmn:R15,R15,R,transports-publics-neuchatelois-sa-cmn,Transports Publics Neuchâtelois SA (cmn),Neuchâtel Place Pury Littorail,Boudry Littorail,Neuchâtel Place Pury Littorail,Boudry Littorail,91-15-K-j26-1,false,794,true
+transports-publics-neuchatelois-sa-cmn:R22,R22,R,transports-publics-neuchatelois-sa-cmn,Transports Publics Neuchâtelois SA (cmn),La Chaux-de-Fonds,Les Ponts-de-Martel,La Chaux-de-Fonds,Les Ponts-de-Martel,91-22-E-j26-1,false,234,true
+transports-publics-neuchatelois-sa-cmn:R24,R24,R,transports-publics-neuchatelois-sa-cmn,Transports Publics Neuchâtelois SA (cmn),Le Locle,Les Brenets,Le Locle,Les Brenets,91-24-G-j26-1,false,40,true
+transports-publics-neuchatelois-sa-rvt:R21,R21,R,transports-publics-neuchatelois-sa-rvt,Transports Publics Neuchâtelois SA (rvt),Neuchâtel,Buttes,Neuchâtel,Buttes,91-21-G-j26-1,false,448,true
+transports-publics-neuchatelois-sa-rvt:R:8504209-8504221,transN R Colombier NE-Neuchâtel,R,transports-publics-neuchatelois-sa-rvt,Transports Publics Neuchâtelois SA (rvt),Colombier NE,Neuchâtel,Colombier NE,Neuchâtel,91-1L-Y-j26-1,true,0,false
+transports-publics-neuchatelois-sa:FUN-111,"Standseilbahn transN Chaumont (FUNI)-Neuchâtel, La Coudre (FUNI)",FUN,transports-publics-neuchatelois-sa,Transports Publics Neuchâtelois SA,"Neuchâtel, La Coudre (FUNI)",Chaumont (FUNI),"Neuchâtel, La Coudre (FUNI)",Chaumont (FUNI),93-111-j26-1,false,314,true
+transports-publics-neuchatelois-sa:FUN-112,"Standseilbahn transN Neuchâtel, Ecluse (FUNI)-Neuchâtel, Plan (FUNI)",FUN,transports-publics-neuchatelois-sa,Transports Publics Neuchâtelois SA,"Neuchâtel, Ecluse (FUNI)","Neuchâtel, Plan (FUNI)","Neuchâtel, Ecluse (FUNI)","Neuchâtel, Plan (FUNI)",93-112-j26-1,false,1858,true
+transports-vallee-de-joux-yverdon-ste-croix:R12,R12,R,transports-vallee-de-joux-yverdon-ste-croix,Transports Vallée de Joux-Yverdon-Ste-Croix,Yverdon-les-Bains,Ste-Croix,Yverdon-les-Bains,Ste-Croix,91-12-I-j26-1,false,95,true
+transports-vallee-de-joux-yverdon-ste-croix:R22,R22,R,transports-vallee-de-joux-yverdon-ste-croix,Transports Vallée de Joux-Yverdon-Ste-Croix,Yverdon-les-Bains,Ste-Croix,Yverdon-les-Bains,Ste-Croix,91-22-D-j26-1,false,247,true
+trasporti-pubblici-luganesi-sa:FUN-2650,Standseilbahn Lugano Città-Stazione,FUN,trasporti-pubblici-luganesi-sa,Trasporti Pubblici Luganesi SA,Lugano Città (funicolare),Lugano Stazione (funicolare),Lugano Città (funicolare),Lugano Stazione (funicolare),93-265-0-j26-1,false,3234,true
+treib-seelisberg-bahn:FUN:8508498-8508499,Standseilbahn Treib-Seelisberg-Bahn,FUN,treib-seelisberg-bahn,Treib-Seelisberg-Bahn,Treib (Talstation),Seelisberg (Bergstation),Treib (Talstation),Seelisberg (Bergstation),93-16-Y-j26-1,false,322,true
+valais:R81,R81,R,valais,Regionalps,Martigny,Le Châble VS,Martigny,Le Châble VS,91-81-B-j26-1;91-81-D-j26-1,false,370,true
+valais:R82,R82,R,valais,Regionalps,Martigny,Orsières,Martigny,Orsières,91-82-A-j26-1,false,282,false
+valais:R90,R90,R,valais,Regionalps,St-Maurice,St-Gingolph (Suisse),St-Maurice,St-Gingolph (Suisse),91-90-B-j26-1,true,0,false
+valais:R91,R91,R,valais,Regionalps;Schweizerische Bundesbahnen SBB,St-Gingolph (Suisse),Brig,St-Gingolph (Suisse),Brig,91-91-A-j26-1;91-91-j26-1,false,539,true
+valais:R:8501426-8501500,RegionAlps R Bouveret-Martigny,R,valais,Regionalps,Bouveret,Martigny,Bouveret,Martigny,91-3G-Y-j26-1,true,0,false
+valais:R:8501500-8501509,RegionAlps R Martigny-Sierre/Siders,R,valais,Regionalps,Martigny,Sierre/Siders,Martigny,Sierre/Siders,91-9S-Y-j26-1,true,0,false
+valais:R:8501500-8594466,RegionAlps R Martigny-Martigny-Expo,R,valais,Regionalps,Martigny,Martigny-Expo,Martigny,Martigny-Expo,91-8Q-Y-j26-1,true,0,false
+valais:R:8501576-8501578,RegionAlps R Martigny-Orsières,R,valais,Regionalps,Martigny,Orsières,Martigny,Orsières,91-4-Y-j26-1,false,84,false
+valais:R:8501605-8501609,RegionAlps R Brig-Visp,R,valais,Regionalps,Visp,Brig,Visp,Brig,91-99-Y-j26-1,true,0,false
+valais:RE2,RE2,RE,valais,BLS AG (bls),Visp,Iselle di Trasquera,Visp,Domodossola (I),91-2-U-j26-1,false,15,false
+valais:RE:8501609-8501950,BLS RE Brig-Preglia,RE,valais,BLS AG (bls),Brig,Preglia,Brig,Domodossola (I),91-23-Y-j26-1,true,0,false
+valais:RE:8501609-8507473,BLS RE Brig-Hohtenn,RE,valais,BLS AG (bls),Brig,Hohtenn,Brig,Hohtenn,91-8B-Y-j26-1,true,0,false
+verein-dampfbahn-bern:R:8508187-8508272,Dampfbahn Bern R Huttwil-Wasen i.E.,R,verein-dampfbahn-bern,Verein Dampfbahn Bern,Huttwil,Wasen i.E.,Huttwil,Wasen i.E.,91-7X-Y-j26-1,true,0,false
+verkehrsbetriebe-biel:FUN-22,Standseilbahn Magglingenbahn,FUN,verkehrsbetriebe-biel,Verkehrsbetriebe Biel,Biel/Bienne Magglingenb.(Funi),Magglingen/Macolin,Biel/Bienne Magglingenb.(Funi),Magglingen/Macolin,93-22-j26-1,false,910,true
+verkehrsbetriebe-biel:FUN-23,Standseilbahn Leubringenbahn,FUN,verkehrsbetriebe-biel,Verkehrsbetriebe Biel,Biel/Bienne Leubringenb.(Funi),Evilard/Leubringen,Biel/Bienne Leubringenb.(Funi),Evilard/Leubringen,93-23-j26-1,false,1358,true
+verkehrsbetriebe-luzern-ag:FUN-2510,Standseilbahn Gütschbahn,FUN,verkehrsbetriebe-luzern-ag,Verkehrsbetriebe Luzern AG,Luzern Gütsch (Talstation),"Luzern, Château Gütsch",Luzern Gütsch (Talstation),"Luzern, Château Gütsch",93-251-0-j26-1,false,4368,true
+verkehrsbetriebe-zuerich:FUN-23,Standseilbahn Rigiblick,FUN,verkehrsbetriebe-zuerich,Verkehrsbetriebe Zürich,"Zürich, Rigiblick","Zürich, Seilbahn Rigiblick","Zürich, Rigiblick","Zürich, Seilbahn Rigiblick",93-23-A-j26-1,false,2362,true
+verticalp-vallee-du-trient-sa:FUN:8501552-8530686,Standseilbahn VerticAlp Le Châtelard VS Funiculaire-Les Montuires,FUN,verticalp-vallee-du-trient-sa,VerticAlp Vallée du Trient SA,Les Montuires,Le Châtelard VS Funiculaire,Les Montuires,Le Châtelard VS Funiculaire,93-F-Y-j26-1,true,231,false
+verticalp-vallee-du-trient-sa:FUN:8530823-8530832,Standseilbahn VerticAlp Lac dEmosson Minifunic-Pied du barrage,FUN,verticalp-vallee-du-trient-sa,VerticAlp Vallée du Trient SA,Lac dEmosson Minifunic,Pied du barrage,Lac dEmosson Minifunic,Pied du barrage,93-J-Y-j26-1,true,224,true
+verticalp-vallee-du-trient-sa:R:8501552-8530832,VerticAlp R Les Montuires-Pied du barrage,R,verticalp-vallee-du-trient-sa,VerticAlp Vallée du Trient SA,Les Montuires,Pied du barrage,Les Montuires,Pied du barrage,91-4J-Y-j26-1,true,224,true
+wengernalpbahn:CC-63,CC 63,CC,wengernalpbahn,Wengernalpbahn,Kleine Scheidegg,Lauterbrunnen,Kleine Scheidegg,Lauterbrunnen,93-63-j26-1,false,591,true
+wengernalpbahn:CC-64,CC 64,CC,wengernalpbahn,Wengernalpbahn,Kleine Scheidegg,Grindelwald,Kleine Scheidegg,Grindelwald,93-64-j26-1,false,336,false
+zermatt-bergbahnen-ag:FUN-2290,Standseilbahn Sunnegga,FUN,zermatt-bergbahnen-ag,Zermatt Bergbahnen AG,Zermatt (Talstation Sunnegga),Sunnegga,Zermatt (Talstation Sunnegga),Sunnegga,93-229-A-j26-1,false,1484,true
+zugerbergbahn:FUN-2566,Standseilbahn Zugerbergbahn,FUN,zugerbergbahn,Zugerbergbahn,Schönegg,Zugerberg,Schönegg,Zugerberg,93-256-6-j26-1,false,491,true
