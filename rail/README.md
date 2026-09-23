@@ -43,20 +43,33 @@ one `route_type`, so a `route_type` rule cannot express the include list — 102
 is IC, EC, ICE and RJX at once, and 117 is `EXT`, which the range 100–117 would
 have included and the exclusion below would never have caught.
 
-- **Included** — `IC`, `EC`, `ICE`, `RJX`, `IR`, `PE`, `S`, `SN`, `R`, `RE`,
-  `NJ`, `CC` and `ZUG` — all within `route_type` 100 to 116 — plus funiculars
-  (`FUN`, 1400).
-- **Excluded** — `EXT` special-event trains (117), buses (`B`, `EV`, `EXB`,
-  `BN`, `BP`, `RUB` — 2xx and 7xx), trams (`T`, 900), metro (`M`, 401), boats
-  (`BAT`, `FAE`, 1000), aerial lifts and gondolas (`PB`, `GB`, `SL`, 1300),
-  lifts (`ASC`, 1303) and taxis (`TX`, 1500).
-- **Undecided** — the foreign categories `TER`, `TGV` and `RB`, 260 routes of
-  French and German regional and high-speed services. "Every Swiss train line"
-  is not "every line in the feed", and where that cut falls is #468's call.
+- **Included** — `IC`, `EC`, `ICE`, `RJX`, `TGV`, `IR`, `PE`, `S`, `SN`, `R`,
+  `RE`, `RB`, `NJ`, `CC` and `ZUG` — all within `route_type` 100 to 116 — plus
+  funiculars (`FUN`, 1400). 676 of the feed's 5,170 routes.
+- **Excluded** — `EXT` special-event trains (117), `TER` (106), buses (`B`,
+  `EV`, `EXB`, `BN`, `BP`, `RUB`, `CAR` — 2xx and 7xx), trams (`T`, 900), metro
+  (`M`, 401), boats (`BAT`, `FAE`, 1000), aerial lifts and gondolas (`PB`, `GB`,
+  `SL`, 1300), lifts (`ASC`, 1303) and taxis (`TX`, 1500).
 
-Both lists are **verified against the feed before they are used**, not assumed.
-A `route_type` the pipeline does not recognise is counted and reported rather
-than silently dropped, so a new code appearing in a future feed is visible.
+The foreign categories were the open question the recon left to #468, and the
+cut runs between `TER` and the rest. `TER` is 190 routes of SNCF's French
+regional network, arriving in the feed wholesale and mostly never touching
+Switzerland; `TGV` and `RB` are equally foreign-operated but run Swiss-facing
+services you board from a Swiss platform. Geography is not a thing `routes.txt`
+knows, so this is the closest the allowlist can get — a later step with
+`stops.txt` in hand can be stricter.
+
+`ZUG` is one SNCF route of six trips. The recon read the code as literally
+"train", a category carrying no category; it is also the name of a Swiss city,
+and the feed settles neither reading. It rides on rails either way, so it is
+included and flagged in the log rather than decided by the filter — #475 has to
+name it whichever it turns out to be.
+
+Both lists live in `src/allowlist/categories.ts`, transcribed from `RECON.md` §1
+and **verified against the feed before they are used**, not assumed. A
+`route_desc` in neither list — or one that has moved to a different
+`route_type` — is counted and reported rather than silently dropped, so a new
+code appearing in a future feed is visible.
 
 ## Data sources
 

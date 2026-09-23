@@ -22,6 +22,7 @@
 
 import { parseArgs } from 'node:util';
 
+import { allowRoutes } from './allowlist.ts';
 import { fetchFeed } from './fetch.ts';
 import { FETCH_FLAGS, parseFetchOptions } from './fetch/options.ts';
 import type { FetchOptions, FlagValue } from './fetch/options.ts';
@@ -87,11 +88,12 @@ async function withFeedOptions(
 
 function build(values: Record<string, FlagValue>): Promise<number> {
   // The remaining steps land as their own modules here and are called from this
-  // function, in order: allowlist, stations, ingest, calendar, patterns, regions,
-  // merge, naming, sequence, seasonal, overpass, match, emit, report.
+  // function, in order: stations, ingest, calendar, patterns, regions, merge,
+  // naming, sequence, seasonal, overpass, match, emit, report.
   return withFeedOptions(values, async options => {
     const feed = await fetchFeed(options, log);
-    log(`feed ${feed.id} is ready; no further steps are implemented yet`);
+    const allowed = await allowRoutes(feed.gtfsDir, log);
+    log(`${allowed.routes.length} routes are ready; no further steps are implemented yet`);
   });
 }
 
