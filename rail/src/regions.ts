@@ -18,6 +18,7 @@
 import { join } from 'node:path';
 
 import type { AllowedRoute } from './allowlist.ts';
+import { lineNumber } from './allowlist/categories.ts';
 import { openGtfs } from './db.ts';
 import { gtfsPath } from './fetch/record.ts';
 import { STORE_FILE } from './ingest.ts';
@@ -113,13 +114,15 @@ function recurring(routes: RegionedRoute[]): { numbers: number; widest: string }
   const regionsByNumber = new Map<string, Set<string>>();
 
   for (const route of routes) {
-    if (route.shortName === null || route.shortName === route.category) {
+    const number = lineNumber(route.shortName, route.category);
+
+    if (number === null) {
       continue;
     }
 
-    const regions = regionsByNumber.get(route.shortName) ?? new Set<string>();
+    const regions = regionsByNumber.get(number) ?? new Set<string>();
     regions.add(route.region);
-    regionsByNumber.set(route.shortName, regions);
+    regionsByNumber.set(number, regions);
   }
 
   const shared = [...regionsByNumber.entries()]
