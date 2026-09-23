@@ -536,12 +536,13 @@ Swiss ones.
 
 ## The artifacts
 
-The build writes four files at the top of this directory. `lines.csv` has one
+The build writes five files at the top of this directory. `lines.csv` has one
 row per line, and `line_stops.csv` has one row per stop of a line. `lines.json`
 holds the same records with the stops nested inside each line, for a reader that
 wants one file instead of a join. The field names are the same in all three, and
 they are the column names of `rail_lines` and `rail_line_stops`. `lines.geojson`
-is the map: see [below](#the-map-geometry).
+is the map: see [below](#the-map-geometry). `REPORT.md` is for a person, read
+before the others are committed: see [the report](#the-report).
 
 | `lines.csv`             |                                                                          |
 | ----------------------- | ------------------------------------------------------------------------ |
@@ -613,6 +614,40 @@ The 2026 file has 318 features and 830,016 positions, and is 15.8 MB. A
 relation that crosses the border is kept whole, so 13 lines draw well beyond
 Switzerland. The night train from Zürich to Budapest and Zagreb alone is
 1.1 MB.
+
+### The report
+
+`REPORT.md` is the review surface: what to read each December before committing
+the snapshot. It decides nothing. It prints the totals that say whether the list
+is the right size, then every line and station a step set aside for a hand
+check. Those are the rows most likely to need an edit once they are in Postgres.
+
+1. **Totals**: the line count split into trains and funiculars, with the feed
+   and the hand-seeded lines apart. A funicular is category `FUN`; everything
+   else, rack railways included, is a train.
+2. **By category** and **by region**, the region by its name in
+   `data/regions.json`. The regions filed under an operator are a table of
+   their own, with the operators behind each.
+3. **Lines with no OSM match**, one table per reason, with the coverage a
+   `low-coverage` line came closest to and the lines a `contested` one lost to.
+   A line that runs in eight weeks or fewer is folded away under its own count,
+   because those are the construction replacements and one-off specials OSM
+   does not map. That keeps the tables to the misses worth chasing, 133 of 214
+   in 2026.
+4. **Possible duplicates**: every suspect from the merge step, part by part,
+   with each part's terminals by name and its operators.
+5. **Names to check by hand**: the derived names flagged `unknown-operator` or
+   `duplicate-name` first, then every other derived name, then every seeded
+   line, marked when a feed line now serves one of its stops.
+6. **Feed checks**: the stations whose Didok number says Swiss and whose
+   position does not, and every `route_desc` the allowlist did not recognise.
+   Empty is the expected state of both, and the report says so.
+
+The report names the publication and the OSM answers it was built from and
+reads nothing from the clock, so two builds over the same inputs write the same
+bytes and the log prints its fingerprint. The file is written after the other
+four, so a build whose checks failed leaves the committed report next to the
+committed files it describes.
 
 ### Determinism
 
