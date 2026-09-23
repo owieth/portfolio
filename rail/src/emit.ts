@@ -35,6 +35,7 @@ import {
 } from './emit/rows.ts';
 import type { LineRecord } from './emit/rows.ts';
 import { compare } from './merge/key.ts';
+import type { Attribution } from './overpass/attribution.ts';
 import { RAIL_DIR } from './paths.ts';
 import type { Station } from './stations.ts';
 import type { TerminiLine } from './termini.ts';
@@ -47,6 +48,8 @@ export interface EmitInput {
   lines: readonly TerminiLine[];
   /** For every feed stop's name, SLOID and position. */
   stations: readonly Station[];
+  /** The OSM licence and timestamps, embedded in `lines.geojson`. */
+  attribution: Attribution;
 }
 
 export interface EmitOptions {

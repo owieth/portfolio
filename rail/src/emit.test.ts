@@ -14,7 +14,7 @@ import {
   LINES_JSON,
   renderArtifacts,
 } from './emit.ts';
-import { EC, GELMERBAHN, S12, STATIONS } from './emit/fixtures.ts';
+import { ATTRIBUTION, EC, GELMERBAHN, S12, STATIONS } from './emit/fixtures.ts';
 import type { TerminiLine } from './termini.ts';
 
 const LINES: TerminiLine[] = [S12, GELMERBAHN, EC];
@@ -37,7 +37,7 @@ async function emit(
   lines: readonly TerminiLine[] = LINES,
 ): Promise<Record<string, string>> {
   const dir = await outputDir();
-  await emitArtifacts({ lines, stations: STATIONS }, log, { dir });
+  await emitArtifacts({ lines, stations: STATIONS, attribution: ATTRIBUTION }, log, { dir });
 
   const names = await readdir(dir);
   const files = await Promise.all(
@@ -159,7 +159,7 @@ describe('renderArtifacts', () => {
     const broken: TerminiLine = { ...S12, region: 'Not A Slug' };
 
     await expect(
-      emitArtifacts({ lines: [broken], stations: STATIONS }, log, { dir }),
+      emitArtifacts({ lines: [broken], stations: STATIONS, attribution: ATTRIBUTION }, log, { dir }),
     ).rejects.toThrow(
       /does not match lines\.schema\.json, so nothing was written:\n {2}\/lines\/0\/network_region must match pattern/,
     );
@@ -170,13 +170,13 @@ describe('renderArtifacts', () => {
     const lonely: TerminiLine = { ...S12, sequence: S12.sequence.slice(0, 1) };
 
     expect(() =>
-      renderArtifacts({ lines: [lonely], stations: STATIONS }),
+      renderArtifacts({ lines: [lonely], stations: STATIONS, attribution: ATTRIBUTION }),
     ).toThrow(/\/lines\/0\/stops must NOT have fewer than 2 items/);
   });
 
   it('refuses two lines on one id', () => {
     expect(() =>
-      renderArtifacts({ lines: [S12, S12], stations: STATIONS }),
+      renderArtifacts({ lines: [S12, S12], stations: STATIONS, attribution: ATTRIBUTION }),
     ).toThrow(/two lines share the id s-bahn-zuerich:S12/);
   });
 
@@ -184,7 +184,7 @@ describe('renderArtifacts', () => {
     const split: TerminiLine = { ...S12, operators: ['BLS AG;SBB'] };
 
     expect(() =>
-      renderArtifacts({ lines: [split], stations: STATIONS }),
+      renderArtifacts({ lines: [split], stations: STATIONS, attribution: ATTRIBUTION }),
     ).toThrow(/\/lines\/0\/operators\/0 must match pattern "\^\[\^;\]\*\$"/);
   });
 });

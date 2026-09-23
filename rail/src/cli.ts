@@ -177,7 +177,10 @@ function build(values: Record<string, FlagValue>): Promise<number> {
       { lines: matched.lines, stations: resolved.stations },
       log,
     );
-    const emitted = await emitArtifacts({ lines: termini.lines, stations: resolved.stations }, log);
+    const emitted = await emitArtifacts(
+      { lines: termini.lines, stations: resolved.stations, attribution: osm.attribution },
+      log,
+    );
 
     log(
       `${emitted.lines} lines written with ${emitted.stops} stops between them — ${named.derived} with derived names and ${seeded.manual} seeded by hand, ${sequenced.branched.length} with branches, ${seasonal.seasonal.length} seasonal, ${termini.international.length} international and ${seasonal.lines.length - matched.unmatched.length} with geometry, from ${allowed.routes.length} routes in ${regioned.regions.length} regions, ${resolved.stations.length} stations, ${ingested.rows} stop times, ${calendar.serviceDays} service days, ${patterns.patterns.length} stop patterns and ${osm.relations.length} OSM route relations; lines.geojson and REPORT.md are not implemented yet`,
