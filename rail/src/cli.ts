@@ -24,6 +24,7 @@
 import { parseArgs } from 'node:util';
 
 import { allowRoutes } from './allowlist.ts';
+import { expandCalendar } from './calendar.ts';
 import { fetchFeed } from './fetch.ts';
 import { FETCH_FLAGS, parseFetchOptions } from './fetch/options.ts';
 import type { FetchOptions, FlagValue } from './fetch/options.ts';
@@ -93,8 +94,8 @@ async function withFeedOptions(
 
 function build(values: Record<string, FlagValue>): Promise<number> {
   // The remaining steps land as their own modules here and are called from this
-  // function, in order: calendar, patterns, regions, merge, naming, sequence,
-  // seasonal, overpass, match, emit, report.
+  // function, in order: patterns, regions, merge, naming, sequence, seasonal,
+  // overpass, match, emit, report.
   return withFeedOptions(values, async options => {
     const feed = await fetchFeed(options, log);
     const allowed = await allowRoutes(feed.gtfsDir, log);
@@ -107,9 +108,13 @@ function build(values: Record<string, FlagValue>): Promise<number> {
     // react-doctor-disable-next-line react-doctor/server-sequential-independent-await
     const resolved = await resolveStations(feed.gtfsDir, log);
     const ingested = await ingestStopTimes(feed.dir, log, parseIngestOptions(values));
+    // After the ingest by necessity rather than for the log: both write into
+    // rail.duckdb, and a DuckDB file takes one writer at a time.
+    // react-doctor-disable-next-line react-doctor/server-sequential-independent-await
+    const calendar = await expandCalendar(feed.dir, log);
 
     log(
-      `${allowed.routes.length} routes, ${resolved.stations.length} stations and ${ingested.rows} stop times are ready; no further steps are implemented yet`,
+      `${allowed.routes.length} routes, ${resolved.stations.length} stations, ${ingested.rows} stop times and ${calendar.serviceDays} service days are ready; no further steps are implemented yet`,
     );
   });
 }

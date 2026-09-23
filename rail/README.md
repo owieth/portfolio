@@ -71,6 +71,33 @@ and **verified against the feed before they are used**, not assumed. A
 `route_type` — is counted and reported rather than silently dropped, so a new
 code appearing in a future feed is visible.
 
+## Service days and the reference week
+
+GTFS says when a service runs twice over: `calendar.txt` as a weekday pattern
+between two dates, and `calendar_dates.txt` as single days added to or removed
+from it. The Swiss feed leans on the second almost entirely — 83,752 services
+against 11 million exceptions — and states "summer only" as a service running
+every day of the year with every day outside the season removed again. So
+neither file says whether a line runs on a given day, and the pipeline expands
+the two into the days each service actually runs, clipped to the feed year that
+`feed_info.txt` gives. For the 2026 feed that is 2025-12-14 to 2026-12-12 and
+4.6 million service days; the Schynige Platte Bahn comes out running from
+13 June to 25 October, and the Brienz Rothorn Bahn from 9 May to 25 October
+across its two `route_id`s.
+
+Weekly trip counts are taken over one named week, the **reference week: the
+first full Monday-to-Sunday week of September in the year the feed ends in** —
+2026-09-07 to 2026-09-13 for the 2026 feed, 2027-09-06 to 2027-09-12 for 2027.
+No week is typical by accident. The feed opens on the December switch and runs
+straight into the Christmas timetables, spring carries Ascension and Whit
+Monday, and a summer-only line has zero trips in every week from November to
+May. Early September avoids all of it: the summer lines still run, 1 August is
+behind it and the Federal Day of Thanksgiving is the third Sunday, after it, and
+most cantonal school holidays are over. It is derived by rule rather than
+written down as a date, so it means the same thing every December, and it is
+defined once, in `src/calendar/week.ts` — the calendar step returns it, and
+nothing downstream picks its own.
+
 ## Data sources
 
 - **Timetable — the official Swiss GTFS Static feed.**
@@ -168,7 +195,7 @@ Each feed lands in its own directory, named for the publication it came from:
 data/raw/otd-fp2026-20260919/
 ├── gtfs.zip      the archive as published
 ├── gtfs/         its members, unpacked
-├── rail.duckdb   the ingested stop times, written by the build
+├── rail.duckdb   the ingested stop times and service days, written by the build
 └── feed.json     provenance — written last, so its presence means the rest is complete
 ```
 
@@ -192,6 +219,10 @@ without serving — sorted into trip order, so the four later steps that walk a
 trip's stops query a table instead of re-parsing gigabytes of CSV apiece. A run
 that finds it still answers for the CSV on disk leaves it alone; `--force`
 rebuilds it.
+
+It also holds `service_days`, the calendar expanded into one row per service per
+day it runs — see below. That one is rebuilt on every run: it takes about ten
+seconds, which is not worth a cache check.
 
 The ingest pins DuckDB's buffer pool to 2 GB and gives it somewhere to spill, so
 what it costs is a property of the feed rather than of the machine — the default
