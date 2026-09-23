@@ -389,6 +389,42 @@ A line seeded by hand has no timetable behind it, so `service_days`,
 than zeroes that would read as "does not run". The log prints a fingerprint
 over every feed line's numbers.
 
+## OSM route relations
+
+The feed has no geometry, so every shape comes from OpenStreetMap. The build asks
+the public Overpass API for every `route=train` and every `route=funicular`
+relation with a member inside Switzerland, the country by its ISO code rather
+than a bounding box. Each relation comes back with its member ways'
+coordinates and its stop nodes' positions inline (`out body geom`), so matching
+them to lines never needs a second request. A relation that crosses a border
+comes back whole, and what to keep of it is the match step's decision.
+
+There are two queries, one per route type, sent one after the other. The public
+instance gives a client about two slots, and the train query is the heavy one.
+In September 2026 it returned 792 relations and 107.6 MB, and took four 504s
+and about five minutes before it found a slot. The funicular query returned 77
+relations and 0.3 MB. Parsed, the two need about 600 MB resident.
+
+Overpass says "not now" often. A 429, 502, 503 or 504, or a connection that
+drops, is retried after 15, 30, 60, 120 and 240 seconds, or after the server's
+`Retry-After` if it asks for longer, up to five minutes. A query it rejects, a
+400, fails at once. A 200 is not always a success: a query that runs out of
+time or memory comes back as a 200 with a `remark` and whatever it found so
+far. That answer is discarded and retried, never cached, because a cached
+partial answer would drop lines from the map until someone noticed.
+
+Nothing asks Overpass twice. Each answer is kept under `data/raw/overpass/` with
+the query that produced it, and a second run reads it back without a single
+request. The log says how many requests a run made, so a warm run can be seen
+to make none. There is no expiry, because OSM changes every minute and two
+builds over one feed should not disagree for reasons the diff cannot show. To
+take new geometry, delete the directory.
+
+The geometry is © OpenStreetMap contributors under the ODbL. The step writes
+that next to the responses, as `attribution.json`, with the OSM timestamp of
+each answer, and hands the same object on to the step that writes
+`lines.geojson`.
+
 ## Data sources
 
 - **Timetable — the official Swiss GTFS Static feed.**
@@ -524,6 +560,21 @@ something different on every laptop. The 2026 feed turns 3.0 GB of
 resident: the buffer pool is the 2 GB of it, and the CSV reader and Node account
 for the rest. The run log prints the wall time and the peak it actually reached,
 so a feed that outgrows this is visible rather than mysterious.
+
+The Overpass answers sit beside the feeds, in a directory of their own, because
+they come from OSM and not from any one feed:
+
+```
+data/raw/overpass/
+├── <key>.json        one raw response, <key> the first 16 hex of the query's sha256
+├── <key>.meta.json   the query, endpoint, OSM timestamp, size, sha256 and fetch time — written last
+└── attribution.json  © OpenStreetMap contributors, ODbL 1.0, and the OSM timestamp of each response
+```
+
+A response is used only when its record is there, names the same query, and
+gives the size the file has. Anything else, like a deleted response, a response
+cut short, or a query edited in the code, is fetched again, and only that one.
+`rm -rf data/raw/overpass` refreshes the geometry.
 
 ## Relationship to Supabase
 
