@@ -919,6 +919,11 @@ dry-run before applying it.
    removed lines, with every renumbered pair on both sides. Once they do,
    apply it. Neither `pnpm build:data` nor `pnpm diff:data` writes to Supabase.
 
+The `Rail data` workflow in `.github/workflows/rail.yml` runs the same build
+from a fresh checkout on every pull request that touches the pipeline, and on
+demand. It writes `pnpm diff:data` into the run's summary and uploads the
+artifacts, so a refresh can also be started from the Actions tab.
+
 ## Layout
 
 ```
