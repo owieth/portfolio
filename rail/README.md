@@ -851,10 +851,22 @@ tables. **Once seeded, Postgres is the source of truth** — the lines get edite
 there or through the UI, and the committed CSVs are a snapshot of what the feed
 produced, not live data.
 
-That makes a re-seed destructive, so a refresh reconciles rather than replaces:
-it upserts by the stable line id, leaves hand-edited fields alone, and flags a
-line that has disappeared from the feed instead of deleting it. Reconciling is a
-deliberate second step with a dry-run mode, never part of `pnpm build:data`.
+The tables are created by
+`supabase/migrations/20260923163703_create_rail_lines_tables.sql` and filled by
+`supabase/seeds/rail.sql`, which `pnpm seed:data` generates from the two CSVs.
+It is generated rather than written because a hand-kept copy would drift from
+the pipeline's output, and a test compares the committed seed with the committed
+CSVs so it cannot. Locally, `supabase db reset` applies the migration and runs
+the seed. Against the project, `supabase db push --include-seed` does the same.
+Every insert is `on conflict do nothing`, so running the seed twice changes
+nothing, and a seed run against tables that already hold edited rows leaves them
+as they are.
+
+The seed only ever adds rows, and replacing rows would be destructive, so a
+refresh reconciles rather than replaces: it upserts by the stable line id,
+leaves hand-edited fields alone, and flags a line that has disappeared from the
+feed instead of deleting it. Reconciling is a deliberate second step with a
+dry-run mode, never part of `pnpm build:data`.
 
 ## Refreshing the data
 
