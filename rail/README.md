@@ -343,6 +343,52 @@ sequence and pattern. The 2026 feed gives 74 lines with a branch and 85 with a
 detour. Only two lines have conflicts, both TPC lines where some trains serve
 Le Sépey and Les Planches in the other order, and three lines have loops.
 
+## Seasonal lines and weekly trips
+
+Some mountain railways and funiculars only run in summer. They are still lines
+to ride, so they stay in the output with `seasonal: true`. A line is seasonal
+when it runs in **fewer than two thirds of the feed year's weeks**, counted over
+every route merged into it. A week counts when the line runs on at least one
+day of it, and the weeks are seven-day blocks from the first day of the feed
+year. The 2026 feed year is exactly 52 of them.
+
+The rule counts weeks rather than days because a line that only runs at weekends
+is not seasonal. The night S-Bahn between Fribourg and Lausanne runs on 113
+days, fewer than any summer railway, but it runs in all 52 weeks. The Pilatus
+rack railway runs on 203 days from 11 May to 29 November, which is 30 weeks, and
+is seasonal. So are the Niesenbahn at 30 weeks and the Stanserhorn at 34, the
+summer line closest to the cut. A line that closes for a few weeks of revision,
+like the Sunnegga in 40, is well over it. The 2026 feed flags 122 of 531 feed
+lines. 16 of them are funiculars and rack railways. 83 run in eight weeks or
+fewer: those are construction replacements and one-off specials, which the merge
+keeps as lines of their own.
+
+Each line also carries `trips_per_week`, its departures in the
+[reference week](#service-days-and-the-reference-week). This is every trip of
+its routes times the days its service runs in that week: 238 for the Pilatus.
+A line with none is listed in the log, because a zero is also what a misread
+calendar looks like. In 2026 that is 100 lines, almost all of them seasonal
+lines that are closed in September, like the Parsennbahn, whose summer ends on
+6 September.
+
+Funiculars and lifts are often not trips in `trips.txt` but **templates in
+`frequencies.txt`**: one trip with running times and a window that says how
+often it leaves. That is `ceil((end_time − start_time) / headway_secs)`
+departures, every window of the trip summed, and it replaces the template trip
+rather than adding to it. Counted as trips, a funicular every ten minutes would
+come out with one a day. The 2026 feed has 1,894 such windows, all with
+`exact_times` 0, and 178 of their templates are on 25 funicular lines; the rest
+are aerial lifts and boats the allowlist drops. All 14 trips of the Sunnegga in
+Zermatt are templates, and it comes out with 1,484 trips a week. Times are read
+as hours past the service day's midnight, so a window that runs to `25:00:00`
+counts. A window that does not parse, has a headway of zero or less, or ends
+where it starts stops the build.
+
+A line seeded by hand has no timetable behind it, so `service_days`,
+`service_weeks`, `seasonal` and `trips_per_week` are all empty on it rather
+than zeroes that would read as "does not run". The log prints a fingerprint
+over every feed line's numbers.
+
 ## Data sources
 
 - **Timetable — the official Swiss GTFS Static feed.**

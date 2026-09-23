@@ -30,6 +30,7 @@ export type GtfsFile =
   | 'calendar'
   | 'calendar_dates'
   | 'feed_info'
+  | 'frequencies'
   | 'routes'
   | 'stop_times'
   | 'stops'
