@@ -12,6 +12,7 @@
  * December diff shows feed changes rather than run timestamps.
  */
 
+import { cell, table } from '../markdown.ts';
 import type {
   AgencyRow,
   CategoryRow,
@@ -58,29 +59,6 @@ const GEOMETRY_DATASET = {
   layer: 'ch.bav.schienennetz',
   url: 'https://data.geo.admin.ch/browser/index.html#/collections/ch.bav.schienennetz',
 };
-
-/** Nothing renders a `|` today, but a route name is operator-supplied text. */
-function cell(value: string | number | null | undefined): string {
-  if (value === null || value === undefined || value === '') {
-    return '—';
-  }
-
-  return typeof value === 'number'
-    ? value.toLocaleString('en-US')
-    : value.replaceAll('|', '\\|');
-}
-
-function table(headers: string[], rows: (string | number | null)[][]): string {
-  if (rows.length === 0) {
-    return '_No rows._';
-  }
-
-  const head = `| ${headers.join(' | ')} |`;
-  const rule = `| ${headers.map(() => '---').join(' | ')} |`;
-  const body = rows.map(row => `| ${row.map(cell).join(' | ')} |`);
-
-  return [head, rule, ...body].join('\n');
-}
 
 function plural(count: number, one: string, many = `${one}s`): string {
   return `${count.toLocaleString('en-US')} ${count === 1 ? one : many}`;
