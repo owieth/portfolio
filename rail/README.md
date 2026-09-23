@@ -15,9 +15,11 @@ The fetch step is implemented, and the feed has been profiled — see
 
 A line is a passenger-facing service you can name and ride end to end: the tuple
 of **category, line number and network region**, merged across every `route_id`
-and every operator that serves it. `S10` is one line, not one per operator and
-not one per direction, even though SZU, SBB and Thurbo all appear against it in
-the feed.
+and every operator that serves it. `IR35` is one line, not one per operator and
+not one per direction, even though BLS, SBB and SOB all appear against it in the
+feed. The `S10` that SZU, SBB and Thurbo appear against is the opposite case:
+the Uetliberg line, a TILO line and a St. Gallen line, three lines in three
+regions that share a number and nothing else.
 
 `route_id` is never the identity and never appears in an id, because it changes
 with every feed regeneration. Ids are built from the region and the number,
@@ -62,6 +64,41 @@ id is reported rather than silently anchoring the wrong station. The run also
 reports any rule that matched nothing — a stale rule after a timetable change —
 and every route no rule placed. Those fall back to their operator's slug and
 are listed, because a route in the wrong region merges into the wrong line.
+
+## Merging routes into lines
+
+Every route that made a stop pattern is filed under a key, and the routes that
+share one are one line. The key is its category, line number and region, and
+the id is the region and the number: `fernverkehr:IR35`, whichever operator
+and direction each of its routes is. The line keeps what it was merged from —
+`operators`, `routeIds` and every station any of them serves — but the
+`route_id`s are only for the later steps to join on and never reach the id.
+
+The line number is `route_short_name` with the whitespace taken out, so `RE 33`
+and `RE33` are one line. Most numbers already say their category, and their ids
+leave it out; a bare number gets it in front, because the 2026 feed has an ICE
+`3` and a Nightjet `3` in the one national region — `fernverkehr:ICE-3` and
+`fernverkehr:NJ-3`. Every rack railway, most funiculars and most TGVs are like
+that. A route whose short name is only its category — an SBB
+`IC`, a bare `R` — has no number, and no number is not a key: all of SBB's
+unnumbered ICs would come out as one line. Those are keyed on their **terminals**
+instead, the two ends of the pattern the route runs most, in Didok order so both
+directions agree: `fernverkehr:IC:8501008-8503000`. Didok numbers survive a feed
+regeneration the way `route_id`s do not. A funicular's BAV number is a number like
+any other and keys the line, as `FUN-2350`.
+
+A key is only as good as the region under it. A group whose routes split into
+parts that share no station at all — the same `S5` in the same region, running
+between two unrelated pairs of stations — is still merged, so the id stays
+stable, and listed as a suspect in the run log with each part's routes,
+operators and terminals. It is almost always a region rule that is missing, and
+the fix is one in `data/regions.json`, not code. The build stops instead if two
+categories would still share one id — an `S` route numbered `SN1` next to the
+`SN1` — or if a line number has a character that cannot go into an id.
+
+Every sort that reaches an id compares by code unit rather than by locale, and
+the log prints a fingerprint over every line, so two runs over the same feed can
+be checked for byte-identical ids by reading one line of each.
 
 Lines with no public number — a quarter of the candidate routes, every funicular
 among them — are named from operator, category and terminals, as in

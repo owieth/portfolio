@@ -130,3 +130,18 @@ export function classify(routeDesc: string | null, routeType: string): Classific
 
   return { kind: 'unknown', reason: `${code} is not in the category vocabulary` };
 }
+
+/**
+ * The passenger-facing line number, or `null` for a route that has none.
+ *
+ * `route_short_name` is the only field that carries one (`RECON.md` §3), and on
+ * a quarter of the candidate routes it holds the category and nothing else — an
+ * SBB `IC` whose number lives only in the train number. That is not a line
+ * called `IC`; it is a line with no number, and the regions and merge steps have
+ * to agree on which routes those are, so the test lives here once.
+ */
+export function lineNumber(shortName: string | null, category: Category): string | null {
+  const number = shortName?.trim() ?? '';
+
+  return number === '' || number.toUpperCase() === category ? null : number;
+}
