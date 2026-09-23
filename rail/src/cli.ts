@@ -31,6 +31,8 @@ import type { FetchOptions, FlagValue } from './fetch/options.ts';
 import { ingestStopTimes } from './ingest.ts';
 import { INGEST_FLAGS, parseIngestOptions } from './ingest/options.ts';
 import { mergeLines } from './merge.ts';
+import { nameLines } from './naming.ts';
+import { loadOperators } from './naming/operators.ts';
 import { derivePatterns } from './patterns.ts';
 import { recon } from './recon.ts';
 import { assignRegions } from './regions.ts';
@@ -97,8 +99,7 @@ async function withFeedOptions(
 
 function build(values: Record<string, FlagValue>): Promise<number> {
   // The remaining steps land as their own modules here and are called from this
-  // function, in order: naming, sequence, seasonal, overpass, match, emit,
-  // report.
+  // function, in order: sequence, seasonal, overpass, match, emit, report.
   return withFeedOptions(values, async options => {
     const feed = await fetchFeed(options, log);
     const allowed = await allowRoutes(feed.gtfsDir, log);
@@ -125,9 +126,19 @@ function build(values: Record<string, FlagValue>): Promise<number> {
     // react-doctor-disable-next-line react-doctor/server-sequential-independent-await
     const regioned = await assignRegions(feed.dir, allowed.routes, log);
     const merged = mergeLines(regioned.routes, patterns.patterns, log);
+    const named = nameLines(
+      {
+        lines: merged.lines,
+        routes: regioned.routes,
+        patterns: patterns.patterns,
+        stations: resolved.stations,
+        operators: await loadOperators(),
+      },
+      log,
+    );
 
     log(
-      `${merged.lines.length} lines from ${allowed.routes.length} routes in ${regioned.regions.length} regions, ${resolved.stations.length} stations, ${ingested.rows} stop times, ${calendar.serviceDays} service days and ${patterns.patterns.length} stop patterns are ready; no further steps are implemented yet`,
+      `${named.lines.length} lines, ${named.derived} of them with derived names, from ${allowed.routes.length} routes in ${regioned.regions.length} regions, ${resolved.stations.length} stations, ${ingested.rows} stop times, ${calendar.serviceDays} service days and ${patterns.patterns.length} stop patterns are ready; no further steps are implemented yet`,
     );
   });
 }
