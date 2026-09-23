@@ -12,7 +12,7 @@
  * A route with no line number — an SBB `IC` whose number lives in the train
  * number, every funicular with only a BAV code — cannot be grouped by a number
  * it does not have. It is grouped by its two terminals instead: the ends of the
- * pattern it runs most, by Didok number. #475 puts a name on top of that.
+ * pattern it runs most, by Didok number. `naming.ts` puts a name on top of that.
  *
  * Merging on a key is only as good as the key. Two routes with one number in
  * one region that share no station at all are more likely two lines the region
@@ -46,7 +46,7 @@ export interface Line {
   /** `region:number`, or `region:category:didok-didok` for a line with no number. */
   id: string;
   category: Category;
-  /** `null` for a line with no public number, which #475 names from its terminals. */
+  /** `null` for a line with no public number, which `naming.ts` names from its terminals. */
   number: string | null;
   region: string;
   /** Didok numbers of the two ends the line is keyed on; `null` when it has a number. */
