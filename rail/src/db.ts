@@ -63,7 +63,7 @@ export interface Gtfs {
 }
 
 /** Single-quoted SQL literal. DuckDB does not treat a backslash as an escape here. */
-function literal(value: string): string {
+export function literal(value: string): string {
   return `'${value.replaceAll("'", "''")}'`;
 }
 
