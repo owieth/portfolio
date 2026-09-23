@@ -29,6 +29,7 @@ export type GtfsFile =
   | 'agency'
   | 'calendar'
   | 'calendar_dates'
+  | 'feed_info'
   | 'routes'
   | 'stop_times'
   | 'stops'

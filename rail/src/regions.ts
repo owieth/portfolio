@@ -1,5 +1,5 @@
 /**
- * Step five: file every rideable route under the network it belongs to.
+ * Step seven: file every rideable route under the network it belongs to.
  *
  * A line is `(category, number, region)`, and the region is the part the feed
  * does not publish. `S1` is five different lines in the 2026 feed — Basel,
