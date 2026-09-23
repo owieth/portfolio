@@ -7,14 +7,17 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { CATEGORIES } from './allowlist/categories.ts';
 import schema from '../lines.schema.json' with { type: 'json' };
 import {
+  assertGeometry,
   assertReferences,
   emitArtifacts,
   LINE_STOPS_CSV,
   LINES_CSV,
+  LINES_GEOJSON,
   LINES_JSON,
   renderArtifacts,
 } from './emit.ts';
 import { ATTRIBUTION, EC, GELMERBAHN, S12, STATIONS } from './emit/fixtures.ts';
+import type { LineRecord } from './emit/rows.ts';
 import type { TerminiLine } from './termini.ts';
 
 const LINES: TerminiLine[] = [S12, GELMERBAHN, EC];
@@ -56,12 +59,13 @@ afterEach(async () => {
 });
 
 describe('emitArtifacts', () => {
-  it('writes the three files', async () => {
+  it('writes the four files', async () => {
     const files = await emit();
 
     expect(Object.keys(files).sort()).toEqual([
       LINE_STOPS_CSV,
       LINES_CSV,
+      LINES_GEOJSON,
       LINES_JSON,
     ]);
   });
@@ -144,11 +148,30 @@ describe('emitArtifacts', () => {
     expect(stopLineIds.every(id => ids.has(id))).toBe(true);
   });
 
+  it('draws exactly the lines lines.json marks has_geometry, keyed by their id', async () => {
+    const files = await emit();
+    const document = JSON.parse(files[LINES_JSON] ?? '') as {
+      lines: { id: string; has_geometry: boolean }[];
+    };
+    const geojson = JSON.parse(files[LINES_GEOJSON] ?? '') as {
+      type: string;
+      attribution: { text: string };
+      features: { properties: { id: string } }[];
+    };
+
+    expect(geojson.type).toBe('FeatureCollection');
+    expect(geojson.attribution.text).toBe('© OpenStreetMap contributors');
+    expect(geojson.features.map(feature => feature.properties.id)).toEqual(
+      document.lines.filter(line => line.has_geometry).map(line => line.id),
+    );
+    expect(geojson.features.map(feature => feature.properties.id)).toEqual([EC.id, S12.id]);
+  });
+
   it('logs what it wrote with a fingerprint per file', async () => {
     await emit();
 
     expect(logged[0]).toMatch(
-      /^wrote 3 lines and 8 line stops, validated against lines\.schema\.json — fingerprints lines\.csv [0-9a-f]{16}, line_stops\.csv [0-9a-f]{16}, lines\.json [0-9a-f]{16}$/,
+      /^wrote 3 lines, 8 line stops and 2 line shapes, validated against lines\.schema\.json — fingerprints lines\.csv [0-9a-f]{16}, line_stops\.csv [0-9a-f]{16}, lines\.json [0-9a-f]{16}, lines\.geojson [0-9a-f]{16}$/,
     );
   });
 });
@@ -195,6 +218,35 @@ describe('assertReferences', () => {
       assertReferences(new Set([S12.id]), [S12.id, 'test:gone']),
     ).toThrow(
       /line_stops\.csv has a stop on test:gone, which is not a line in lines\.csv/,
+    );
+  });
+});
+
+describe('assertGeometry', () => {
+  const records = [
+    { id: S12.id, has_geometry: true },
+    { id: GELMERBAHN.id, has_geometry: false },
+  ] as LineRecord[];
+
+  it('accepts a feature for every line with geometry and none for the rest', () => {
+    expect(() => assertGeometry(records, [S12.id])).not.toThrow();
+  });
+
+  it('refuses a feature for a line that is not in lines.json', () => {
+    expect(() => assertGeometry(records, [S12.id, 'test:gone'])).toThrow(
+      /lines\.geojson has a feature for test:gone, which is not a line in lines\.json/,
+    );
+  });
+
+  it('refuses a line with has_geometry and no feature', () => {
+    expect(() => assertGeometry(records, [])).toThrow(
+      /s-bahn-zuerich:S12 has has_geometry true in lines\.json but no feature in lines\.geojson/,
+    );
+  });
+
+  it('refuses a feature for a line without has_geometry', () => {
+    expect(() => assertGeometry(records, [S12.id, GELMERBAHN.id])).toThrow(
+      /kwo-seilbahnen:FUN:8531013-8531014 has has_geometry false in lines\.json but a feature in lines\.geojson/,
     );
   });
 });

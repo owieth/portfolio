@@ -1,5 +1,6 @@
 /**
- * Step sixteen: write `lines.csv`, `line_stops.csv` and `lines.json`.
+ * Step sixteen: write `lines.csv`, `line_stops.csv`, `lines.json` and
+ * `lines.geojson`.
  *
  * These are the artifacts everything after the pipeline reads: #489 seeds
  * `rail_lines` and `rail_line_stops` from the two CSVs, and the December diff
@@ -13,9 +14,11 @@
  *   written, and the CSVs are flattened from the very records it holds.
  * - Every stop row has to name a line in `lines.csv`, and every line id has to
  *   be unique, which the schema cannot say.
+ * - `lines.geojson` has a feature for exactly the lines `lines.json` marks
+ *   `has_geometry`, each keyed by that line's id.
  *
- * All three are built in memory and only then written, so a failed check leaves
- * the committed files as they were rather than one of three rewritten.
+ * All four are built in memory and only then written, so a failed check leaves
+ * the committed files as they were rather than one of four rewritten.
  */
 
 import { createHash } from 'node:crypto';
@@ -26,6 +29,7 @@ import { Ajv2020 } from 'ajv/dist/2020.js';
 
 import schema from '../lines.schema.json' with { type: 'json' };
 import { toCsv } from './emit/csv.ts';
+import { toCollection, toGeoJson } from './emit/geojson.ts';
 import {
   LINE_COLUMNS,
   STOP_COLUMNS,
@@ -43,6 +47,7 @@ import type { TerminiLine } from './termini.ts';
 export const LINES_CSV = 'lines.csv';
 export const LINE_STOPS_CSV = 'line_stops.csv';
 export const LINES_JSON = 'lines.json';
+export const LINES_GEOJSON = 'lines.geojson';
 
 export interface EmitInput {
   lines: readonly TerminiLine[];
@@ -53,13 +58,15 @@ export interface EmitInput {
 }
 
 export interface EmitOptions {
-  /** Where the three files go. The top of `rail/` unless a test says otherwise. */
+  /** Where the four files go. The top of `rail/` unless a test says otherwise. */
   dir?: string;
 }
 
 export interface Emitted {
   lines: number;
   stops: number;
+  /** Lines drawn in `lines.geojson`. */
+  features: number;
   /** Per file, the first 16 hex characters of the sha256 of what was written. */
   fingerprints: Record<string, string>;
 }
@@ -131,6 +138,35 @@ export function assertReferences(
   }
 }
 
+/**
+ * Both built from the same lines, so they cannot disagree today; checked for
+ * the same reason as the stop rows. A feature the list does not have would draw
+ * a line nobody can tick off, and a missing one would leave a line that claims
+ * a shape without one on the map.
+ */
+export function assertGeometry(
+  records: readonly LineRecord[],
+  featureIds: readonly string[],
+): void {
+  const ids = new Set(records.map(record => record.id));
+  const drawn = new Set(featureIds);
+  const stray = featureIds.find(id => !ids.has(id));
+
+  if (stray !== undefined) {
+    throw new Error(
+      `${LINES_GEOJSON} has a feature for ${stray}, which is not a line in ${LINES_JSON}, so nothing was written`,
+    );
+  }
+
+  const disagrees = records.find(record => record.has_geometry !== drawn.has(record.id));
+
+  if (disagrees !== undefined) {
+    throw new Error(
+      `${disagrees.id} has has_geometry ${disagrees.has_geometry} in ${LINES_JSON} but ${disagrees.has_geometry ? 'no' : 'a'} feature in ${LINES_GEOJSON}, so nothing was written`,
+    );
+  }
+}
+
 export interface Artifact {
   name: string;
   contents: string;
@@ -138,11 +174,12 @@ export interface Artifact {
 
 export interface Artifacts {
   records: LineRecord[];
+  features: number;
   /** In the order they are logged. */
   files: Artifact[];
 }
 
-/** The three files, checked and serialised, not yet written. */
+/** The four files, checked and serialised, not yet written. */
 export function renderArtifacts(input: EmitInput): Artifacts {
   const stations = new Map(
     input.stations.map(station => [station.didok, station]),
@@ -163,12 +200,21 @@ export function renderArtifacts(input: EmitInput): Artifacts {
     stops.map(stop => stop.line_id),
   );
 
+  const collection = toCollection(input.lines, input.attribution);
+
+  assertGeometry(
+    records,
+    collection.features.map(feature => feature.properties.id),
+  );
+
   return {
     records,
+    features: collection.features.length,
     files: [
       { name: LINES_CSV, contents: toCsv(LINE_COLUMNS, lines) },
       { name: LINE_STOPS_CSV, contents: toCsv(STOP_COLUMNS, stops) },
       { name: LINES_JSON, contents: `${JSON.stringify(document, null, 2)}\n` },
+      { name: LINES_GEOJSON, contents: toGeoJson(collection) },
     ],
   };
 }
@@ -178,7 +224,7 @@ export async function emitArtifacts(
   log: Log,
   { dir = RAIL_DIR }: EmitOptions = {},
 ): Promise<Emitted> {
-  const { records, files } = renderArtifacts(input);
+  const { records, features, files } = renderArtifacts(input);
 
   await Promise.all(
     files.map(file => writeFile(join(dir, file.name), file.contents, 'utf8')),
@@ -190,8 +236,8 @@ export async function emitArtifacts(
   );
 
   log(
-    `wrote ${count(records.length)} lines and ${count(stops)} line stops, validated against lines.schema.json — fingerprints ${files.map(file => `${file.name} ${fingerprints[file.name]}`).join(', ')}`,
+    `wrote ${count(records.length)} lines, ${count(stops)} line stops and ${count(features)} line shapes, validated against lines.schema.json — fingerprints ${files.map(file => `${file.name} ${fingerprints[file.name]}`).join(', ')}`,
   );
 
-  return { lines: records.length, stops, fingerprints };
+  return { lines: records.length, stops, features, fingerprints };
 }
