@@ -1,0 +1,53 @@
+name: Rail data
+
+# Builds the rail artifacts from a clean checkout: no cached feed and no cached
+# Overpass answers, the way the December refresh starts on a fresh clone. A run
+# downloads the timetable feed (about 256 MB, 3 GB unpacked) and about 110 MB
+# from the public Overpass API, so it runs on changes to the pipeline and on
+# demand, never on a timer.
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - rail/src/**
+      - rail/data/*.json
+      - rail/lines.schema.json
+      - .github/workflows/rail.yml
+
+concurrency:
+  group: rail-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-data:
+    runs-on: ubuntu-latest
+    # Overpass alone has taken five minutes of retries to find a slot.
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm build:data
+
+      # Against the checkout's own snapshot, so the summary shows what the feed
+      # and OSM changed since the artifacts were last committed.
+      - run: pnpm --silent diff:data >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: rail-artifacts
+          path: |
+            rail/lines.csv
+            rail/line_stops.csv
+            rail/lines.json
+            rail/lines.geojson
+            rail/REPORT.md

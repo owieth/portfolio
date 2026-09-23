@@ -772,6 +772,8 @@ pnpm install
 pnpm build:data
 pnpm build:data --year 2027     # the next timetable, once the portal publishes it
 pnpm build:data --source geops  # when the official portal is down
+pnpm diff:data                  # what the build changed against the committed CSVs
+pnpm diff:data --base HEAD~1    # the same, against another commit's snapshot
 pnpm recon:data                 # regenerate RECON.md from the feed
 ```
 
@@ -860,9 +862,67 @@ with it, so the refresh is annual: bump the year, run `pnpm build:data`, read
 `pnpm diff:data` and `REPORT.md`, commit the snapshot, then run the reconcile in
 dry-run before applying it.
 
-The full December runbook — what a real line change looks like next to a feed
-artefact, and what to check in the diff — is written once `pnpm diff:data`
-actually does something.
+### The December runbook
+
+1. **Wait for the switch.** The switch is the second Sunday of December. The
+   portal publishes the next year's dataset months before that, but the early
+   publications are drafts. The September 2026 publication of the 2027 feed was
+   69 MB against 256 MB for 2026. It allowed 464 routes where 2026 allowed 676,
+   and built 447 lines where 2026 built 532, many of them with stops missing. A
+   diff against a draft is mostly the draft. Build a few days after the switch,
+   when the dataset has been republished complete.
+2. **Bump the year.** Nothing in the code names one. After the switch,
+   `--year` defaults to the new timetable. Before it, pass `--year 2027`.
+3. **Build from a clean state.** Start from a clean working tree on `main`.
+   To pick up this year's OSM geometry, run `rm -rf rail/data/raw/overpass`
+   first, because the Overpass cache never expires. Then run
+   `pnpm build:data`. Expect a download, a few minutes of Overpass retries, and
+   a log that ends with the line count. A failed check stops the build before
+   it writes the artifacts, so the committed files stay as they were.
+4. **Read the diff.** Run `pnpm diff:data`. It compares the `lines.csv` and
+   `line_stops.csv` the build just wrote with the ones at `HEAD`. The Markdown
+   it prints is what to read. `git diff` is not: every `route_id` carries the
+   timetable year (`…-j26-1` becomes `…-j27-1`) and many `trips_per_week`
+   values move a little, so almost every row of `lines.csv` changes as text.
+   The other artifacts diff by row. For each section of the diff:
+   - **Added** and **Removed**: a real timetable change is a handful of lines
+     that you can name. A whole region or operator coming and going together
+     points at a region rule or an agency rename. So does a region shift with
+     no line added or removed. Check the build log for rules that matched
+     nothing, and fix `data/regions.json` or `data/operators.json`, not the
+     code.
+   - **Likely renumbered**: pairs of lines with the same two terminals. A new
+     number, like `IR-VAE` becoming `IR32`, is a real change. Some pairs are
+     not: an unnumbered line is keyed on the Didok numbers of its busiest
+     pattern's terminals, so when that pattern changes, the id changes too.
+     `fernverkehr:IC:8501120-8505400` becoming `…:8501026-8505400` is the same
+     IC. So is an operator's renamed agency, which moves its region slug
+     (`verticalp-vallee-du-trient-sa` became `verticalp-sa`). Note the pairs
+     that are one line. The reconcile still sees a removal and an insertion.
+   - **Renamed**: only derived names change like this. Either the line's
+     longest pattern now ends somewhere else, or a funicular gained its
+     terminals because another one now has the same name. Check the new name
+     in `REPORT.md`'s names section.
+   - **Stations changed**: a line that lost a long run of stations usually
+     lost its trips to a draft feed or a construction timetable, not the stops.
+     Check the line's `trips_per_week` before believing it.
+5. **Read `REPORT.md`.** Its own diff is readable. Check the totals, the lines
+   with no OSM match, and the names to check. An unrecognised `route_desc` or a
+   doubted station in the feed checks means a step needs a code change before
+   the snapshot is worth committing.
+6. **Commit the snapshot.** Commit the five artifacts alone, as
+   `chore(rail): commit the 2027 snapshot`, and paste the output of
+   `pnpm diff:data` into the pull request. `--base` repeats the diff against
+   any other commit afterwards, for example `pnpm diff:data --base HEAD~1`.
+7. **Reconcile.** Run the reconcile from #488 in dry-run. Its inserts, updates
+   and flagged-missing lines should match the diff's added, changed and
+   removed lines, with every renumbered pair on both sides. Once they do,
+   apply it. Neither `pnpm build:data` nor `pnpm diff:data` writes to Supabase.
+
+The `Rail data` workflow in `.github/workflows/rail.yml` runs the same build
+from a fresh checkout on every pull request that touches the pipeline, and on
+demand. It writes `pnpm diff:data` into the run's summary and uploads the
+artifacts, so a refresh can also be started from the Actions tab.
 
 ## Layout
 

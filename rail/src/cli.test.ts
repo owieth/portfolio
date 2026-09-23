@@ -28,6 +28,7 @@ describe('main', () => {
     // rather than reaching the network and failing there.
     ['a bad source under recon', ['recon', '--source', 'sbb']],
     ['a bad year under recon', ['recon', '--year', '1998']],
+    ['--base without a ref', ['diff', '--base']],
   ];
 
   it.each(REJECTED)('returns 1 for %s', async (_label, argv) => {
@@ -43,7 +44,16 @@ describe('main', () => {
   });
 
   it('runs diff without touching the network', async () => {
+    vi.spyOn(process.stdout, 'write').mockReturnValue(true);
+
     await expect(main(['diff'])).resolves.toBe(0);
+    expect(process.stdout.write).toHaveBeenCalledWith(
+      expect.stringContaining('# Rail lines — feed diff'),
+    );
+  });
+
+  it('returns 2 for a --base that names no commit', async () => {
+    await expect(main(['diff', '--base', 'no-such-ref'])).resolves.toBe(2);
   });
 
   it('offers recon in the usage', async () => {
