@@ -6,7 +6,7 @@
  * in two at a junction, and a mountain railway runs its summit trains only in
  * summer. "Which segments of this line have I ridden" is only answerable later
  * if every one of those shapes survives this step, so none of them is merged
- * away here — that is #477's job, with all of them in hand.
+ * away here — `sequence.ts` does that, with all of them in hand.
  *
  * A pattern is a route's ordered list of Swiss stations, and its identity is a
  * hash of that list. It is never a `trip_id` or a `service_id`: both are
