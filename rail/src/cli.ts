@@ -36,6 +36,7 @@ import { loadOperators } from './naming/operators.ts';
 import { derivePatterns } from './patterns.ts';
 import { recon } from './recon.ts';
 import { assignRegions } from './regions.ts';
+import { flagSeasonal } from './seasonal.ts';
 import { seedLines } from './seed.ts';
 import { loadFunicularSeed } from './seed/funiculars.ts';
 import { sequenceLines } from './sequence.ts';
@@ -102,7 +103,7 @@ async function withFeedOptions(
 
 function build(values: Record<string, FlagValue>): Promise<number> {
   // The remaining steps land as their own modules here and are called from this
-  // function, in order: seasonal, overpass, match, emit, report.
+  // function, in order: overpass, match, emit, report.
   return withFeedOptions(values, async options => {
     const feed = await fetchFeed(options, log);
     const allowed = await allowRoutes(feed.gtfsDir, log);
@@ -144,9 +145,19 @@ function build(values: Record<string, FlagValue>): Promise<number> {
       { lines: seeded.lines, patterns: patterns.patterns, stations: resolved.stations },
       log,
     );
+    // Back into rail.duckdb for the service days the calendar step wrote.
+    const seasonal = await flagSeasonal(
+      feed.dir,
+      {
+        lines: sequenced.lines,
+        window: calendar.window,
+        referenceWeek: calendar.referenceWeek,
+      },
+      log,
+    );
 
     log(
-      `${sequenced.lines.length} lines, ${named.derived} of them with derived names and ${seeded.manual} seeded by hand, ${sequenced.branched.length} with branches, from ${allowed.routes.length} routes in ${regioned.regions.length} regions, ${resolved.stations.length} stations, ${ingested.rows} stop times, ${calendar.serviceDays} service days and ${patterns.patterns.length} stop patterns are ready; no further steps are implemented yet`,
+      `${seasonal.lines.length} lines, ${named.derived} of them with derived names and ${seeded.manual} seeded by hand, ${sequenced.branched.length} with branches and ${seasonal.seasonal.length} seasonal, from ${allowed.routes.length} routes in ${regioned.regions.length} regions, ${resolved.stations.length} stations, ${ingested.rows} stop times, ${calendar.serviceDays} service days and ${patterns.patterns.length} stop patterns are ready; no further steps are implemented yet`,
     );
   });
 }
