@@ -19,6 +19,8 @@
  *   pnpm diff:data --base HEAD~1
  *   pnpm recon:data
  *   pnpm seed:data
+ *   pnpm reconcile:data
+ *   pnpm reconcile:data --apply
  *
  * Exit codes: 0 done, 1 the command line was wrong, 2 a step failed.
  */
@@ -43,6 +45,8 @@ import { loadOperators } from './naming/operators.ts';
 import { fetchOsmRelations } from './overpass.ts';
 import { derivePatterns } from './patterns.ts';
 import { recon } from './recon.ts';
+import { reconcileFeed } from './reconcile.ts';
+import { RECONCILE_FLAGS, parseReconcileOptions } from './reconcile/options.ts';
 import { assignRegions } from './regions.ts';
 import { loadRules } from './regions/rules.ts';
 import { reportFeed, writeReport } from './report.ts';
@@ -54,7 +58,7 @@ import { assertSpotChecks } from './spotcheck.ts';
 import { resolveStations } from './stations.ts';
 import { findTermini } from './termini.ts';
 
-const COMMANDS = ['build', 'diff', 'recon', 'seed'] as const;
+const COMMANDS = ['build', 'diff', 'recon', 'seed', 'reconcile'] as const;
 
 type Command = (typeof COMMANDS)[number];
 
@@ -62,16 +66,20 @@ const USAGE = `usage: pnpm build:data [--year <year>] [--source opentransportdat
        pnpm diff:data [--base <git ref>]
        pnpm recon:data [--year <year>] [--source opentransportdata|geops]
        pnpm seed:data
+       pnpm reconcile:data [--apply] [--dir <path>]
 
-  build   regenerate lines.csv, line_stops.csv, lines.json, lines.geojson and REPORT.md
-  diff    compare the generated lines.csv and line_stops.csv against the committed ones
-  recon   profile the feed into RECON.md, before anything models it
-  seed    write supabase/seeds/rail.sql from the committed lines.csv and line_stops.csv
+  build      regenerate lines.csv, line_stops.csv, lines.json, lines.geojson and REPORT.md
+  diff       compare the generated lines.csv and line_stops.csv against the committed ones
+  recon      profile the feed into RECON.md, before anything models it
+  seed       write supabase/seeds/rail.sql from the committed lines.csv and line_stops.csv
+  reconcile  plan, or with --apply write, the CSVs into Supabase without undoing hand edits
 
   --year    timetable year to build; defaults to the one in force today
   --source  where to get the feed; the geops mirror is opt-in, never automatic
   --force   re-read stop_times.txt even when the feed's store already answers for it
-  --base    the commit diff reads the committed files at; defaults to HEAD`;
+  --base    the commit diff reads the committed files at; defaults to HEAD
+  --apply   write the reconcile's plan; without it the reconcile writes nothing
+  --dir     where the reconcile reads the CSVs from; defaults to rail/`;
 
 /**
  * Progress goes to stderr so stdout stays clean for an artifact that a future
@@ -256,6 +264,27 @@ async function seed(): Promise<number> {
   return 0;
 }
 
+/** Like the diff, the plan goes to stdout so it can be piped into a pull request. */
+async function reconcile(values: Record<string, FlagValue>): Promise<number> {
+  const options = parseReconcileOptions(values);
+
+  if (!options.ok) {
+    log(options.error);
+    process.stderr.write(`${USAGE}\n`);
+    return 1;
+  }
+
+  try {
+    const { markdown } = await reconcileFeed(options.value, log);
+    process.stdout.write(markdown);
+  } catch (error) {
+    logFailure(error);
+    return 2;
+  }
+
+  return 0;
+}
+
 /**
  * Returns the exit code instead of calling `process.exit`, so a test can assert
  * on it without catching a thrown exit.
@@ -266,7 +295,7 @@ export async function main(argv: string[]): Promise<number> {
   // values are consumed correctly, and validates them itself.
   const { positionals, values } = parseArgs({
     args: argv,
-    options: { ...FETCH_FLAGS, ...INGEST_FLAGS, ...DIFF_FLAGS },
+    options: { ...FETCH_FLAGS, ...INGEST_FLAGS, ...DIFF_FLAGS, ...RECONCILE_FLAGS },
     strict: false,
     allowPositionals: true,
   });
@@ -284,6 +313,10 @@ export async function main(argv: string[]): Promise<number> {
 
   if (command === 'seed') {
     return seed();
+  }
+
+  if (command === 'reconcile') {
+    return reconcile(values);
   }
 
   return command === 'build' ? build(values) : profile(values);

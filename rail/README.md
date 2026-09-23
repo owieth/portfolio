@@ -776,6 +776,8 @@ pnpm diff:data                  # what the build changed against the committed C
 pnpm diff:data --base HEAD~1    # the same, against another commit's snapshot
 pnpm recon:data                 # regenerate RECON.md from the feed
 pnpm seed:data                  # regenerate supabase/seeds/rail.sql from the CSVs
+pnpm reconcile:data             # what a refresh would write to Supabase, as a dry run
+pnpm reconcile:data --apply     # write it
 ```
 
 A run writes the five committed artifacts at the top of this directory, and the
@@ -868,6 +870,48 @@ leaves hand-edited fields alone, and flags a line that has disappeared from the
 feed instead of deleting it. Reconciling is a deliberate second step with a
 dry-run mode, never part of `pnpm build:data`.
 
+### The reconcile
+
+`pnpm reconcile:data` reads the committed `lines.csv` and `line_stops.csv`, or
+the ones in `--dir`, and compares them with the two tables row by row: a line by
+its id, a stop by its line and its sequence number. It is a dry run unless
+`--apply` is given, and prints the same Markdown either way.
+
+- A row in the CSVs and not in the table is inserted. New lines are listed for
+  review, because a renumbered line arrives as a new id: an edit made on the
+  old id does not carry over.
+- A row in both gets the feed's value in every field it changed, except the
+  fields in its `edited_fields`. Those keep the edit and are listed as skipped,
+  with both values.
+- A row in the table and not in the CSVs gets `missing_since`, the day a
+  reconcile first found it gone, and stays. Rides may already reference it. If
+  it comes back, the date is cleared.
+
+Nothing it runs removes a row, and a test reads its sources to keep it that way.
+
+`edited_fields` is kept by a trigger, not by whoever edits. Any update to a row,
+from Studio, SQL or the UI, adds the columns it changed. The reconcile's own
+writes run with `set local rail.reconciling = 'on'`, which the trigger skips.
+To hand a field back to the feed, remove it from `edited_fields`; the next
+reconcile writes the feed's value into it.
+
+`--apply` plans again inside the transaction that writes, with both tables
+locked against other writers, and every write commits or none does. The dry run
+and the apply use the same plan, so the apply writes what the dry run showed, as
+long as nothing was edited in between.
+
+The reconcile goes straight to Postgres rather than through the Supabase API,
+because the API cannot hold a transaction open or `set local` inside one. It
+connects with `DATABASE_URL`, the session pooler string from the project's
+Connect dialog, which `pnpm reconcile:data` reads from `.env.local`. It is the
+database password, so it belongs on the laptop that runs the refresh and not
+on Vercel.
+
+The tests that need a database are opt-in, because CI has none. Point
+`RAIL_TEST_DATABASE_URL` at a local Supabase after `supabase db reset`, for
+example `postgresql://postgres:postgres@127.0.0.1:54322/postgres`, and they run
+in transactions that are rolled back.
+
 ## Refreshing the data
 
 The feed changes at the mid-December timetable switch and line numbers change
@@ -928,10 +972,12 @@ dry-run before applying it.
    `chore(rail): commit the 2027 snapshot`, and paste the output of
    `pnpm diff:data` into the pull request. `--base` repeats the diff against
    any other commit afterwards, for example `pnpm diff:data --base HEAD~1`.
-7. **Reconcile.** Run the reconcile from #488 in dry-run. Its inserts, updates
-   and flagged-missing lines should match the diff's added, changed and
-   removed lines, with every renumbered pair on both sides. Once they do,
-   apply it. Neither `pnpm build:data` nor `pnpm diff:data` writes to Supabase.
+7. **Reconcile.** Run `pnpm reconcile:data`, which is a dry run. Its inserts,
+   updates and flagged-missing lines should match the diff's added, changed
+   and removed lines, with every renumbered pair on both sides. Read its
+   skipped fields too: each is a hand edit the feed now disagrees with. Once
+   they match, run `pnpm reconcile:data --apply`. Neither `pnpm build:data`
+   nor `pnpm diff:data` writes to Supabase.
 
 The `Rail data` workflow in `.github/workflows/rail.yml` runs the same build
 from a fresh checkout on every pull request that touches the pipeline, and on
