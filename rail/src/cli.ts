@@ -30,6 +30,7 @@ import type { FetchOptions, FlagValue } from './fetch/options.ts';
 import { ingestStopTimes } from './ingest.ts';
 import { INGEST_FLAGS, parseIngestOptions } from './ingest/options.ts';
 import { recon } from './recon.ts';
+import { assignRegions } from './regions.ts';
 import { resolveStations } from './stations.ts';
 
 const COMMANDS = ['build', 'diff', 'recon'] as const;
@@ -93,8 +94,8 @@ async function withFeedOptions(
 
 function build(values: Record<string, FlagValue>): Promise<number> {
   // The remaining steps land as their own modules here and are called from this
-  // function, in order: calendar, patterns, regions, merge, naming, sequence,
-  // seasonal, overpass, match, emit, report.
+  // function, in order: calendar, patterns, merge, naming, sequence, seasonal,
+  // overpass, match, emit, report.
   return withFeedOptions(values, async options => {
     const feed = await fetchFeed(options, log);
     const allowed = await allowRoutes(feed.gtfsDir, log);
@@ -107,9 +108,13 @@ function build(values: Record<string, FlagValue>): Promise<number> {
     // react-doctor-disable-next-line react-doctor/server-sequential-independent-await
     const resolved = await resolveStations(feed.gtfsDir, log);
     const ingested = await ingestStopTimes(feed.dir, log, parseIngestOptions(values));
+    // Depends on the ingest through the disk: it reads the stop times table the
+    // previous line wrote into the feed's store.
+    // react-doctor-disable-next-line react-doctor/server-sequential-independent-await
+    const regioned = await assignRegions(feed.dir, allowed.routes, log);
 
     log(
-      `${allowed.routes.length} routes, ${resolved.stations.length} stations and ${ingested.rows} stop times are ready; no further steps are implemented yet`,
+      `${allowed.routes.length} routes in ${regioned.regions.length} regions, ${resolved.stations.length} stations and ${ingested.rows} stop times are ready; no further steps are implemented yet`,
     );
   });
 }
