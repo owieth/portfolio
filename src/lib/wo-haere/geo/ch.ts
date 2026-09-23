@@ -1,27 +1,17 @@
-export interface LatLon {
-  lat: number;
-  lon: number;
-}
+/**
+ * The Switzerland the game is played on, plus the throw geometry around it.
+ *
+ * `LatLon`, `CH_BOUNDS` and `isInChBbox` live in `@/lib/geo/ch` since the rail
+ * pipeline started asking the same question of a station, and are re-exported
+ * here so nothing in this folder has to learn a second import path.
+ */
+
+import { CH_BOUNDS, isInChBbox, type LatLon } from '@/lib/geo/ch';
+
+export { CH_BOUNDS, isInChBbox, type LatLon };
 
 /** Bern, Zytglogge — every distance in the app is measured from here. */
 export const BAERN: LatLon = { lat: 46.948, lon: 7.4474 };
-
-/** Bounding box of Swiss territory, used to clamp throws and the map view. */
-export const CH_BOUNDS = {
-  west: 5.9559,
-  south: 45.818,
-  east: 10.4921,
-  north: 47.8085,
-} as const;
-
-export function isInChBbox({ lat, lon }: LatLon): boolean {
-  return (
-    lon >= CH_BOUNDS.west &&
-    lon <= CH_BOUNDS.east &&
-    lat >= CH_BOUNDS.south &&
-    lat <= CH_BOUNDS.north
-  );
-}
 
 /**
  * Grid resolution for coordinates sent upstream and shared in links.
