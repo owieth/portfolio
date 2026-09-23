@@ -28,6 +28,8 @@ import { assign, loadRules, operatorSlug, RULES_FILE, verify } from './regions/r
 import type { Rule } from './regions/rules.ts';
 
 export interface RegionedRoute extends AllowedRoute {
+  /** The operator's name from `agency.txt`, or its id when the feed names none. */
+  operator: string;
   region: string;
   /**
    * `rule` for a named region, `operator` for a rule that files the route under
@@ -201,7 +203,7 @@ export async function assignRegions(
       }
 
       if (match?.rule.region !== undefined) {
-        regioned.push({ ...route, region: match.rule.region, source: 'rule' });
+        regioned.push({ ...route, operator, region: match.rule.region, source: 'rule' });
         continue;
       }
 
@@ -209,11 +211,11 @@ export async function assignRegions(
       names.set(region, operator);
 
       if (match !== null) {
-        regioned.push({ ...route, region, source: 'operator' });
+        regioned.push({ ...route, operator, region, source: 'operator' });
         continue;
       }
 
-      regioned.push({ ...route, region, source: 'fallback' });
+      regioned.push({ ...route, operator, region, source: 'fallback' });
       unassigned.push({
         routeId: route.routeId,
         category: route.category,
