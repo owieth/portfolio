@@ -19,6 +19,7 @@ import {
 } from './emit.ts';
 import { ATTRIBUTION, EC, GELMERBAHN, S12, STATIONS } from './emit/fixtures.ts';
 import type { LineRecord } from './emit/rows.ts';
+import { PUBLIC_RAIL_DIR } from './paths.ts';
 import type { TerminiLine } from './termini.ts';
 
 const LINES: TerminiLine[] = [S12, GELMERBAHN, EC];
@@ -252,6 +253,18 @@ describe('emitWebGeometry', () => {
     expect(logged.at(-1)).toMatch(
       /^wrote the map's lines\.geojson: 2 line shapes simplified at 30 m from \d+ to \d+ points, \d+\.\d{2} MB or \d+\.\d{2} MB gzipped — fingerprint [0-9a-f]{16}$/,
     );
+  });
+});
+
+describe(`the committed public/rail/${LINES_GEOJSON}`, () => {
+  it('is what the web emit writes from the committed lines.geojson, at about a megabyte', async () => {
+    const dir = await outputDir();
+    const { bytes } = await emitWebGeometry(log, { dir });
+
+    expect(await readFile(join(dir, LINES_GEOJSON), 'utf8')).toBe(
+      await readFile(join(PUBLIC_RAIL_DIR, LINES_GEOJSON), 'utf8'),
+    );
+    expect(bytes).toBeLessThan(1_100_000);
   });
 });
 
