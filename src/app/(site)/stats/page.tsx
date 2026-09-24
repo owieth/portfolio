@@ -30,6 +30,7 @@ import { loadRail } from '@/lib/stats/rail/query';
 import {
   categoryProgress,
   lineProgress,
+  lineRidership,
   railTotals,
   rideLog,
   stationsVisited,
@@ -142,6 +143,7 @@ const Rail = ({
   const categories = categoryProgress(progress);
   const totals = railTotals(progress, stations);
   const log = rideLog(coverage, stops);
+  const ridership = lineRidership(progress, coverage);
   // Over the categories rather than `stops`, so the share counts what the
   // tables count: a stop on a line the data does not know is on no line.
   const stopCount = categories.reduce((sum, { stops }) => sum + stops, 0);
@@ -202,6 +204,34 @@ const Rail = ({
           )}
         />
       </Section>
+
+      {ridership.length > 0 && (
+        <Section title="Lines ridden">
+          <P>
+            Every line counts once towards the goal, however often it is ridden.
+            The commute still gets ridden every week, so this is where it shows
+            — next to how much of each line those rides have covered.
+          </P>
+          <Table
+            head={['Line', 'Rides', 'Coverage', 'Last ridden']}
+            rows={ridership.map(
+              ({ line, rides, stops, covered, complete, lastRiddenOn }) => ({
+                id: line.id,
+                cells: [
+                  <Named
+                    key="line"
+                    code={line.displayName}
+                    name={`${line.terminalA} – ${line.terminalB}`}
+                  />,
+                  rides,
+                  complete ? 'Complete' : shareOf(covered, stops),
+                  formatDay(lastRiddenOn),
+                ],
+              }),
+            )}
+          />
+        </Section>
+      )}
 
       <Section title="Ride log">
         {log.length > 0 ? (
