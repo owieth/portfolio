@@ -30,6 +30,13 @@ const GROUP_SEPARATOR = '\u2019';
 const MINUTES_PER_HOUR = 60;
 const MINUTES_PER_DAY = 1440;
 
+/** A whole number, grouped the Swiss way: `6’081` stops. */
+export function formatCount(count: number): string {
+  return KM.formatToParts(Math.round(count))
+    .map(part => (part.type === 'group' ? GROUP_SEPARATOR : part.value))
+    .join('');
+}
+
 /** Whole kilometres — a great-circle estimate does not earn a decimal. */
 export function formatDistanceKm(km: number): string {
   const grouped = KM.formatToParts(Math.round(km))
