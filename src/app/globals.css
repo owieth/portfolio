@@ -124,3 +124,29 @@ body {
 [data-panee-offe] .maplibregl-ctrl-bottom-right {
   margin-right: min(20rem, 100vw);
 }
+
+/* MapLibre draws its zoom buttons white, which in dark mode makes them the
+   brightest thing on the map. Matched to the page and the map's own border.
+   Scoped under `.maplibregl-map` to outrank MapLibre's CSS whichever order
+   the two stylesheets load in. */
+@media (prefers-color-scheme: dark) {
+  .maplibregl-map .maplibregl-ctrl-group {
+    background: var(--background);
+  }
+
+  .maplibregl-map .maplibregl-ctrl-group:not(:empty) {
+    box-shadow: 0 0 0 1px rgb(255 255 255 / 0.2);
+  }
+
+  .maplibregl-map .maplibregl-ctrl-group button + button {
+    border-top-color: rgb(255 255 255 / 0.2);
+  }
+
+  .maplibregl-map .maplibregl-ctrl-group .maplibregl-ctrl-icon {
+    filter: invert(1);
+  }
+
+  .maplibregl-map .maplibregl-ctrl button:not(:disabled):hover {
+    background-color: rgb(255 255 255 / 0.1);
+  }
+}
