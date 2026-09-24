@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   categoryProgress,
   lineProgress,
+  lineRidership,
   railTotals,
   rideLog,
   stationsVisited,
@@ -89,10 +90,11 @@ const ride = (
   lineId: string,
   fromDidok: string | null = null,
   toDidok: string | null = null,
+  riddenOn = '2026-09-24',
 ): RailRide => ({
   id: `ride-${(rideCount += 1)}`,
   lineId,
-  riddenOn: '2026-09-24',
+  riddenOn,
   fromDidok,
   toDidok,
 });
@@ -376,6 +378,83 @@ describe('categoryProgress and railTotals', () => {
       touched: totals.touched,
       complete: totals.complete,
     });
+  });
+});
+
+describe('lineRidership', () => {
+  const ridershipOf = (rides: RailRide[]) => {
+    const coverage = toCoverage(LINES, STOPS, rides);
+
+    return lineRidership(lineProgress(LINES, STOPS, coverage), coverage);
+  };
+
+  it('counts every ride on a line, whole or stretch', () => {
+    const [s1] = ridershipOf([
+      ride(S1.id),
+      ride(S1.id, '8500001', '8500004'),
+      ride(S1.id, '8500001', '8500004'),
+    ]);
+
+    expect(s1).toMatchObject({ line: S1, rides: 3, complete: true });
+  });
+
+  it('keeps the coverage of the line alongside the count', () => {
+    const [s1] = ridershipOf([
+      ride(S1.id, '8500001', '8500002'),
+      ride(S1.id, '8500001', '8500002'),
+    ]);
+
+    expect(s1).toMatchObject({ rides: 2, covered: 2, stops: 11 });
+  });
+
+  it('dates a line by its latest ride, whatever order they came in', () => {
+    const [ir1] = ridershipOf([
+      ride(IR1.id, null, null, '2026-03-01'),
+      ride(IR1.id, null, null, '2026-07-12'),
+      ride(IR1.id, null, null, '2025-11-30'),
+    ]);
+
+    expect(ir1.lastRiddenOn).toBe('2026-07-12');
+  });
+
+  it('leaves out lines never ridden', () => {
+    const ridership = ridershipOf([ride(IR1.id)]);
+
+    expect(ridership.map(({ line }) => line.id)).toEqual([IR1.id]);
+  });
+
+  it('does not count a skipped ride', () => {
+    const [s1] = ridershipOf([
+      ride(S1.id),
+      ride(S1.id, '8500001', '8599999'),
+    ]);
+
+    expect(s1.rides).toBe(1);
+  });
+
+  it('puts the most ridden first, then the line further along', () => {
+    const ridership = ridershipOf([
+      ride(IR1.id, '8500004', '8500020'),
+      ride(FUN1.id),
+      ride(S1.id),
+      ride(FUN1.id),
+    ]);
+
+    expect(ridership.map(({ line }) => line.id)).toEqual([
+      FUN1.id,
+      S1.id,
+      IR1.id,
+    ]);
+  });
+
+  it('breaks a tie in count and share by name', () => {
+    const ridership = ridershipOf([ride(S1.id), ride(IR1.id)]);
+
+    expect(ridership.map(({ line }) => line.id)).toEqual([IR1.id, S1.id]);
+  });
+
+  it('is empty with no rides', () => {
+    expect(ridershipOf([])).toEqual([]);
   });
 });
 

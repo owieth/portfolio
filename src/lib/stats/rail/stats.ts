@@ -2,6 +2,7 @@ import type {
   RailCategoryProgress,
   RailLine,
   RailLineProgress,
+  RailLineRidership,
   RailRide,
   RailRideCoverage,
   RailRideLogEntry,
@@ -338,6 +339,41 @@ export function railTotals(
     complete: progress.filter(({ complete }) => complete).length,
     stations: stations.length,
   };
+}
+
+/**
+ * The touched lines, most ridden first. Every line counts towards the goal
+ * once, but the commute gets ridden every week, and this is where that shows.
+ * Counted off the coverage, so a ride the totals skipped is not counted here
+ * either. Ties go to the line further along, then by name.
+ */
+export function lineRidership(
+  progress: RailLineProgress[],
+  coverage: RailRideCoverage[],
+): RailLineRidership[] {
+  const rides = new Map<string, { rides: number; lastRiddenOn: string }>();
+
+  for (const { ride, line } of coverage) {
+    const entry = rides.get(line.id) ?? { rides: 0, lastRiddenOn: '' };
+
+    entry.rides += 1;
+    if (ride.riddenOn > entry.lastRiddenOn) entry.lastRiddenOn = ride.riddenOn;
+    rides.set(line.id, entry);
+  }
+
+  return progress
+    .flatMap((entry) => {
+      const ridden = rides.get(entry.line.id);
+
+      return ridden ? [{ ...entry, ...ridden }] : [];
+    })
+    .sort(
+      (x, y) =>
+        y.rides - x.rides ||
+        y.share - x.share ||
+        x.line.displayName.localeCompare(y.line.displayName) ||
+        x.line.id.localeCompare(y.line.id),
+    );
 }
 
 /**
