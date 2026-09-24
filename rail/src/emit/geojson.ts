@@ -43,7 +43,11 @@ export type FeatureProperties = {
 
 export type LineFeature = Feature<MultiLineString, FeatureProperties>;
 
-export type LineCollection = FeatureCollection<MultiLineString, FeatureProperties> & {
+/** Generic over the properties, so the slimmed web copy is written the same way. */
+export type LineCollection<Properties = FeatureProperties> = FeatureCollection<
+  MultiLineString,
+  Properties
+> & {
   attribution: Attribution;
 };
 
@@ -121,7 +125,7 @@ export function toCollection(
 }
 
 /** The collection as JSON, its header on the first line and one feature per line after it. */
-export function toGeoJson(collection: LineCollection): string {
+export function toGeoJson<Properties>(collection: LineCollection<Properties>): string {
   const header = JSON.stringify({
     type: collection.type,
     attribution: collection.attribution,
