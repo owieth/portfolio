@@ -17,12 +17,13 @@ import { CH_BOUNDS } from '@/lib/geo/ch';
 import { ensureMaplibreWorker } from '@/lib/maplibre/worker';
 import { flatStyle } from '@/lib/stats/maplibre/styles';
 import { mapLines, type RailMapLine } from '@/lib/stats/rail/map';
+import type { RailStretch } from '@/lib/stats/rail/stretch';
 import type { RailLineProgress, RailStation } from '@/lib/stats/rail/types';
 import { prefersReducedMotion } from '@/lib/wo-haere/motion';
 
 /**
  * The Swiss rail network on a flat map: every line with geometry in a muted
- * grey, the ones ridden in the accent, one dot per station gone through. The
+ * grey, what was ridden in the accent, one dot per station gone through. The
  * same family as `FlightGlobe` — no labels, one accent, and a tap names the
  * line below the map. The same line can be found by name in the combobox under
  * it, which is the way in for anyone without a pointer.
@@ -30,13 +31,20 @@ import { prefersReducedMotion } from '@/lib/wo-haere/motion';
  * The geometry is fetched by MapLibre from `public/rail/lines.geojson` rather
  * than passed as a prop, so a megabyte of coordinates stays out of the page's
  * RSC payload and out of the JS bundle.
+ *
+ * What was ridden comes two ways. A line ridden end to end is its own feature
+ * in that file, picked out by id. A stretch between two stops was cut out of
+ * the same file on the server by `rideStretches`, and arrives as a prop: only
+ * the track ridden, which is a few points per ride.
  */
 
 const LINES_SOURCE_ID = 'rail-lines';
 const STATIONS_SOURCE_ID = 'rail-stations';
+const STRETCHES_SOURCE_ID = 'rail-stretches';
 const LINES_HIT_LAYER_ID = 'rail-lines-hit';
 const LINES_LAYER_ID = 'rail-lines';
 const RIDDEN_LAYER_ID = 'rail-ridden';
+const STRETCHES_LAYER_ID = 'rail-stretched';
 const SELECTED_LAYER_ID = 'rail-selected';
 const STATIONS_LAYER_ID = 'rail-stations';
 
@@ -109,7 +117,10 @@ const selectedFilter = (id: string | null) =>
 const opacityFor = (selectedId: string | null) =>
   selectedId === null ? 1 : DIMMED;
 
-function sourcesFor(stations: RailStation[]): Record<string, MapSource> {
+function sourcesFor(
+  stations: RailStation[],
+  stretches: RailStretch[],
+): Record<string, MapSource> {
   const dots: Feature<Point>[] = stations.flatMap(({ didok, lat, lon }) =>
     lat === null || lon === null
       ? []
@@ -132,6 +143,10 @@ function sourcesFor(stations: RailStation[]): Record<string, MapSource> {
       type: 'geojson',
       data: { type: 'FeatureCollection', features: dots } as FeatureCollection,
     },
+    [STRETCHES_SOURCE_ID]: {
+      type: 'geojson',
+      data: { type: 'FeatureCollection', features: stretches },
+    },
   };
 }
 
@@ -142,7 +157,7 @@ function sourcesFor(stations: RailStation[]): Record<string, MapSource> {
  */
 function layersFor(
   scheme: Scheme,
-  riddenIds: string[],
+  wholeIds: string[],
   selectedId: string | null,
 ): MapLayer[] {
   const opacity = opacityFor(selectedId);
@@ -170,7 +185,18 @@ function layersFor(
       id: RIDDEN_LAYER_ID,
       type: 'line',
       source: LINES_SOURCE_ID,
-      filter: ['in', ['get', 'id'], ['literal', riddenIds]],
+      filter: ['in', ['get', 'id'], ['literal', wholeIds]],
+      layout: { 'line-cap': 'round', 'line-join': 'round' },
+      paint: {
+        'line-color': ACCENT,
+        'line-opacity': opacity,
+        'line-width': width(2, 4),
+      },
+    },
+    {
+      id: STRETCHES_LAYER_ID,
+      type: 'line',
+      source: STRETCHES_SOURCE_ID,
       layout: { 'line-cap': 'round', 'line-join': 'round' },
       paint: {
         'line-color': ACCENT,
@@ -214,6 +240,7 @@ function applySelection(map: MlMap, selectedId: string | null): void {
   map.setFilter(SELECTED_LAYER_ID, selectedFilter(selectedId));
   map.setPaintProperty(LINES_LAYER_ID, 'line-opacity', opacity);
   map.setPaintProperty(RIDDEN_LAYER_ID, 'line-opacity', opacity);
+  map.setPaintProperty(STRETCHES_LAYER_ID, 'line-opacity', opacity);
   map.setPaintProperty(STATIONS_LAYER_ID, 'circle-opacity', opacity);
   map.setPaintProperty(
     STATIONS_LAYER_ID,
@@ -225,9 +252,15 @@ function applySelection(map: MlMap, selectedId: string | null): void {
 export default function RailMap({
   progress,
   stations,
+  wholeIds,
+  stretches,
 }: {
   progress: RailLineProgress[];
   stations: RailStation[];
+  /** Lines ridden end to end, drawn whole. */
+  wholeIds: string[];
+  /** The track between the stops of every other ride. */
+  stretches: RailStretch[];
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MlMap | null>(null);
@@ -240,7 +273,10 @@ export default function RailMap({
     () => lines.filter(({ touched }) => touched).map(({ id }) => id),
     [lines],
   );
-  const sources = useMemo(() => sourcesFor(stations), [stations]);
+  const sources = useMemo(
+    () => sourcesFor(stations, stretches),
+    [stations, stretches],
+  );
   const [selectedId, setSelectedId] = useState<string | null>(null);
   // Read inside map handlers, which outlive the render that registered them.
   const selectedIdRef = useRef<string | null>(null);
@@ -256,7 +292,7 @@ export default function RailMap({
     // Read here and never during render, for the reason FlightGlobe gives.
     const dark = window.matchMedia('(prefers-color-scheme: dark)');
     const scheme = (): Scheme => (dark.matches ? 'dark' : 'light');
-    const layers = () => layersFor(scheme(), riddenIds, selectedIdRef.current);
+    const layers = () => layersFor(scheme(), wholeIds, selectedIdRef.current);
 
     /** Guarded for the reason `FlightGlobe.onStyleLoad` gives. */
     const onStyleLoad = () => {
@@ -356,7 +392,7 @@ export default function RailMap({
       map = null;
       mapRef.current = null;
     };
-  }, [sources, riddenIds, lineById]);
+  }, [sources, riddenIds, wholeIds, lineById]);
 
   useEffect(() => {
     selectedIdRef.current = selectedId;

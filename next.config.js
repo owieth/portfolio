@@ -22,6 +22,11 @@ const nextConfig = {
   experimental: {
     useTypeScriptCli: true,
   },
+  // `loadRailGeometry` reads the rail web geometry off the disk, and /stats
+  // revalidates hourly in a function that would otherwise ship without it.
+  outputFileTracingIncludes: {
+    '/stats': ['./public/rail/lines.geojson'],
+  },
   async headers() {
     return [
       {
