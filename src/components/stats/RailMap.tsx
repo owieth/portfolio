@@ -328,8 +328,9 @@ export default function RailMap({
         maxBounds: CH_ROOM,
         maxZoom: MAX_ZOOM,
         renderWorldCopies: false,
-        // Not `cooperativeGestures`, for the reason FlightGlobe gives.
-        scrollZoom: false,
+        // Scroll zoom stays on but only sees a wheel with a modifier held; see
+        // `onWheel`. Not `cooperativeGestures`, for the reason FlightGlobe
+        // gives.
         dragRotate: false,
         pitchWithRotate: false,
         touchPitch: false,
@@ -378,6 +379,20 @@ export default function RailMap({
       layers: [...next.layers, ...layers()],
     });
 
+    /**
+     * A plain wheel belongs to the page. Stopped here, on its way down to
+     * MapLibre's canvas container, it never zooms the map and still scrolls
+     * the page, since nothing cancels it. With ⌘ or Ctrl held, which is also
+     * how a trackpad pinch arrives, it goes through and zooms.
+     */
+    const onWheel = (event: WheelEvent) => {
+      if (!event.ctrlKey && !event.metaKey) event.stopPropagation();
+    };
+    container.addEventListener('wheel', onWheel, {
+      capture: true,
+      passive: true,
+    });
+
     const onThemeChange = () => {
       map?.setStyle(flatStyle(scheme()), { transformStyle });
     };
@@ -398,6 +413,7 @@ export default function RailMap({
 
     return () => {
       observer.disconnect();
+      container.removeEventListener('wheel', onWheel, { capture: true });
       dark.removeEventListener('change', onThemeChange);
       map?.remove();
       map = null;
