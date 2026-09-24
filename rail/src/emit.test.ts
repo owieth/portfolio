@@ -10,6 +10,7 @@ import {
   assertGeometry,
   assertReferences,
   emitArtifacts,
+  emitWebGeometry,
   LINE_STOPS_CSV,
   LINES_CSV,
   LINES_GEOJSON,
@@ -199,6 +200,58 @@ describe('emitArtifacts', () => {
     ).rejects.toThrow('IC1: expected fernverkehr:IC1');
     expect(await readdir(dir)).toEqual([]);
     expect(logged).toEqual([]);
+  });
+});
+
+describe('emitWebGeometry', () => {
+  async function emitWeb(): Promise<{ full: string; web: string }> {
+    const source = await outputDir();
+    const target = join(await outputDir(), 'public', 'rail');
+
+    await emitArtifacts({ lines: LINES, stations: STATIONS, attribution: ATTRIBUTION }, log, {
+      dir: source,
+    });
+    await emitWebGeometry(log, { source: join(source, LINES_GEOJSON), dir: target });
+
+    return {
+      full: await readFile(join(source, LINES_GEOJSON), 'utf8'),
+      web: await readFile(join(target, LINES_GEOJSON), 'utf8'),
+    };
+  }
+
+  it('writes the same lines as the full file, with only their id and category', async () => {
+    const { web } = await emitWeb();
+    const collection = JSON.parse(web) as {
+      features: { properties: Record<string, unknown> }[];
+    };
+
+    expect(collection.features.map(feature => feature.properties)).toEqual([
+      { id: EC.id, category: 'EC' },
+      { id: S12.id, category: 'S' },
+    ]);
+  });
+
+  it('carries the attribution over unchanged', async () => {
+    const { full, web } = await emitWeb();
+
+    expect((JSON.parse(web) as { attribution: unknown }).attribution).toEqual(
+      (JSON.parse(full) as { attribution: unknown }).attribution,
+    );
+  });
+
+  it('writes the same bytes twice', async () => {
+    const first = await emitWeb();
+    const second = await emitWeb();
+
+    expect(second.web).toBe(first.web);
+  });
+
+  it('logs the points it kept, the size and a fingerprint', async () => {
+    await emitWeb();
+
+    expect(logged.at(-1)).toMatch(
+      /^wrote the map's lines\.geojson: 2 line shapes simplified at 30 m from \d+ to \d+ points, \d+\.\d{2} MB or \d+\.\d{2} MB gzipped — fingerprint [0-9a-f]{16}$/,
+    );
   });
 });
 

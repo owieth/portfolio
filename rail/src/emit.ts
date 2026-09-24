@@ -1,6 +1,6 @@
 /**
  * Step sixteen: write `lines.csv`, `line_stops.csv`, `lines.json` and
- * `lines.geojson`.
+ * `lines.geojson`, then the map's slim copy of the last in `public/rail/`.
  *
  * These are the artifacts everything after the pipeline reads: #489 seeds
  * `rail_lines` and `rail_line_stops` from the two CSVs, and the December diff
@@ -22,8 +22,9 @@
  */
 
 import { createHash } from 'node:crypto';
-import { writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import { gzipSync } from 'node:zlib';
 
 import { Ajv2020 } from 'ajv/dist/2020.js';
 
@@ -38,9 +39,12 @@ import {
   toRecord,
 } from './emit/rows.ts';
 import type { LineRecord } from './emit/rows.ts';
+import { WEB_TOLERANCE_M } from './emit/simplify.ts';
+import { assertWebCollection, toWebCollection } from './emit/web.ts';
+import type { SourceCollection } from './emit/web.ts';
 import { compare } from './merge/key.ts';
 import type { Attribution } from './overpass/attribution.ts';
-import { RAIL_DIR } from './paths.ts';
+import { PUBLIC_RAIL_DIR, RAIL_DIR } from './paths.ts';
 import type { Station } from './stations.ts';
 import type { TerminiLine } from './termini.ts';
 
@@ -248,4 +252,66 @@ export async function emitArtifacts(
   );
 
   return { lines: records.length, stops, features, fingerprints };
+}
+
+export interface WebOptions {
+  /** The full `lines.geojson` to read. The one at the top of `rail/` unless a test says otherwise. */
+  source?: string;
+  /** Where the web copy goes. `public/rail/` unless a test says otherwise. */
+  dir?: string;
+}
+
+export interface EmittedWeb {
+  features: number;
+  points: number;
+  /** Bytes as written, and as a browser would download them gzipped. */
+  bytes: number;
+  gzipped: number;
+  fingerprint: string;
+}
+
+interface Drawn {
+  features: readonly { geometry: { coordinates: readonly (readonly unknown[])[] } }[];
+}
+
+function pointsIn(collection: Drawn): number {
+  return collection.features.reduce(
+    (sum, feature) =>
+      sum + feature.geometry.coordinates.reduce((parts, part) => parts + part.length, 0),
+    0,
+  );
+}
+
+function megabytes(bytes: number): string {
+  return `${(bytes / 1_000_000).toFixed(2)} MB`;
+}
+
+/**
+ * The map's copy of `lines.geojson`, read back from the file `emitArtifacts`
+ * just wrote, so it is derived from exactly the committed geometry and can be
+ * rebuilt without the feed. Checked before it is written, like the four files.
+ */
+export async function emitWebGeometry(
+  log: Log,
+  { source = join(RAIL_DIR, LINES_GEOJSON), dir = PUBLIC_RAIL_DIR }: WebOptions = {},
+): Promise<EmittedWeb> {
+  const full = JSON.parse(await readFile(source, 'utf8')) as SourceCollection;
+  const web = toWebCollection(full, WEB_TOLERANCE_M);
+
+  assertWebCollection(full, web);
+
+  const contents = toGeoJson(web);
+  const bytes = Buffer.byteLength(contents, 'utf8');
+  const gzipped = gzipSync(contents).length;
+  const points = pointsIn(web);
+  const fingerprint = fingerprintOf(contents);
+
+  await mkdir(dir, { recursive: true });
+  await writeFile(join(dir, LINES_GEOJSON), contents, 'utf8');
+
+  log(
+    `wrote the map's ${LINES_GEOJSON}: ${count(web.features.length)} line shapes simplified at ${WEB_TOLERANCE_M} m from ${count(pointsIn(full))} to ${count(points)} points, ${megabytes(bytes)} or ${megabytes(gzipped)} gzipped — fingerprint ${fingerprint}`,
+  );
+
+  return { features: web.features.length, points, bytes, gzipped, fingerprint };
 }
