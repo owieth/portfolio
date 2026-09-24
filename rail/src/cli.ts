@@ -1,7 +1,8 @@
 /**
  * Regenerates every committed artifact in this directory — `lines.csv`,
  * `line_stops.csv`, `lines.json`, `lines.geojson` and `REPORT.md` — from the
- * published Swiss timetable feed and OpenStreetMap geometry.
+ * published Swiss timetable feed and OpenStreetMap geometry, and the map's slim
+ * copy of the geometry in `public/rail/lines.geojson`.
  *
  * The step order lives here rather than in a build tool because the steps share
  * one DuckDB connection and a lot of intermediate state, which file-level build
@@ -32,7 +33,7 @@ import { expandCalendar } from './calendar.ts';
 import { writeSeed } from './dbseed.ts';
 import { diffArtifacts } from './diff.ts';
 import { DIFF_FLAGS, parseDiffOptions } from './diff/options.ts';
-import { emitArtifacts } from './emit.ts';
+import { emitArtifacts, emitWebGeometry } from './emit.ts';
 import { fetchFeed } from './fetch.ts';
 import { FETCH_FLAGS, parseFetchOptions } from './fetch/options.ts';
 import type { FetchOptions, FlagValue } from './fetch/options.ts';
@@ -68,7 +69,8 @@ const USAGE = `usage: pnpm build:data [--year <year>] [--source opentransportdat
        pnpm seed:data
        pnpm reconcile:data [--apply] [--dir <path>]
 
-  build      regenerate lines.csv, line_stops.csv, lines.json, lines.geojson and REPORT.md
+  build      regenerate lines.csv, line_stops.csv, lines.json, lines.geojson and REPORT.md,
+             and the map's public/rail/lines.geojson
   diff       compare the generated lines.csv and line_stops.csv against the committed ones
   recon      profile the feed into RECON.md, before anything models it
   seed       write supabase/seeds/rail.sql from the committed lines.csv and line_stops.csv
@@ -202,6 +204,8 @@ function build(values: Record<string, FlagValue>): Promise<number> {
       log,
       { verify: assertSpotChecks },
     );
+    // Reads back the lines.geojson just written, so it only runs once that passed.
+    await emitWebGeometry(log);
     // After the emit, so a build whose checks failed leaves the committed report
     // as it was, next to the files it describes.
     await writeReport(

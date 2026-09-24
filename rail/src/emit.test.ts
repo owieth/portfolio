@@ -10,6 +10,7 @@ import {
   assertGeometry,
   assertReferences,
   emitArtifacts,
+  emitWebGeometry,
   LINE_STOPS_CSV,
   LINES_CSV,
   LINES_GEOJSON,
@@ -18,6 +19,7 @@ import {
 } from './emit.ts';
 import { ATTRIBUTION, EC, GELMERBAHN, S12, STATIONS } from './emit/fixtures.ts';
 import type { LineRecord } from './emit/rows.ts';
+import { PUBLIC_RAIL_DIR } from './paths.ts';
 import type { TerminiLine } from './termini.ts';
 
 const LINES: TerminiLine[] = [S12, GELMERBAHN, EC];
@@ -199,6 +201,70 @@ describe('emitArtifacts', () => {
     ).rejects.toThrow('IC1: expected fernverkehr:IC1');
     expect(await readdir(dir)).toEqual([]);
     expect(logged).toEqual([]);
+  });
+});
+
+describe('emitWebGeometry', () => {
+  async function emitWeb(): Promise<{ full: string; web: string }> {
+    const source = await outputDir();
+    const target = join(await outputDir(), 'public', 'rail');
+
+    await emitArtifacts({ lines: LINES, stations: STATIONS, attribution: ATTRIBUTION }, log, {
+      dir: source,
+    });
+    await emitWebGeometry(log, { source: join(source, LINES_GEOJSON), dir: target });
+
+    return {
+      full: await readFile(join(source, LINES_GEOJSON), 'utf8'),
+      web: await readFile(join(target, LINES_GEOJSON), 'utf8'),
+    };
+  }
+
+  it('writes the same lines as the full file, with only their id and category', async () => {
+    const { web } = await emitWeb();
+    const collection = JSON.parse(web) as {
+      features: { properties: Record<string, unknown> }[];
+    };
+
+    expect(collection.features.map(feature => feature.properties)).toEqual([
+      { id: EC.id, category: 'EC' },
+      { id: S12.id, category: 'S' },
+    ]);
+  });
+
+  it('carries the attribution over unchanged', async () => {
+    const { full, web } = await emitWeb();
+
+    expect((JSON.parse(web) as { attribution: unknown }).attribution).toEqual(
+      (JSON.parse(full) as { attribution: unknown }).attribution,
+    );
+  });
+
+  it('writes the same bytes twice', async () => {
+    const first = await emitWeb();
+    const second = await emitWeb();
+
+    expect(second.web).toBe(first.web);
+  });
+
+  it('logs the points it kept, the size and a fingerprint', async () => {
+    await emitWeb();
+
+    expect(logged.at(-1)).toMatch(
+      /^wrote the map's lines\.geojson: 2 line shapes simplified at 30 m from \d+ to \d+ points, \d+\.\d{2} MB or \d+\.\d{2} MB gzipped — fingerprint [0-9a-f]{16}$/,
+    );
+  });
+});
+
+describe(`the committed public/rail/${LINES_GEOJSON}`, () => {
+  it('is what the web emit writes from the committed lines.geojson, at about a megabyte', async () => {
+    const dir = await outputDir();
+    const { bytes } = await emitWebGeometry(log, { dir });
+
+    expect(await readFile(join(dir, LINES_GEOJSON), 'utf8')).toBe(
+      await readFile(join(PUBLIC_RAIL_DIR, LINES_GEOJSON), 'utf8'),
+    );
+    expect(bytes).toBeLessThan(1_100_000);
   });
 });
 
