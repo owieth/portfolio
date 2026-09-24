@@ -101,24 +101,7 @@ const Page = ({ children }: { children: React.ReactNode }) => (
   </div>
 );
 
-export default async function StatsPage() {
-  const { flights } = await loadFlights();
-  const legs = toLegs(flights);
-
-  // Covers all three failure shapes at once — Supabase unconfigured, the read
-  // failed, or the table is empty — because the page renders the same thing for
-  // each. A preview deploy without env vars is the everyday case.
-  if (legs.length === 0) {
-    return (
-      <Page>
-        <P>No flights logged yet.</P>
-        <div className="mt-6">
-          <CustomLink link="/">Back home</CustomLink>
-        </div>
-      </Page>
-    );
-  }
-
+const Flights = ({ legs }: { legs: FlightLeg[] }) => {
   const totals = flightTotals(legs);
   const routes = rankRoutes(legs);
   const airlines = rankAirlines(legs);
@@ -137,12 +120,7 @@ export default async function StatsPage() {
   const typed = manufacturers.reduce((sum, { flights }) => sum + flights, 0);
 
   return (
-    <Page>
-      <p className="text-muted mt-4 text-pretty">
-        Every flight I have taken, the routes I keep repeating, and how far it
-        all adds up to.
-      </p>
-
+    <>
       <FlightGlobe legs={legs} />
       <CountryFlags legs={legs} />
 
@@ -305,6 +283,36 @@ export default async function StatsPage() {
           }))}
         />
       </Section>
+    </>
+  );
+};
+
+export default async function StatsPage() {
+  const { flights } = await loadFlights();
+  const legs = toLegs(flights);
+
+  // Covers all three failure shapes at once — Supabase unconfigured, the read
+  // failed, or the table is empty — because the page renders the same thing for
+  // each. A preview deploy without env vars is the everyday case.
+  if (legs.length === 0) {
+    return (
+      <Page>
+        <P>No flights logged yet.</P>
+        <div className="mt-6">
+          <CustomLink link="/">Back home</CustomLink>
+        </div>
+      </Page>
+    );
+  }
+
+  return (
+    <Page>
+      <p className="text-muted mt-4 text-pretty">
+        Every flight I have taken, the routes I keep repeating, and how far it
+        all adds up to.
+      </p>
+
+      <Flights legs={legs} />
     </Page>
   );
 }
