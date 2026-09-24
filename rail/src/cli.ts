@@ -32,7 +32,7 @@ import { expandCalendar } from './calendar.ts';
 import { writeSeed } from './dbseed.ts';
 import { diffArtifacts } from './diff.ts';
 import { DIFF_FLAGS, parseDiffOptions } from './diff/options.ts';
-import { emitArtifacts } from './emit.ts';
+import { emitArtifacts, emitWebGeometry } from './emit.ts';
 import { fetchFeed } from './fetch.ts';
 import { FETCH_FLAGS, parseFetchOptions } from './fetch/options.ts';
 import type { FetchOptions, FlagValue } from './fetch/options.ts';
@@ -202,6 +202,8 @@ function build(values: Record<string, FlagValue>): Promise<number> {
       log,
       { verify: assertSpotChecks },
     );
+    // Reads back the lines.geojson just written, so it only runs once that passed.
+    await emitWebGeometry(log);
     // After the emit, so a build whose checks failed leaves the committed report
     // as it was, next to the files it describes.
     await writeReport(
