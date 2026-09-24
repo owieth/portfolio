@@ -165,7 +165,11 @@ const Rail = ({
             hint={`of ${formatCount(totals.lines)}`}
           />
           <Stat label="Stations" value={formatCount(totals.stations)} />
-          <Stat label="Coverage" value={shareOf(coveredCount, stopCount)} />
+          <Stat
+            label="Coverage"
+            value={shareOf(coveredCount, stopCount)}
+            hint={`${formatCount(coveredCount)} of ${formatCount(stopCount)} stops`}
+          />
         </dl>
       </Section>
 
