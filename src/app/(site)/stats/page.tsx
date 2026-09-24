@@ -162,6 +162,24 @@ const Rail = ({
           <Stat label="Coverage" value={shareOf(coveredCount, stopCount)} />
         </dl>
       </Section>
+
+      <Section title="By category">
+        <Table
+          head={['Category', 'Lines', 'Touched', 'Complete', 'Coverage']}
+          rows={categories.map(
+            ({ category, lines, touched, complete, stops, covered }) => ({
+              id: category,
+              cells: [
+                category,
+                lines,
+                touched,
+                complete,
+                shareOf(covered, stops),
+              ],
+            }),
+          )}
+        />
+      </Section>
     </>
   );
 };
