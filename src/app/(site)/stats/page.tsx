@@ -409,8 +409,8 @@ export default async function StatsPage() {
   return (
     <Page>
       <p className="text-muted mt-4 text-pretty">
-        Every flight I have taken, the routes I keep repeating, and how far it
-        all adds up to.
+        Every flight I have taken and every Swiss train line I have ridden, the
+        routes I keep repeating, and how far it all adds up to.
       </p>
 
       {/*
