@@ -40,7 +40,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Stats',
   description:
-    'Every flight Olivier Winkler has taken — the totals, the routes he keeps repeating, and the log itself.',
+    'Every flight Olivier Winkler has taken and every Swiss train line he has ridden — the totals, the routes he keeps repeating, and the logs themselves.',
   alternates: {
     canonical: '/stats',
   },
