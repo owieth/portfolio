@@ -7,7 +7,11 @@ import HaulMix from '@/components/stats/HaulMix';
 import RailMap from '@/components/stats/RailMap';
 import { aircraft as aircraftType } from '@/lib/stats/flights/aircraft';
 import { airline } from '@/lib/stats/flights/airlines';
-import { formatDistanceKm, formatDuration } from '@/lib/stats/flights/format';
+import {
+  formatCount,
+  formatDistanceKm,
+  formatDuration,
+} from '@/lib/stats/flights/format';
 import { EARTH_CIRCUMFERENCE_KM } from '@/lib/stats/flights/geo';
 import { loadFlights } from '@/lib/stats/flights/query';
 import {
@@ -153,14 +157,14 @@ const Rail = ({
           <Stat
             label="Lines touched"
             value={String(totals.touched)}
-            hint={`of ${totals.lines}`}
+            hint={`of ${formatCount(totals.lines)}`}
           />
           <Stat
             label="Lines complete"
             value={String(totals.complete)}
-            hint={`of ${totals.lines}`}
+            hint={`of ${formatCount(totals.lines)}`}
           />
-          <Stat label="Stations" value={String(totals.stations)} />
+          <Stat label="Stations" value={formatCount(totals.stations)} />
           <Stat label="Coverage" value={shareOf(coveredCount, stopCount)} />
         </dl>
       </Section>
