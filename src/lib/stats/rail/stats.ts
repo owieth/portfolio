@@ -4,6 +4,7 @@ import type {
   RailLineProgress,
   RailRide,
   RailRideCoverage,
+  RailRideLogEntry,
   RailStation,
   RailStop,
   RailTotals,
@@ -337,4 +338,35 @@ export function railTotals(
     complete: progress.filter(({ complete }) => complete).length,
     stations: stations.length,
   };
+}
+
+/**
+ * Resolved rides with their stops named, in the order they came in, so newest
+ * first off `loadRail`. Off the coverage rather than the rides, so a ride the
+ * totals skipped is not in the log either.
+ *
+ * A Didok number listed twice on a line names the first stop to list it, the
+ * same one `toCoverage` walks from.
+ */
+export function rideLog(
+  coverage: RailRideCoverage[],
+  stops: RailStop[],
+): RailRideLogEntry[] {
+  const names = new Map<string, string>();
+
+  for (const { lineId, didok, stopName } of stops) {
+    const key = `${lineId} ${didok}`;
+
+    if (didok !== null && !names.has(key)) names.set(key, stopName);
+  }
+
+  const nameOf = (lineId: string, didok: string | null) =>
+    didok === null ? null : (names.get(`${lineId} ${didok}`) ?? didok);
+
+  return coverage.map(({ ride, line }) => ({
+    ride,
+    line,
+    from: nameOf(line.id, ride.fromDidok),
+    to: nameOf(line.id, ride.toDidok),
+  }));
 }

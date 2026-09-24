@@ -4,6 +4,7 @@ import {
   categoryProgress,
   lineProgress,
   railTotals,
+  rideLog,
   stationsVisited,
   toCoverage,
 } from '@/lib/stats/rail/stats';
@@ -375,5 +376,52 @@ describe('categoryProgress and railTotals', () => {
       touched: totals.touched,
       complete: totals.complete,
     });
+  });
+});
+
+describe('rideLog', () => {
+  const logOf = (rides: RailRide[]) =>
+    rideLog(toCoverage(LINES, STOPS, rides), STOPS);
+
+  it('names the stops a segment ran between, in the direction it ran', () => {
+    const [entry] = logOf([ride(S1.id, '8500005', '8500002')]);
+
+    expect(entry).toMatchObject({
+      line: S1,
+      from: 'Stop 8500005',
+      to: 'Stop 8500002',
+    });
+  });
+
+  it('names no stops for a whole-line ride', () => {
+    const [entry] = logOf([ride(IR1.id)]);
+
+    expect(entry).toMatchObject({ line: IR1, from: null, to: null });
+  });
+
+  it('names a shared station after the line the ride was on', () => {
+    const renamed = STOPS.map((s) =>
+      s.lineId === IR1.id && s.didok === '8500004'
+        ? { ...s, stopName: 'On the IR1' }
+        : s,
+    );
+    const rides = [ride(IR1.id, '8500004', '8500020')];
+    const [entry] = rideLog(toCoverage(LINES, renamed, rides), renamed);
+
+    expect(entry.from).toBe('On the IR1');
+  });
+
+  it('leaves out a skipped ride', () => {
+    const log = logOf([ride('test:S99'), ride(IR1.id)]);
+
+    expect(log.map(({ line }) => line.id)).toEqual([IR1.id]);
+  });
+
+  it('keeps the order the rides came in', () => {
+    const rides = [ride(IR1.id), ride(S1.id), ride(FUN1.id)];
+
+    expect(logOf(rides).map(({ ride: { id } }) => id)).toEqual(
+      rides.map(({ id }) => id),
+    );
   });
 });
