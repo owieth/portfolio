@@ -88,6 +88,17 @@ export interface RailRideCoverage {
   sequences: number[];
 }
 
+/**
+ * A ride as the log prints it: where it got on and off, by name, in the
+ * direction it ran. Both null for a whole-line ride.
+ */
+export interface RailRideLogEntry {
+  ride: RailRide;
+  line: RailLine;
+  from: string | null;
+  to: string | null;
+}
+
 export interface RailLineProgress {
   line: RailLine;
   stops: number;

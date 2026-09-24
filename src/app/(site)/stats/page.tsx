@@ -4,9 +4,14 @@ import AirlineChip from '@/components/stats/AirlineChip';
 import CountryFlags from '@/components/stats/CountryFlags';
 import FlightGlobe from '@/components/stats/FlightGlobe';
 import HaulMix from '@/components/stats/HaulMix';
+import RailMap from '@/components/stats/RailMap';
 import { aircraft as aircraftType } from '@/lib/stats/flights/aircraft';
 import { airline } from '@/lib/stats/flights/airlines';
-import { formatDistanceKm, formatDuration } from '@/lib/stats/flights/format';
+import {
+  formatCount,
+  formatDistanceKm,
+  formatDuration,
+} from '@/lib/stats/flights/format';
 import { EARTH_CIRCUMFERENCE_KM } from '@/lib/stats/flights/geo';
 import { loadFlights } from '@/lib/stats/flights/query';
 import {
@@ -19,19 +24,30 @@ import {
   toLegs,
 } from '@/lib/stats/flights/stats';
 import type { FlightLeg } from '@/lib/stats/flights/types';
+import { formatShare } from '@/lib/stats/rail/format';
+import { loadRail } from '@/lib/stats/rail/query';
+import {
+  categoryProgress,
+  lineProgress,
+  railTotals,
+  rideLog,
+  stationsVisited,
+  toCoverage,
+} from '@/lib/stats/rail/stats';
+import type { RailLine, RailRide, RailStop } from '@/lib/stats/rail/types';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Stats',
   description:
-    'Every flight Olivier Winkler has taken — the totals, the routes he keeps repeating, and the log itself.',
+    'Every flight Olivier Winkler has taken and every Swiss train line he has ridden — the totals, the routes he keeps repeating, and the logs themselves.',
   alternates: {
     canonical: '/stats',
   },
 };
 
 /**
- * `flown_on` is a Postgres `date`: no time and no zone. `new Date('2017-07-14')`
+ * `flown_on` and `ridden_on` are Postgres `date`s: no time and no zone. `new Date('2017-07-14')`
  * parses as midnight UTC but formats in the runtime's own zone, which renders
  * the previous day anywhere west of it — and this page is prerendered, so the
  * wrong day would be baked into the HTML by whichever machine ran the build.
@@ -47,8 +63,7 @@ const DATE = new Intl.DateTimeFormat('en-GB', {
   timeZone: 'UTC',
 });
 
-const formatFlownOn = (flownOn: string) =>
-  DATE.format(new Date(`${flownOn}T00:00:00Z`));
+const formatDay = (day: string) => DATE.format(new Date(`${day}T00:00:00Z`));
 
 const Stat = ({
   label,
@@ -102,24 +117,106 @@ const Page = ({ children }: { children: React.ReactNode }) => (
   </div>
 );
 
-export default async function StatsPage() {
-  const { flights } = await loadFlights();
-  const legs = toLegs(flights);
+const shareOf = (covered: number, stops: number) =>
+  stops === 0 ? '—' : formatShare(covered / stops);
 
-  // Covers all three failure shapes at once — Supabase unconfigured, the read
-  // failed, or the table is empty — because the page renders the same thing for
-  // each. A preview deploy without env vars is the everyday case.
-  if (legs.length === 0) {
-    return (
-      <Page>
-        <P>No flights logged yet.</P>
-        <div className="mt-6">
-          <CustomLink link="/">Back home</CustomLink>
-        </div>
-      </Page>
-    );
-  }
+const Rail = ({
+  lines,
+  stops,
+  rides,
+}: {
+  lines: RailLine[];
+  stops: RailStop[];
+  rides: RailRide[];
+}) => {
+  const coverage = toCoverage(lines, stops, rides);
+  const progress = lineProgress(lines, stops, coverage);
+  const stations = stationsVisited(stops, coverage);
+  const categories = categoryProgress(progress);
+  const totals = railTotals(progress, stations);
+  const log = rideLog(coverage, stops);
+  // Over the categories rather than `stops`, so the share counts what the
+  // tables count: a stop on a line the data does not know is on no line.
+  const stopCount = categories.reduce((sum, { stops }) => sum + stops, 0);
+  const coveredCount = categories.reduce(
+    (sum, { covered }) => sum + covered,
+    0,
+  );
 
+  return (
+    <>
+      <Section title="Rail">
+        <P>
+          Every Swiss train line, from the InterCity down to the funicular. A
+          line is touched after any ride on it and complete once every one of
+          its stops has been ridden through. Coverage is the share of all those
+          stops.
+        </P>
+        <RailMap progress={progress} stations={stations} />
+        <dl className="grid grid-cols-2 gap-x-8 gap-y-6 sm:grid-cols-4">
+          <Stat
+            label="Lines touched"
+            value={String(totals.touched)}
+            hint={`of ${formatCount(totals.lines)}`}
+          />
+          <Stat
+            label="Lines complete"
+            value={String(totals.complete)}
+            hint={`of ${formatCount(totals.lines)}`}
+          />
+          <Stat label="Stations" value={formatCount(totals.stations)} />
+          <Stat
+            label="Coverage"
+            value={shareOf(coveredCount, stopCount)}
+            hint={`${formatCount(coveredCount)} of ${formatCount(stopCount)} stops`}
+          />
+        </dl>
+      </Section>
+
+      <Section title="By category">
+        <Table
+          head={['Category', 'Lines', 'Touched', 'Complete', 'Coverage']}
+          rows={categories.map(
+            ({ category, lines, touched, complete, stops, covered }) => ({
+              id: category,
+              cells: [
+                category,
+                lines,
+                touched,
+                complete,
+                shareOf(covered, stops),
+              ],
+            }),
+          )}
+        />
+      </Section>
+
+      <Section title="Ride log">
+        {log.length > 0 ? (
+          <Table
+            head={['Date', 'Line', 'Stretch']}
+            rows={log.map(({ ride, line, from, to }) => ({
+              id: ride.id,
+              cells: [
+                formatDay(ride.riddenOn),
+                <Named
+                  key="line"
+                  code={line.displayName}
+                  name={`${line.terminalA} – ${line.terminalB}`}
+                />,
+                from && to ? `${from} → ${to}` : 'Whole line',
+              ],
+            }))}
+          />
+        ) : (
+          <P>No rides logged yet.</P>
+        )}
+      </Section>
+    </>
+  );
+};
+
+const Flights = ({ legs }: { legs: FlightLeg[] }) => {
   const totals = flightTotals(legs);
   const routes = rankRoutes(legs);
   const airlines = rankAirlines(legs);
@@ -138,12 +235,7 @@ export default async function StatsPage() {
   const typed = manufacturers.reduce((sum, { flights }) => sum + flights, 0);
 
   return (
-    <Page>
-      <p className="text-muted mt-4 text-pretty">
-        Every flight I have taken, the routes I keep repeating, and how far it
-        all adds up to.
-      </p>
-
+    <>
       <FlightGlobe legs={legs} />
       <CountryFlags legs={legs} />
 
@@ -285,7 +377,7 @@ export default async function StatsPage() {
           rows={legs.map(({ flight, from, to }) => ({
             id: flight.id,
             cells: [
-              formatFlownOn(flight.flownOn),
+              formatDay(flight.flownOn),
               `${from.iata} → ${to.iata}`,
               <Named
                 key="flight"
@@ -306,6 +398,48 @@ export default async function StatsPage() {
           }))}
         />
       </Section>
+    </>
+  );
+};
+
+export default async function StatsPage() {
+  const [{ flights }, rail] = await Promise.all([loadFlights(), loadRail()]);
+  const legs = toLegs(flights);
+
+  return (
+    <Page>
+      <p className="text-muted mt-4 text-pretty">
+        Every flight I have taken and every Swiss train line I have ridden, the
+        routes I keep repeating, and how far it all adds up to.
+      </p>
+
+      {/*
+        Each empty state covers all three failure shapes at once — Supabase
+        unconfigured, the read failed, or the table is empty — because the page
+        renders the same thing for each. A preview deploy without env vars is
+        the everyday case. Neither section hides the other.
+      */}
+      {legs.length > 0 ? (
+        <Flights legs={legs} />
+      ) : (
+        <div className="mt-6">
+          <P>No flights logged yet.</P>
+        </div>
+      )}
+
+      {rail.lines.length > 0 ? (
+        <Rail lines={rail.lines} stops={rail.stops} rides={rail.rides} />
+      ) : (
+        <Section title="Rail">
+          <P>No rail lines loaded yet.</P>
+        </Section>
+      )}
+
+      {legs.length === 0 && rail.lines.length === 0 && (
+        <div className="mt-6">
+          <CustomLink link="/">Back home</CustomLink>
+        </div>
+      )}
     </Page>
   );
 }

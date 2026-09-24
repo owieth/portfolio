@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { formatDistanceKm, formatDuration } from '@/lib/stats/flights/format';
+import {
+  formatCount,
+  formatDistanceKm,
+  formatDuration,
+} from '@/lib/stats/flights/format';
 
 describe('formatDuration', () => {
   it('formats the boundaries', () => {
@@ -63,5 +67,16 @@ describe('formatDistanceKm', () => {
   it('leaves small numbers ungrouped', () => {
     expect(formatDistanceKm(0)).toBe('0 km');
     expect(formatDistanceKm(856.5)).toBe('857 km');
+  });
+});
+
+describe('formatCount', () => {
+  it('groups thousands with the pinned separator', () => {
+    expect(formatCount(6081)).toBe('6’081');
+  });
+
+  it('leaves small numbers ungrouped', () => {
+    expect(formatCount(0)).toBe('0');
+    expect(formatCount(532)).toBe('532');
   });
 });

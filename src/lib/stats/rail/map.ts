@@ -1,3 +1,4 @@
+import { formatShare } from '@/lib/stats/rail/format';
 import type { RailLineProgress } from '@/lib/stats/rail/types';
 
 /**
@@ -21,18 +22,12 @@ export interface RailMapLine {
  */
 const COLLATOR = new Intl.Collator('de-CH', { numeric: true });
 
-/**
- * Floored rather than rounded, so 100% only ever means every stop: a line with
- * one stop left out of 300 would otherwise read as done.
- */
-const percent = (share: number) => `${Math.floor(share * 100)}%`;
-
 /** A line with no stops can still be ridden, but has nothing to count. */
 function detailOf({ touched, covered, stops, share }: RailLineProgress) {
   if (!touched) return 'Not ridden yet';
   if (stops === 0) return 'Ridden';
 
-  return `${covered} of ${stops} ${stops === 1 ? 'stop' : 'stops'} · ${percent(share)}`;
+  return `${covered} of ${stops} ${stops === 1 ? 'stop' : 'stops'} · ${formatShare(share)}`;
 }
 
 /**
