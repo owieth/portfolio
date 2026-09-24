@@ -73,10 +73,12 @@ export type Database = {
       rail_line_stops: {
         Row: {
           didok: string | null;
+          edited_fields: string[];
           junction: string | null;
           lat: number | null;
           line_id: string;
           lon: number | null;
+          missing_since: string | null;
           sequence: number;
           sloid: string | null;
           stop_name: string;
@@ -84,10 +86,12 @@ export type Database = {
         };
         Insert: {
           didok?: string | null;
+          edited_fields?: string[];
           junction?: string | null;
           lat?: number | null;
           line_id: string;
           lon?: number | null;
+          missing_since?: string | null;
           sequence: number;
           sloid?: string | null;
           stop_name: string;
@@ -95,10 +99,12 @@ export type Database = {
         };
         Update: {
           didok?: string | null;
+          edited_fields?: string[];
           junction?: string | null;
           lat?: number | null;
           line_id?: string;
           lon?: number | null;
+          missing_since?: string | null;
           sequence?: number;
           sloid?: string | null;
           stop_name?: string;
@@ -119,8 +125,10 @@ export type Database = {
           category: string;
           created_at: string;
           display_name: string;
+          edited_fields: string[];
           has_geometry: boolean;
           id: string;
+          missing_since: string | null;
           network_region: string;
           operators: string[];
           route_ids: string[];
@@ -135,8 +143,10 @@ export type Database = {
           category: string;
           created_at?: string;
           display_name: string;
+          edited_fields?: string[];
           has_geometry: boolean;
           id: string;
+          missing_since?: string | null;
           network_region: string;
           operators: string[];
           route_ids?: string[];
@@ -151,8 +161,10 @@ export type Database = {
           category?: string;
           created_at?: string;
           display_name?: string;
+          edited_fields?: string[];
           has_geometry?: boolean;
           id?: string;
+          missing_since?: string | null;
           network_region?: string;
           operators?: string[];
           route_ids?: string[];
