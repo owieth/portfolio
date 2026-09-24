@@ -39,11 +39,7 @@ export function formatCount(count: number): string {
 
 /** Whole kilometres — a great-circle estimate does not earn a decimal. */
 export function formatDistanceKm(km: number): string {
-  const grouped = KM.formatToParts(Math.round(km))
-    .map(part => (part.type === 'group' ? GROUP_SEPARATOR : part.value))
-    .join('');
-
-  return `${grouped} km`;
+  return `${formatCount(km)} km`;
 }
 
 /**
