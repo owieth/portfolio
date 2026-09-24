@@ -1,7 +1,7 @@
 import type { StyleSpecification } from 'maplibre-gl';
 
 /**
- * The globe's basemap: land, water, country outlines. No labels.
+ * The stats page's basemaps: land, water, country outlines. No labels.
  *
  * OpenFreeMap's `positron` and `dark` would do the job, but a third of their
  * layers are `symbol` layers, and a globe at zoom 1.5 covered in place names
@@ -14,10 +14,14 @@ import type { StyleSpecification } from 'maplibre-gl';
  * filters are lifted from those two styles so the globe still belongs to the
  * same family as the map wo häre? uses.
  *
+ * The same three layers come in two projections: a globe for the flights and
+ * a flat Mercator map for the rail network, which covers one small country and
+ * would only bulge on a sphere.
+ *
  * `projection` is declared here rather than set on `style.load`. It means the
- * map is a globe from its first frame, and — because both schemes declare it —
- * a `setStyle` diff never emits the `setProjection(undefined)` that would
- * flatten it.
+ * map has its projection from its first frame, and — because both schemes
+ * declare it — a `setStyle` diff never emits the `setProjection(undefined)`
+ * that would reset it.
  */
 
 /** Same host as the `liberty` style wo häre? uses, so the CSP is unchanged. */
@@ -25,13 +29,15 @@ const OPENMAPTILES_URL = 'https://tiles.openfreemap.org/planet';
 
 const SOURCE_ID = 'openmaptiles';
 
+type Scheme = 'light' | 'dark';
+
 interface Palette {
   land: string;
   water: string;
   boundary: string;
 }
 
-const PALETTE: Record<'light' | 'dark', Palette> = {
+const PALETTE: Record<Scheme, Palette> = {
   light: {
     land: 'rgb(242, 243, 240)',
     water: 'rgb(194, 200, 202)',
@@ -44,12 +50,15 @@ const PALETTE: Record<'light' | 'dark', Palette> = {
   },
 };
 
-export function globeStyle(scheme: 'light' | 'dark'): StyleSpecification {
+function basemap(
+  scheme: Scheme,
+  projection: 'globe' | 'mercator',
+): StyleSpecification {
   const palette = PALETTE[scheme];
 
   return {
     version: 8,
-    projection: { type: 'globe' },
+    projection: { type: projection },
     sources: {
       [SOURCE_ID]: { type: 'vector', url: OPENMAPTILES_URL },
     },
@@ -102,3 +111,9 @@ export function globeStyle(scheme: 'light' | 'dark'): StyleSpecification {
     ],
   };
 }
+
+export const globeStyle = (scheme: Scheme): StyleSpecification =>
+  basemap(scheme, 'globe');
+
+export const flatStyle = (scheme: Scheme): StyleSpecification =>
+  basemap(scheme, 'mercator');
