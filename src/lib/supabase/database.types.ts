@@ -177,6 +177,41 @@ export type Database = {
         };
         Relationships: [];
       };
+      rail_rides: {
+        Row: {
+          created_at: string;
+          from_didok: string | null;
+          id: string;
+          line_id: string;
+          ridden_on: string;
+          to_didok: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          from_didok?: string | null;
+          id?: string;
+          line_id: string;
+          ridden_on: string;
+          to_didok?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          from_didok?: string | null;
+          id?: string;
+          line_id?: string;
+          ridden_on?: string;
+          to_didok?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'rail_rides_line_id_fkey';
+            columns: ['line_id'];
+            isOneToOne: false;
+            referencedRelation: 'rail_lines';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
     };
     Views: {
       [_ in never]: never;
