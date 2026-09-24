@@ -291,20 +291,6 @@ export default async function StatsPage() {
   const { flights } = await loadFlights();
   const legs = toLegs(flights);
 
-  // Covers all three failure shapes at once — Supabase unconfigured, the read
-  // failed, or the table is empty — because the page renders the same thing for
-  // each. A preview deploy without env vars is the everyday case.
-  if (legs.length === 0) {
-    return (
-      <Page>
-        <P>No flights logged yet.</P>
-        <div className="mt-6">
-          <CustomLink link="/">Back home</CustomLink>
-        </div>
-      </Page>
-    );
-  }
-
   return (
     <Page>
       <p className="text-muted mt-4 text-pretty">
@@ -312,7 +298,23 @@ export default async function StatsPage() {
         all adds up to.
       </p>
 
-      <Flights legs={legs} />
+      {/*
+        Covers all three failure shapes at once — Supabase unconfigured, the
+        read failed, or the table is empty — because the page renders the same
+        thing for each. A preview deploy without env vars is the everyday case.
+      */}
+      {legs.length > 0 ? (
+        <Flights legs={legs} />
+      ) : (
+        <>
+          <div className="mt-6">
+            <P>No flights logged yet.</P>
+          </div>
+          <div className="mt-6">
+            <CustomLink link="/">Back home</CustomLink>
+          </div>
+        </>
+      )}
     </Page>
   );
 }
