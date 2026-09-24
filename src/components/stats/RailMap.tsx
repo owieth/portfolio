@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 // maplibre-gl v6 has no default export — named imports only.
 import {
   Map as MlMap,
+  NavigationControl,
   type LngLatBoundsLike,
   type StyleSpecification,
   type TransformStyleFunction,
@@ -91,6 +92,13 @@ const CH_ROOM: LngLatBoundsLike = [
   [CH_BOUNDS.west - 2, CH_BOUNDS.south - 2],
   [CH_BOUNDS.east + 2, CH_BOUNDS.north + 2],
 ];
+
+/**
+ * Street level, roughly. The basemap is land, water and borders and nothing
+ * else, so further in shows no more than this does, and the line widths stop
+ * growing at 12.
+ */
+const MAX_ZOOM = 14;
 
 const PREBUILD_MARGIN = '200px';
 
@@ -318,6 +326,7 @@ export default function RailMap({
         bounds: CH_FIT,
         fitBoundsOptions: { padding: 16 },
         maxBounds: CH_ROOM,
+        maxZoom: MAX_ZOOM,
         renderWorldCopies: false,
         // Not `cooperativeGestures`, for the reason FlightGlobe gives.
         scrollZoom: false,
@@ -331,6 +340,8 @@ export default function RailMap({
       });
       map.touchZoomRotate.disableRotation();
       map.keyboard.disableRotation();
+      // The only zoom a mouse can see. Pinch and double-click need no button.
+      map.addControl(new NavigationControl({ showCompass: false }));
       mapRef.current = map;
 
       map.on('style.load', onStyleLoad);
