@@ -26,6 +26,7 @@ import {
   categoryProgress,
   lineProgress,
   railTotals,
+  rideLog,
   stationsVisited,
   toCoverage,
 } from '@/lib/stats/rail/stats';
@@ -129,6 +130,7 @@ const Rail = ({
   const stations = stationsVisited(stops, coverage);
   const categories = categoryProgress(progress);
   const totals = railTotals(progress, stations);
+  const log = rideLog(coverage, stops);
   // Over the categories rather than `stops`, so the share counts what the
   // tables count: a stop on a line the data does not know is on no line.
   const stopCount = categories.reduce((sum, { stops }) => sum + stops, 0);
@@ -179,6 +181,28 @@ const Rail = ({
             }),
           )}
         />
+      </Section>
+
+      <Section title="Ride log">
+        {log.length > 0 ? (
+          <Table
+            head={['Date', 'Line', 'Stretch']}
+            rows={log.map(({ ride, line, from, to }) => ({
+              id: ride.id,
+              cells: [
+                formatDay(ride.riddenOn),
+                <Named
+                  key="line"
+                  code={line.displayName}
+                  name={`${line.terminalA} – ${line.terminalB}`}
+                />,
+                from && to ? `${from} → ${to}` : 'Whole line',
+              ],
+            }))}
+          />
+        ) : (
+          <P>No rides logged yet.</P>
+        )}
       </Section>
     </>
   );
