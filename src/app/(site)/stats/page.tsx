@@ -43,7 +43,7 @@ export const metadata: Metadata = {
 };
 
 /**
- * `flown_on` is a Postgres `date`: no time and no zone. `new Date('2017-07-14')`
+ * `flown_on` and `ridden_on` are Postgres `date`s: no time and no zone. `new Date('2017-07-14')`
  * parses as midnight UTC but formats in the runtime's own zone, which renders
  * the previous day anywhere west of it — and this page is prerendered, so the
  * wrong day would be baked into the HTML by whichever machine ran the build.
