@@ -49,6 +49,7 @@ describe.skipIf(DATABASE_URL === undefined)('the reconcile against Postgres', ()
 
   async function inRolledBack(run: (tx: TransactionSql) => Promise<void>): Promise<void> {
     const attempt = sql.begin(async tx => {
+      await tx`delete from public.rail_rides`;
       await tx`delete from public.rail_line_stops`;
       await tx`delete from public.rail_lines`;
       await run(tx);
