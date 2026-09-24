@@ -75,3 +75,54 @@ export interface RailRide {
   fromDidok: string | null;
   toDidok: string | null;
 }
+
+/**
+ * A ride resolved against its line: the stops it went through, as sequences.
+ * What `toCoverage` in `./stats` returns, and so a ride whose line and stops
+ * are known to the data.
+ */
+export interface RailRideCoverage {
+  ride: RailRide;
+  line: RailLine;
+  /** Ascending and distinct, whichever way the ride ran. */
+  sequences: number[];
+}
+
+export interface RailLineProgress {
+  line: RailLine;
+  stops: number;
+  /** Distinct, so two rides over the same stretch count it once. */
+  covered: number;
+  /** `covered / stops`, from 0 to 1. A line with no stops is 0. */
+  share: number;
+  /** Any ride at all, even one that covered a single stop. */
+  touched: boolean;
+  /** Every stop covered. Never true of a line with no stops. */
+  complete: boolean;
+}
+
+/** The same counts as `RailLineProgress`, summed over one `category`. */
+export interface RailCategoryProgress {
+  category: string;
+  lines: number;
+  touched: number;
+  complete: number;
+  stops: number;
+  covered: number;
+}
+
+/** A station, once however many lines it is on. */
+export interface RailStation {
+  didok: string;
+  stopName: string;
+  lat: number | null;
+  lon: number | null;
+}
+
+export interface RailTotals {
+  lines: number;
+  touched: number;
+  complete: number;
+  /** Distinct by Didok number across every line. */
+  stations: number;
+}
