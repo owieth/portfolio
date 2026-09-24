@@ -47,8 +47,7 @@ const DATE = new Intl.DateTimeFormat('en-GB', {
   timeZone: 'UTC',
 });
 
-const formatFlownOn = (flownOn: string) =>
-  DATE.format(new Date(`${flownOn}T00:00:00Z`));
+const formatDay = (day: string) => DATE.format(new Date(`${day}T00:00:00Z`));
 
 const Stat = ({
   label,
@@ -285,7 +284,7 @@ export default async function StatsPage() {
           rows={legs.map(({ flight, from, to }) => ({
             id: flight.id,
             cells: [
-              formatFlownOn(flight.flownOn),
+              formatDay(flight.flownOn),
               `${from.iata} → ${to.iata}`,
               <Named
                 key="flight"
