@@ -1,6 +1,6 @@
 /**
- * The two numbers the /stats page repeats often enough to be worth a shared
- * rule: a distance and a block time.
+ * The numbers the /stats page repeats often enough to be worth a shared rule:
+ * a count, a distance and a block time.
  *
  * `de-CH` for the grouping, matching the only other formatted number on the
  * site (`Resultatcharte.tsx`).
