@@ -615,6 +615,25 @@ relation that crosses the border is kept whole, so 13 lines draw well beyond
 Switzerland. The night train from Zürich to Budapest and Zagreb alone is
 1.1 MB.
 
+### The web copy
+
+No phone should download 15.8 MB, so the build writes a second copy for the map
+to `public/rail/lines.geojson`, which Next.js serves as a static file outside
+the JS bundle. It is read back from `lines.geojson` right after that is written,
+so it is always derived from exactly the committed geometry.
+
+It has the same features under the same ids, each part simplified with
+Douglas–Peucker at 30 m, about a pixel at zoom 12, so a line still follows its
+valley at city zoom. The tolerance is measured in metres rather than degrees,
+and every part keeps its two ends. Coordinates are rounded to five decimals, as
+in the full file. `properties` are cut to `id` and `category`: the map joins
+everything else from `rail_lines` by `id`. The `attribution` member is carried
+over unchanged, because the ODbL asks for it on anything built from the
+geometry. The build stops if the copy draws a different set of lines or its
+attribution differs.
+
+The 2026 copy has 51,653 positions and is 1.03 MB, 0.26 MB gzipped.
+
 ### The report
 
 `REPORT.md` is the review surface: what to read each December before committing
