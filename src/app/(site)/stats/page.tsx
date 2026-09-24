@@ -25,6 +25,7 @@ import {
 } from '@/lib/stats/flights/stats';
 import type { FlightLeg } from '@/lib/stats/flights/types';
 import { formatShare } from '@/lib/stats/rail/format';
+import { loadRailGeometry } from '@/lib/stats/rail/geometry';
 import { loadRail } from '@/lib/stats/rail/query';
 import {
   categoryProgress,
@@ -34,7 +35,9 @@ import {
   stationsVisited,
   toCoverage,
 } from '@/lib/stats/rail/stats';
+import { rideStretches, wholeLineIds } from '@/lib/stats/rail/stretch';
 import type { RailLine, RailRide, RailStop } from '@/lib/stats/rail/types';
+import type { Position } from 'geojson';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -124,14 +127,18 @@ const Rail = ({
   lines,
   stops,
   rides,
+  geometry,
 }: {
   lines: RailLine[];
   stops: RailStop[];
   rides: RailRide[];
+  geometry: ReadonlyMap<string, Position[][]>;
 }) => {
   const coverage = toCoverage(lines, stops, rides);
   const progress = lineProgress(lines, stops, coverage);
   const stations = stationsVisited(stops, coverage);
+  const stretches = rideStretches(coverage, stops, geometry);
+  const wholeIds = wholeLineIds(coverage);
   const categories = categoryProgress(progress);
   const totals = railTotals(progress, stations);
   const log = rideLog(coverage, stops);
@@ -152,7 +159,12 @@ const Rail = ({
           its stops has been ridden through. Coverage is the share of all those
           stops.
         </P>
-        <RailMap progress={progress} stations={stations} />
+        <RailMap
+          progress={progress}
+          stations={stations}
+          wholeIds={wholeIds}
+          stretches={stretches}
+        />
         <dl className="grid grid-cols-2 gap-x-8 gap-y-6 sm:grid-cols-4">
           <Stat
             label="Lines touched"
@@ -403,7 +415,11 @@ const Flights = ({ legs }: { legs: FlightLeg[] }) => {
 };
 
 export default async function StatsPage() {
-  const [{ flights }, rail] = await Promise.all([loadFlights(), loadRail()]);
+  const [{ flights }, rail, railGeometry] = await Promise.all([
+    loadFlights(),
+    loadRail(),
+    loadRailGeometry(),
+  ]);
   const legs = toLegs(flights);
 
   return (
@@ -428,7 +444,12 @@ export default async function StatsPage() {
       )}
 
       {rail.lines.length > 0 ? (
-        <Rail lines={rail.lines} stops={rail.stops} rides={rail.rides} />
+        <Rail
+          lines={rail.lines}
+          stops={rail.stops}
+          rides={rail.rides}
+          geometry={railGeometry}
+        />
       ) : (
         <Section title="Rail">
           <P>No rail lines loaded yet.</P>
