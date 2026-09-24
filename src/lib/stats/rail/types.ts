@@ -112,6 +112,13 @@ export interface RailLineProgress {
   complete: boolean;
 }
 
+/** A touched line with how often it was ridden, whatever share that covered. */
+export interface RailLineRidership extends RailLineProgress {
+  rides: number;
+  /** The latest `riddenOn` of its rides, as `YYYY-MM-DD`. */
+  lastRiddenOn: string;
+}
+
 /** The same counts as `RailLineProgress`, summed over one `category`. */
 export interface RailCategoryProgress {
   category: string;
