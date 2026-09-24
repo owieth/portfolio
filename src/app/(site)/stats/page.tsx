@@ -4,6 +4,7 @@ import AirlineChip from '@/components/stats/AirlineChip';
 import CountryFlags from '@/components/stats/CountryFlags';
 import FlightGlobe from '@/components/stats/FlightGlobe';
 import HaulMix from '@/components/stats/HaulMix';
+import RailMap from '@/components/stats/RailMap';
 import { aircraft as aircraftType } from '@/lib/stats/flights/aircraft';
 import { airline } from '@/lib/stats/flights/airlines';
 import { formatDistanceKm, formatDuration } from '@/lib/stats/flights/format';
@@ -19,6 +20,16 @@ import {
   toLegs,
 } from '@/lib/stats/flights/stats';
 import type { FlightLeg } from '@/lib/stats/flights/types';
+import { formatShare } from '@/lib/stats/rail/format';
+import { loadRail } from '@/lib/stats/rail/query';
+import {
+  categoryProgress,
+  lineProgress,
+  railTotals,
+  stationsVisited,
+  toCoverage,
+} from '@/lib/stats/rail/stats';
+import type { RailLine, RailRide, RailStop } from '@/lib/stats/rail/types';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -100,6 +111,60 @@ const Page = ({ children }: { children: React.ReactNode }) => (
     {children}
   </div>
 );
+
+const shareOf = (covered: number, stops: number) =>
+  stops === 0 ? '—' : formatShare(covered / stops);
+
+const Rail = ({
+  lines,
+  stops,
+  rides,
+}: {
+  lines: RailLine[];
+  stops: RailStop[];
+  rides: RailRide[];
+}) => {
+  const coverage = toCoverage(lines, stops, rides);
+  const progress = lineProgress(lines, stops, coverage);
+  const stations = stationsVisited(stops, coverage);
+  const categories = categoryProgress(progress);
+  const totals = railTotals(progress, stations);
+  // Over the categories rather than `stops`, so the share counts what the
+  // tables count: a stop on a line the data does not know is on no line.
+  const stopCount = categories.reduce((sum, { stops }) => sum + stops, 0);
+  const coveredCount = categories.reduce(
+    (sum, { covered }) => sum + covered,
+    0,
+  );
+
+  return (
+    <>
+      <Section title="Rail">
+        <P>
+          Every Swiss train line, from the InterCity down to the funicular. A
+          line is touched after any ride on it and complete once every one of
+          its stops has been ridden through. Coverage is the share of all those
+          stops.
+        </P>
+        <RailMap progress={progress} stations={stations} />
+        <dl className="grid grid-cols-2 gap-x-8 gap-y-6 sm:grid-cols-4">
+          <Stat
+            label="Lines touched"
+            value={String(totals.touched)}
+            hint={`of ${totals.lines}`}
+          />
+          <Stat
+            label="Lines complete"
+            value={String(totals.complete)}
+            hint={`of ${totals.lines}`}
+          />
+          <Stat label="Stations" value={String(totals.stations)} />
+          <Stat label="Coverage" value={shareOf(coveredCount, stopCount)} />
+        </dl>
+      </Section>
+    </>
+  );
+};
 
 const Flights = ({ legs }: { legs: FlightLeg[] }) => {
   const totals = flightTotals(legs);
@@ -288,7 +353,7 @@ const Flights = ({ legs }: { legs: FlightLeg[] }) => {
 };
 
 export default async function StatsPage() {
-  const { flights } = await loadFlights();
+  const [{ flights }, rail] = await Promise.all([loadFlights(), loadRail()]);
   const legs = toLegs(flights);
 
   return (
@@ -314,6 +379,14 @@ export default async function StatsPage() {
             <CustomLink link="/">Back home</CustomLink>
           </div>
         </>
+      )}
+
+      {rail.lines.length > 0 ? (
+        <Rail lines={rail.lines} stops={rail.stops} rides={rail.rides} />
+      ) : (
+        <Section title="Rail">
+          <P>No rail lines loaded yet.</P>
+        </Section>
       )}
     </Page>
   );
