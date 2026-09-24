@@ -1017,7 +1017,8 @@ rail/
 
 The generated artifacts — `lines.csv`, `line_stops.csv`, `lines.json`,
 `lines.geojson` and `REPORT.md` — land at the top of this directory and are
-committed.
+committed. The map's copy of the geometry lands in
+`public/rail/lines.geojson` and is committed with them.
 
 `RECON.md` sits next to them but is not one of them. `pnpm build:data` does not
 write it and nothing downstream reads it: it is what the feed was found to
