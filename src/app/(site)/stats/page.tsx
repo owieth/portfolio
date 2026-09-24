@@ -371,14 +371,9 @@ export default async function StatsPage() {
       {legs.length > 0 ? (
         <Flights legs={legs} />
       ) : (
-        <>
-          <div className="mt-6">
-            <P>No flights logged yet.</P>
-          </div>
-          <div className="mt-6">
-            <CustomLink link="/">Back home</CustomLink>
-          </div>
-        </>
+        <div className="mt-6">
+          <P>No flights logged yet.</P>
+        </div>
       )}
 
       {rail.lines.length > 0 ? (
@@ -387,6 +382,12 @@ export default async function StatsPage() {
         <Section title="Rail">
           <P>No rail lines loaded yet.</P>
         </Section>
+      )}
+
+      {legs.length === 0 && rail.lines.length === 0 && (
+        <div className="mt-6">
+          <CustomLink link="/">Back home</CustomLink>
+        </div>
       )}
     </Page>
   );
