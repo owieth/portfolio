@@ -1,3 +1,4 @@
+import ConsentChoiceButton from '@/components/analytics/ConsentChoiceButton';
 import { A, P, Section, Table } from '@/components/projects/Prose';
 import type { Metadata } from 'next';
 
@@ -81,8 +82,13 @@ export default function PrivacyPage() {
         <P>
           Choose <strong>Opt out</strong> in the notice at any time — it stops
           Google Analytics from collecting anything further and remembers the
-          choice across visits. You can also block or clear cookies in your
-          browser, or install Google&rsquo;s{' '}
+          choice across visits. The notice shows by itself only on a first
+          visit; this brings it back:
+        </P>
+        <ConsentChoiceButton />
+        <P>
+          You can also block or clear cookies in your browser, or install
+          Google&rsquo;s{' '}
           <A href="https://tools.google.com/dlpage/gaoptout">
             opt-out browser add-on
           </A>
