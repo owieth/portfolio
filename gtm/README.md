@@ -14,13 +14,13 @@ is no separate `<GoogleAnalytics>` script, so there is no double-tagging.
 
 - **1 Constant** — `GA4 Measurement ID`, the single place every tag reads the
   `G-…` id from.
-- **20 Data Layer Variables** — one per event parameter across the stack, plus
+- **42 Data Layer Variables** — one per event parameter across the stack, plus
   one per user property (dot-notation, e.g. `user_properties.throw_count`).
 - **1 Google tag (GA4 config)** on *Initialization – All Pages*, with
   `send_page_view: false`, a `traffic_type` field, and the six user properties.
   It also fires on the `set_user_properties` event so the user properties
   refresh once game state is known.
-- **9 GA4 Event tags** — one per client event, each on a Custom Event trigger
+- **27 GA4 Event tags** — one per client event, each on a Custom Event trigger
   matching the `dataLayer` `event` name.
 - **Consent settings** requiring `analytics_storage` on every tag.
 - **Folders** per domain: `Site`, `wo-haere`, `Vitals`.
@@ -67,11 +67,17 @@ definitions → Custom dimensions**, scope **Event**, one per param:
 
 `page_path`, `page_title`, `link_url`, `link_text`, `link_domain`,
 `nav_location`, `project_slug`, `cta_label`, `referrer`, `metric_name`,
-`metric_rating`, `metric_id`, `traffic_type` — plus the server params
+`metric_rating`, `metric_id`, `traffic_type`, the wo-haere params
+`input_method`, `outcome`, `throw_quality`, `canton`, `municipality`,
+`bearing`, `water`, `miss_reason`, `open`, `share_method`, `action`,
+`setting_name`, `setting_value`, `dart_skin` — plus the server params
 `art`, `upstream_ms`, `kanton`, `wasser`, `hoechi`, `distanz_km`, `richtig`,
 `grund`, `has_wurf`, `resolved`, `status`, `client_source`, `session_id`.
 
-- `metric_value` is numeric — register it as a **Custom metric** instead.
+- `metric_value` is numeric — register it as a **Custom metric** instead, as
+  are the wo-haere params `elevation`, `distance_km`, `entry_count`,
+  `cantons_collected`, `throw_count` and `threshold`.
+- That is 40 event-scoped custom dimensions; a standard GA4 property allows 50.
 - The six user properties — `throw_count`, `cantons_collected`,
   `dart_skins_unlocked`, `color_scheme`, `reduced_motion`, `pointer_type` —
   register as **User**-scoped custom dimensions.
@@ -97,7 +103,9 @@ history events"*. Leaving it on double-counts every client-side navigation.
 
 - **Preview / Tag Assistant** — navigate the site and confirm each `dataLayer`
   event (`page_view`, `outbound_click`, …, `web_vitals`) fires its tag exactly
-  once, that the Google tag sends no automatic `page_view`, and that
+  once — on `/projects/wo-haere/play` also the wo-haere events (`throw_started`,
+  `throw_input_method`, `throw_completed`, `share_result`, `setting_changed`,
+  …) — that the Google tag sends no automatic `page_view`, and that
   `traffic_type` and the user properties populate.
 - **GA4 DebugView** — client events appear, and the server `*_server` events
   land too (they need `GA4_API_SECRET`; verify separately since they skip GTM).
@@ -109,12 +117,18 @@ matters: variables → triggers → tags.
 
 1. **Constant** `GA4 Measurement ID` = your `NEXT_PUBLIC_GA_ID`.
 2. **Data Layer Variables** (Version 2), one per param name listed under
-   [custom dimensions](#1-register-the-event-params-as-custom-dimensions), plus
-   `user_properties.throw_count` and the other five user properties.
+   [custom dimensions](#1-register-the-event-params-as-custom-dimensions) and
+   custom metrics, plus `user_properties.throw_count` and the other five user
+   properties.
 3. **Custom Event triggers**, one per client event name: `page_view`,
    `outbound_click`, `internal_link_click`, `nav_click`, `project_cta_click`,
-   `download_click`, `citation_click`, `page_not_found`, `web_vitals`, and
-   `set_user_properties`.
+   `download_click`, `citation_click`, `page_not_found`, `web_vitals`, the
+   wo-haere events `throw_started`, `throw_input_method`, `throw_abandoned`,
+   `throw_completed`, `throw_off_map`, `throw_api_error`,
+   `shared_throw_opened`, `panel_toggle`, `map_engaged`, `share_attempt`,
+   `share_result`, `result_action`, `setting_changed`,
+   `throw_log_entry_click`, `throw_log_cleared`, `canton_collected`,
+   `all_cantons_collected`, `dart_skin_unlocked`, and `set_user_properties`.
 4. **Google tag (GA4 config)** → tag id `{{GA4 Measurement ID}}`; set
    `send_page_view` to `false`; add field `traffic_type` = `{{traffic_type}}`;
    add the six user properties from their `{{user_properties.*}}` variables.
