@@ -1,6 +1,10 @@
 'use client';
 
 import {
+  CONSENT_NOTICE,
+  consentNotice,
+} from '@/components/analytics/consent-notice';
+import {
   ALL_DENIED,
   GRANTED_DEFAULT,
   isPrivacySignalOn,
@@ -13,8 +17,6 @@ import { Toast } from '@base-ui/react/toast';
 import Link from 'next/link';
 import { useEffect, useRef } from 'react';
 
-const NOTICE_ID = 'ow-consent-notice';
-
 /**
  * Persists the visitor's choice and pushes a Consent Mode update so GA4 reacts
  * within the same page view — the `beforeInteractive` bootstrap only sets the
@@ -26,11 +28,13 @@ const applyConsent = (state: ConsentState): void => {
 };
 
 /**
- * Shows the notice once — skipped when a prior choice is stored in `ow_consent`
- * or a browser privacy signal (GPC/DNT) already forces an opt-out. `timeout: 0`
- * keeps it up until the visitor acts; `priority: 'low'` lets Base UI announce it
- * politely (equivalent to `aria-live="polite"`), so no second live region is
- * added.
+ * Shows the notice by itself once — skipped when a prior choice is stored in
+ * `ow_consent` or a browser privacy signal (GPC/DNT) already forces an opt-out.
+ * `/privacy` can bring it back later through `openConsentNotice`.
+ *
+ * This goes through the provider's own manager, not `consentNotice`: the
+ * provider subscribes to the global manager in an effect that runs after this
+ * child's, so a mount-time `consentNotice.add` would be lost.
  */
 function ConsentTrigger() {
   const manager = Toast.useToastManager();
@@ -41,14 +45,7 @@ function ConsentTrigger() {
       return;
     }
     shown.current = true;
-    manager.add({
-      id: NOTICE_ID,
-      title: 'Cookies & analytics',
-      description:
-        'This site uses Google Analytics to see how it is used, and Vercel Analytics for aggregate traffic. You can opt out at any time.',
-      timeout: 0,
-      priority: 'low',
-    });
+    manager.add(CONSENT_NOTICE);
   }, [manager]);
 
   return null;
@@ -102,7 +99,7 @@ function ConsentToasts() {
 
 export default function CookieNotice() {
   return (
-    <Toast.Provider>
+    <Toast.Provider toastManager={consentNotice}>
       <ConsentTrigger />
       <Toast.Portal>
         <Toast.Viewport
