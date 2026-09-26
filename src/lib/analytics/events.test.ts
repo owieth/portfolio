@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  CLIENT_EVENT_NAMES,
   MAX_EVENT_NAME_LENGTH,
   MAX_EVENT_PARAMS,
   isValidEvent,
@@ -174,5 +175,12 @@ describe('isValidEvent', () => {
     const event = { name: 'page_view', ...params } as unknown as AnalyticsEvent;
 
     expect(isValidEvent(event)).toBe(true);
+  });
+});
+
+describe('CLIENT_EVENT_NAMES', () => {
+  it('lists each of the 27 client events once', () => {
+    expect(CLIENT_EVENT_NAMES).toHaveLength(27);
+    expect(new Set(CLIENT_EVENT_NAMES).size).toBe(27);
   });
 });
