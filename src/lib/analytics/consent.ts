@@ -11,9 +11,9 @@
  * first-party `ow_consent` cookie remembers a prior choice; absent that, the
  * granted defaults apply.
  *
- * The `ConsentBootstrap` inline script re-implements `resolveConsent` in plain
- * JS (it cannot import this module), so the category shapes below are the single
- * source of truth it serializes — keep them plain JSON-serialisable objects.
+ * The inline script in `consent-bootstrap.ts` re-implements `resolveConsent` in
+ * plain JS (it cannot import this module), so the category shapes below are the
+ * single source of truth it serializes — keep them plain JSON-serialisable objects.
  */
 export type ConsentValue = 'granted' | 'denied';
 
