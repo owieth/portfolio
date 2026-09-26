@@ -3,6 +3,7 @@ import {
   GA_ID,
   isServerAnalyticsEnabled,
 } from '@/lib/analytics/config';
+import { CONSENT_COOKIE } from '@/lib/analytics/consent';
 import { MAX_EVENT_NAME_LENGTH, MAX_EVENT_PARAMS } from '@/lib/analytics/events';
 
 /**
@@ -73,6 +74,30 @@ const parseCookieHeader = (
     if (key) map[key] = part.slice(index + 1).trim();
   }
   return map;
+};
+
+/**
+ * The server twin of `resolveConsent()` plus the gate in client `track()`: a
+ * browser privacy signal refuses outright, then a stored `ow_consent` choice
+ * decides, and a missing or unreadable cookie falls back to the granted default.
+ */
+export const isServerConsentGranted = (headers: Headers): boolean => {
+  if (headers.get('sec-gpc') === '1' || headers.get('dnt') === '1') {
+    return false;
+  }
+
+  const value = parseCookieHeader(headers.get('cookie'))[CONSENT_COOKIE];
+  if (!value) return true;
+
+  let parsed: { analytics_storage?: unknown } | null;
+  try {
+    parsed = JSON.parse(decodeURIComponent(value));
+  } catch {
+    return true;
+  }
+  if (parsed === null) return true;
+
+  return parsed.analytics_storage === 'granted';
 };
 
 /**
