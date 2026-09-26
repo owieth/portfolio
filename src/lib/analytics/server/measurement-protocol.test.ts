@@ -1,5 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { ALL_DENIED, GRANTED_DEFAULT } from '@/lib/analytics/consent';
+
 /**
  * `config` reads the env at module load, so toggling the server layer on/off
  * means re-importing after stubbing the env — the same pattern `track.test.ts`
@@ -149,6 +151,78 @@ describe('buildPayload', () => {
 
     expect(payload.events[0].name).toBe('swisstopo_error_server');
     expect(payload.events[0].params.client_source).toBe('synthetic');
+  });
+});
+
+describe('isServerConsentGranted', () => {
+  const consentCookie = (state: object) =>
+    `ow_consent=${encodeURIComponent(JSON.stringify(state))}`;
+
+  it('grants when no ow_consent cookie is set', async () => {
+    const { isServerConsentGranted } = await importModule();
+
+    expect(
+      isServerConsentGranted(new Headers({ cookie: '_ga=GA1.1.10.20' })),
+    ).toBe(true);
+  });
+
+  it('refuses an opted-out cookie', async () => {
+    const { isServerConsentGranted } = await importModule();
+
+    expect(
+      isServerConsentGranted(
+        new Headers({ cookie: consentCookie(ALL_DENIED) }),
+      ),
+    ).toBe(false);
+  });
+
+  it('grants a granting cookie', async () => {
+    const { isServerConsentGranted } = await importModule();
+
+    expect(
+      isServerConsentGranted(
+        new Headers({ cookie: consentCookie(GRANTED_DEFAULT) }),
+      ),
+    ).toBe(true);
+  });
+
+  it('refuses Sec-GPC: 1 even with a granting cookie', async () => {
+    const { isServerConsentGranted } = await importModule();
+
+    expect(
+      isServerConsentGranted(
+        new Headers({
+          cookie: consentCookie(GRANTED_DEFAULT),
+          'sec-gpc': '1',
+        }),
+      ),
+    ).toBe(false);
+  });
+
+  it('refuses DNT: 1', async () => {
+    const { isServerConsentGranted } = await importModule();
+
+    expect(isServerConsentGranted(new Headers({ dnt: '1' }))).toBe(false);
+  });
+
+  it('treats a corrupt cookie as granted', async () => {
+    const { isServerConsentGranted } = await importModule();
+
+    expect(
+      isServerConsentGranted(new Headers({ cookie: 'ow_consent=%7Bnope' })),
+    ).toBe(true);
+  });
+
+  it('finds ow_consent after other cookies', async () => {
+    const { isServerConsentGranted } = await importModule();
+
+    expect(
+      isServerConsentGranted(
+        new Headers({
+          cookie: `_ga=GA1.1.10.20; ${consentCookie(ALL_DENIED)}`,
+        }),
+      ),
+    ).toBe(false);
   });
 });
 
