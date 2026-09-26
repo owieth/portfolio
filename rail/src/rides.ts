@@ -92,10 +92,17 @@ async function lineStops(dir: string): Promise<Map<string, Set<string>>> {
   const stops = new Map<string, Set<string>>();
 
   for (const row of parseCsv(await readFile(join(dir, LINE_STOPS_CSV), 'utf8'))) {
-    const line = stops.get(row.line_id) ?? new Set<string>();
+    const { line_id: lineId, didok } = row;
 
-    line.add(row.didok);
-    stops.set(row.line_id, line);
+    // Every cell of a CSV can be empty. A stop with no Didok cannot be an end of
+    // a ride, so leaving it out of the index is what makes `assertOnLine` reject
+    // one, rather than a second check for the same thing.
+    if (lineId === null || didok === null) continue;
+
+    const line = stops.get(lineId) ?? new Set<string>();
+
+    line.add(didok);
+    stops.set(lineId, line);
   }
 
   return stops;
