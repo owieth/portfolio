@@ -32,7 +32,6 @@ export async function POST(request: Request) {
     );
   }
 
-  const cookieHeader = request.headers.get('cookie');
   const start = performance.now();
 
   try {
@@ -57,7 +56,7 @@ export async function POST(request: Request) {
             upstream_ms,
             grund: wurf.grund,
           },
-      cookieHeader,
+      request.headers,
     );
 
     return Response.json(wurf);
@@ -68,7 +67,7 @@ export async function POST(request: Request) {
         name: 'swisstopo_error_server',
         upstream_ms: Math.round(performance.now() - start),
       },
-      cookieHeader,
+      request.headers,
     );
     return Response.json(
       { fähler: 'swisstopo git grad nid Antwort' },

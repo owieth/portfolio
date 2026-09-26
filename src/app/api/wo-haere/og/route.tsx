@@ -116,7 +116,6 @@ const Chaarte = ({ titu, underTitu, zeile }: Chaarte) => (
 );
 
 export async function GET(request: Request) {
-  const cookieHeader = request.headers.get('cookie');
   const wurfParam = parseWurf(new URL(request.url).searchParams.get('wurf'));
   const chaarte = await chaarteFür(wurfParam);
 
@@ -129,7 +128,7 @@ export async function GET(request: Request) {
       has_wurf: Boolean(wurfParam),
       resolved: chaarte.resolved,
     },
-    cookieHeader,
+    request.headers,
   );
 
   return new ImageResponse(<Chaarte {...chaarte} />, size);

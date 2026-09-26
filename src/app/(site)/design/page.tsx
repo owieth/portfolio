@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { MDXRemote } from 'next-mdx-remote/rsc';
-import { cookies } from 'next/headers';
+import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 
 import { trackServer } from '@/lib/analytics/server/track-server';
@@ -15,10 +15,10 @@ export const metadata: Metadata = {
 };
 
 export default async function DesignPage() {
-  // Reading the cookie attaches the failure event to the visitor's session, at
-  // the cost of opting the page render out of ISR; the GitHub fetch below keeps
-  // its own `revalidate` cache regardless.
-  const cookieHeader = (await cookies()).toString();
+  // Reading the request headers attaches the failure event to the visitor's
+  // session, at the cost of opting the page render out of ISR; the GitHub fetch
+  // below keeps its own `revalidate` cache regardless.
+  const requestHeaders = await headers();
 
   const res = await fetch(
     'https://raw.githubusercontent.com/owieth/designs/main/README.md',
@@ -28,7 +28,7 @@ export default async function DesignPage() {
   if (!res.ok) {
     trackServer(
       { name: 'design_fetch_failed_server', status: res.status },
-      cookieHeader,
+      requestHeaders,
     );
     return notFound();
   }
