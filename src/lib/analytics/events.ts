@@ -221,6 +221,45 @@ export type AnalyticsEvent =
   | DartSkinUnlockedEvent;
 
 /**
+ * The union's event names as a runtime list, for checks that must see every
+ * client event (e.g. the GTM container test). `satisfies` keeps it exhaustive:
+ * a missing or unknown key fails the type check.
+ */
+const CLIENT_EVENTS = {
+  page_view: true,
+  outbound_click: true,
+  internal_link_click: true,
+  nav_click: true,
+  project_cta_click: true,
+  download_click: true,
+  citation_click: true,
+  page_not_found: true,
+  web_vitals: true,
+  throw_started: true,
+  throw_input_method: true,
+  throw_abandoned: true,
+  throw_completed: true,
+  throw_off_map: true,
+  throw_api_error: true,
+  shared_throw_opened: true,
+  panel_toggle: true,
+  map_engaged: true,
+  share_attempt: true,
+  share_result: true,
+  result_action: true,
+  setting_changed: true,
+  throw_log_entry_click: true,
+  throw_log_cleared: true,
+  canton_collected: true,
+  all_cantons_collected: true,
+  dart_skin_unlocked: true,
+} satisfies Record<AnalyticsEvent['name'], true>;
+
+export const CLIENT_EVENT_NAMES = Object.keys(
+  CLIENT_EVENTS,
+) as AnalyticsEvent['name'][];
+
+/**
  * GA4 silently drops an event whose name exceeds 40 characters or that carries
  * more than 25 parameters — no error, no console warning, the hit just never
  * lands. `isValidEvent` is the runtime guard the tests pin against, because the
