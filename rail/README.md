@@ -931,6 +931,45 @@ The tests that need a database are opt-in, because CI has none. Point
 example `postgresql://postgres:postgres@127.0.0.1:54322/postgres`, and they run
 in transactions that are rolled back.
 
+### Rides from the calendar
+
+`rail_rides` is the one table nothing in the feed fills: it is the log of what I
+have actually ridden, and `supabase/seeds/rail_rides.sql` holds the backfill of
+my commute to the office. `pnpm rides:data` generates it from a calendar export.
+
+Export the calendar from Calendar.app — File ▸ Export ▸ Export… — and save it as
+`data/raw/calendar.ics`, next to the feed cache and gitignored with it. The run
+keeps the events titled `Frigg`, reads the destination off each one's
+`LOCATION`, drops any day after the export's own file date because a scheduled
+office day is not a ride, and writes one row per leg per direction. Nothing else
+in the calendar is read, and no event title, description or attendee reaches the
+seed.
+
+The commute itself is a table in [`src/rides/commute.ts`](src/rides/commute.ts):
+which legs a day at each destination is made of, which stations they run
+between, and which lines run them. It is keyed on the day I moved, because the
+journey changed with it — Unterzollikofen to Bern to Zürich to Zug before it,
+Luzern to Zug after.
+
+**The line on any single row is an estimate.** The calendar knows which days I
+went to the office and where; it does not know which train I took, and no
+timetable can answer that for a past date, because
+[opentransportdata](https://opentransportdata.swiss) publishes the current
+timetable only. So the lines come from memory as ratios — nine Bern–Zürich legs
+in ten were the IC1, thirty Zürich–Zug legs were the S24, ten of the two hundred
+returns came home through Luzern. `allocate` turns a ratio into exact counts for
+a pool of legs and `spread` deals them out in date order, both deterministically,
+so the same export always produces the same seed. The totals per line are the
+claim; which date carries which line is an artefact. The generated file says so
+in its header, along with the SHA-256 of the export it came from, since the rows
+cannot be re-derived from anything else and a calendar drifts as soon as an
+event is edited.
+
+Every row carries an id derived from its own values and the insert ends
+`on conflict (id) do nothing`, so the file is safe to run twice: without that a
+second `supabase db push --include-seed` would double a log whose whole purpose
+is counting. Rides added later belong in Studio, not in a rerun.
+
 ## Refreshing the data
 
 The feed changes at the mid-December timetable switch and line numbers change
@@ -1012,7 +1051,7 @@ rail/
 ├── lines.schema.json the JSON Schema lines.json is checked against, written by hand
 ├── src/              the pipeline; src/cli.ts is the entry point
 ├── data/             committed lookups and seed files, reviewed by hand
-└── data/raw/         the feed and Overpass cache, gitignored and disposable
+└── data/raw/         the feed cache and the calendar export, gitignored
 ```
 
 The generated artifacts — `lines.csv`, `line_stops.csv`, `lines.json`,

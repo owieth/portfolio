@@ -20,6 +20,7 @@
  *   pnpm diff:data --base HEAD~1
  *   pnpm recon:data
  *   pnpm seed:data
+ *   pnpm rides:data
  *   pnpm reconcile:data
  *   pnpm reconcile:data --apply
  *
@@ -51,6 +52,7 @@ import { RECONCILE_FLAGS, parseReconcileOptions } from './reconcile/options.ts';
 import { assignRegions } from './regions.ts';
 import { loadRules } from './regions/rules.ts';
 import { reportFeed, writeReport } from './report.ts';
+import { writeRides } from './rides.ts';
 import { flagSeasonal } from './seasonal.ts';
 import { seedLines } from './seed.ts';
 import { loadFunicularSeed } from './seed/funiculars.ts';
@@ -59,7 +61,7 @@ import { assertSpotChecks } from './spotcheck.ts';
 import { resolveStations } from './stations.ts';
 import { findTermini } from './termini.ts';
 
-const COMMANDS = ['build', 'diff', 'recon', 'seed', 'reconcile'] as const;
+const COMMANDS = ['build', 'diff', 'recon', 'seed', 'rides', 'reconcile'] as const;
 
 type Command = (typeof COMMANDS)[number];
 
@@ -67,6 +69,7 @@ const USAGE = `usage: pnpm build:data [--year <year>] [--source opentransportdat
        pnpm diff:data [--base <git ref>]
        pnpm recon:data [--year <year>] [--source opentransportdata|geops]
        pnpm seed:data
+       pnpm rides:data
        pnpm reconcile:data [--apply] [--dir <path>]
 
   build      regenerate lines.csv, line_stops.csv, lines.json, lines.geojson and REPORT.md,
@@ -74,6 +77,7 @@ const USAGE = `usage: pnpm build:data [--year <year>] [--source opentransportdat
   diff       compare the generated lines.csv and line_stops.csv against the committed ones
   recon      profile the feed into RECON.md, before anything models it
   seed       write supabase/seeds/rail.sql from the committed lines.csv and line_stops.csv
+  rides      write supabase/seeds/rail_rides.sql from the calendar export in data/raw/
   reconcile  plan, or with --apply write, the CSVs into Supabase without undoing hand edits
 
   --year    timetable year to build; defaults to the one in force today
@@ -268,6 +272,17 @@ async function seed(): Promise<number> {
   return 0;
 }
 
+async function rides(): Promise<number> {
+  try {
+    await writeRides(log);
+  } catch (error) {
+    logFailure(error);
+    return 2;
+  }
+
+  return 0;
+}
+
 /** Like the diff, the plan goes to stdout so it can be piped into a pull request. */
 async function reconcile(values: Record<string, FlagValue>): Promise<number> {
   const options = parseReconcileOptions(values);
@@ -317,6 +332,10 @@ export async function main(argv: string[]): Promise<number> {
 
   if (command === 'seed') {
     return seed();
+  }
+
+  if (command === 'rides') {
+    return rides();
   }
 
   if (command === 'reconcile') {
