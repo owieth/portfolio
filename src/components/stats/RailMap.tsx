@@ -3,19 +3,18 @@
 import { Combobox } from '@base-ui/react/combobox';
 import { useEffect, useMemo, useRef, useState } from 'react';
 // maplibre-gl v6 has no default export — named imports only.
-import {
+import type {
   Map as MlMap,
-  NavigationControl,
-  type LngLatBoundsLike,
-  type StyleSpecification,
-  type TransformStyleFunction,
+  LngLatBoundsLike,
+  StyleSpecification,
+  TransformStyleFunction,
 } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
 import type { Feature, FeatureCollection, Point } from 'geojson';
 
 import { CH_BOUNDS } from '@/lib/geo/ch';
-import { ensureMaplibreWorker } from '@/lib/maplibre/worker';
+import { loadMaplibre } from '@/lib/maplibre/load';
 import { flatStyle } from '@/lib/stats/maplibre/styles';
 import type { RailMapLine } from '@/lib/stats/rail/map';
 import type { RailStretch } from '@/lib/stats/rail/stretch';
@@ -294,6 +293,8 @@ export default function RailMap({
     if (!container) return;
 
     let map: MlMap | null = null;
+    // Set first in the cleanup, for the reason FlightGlobe gives.
+    let disposed = false;
     const ridden = new Set(riddenIds);
 
     // Read here and never during render, for the reason FlightGlobe gives.
@@ -316,9 +317,11 @@ export default function RailMap({
       if (map) map.getCanvas().style.cursor = over ? 'pointer' : '';
     };
 
-    const build = () => {
-      ensureMaplibreWorker();
-      map = new MlMap({
+    const build = async () => {
+      const maplibre = await loadMaplibre();
+      if (disposed) return;
+
+      map = new maplibre.Map({
         container,
         style: flatStyle(scheme()),
         // Fitted once, on construction, so it never animates into place.
@@ -341,7 +344,7 @@ export default function RailMap({
       map.touchZoomRotate.disableRotation();
       map.keyboard.disableRotation();
       // The only zoom a mouse can see. Pinch and double-click need no button.
-      map.addControl(new NavigationControl({ showCompass: false }));
+      map.addControl(new maplibre.NavigationControl({ showCompass: false }));
       mapRef.current = map;
 
       map.on('style.load', onStyleLoad);
@@ -402,7 +405,9 @@ export default function RailMap({
     const observer = new IntersectionObserver(
       entries => {
         if (!map && entries.some(({ isIntersecting }) => isIntersecting)) {
-          build();
+          // No error UI, and no retry: the observer is gone, so the box stays
+          // empty until the page is next opened.
+          build().catch((error: unknown) => console.error(error));
           observer.disconnect();
         }
       },
@@ -411,6 +416,7 @@ export default function RailMap({
     observer.observe(container);
 
     return () => {
+      disposed = true;
       observer.disconnect();
       container.removeEventListener('wheel', onWheel, { capture: true });
       dark.removeEventListener('change', onThemeChange);
