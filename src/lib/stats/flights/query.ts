@@ -1,6 +1,9 @@
 import 'server-only';
 
+import type { PostgrestResponse } from '@supabase/supabase-js';
+
 import type { Flight } from '@/lib/stats/flights/types';
+import { readFailed } from '@/lib/stats/read-failure';
 import type { Tables } from '@/lib/supabase/database.types';
 import { getSupabaseClient } from '@/lib/supabase/server';
 
@@ -16,16 +19,27 @@ import { getSupabaseClient } from '@/lib/supabase/server';
  */
 
 /**
- * A result, never an exception. With a 1h revalidate and no dynamic APIs,
- * /stats is prerendered at `next build` — Next keeps the fetch cacheable rather
- * than flipping the route dynamic, because `autoNoCache` only trips at
- * `revalidate === 0`. That makes an unset env or an unreachable Supabase a
- * *build-time* failure, so throwing here would break the build rather than a
- * request. The page renders an empty state instead.
+ * A result at build time, an exception at runtime.
  *
- * This is the opposite of `@/app/(site)/design/page.tsx`, which does call
- * `notFound()` on a failed fetch — it can, because reading `cookies()` opts it
- * out of ISR first, so its failure path is a runtime one.
+ * With a 1h revalidate and no dynamic APIs, /stats is prerendered at
+ * `next build` — Next keeps the fetch cacheable rather than flipping the route
+ * dynamic, because `autoNoCache` only trips at `revalidate === 0`. A throw
+ * there would break the build rather than a request, so a failed read answers
+ * a result and the page renders an empty state.
+ *
+ * The hourly regeneration needs the opposite. Next caches whatever a render
+ * returns, so that same result would swap a good /stats for its empty state
+ * for an hour; only a render that throws keeps the last good page. So at
+ * runtime a failed read throws. `readFailed` in `@/lib/stats/read-failure`
+ * makes that call, and logs on both sides of it.
+ *
+ * An unset env is neither case. It is a deploy without Supabase rather than a
+ * failed read, so it answers `configured: false` at build and at runtime
+ * alike, and says nothing.
+ *
+ * `@/app/(site)/design/page.tsx` needs no such split. It calls `notFound()` on
+ * a failed fetch outright, because reading `headers()` opts it out of ISR
+ * first, so its failure path is only ever a runtime one.
  */
 export type FlightsResult =
   | { configured: false; flights: [] }
@@ -47,8 +61,9 @@ export async function loadFlights(): Promise<FlightsResult> {
 
   if (!supabase) return { configured: false, flights: [] };
 
+  let response: PostgrestResponse<Tables<'flights'>>;
   try {
-    const { data, error } = await supabase
+    response = await supabase
       .from('flights')
       .select('*')
       // Newest first, then the order the day was actually flown. The second
@@ -58,11 +73,19 @@ export async function loadFlights(): Promise<FlightsResult> {
       // nudges the second leg of each seeded connection by a second.
       .order('flown_on', { ascending: false })
       .order('created_at', { ascending: true });
-
-    if (error) return { configured: true, error: error.message, flights: [] };
-
-    return { configured: true, flights: data.map(toFlight) };
-  } catch {
+  } catch (thrown) {
+    // Rarely reached: `postgrest-js` answers even a refused connection as an
+    // `error`. Whatever does land here is unexpected, so the log carries it.
+    readFailed('stats/flights', String(thrown));
     return { configured: true, error: 'unreachable', flights: [] };
   }
+
+  const { data, error } = response;
+
+  if (error) {
+    readFailed('stats/flights', error.message);
+    return { configured: true, error: error.message, flights: [] };
+  }
+
+  return { configured: true, flights: data.map(toFlight) };
 }
