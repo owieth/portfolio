@@ -233,10 +233,10 @@ describe('sliceLine', () => {
 });
 
 describe('rideStretches', () => {
-  it('draws one feature per segment ride, keyed by line and ride', () => {
-    const ride = covered('8500001', '8500002');
-
-    expect(rideStretches([ride], S1_STOPS, GEOMETRY)).toEqual([
+  it('draws one feature per stretch, keyed by line', () => {
+    expect(
+      rideStretches([covered('8500001', '8500002')], S1_STOPS, GEOMETRY),
+    ).toEqual([
       {
         type: 'Feature',
         geometry: {
@@ -249,7 +249,7 @@ describe('rideStretches', () => {
             ],
           ],
         },
-        properties: { id: S1.id, rideId: ride.ride.id },
+        properties: { id: S1.id },
       },
     ]);
   });
@@ -301,16 +301,18 @@ describe('rideStretches', () => {
   });
 
   it('keeps the other rides when one is skipped', () => {
-    const kept = covered('8500002', '8500003');
     const stretches = rideStretches(
-      [covered('8500001', '8500005'), kept],
+      [covered('8500001', '8500005'), covered('8500002', '8500003')],
       S1_STOPS,
       GEOMETRY,
     );
 
-    expect(stretches.map(({ properties }) => properties.rideId)).toEqual([
-      kept.ride.id,
-    ]);
+    expect(
+      stretches.map(({ properties, geometry }) => [
+        properties.id,
+        geometry.coordinates[0][0],
+      ]),
+    ).toEqual([[S1.id, [7.015, 47]]]);
   });
 });
 

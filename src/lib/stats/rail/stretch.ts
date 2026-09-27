@@ -39,10 +39,7 @@ const RADIANS = Math.PI / 180;
 /** The precision of `lines.geojson`, so a cut point is no finer than the rest. */
 const PRECISION = 1e5;
 
-export type RailStretch = Feature<
-  MultiLineString,
-  { id: string; rideId: string }
->;
+export type RailStretch = Feature<MultiLineString, { id: string }>;
 
 export type Slice =
   | { ok: true; coordinates: Position[][] }
@@ -359,7 +356,7 @@ export function rideStretches(
     stretches.push({
       type: 'Feature',
       geometry: { type: 'MultiLineString', coordinates: slice.coordinates },
-      properties: { id: line.id, rideId: ride.id },
+      properties: { id: line.id },
     });
   }
 
