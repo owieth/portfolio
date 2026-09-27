@@ -17,9 +17,9 @@ import type { Feature, FeatureCollection, Point } from 'geojson';
 import { CH_BOUNDS } from '@/lib/geo/ch';
 import { ensureMaplibreWorker } from '@/lib/maplibre/worker';
 import { flatStyle } from '@/lib/stats/maplibre/styles';
-import { mapLines, type RailMapLine } from '@/lib/stats/rail/map';
+import type { RailMapLine } from '@/lib/stats/rail/map';
 import type { RailStretch } from '@/lib/stats/rail/stretch';
-import type { RailLineProgress, RailStation } from '@/lib/stats/rail/types';
+import type { RailStation } from '@/lib/stats/rail/types';
 import { prefersReducedMotion } from '@/lib/wo-haere/motion';
 
 /**
@@ -258,12 +258,12 @@ function applySelection(map: MlMap, selectedId: string | null): void {
 }
 
 export default function RailMap({
-  progress,
+  lines,
   stations,
   wholeIds,
   stretches,
 }: {
-  progress: RailLineProgress[];
+  lines: RailMapLine[];
   stations: RailStation[];
   /** Lines ridden end to end, drawn whole. */
   wholeIds: string[];
@@ -272,7 +272,6 @@ export default function RailMap({
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MlMap | null>(null);
-  const lines = useMemo(() => mapLines(progress), [progress]);
   const lineById = useMemo(
     () => new Map(lines.map(line => [line.id, line])),
     [lines],

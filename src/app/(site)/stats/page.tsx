@@ -26,6 +26,7 @@ import {
 import type { FlightLeg } from '@/lib/stats/flights/types';
 import { formatShare } from '@/lib/stats/rail/format';
 import { loadRailGeometry } from '@/lib/stats/rail/geometry';
+import { mapLines } from '@/lib/stats/rail/map';
 import { loadRail } from '@/lib/stats/rail/query';
 import {
   categoryProgress,
@@ -162,7 +163,7 @@ const Rail = ({
           stops.
         </P>
         <RailMap
-          progress={progress}
+          lines={mapLines(progress)}
           stations={stations}
           wholeIds={wholeIds}
           stretches={stretches}
