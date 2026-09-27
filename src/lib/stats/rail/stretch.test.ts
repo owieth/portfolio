@@ -36,6 +36,22 @@ const BRANCH: Position[] = [
 ];
 const PARTS = [WEST, EAST, BRANCH];
 
+/**
+ * A double-track line along the 47th parallel from 7.0 to 7.2, as the
+ * pipeline leaves one: a part per track, 11 m apart and joined only at the
+ * ends. The second track is stored running west, as a part may be.
+ */
+const T1: Position[] = [
+  [7, 47],
+  [7.1, 47],
+  [7.2, 47],
+];
+const T2: Position[] = [
+  [7.2, 47.0001],
+  [7.1, 47.0001],
+  [7, 47.0001],
+];
+
 const at = (lon: number, lat = 47) => ({ lat, lon });
 
 /** The same track the other way round: the runs reversed, and each run too. */
@@ -202,6 +218,54 @@ describe('sliceLine', () => {
         [
           [7.002, 47],
           [7.008, 47],
+        ],
+      ],
+    });
+  });
+
+  it('stays on one track of a double-track line', () => {
+    // The west stop is nearest the second track, and the east stop the first.
+    const west = at(7.05, 47.00012);
+    const east = at(7.15, 47.00003);
+
+    expect(sliceLine([T1, T2], west, east)).toEqual({
+      ok: true,
+      coordinates: [
+        [
+          [7.05, 47.0001],
+          [7.1, 47.0001],
+          [7.15, 47.0001],
+        ],
+      ],
+    });
+  });
+
+  it('cuts the same track either way on a double-track line', () => {
+    const west = at(7.05, 47.00012);
+    const east = at(7.15, 47.00003);
+    const forward = sliceLine([T1, T2], west, east);
+    const backward = sliceLine([T1, T2], east, west);
+
+    expect(forward.ok && backward.ok).toBe(true);
+    if (!forward.ok || !backward.ok) return;
+
+    expect(backward.coordinates).toEqual(reversed(forward.coordinates));
+  });
+
+  it('starts on the stop’s own part rather than at a junction beside it', () => {
+    // 11 m south of the trunk and 23 m short of the junction, which is the
+    // nearest point of both the east part and the branch.
+    expect(sliceLine(PARTS, at(7.0197, 46.9999), at(7.035))).toEqual({
+      ok: true,
+      coordinates: [
+        [
+          [7.0197, 47],
+          [7.02, 47],
+        ],
+        [
+          [7.02, 47],
+          [7.03, 47],
+          [7.035, 47],
         ],
       ],
     });
