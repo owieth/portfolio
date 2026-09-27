@@ -122,7 +122,7 @@ const Page = ({ children }: { children: React.ReactNode }) => (
 );
 
 const shareOf = (covered: number, stops: number) =>
-  stops === 0 ? '—' : formatShare(covered / stops);
+  stops === 0 ? '—' : formatShare(covered, stops);
 
 const Rail = ({
   lines,
