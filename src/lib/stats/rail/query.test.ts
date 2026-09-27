@@ -1,4 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { PHASE_PRODUCTION_BUILD } from 'next/constants';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { Tables } from '@/lib/supabase/database.types';
 import { getSupabaseClient } from '@/lib/supabase/server';
@@ -99,8 +100,17 @@ const ride: Tables<'rail_rides'> = {
 const empty = { lines: [], stops: [], rides: [] };
 
 describe('loadRail', () => {
+  let consoleError: ReturnType<typeof vi.spyOn>;
+
   beforeEach(() => {
     vi.mocked(getSupabaseClient).mockReset();
+    vi.stubEnv('NEXT_PHASE', undefined);
+    consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    consoleError.mockRestore();
+    vi.unstubAllEnvs();
   });
 
   it('reports an unset env as unconfigured', async () => {
@@ -116,6 +126,7 @@ describe('loadRail', () => {
   });
 
   it('empties every table when one read fails', async () => {
+    vi.stubEnv('NEXT_PHASE', PHASE_PRODUCTION_BUILD);
     fakeClient({
       rail_lines: [line],
       rail_line_stops: { message: 'permission denied' },
@@ -127,9 +138,28 @@ describe('loadRail', () => {
       error: 'permission denied',
       ...empty,
     });
+    expect(consoleError).toHaveBeenCalledWith(
+      '[stats/rail] read failed: permission denied',
+    );
+  });
+
+  it('throws when one read fails outside the build', async () => {
+    fakeClient({
+      rail_lines: [line],
+      rail_line_stops: { message: 'permission denied' },
+      rail_rides: [ride],
+    });
+
+    await expect(loadRail()).rejects.toThrow(
+      'stats/rail read failed: permission denied',
+    );
+    expect(consoleError.mock.calls).toEqual([
+      ['[stats/rail] read failed: permission denied'],
+    ]);
   });
 
   it('reports a thrown request as unreachable', async () => {
+    vi.stubEnv('NEXT_PHASE', PHASE_PRODUCTION_BUILD);
     fakeClient({ rail_lines: new TypeError('fetch failed') });
 
     expect(await loadRail()).toEqual({
@@ -137,6 +167,20 @@ describe('loadRail', () => {
       error: 'unreachable',
       ...empty,
     });
+    expect(consoleError).toHaveBeenCalledWith(
+      '[stats/rail] read failed: TypeError: fetch failed',
+    );
+  });
+
+  it('throws on a thrown request outside the build', async () => {
+    fakeClient({ rail_lines: new TypeError('fetch failed') });
+
+    await expect(loadRail()).rejects.toThrow(
+      'stats/rail read failed: TypeError: fetch failed',
+    );
+    expect(consoleError.mock.calls).toEqual([
+      ['[stats/rail] read failed: TypeError: fetch failed'],
+    ]);
   });
 
   it('renames rows onto the domain types', async () => {
