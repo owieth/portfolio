@@ -3,17 +3,13 @@ name: Rail data
 # Builds the rail artifacts from a clean checkout: no cached feed and no cached
 # Overpass answers, the way the December refresh starts on a fresh clone. A run
 # downloads the timetable feed (about 256 MB, 3 GB unpacked) and about 110 MB
-# from the public Overpass API, so it runs on changes to the pipeline and on
-# demand, never on a timer.
+# from the public Overpass API, so it runs on demand only, never on a timer.
+# Run it before the December refresh, and on a branch that changes fetching,
+# Overpass or ingest, or bumps `@duckdb/node-api`. Start it from Actions →
+# Rail data → Run workflow, or with `gh workflow run rail.yml --ref <branch>`.
 
 on:
   workflow_dispatch:
-  pull_request:
-    paths:
-      - rail/src/**
-      - rail/data/*.json
-      - rail/lines.schema.json
-      - .github/workflows/rail.yml
 
 concurrency:
   group: rail-${{ github.ref }}
