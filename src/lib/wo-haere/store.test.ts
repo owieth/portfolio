@@ -179,4 +179,23 @@ describe('useWoHaere', () => {
 
     expect(useWoHaere().wurfbuech).toHaveLength(0);
   });
+
+  it('refreshes only the slice another tab changed', async () => {
+    const localStorage = makeStorage({
+      'wo-haere:yschtellige': JSON.stringify({ ton: true }),
+    });
+    const storageHandlers = stubWindow(localStorage);
+    const useWoHaere = await importStore();
+    const vorher = useWoHaere().yschtellige;
+    const onChange = vi.fn();
+    hooks.subscribe!(onChange);
+
+    localStorage.setItem('wo-haere:wurfbuech', JSON.stringify([wurf('a')]));
+    for (const handler of storageHandlers)
+      handler({ key: 'wo-haere:wurfbuech' });
+
+    expect(onChange).toHaveBeenCalled();
+    expect(useWoHaere().wurfbuech).toEqual([wurf('a')]);
+    expect(useWoHaere().yschtellige).toBe(vorher);
+  });
 });

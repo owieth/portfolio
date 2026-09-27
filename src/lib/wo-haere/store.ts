@@ -67,11 +67,6 @@ function getServerSnapshot(): Schnappschuss {
   return SERVER;
 }
 
-function meldi() {
-  schnappschuss = läse();
-  for (const l of losenr) l();
-}
-
 function setze(teil: Partial<Schnappschuss>) {
   schnappschuss = { ...getSnapshot(), ...teil };
   for (const l of losenr) l();
@@ -81,7 +76,8 @@ function subscribe(onChange: () => void) {
   losenr.add(onChange);
   // Another tab writing to localStorage should update this one too.
   const onStorage = (e: StorageEvent) => {
-    if (e.key === KEY_YSCHTELLIGE || e.key === KEY_WURFBUECH) meldi();
+    if (e.key === KEY_YSCHTELLIGE) setze({ yschtellige: ladeYschtellige() });
+    if (e.key === KEY_WURFBUECH) setze({ wurfbuech: ladeWurfbuech() });
   };
   window.addEventListener('storage', onStorage);
   return () => {
