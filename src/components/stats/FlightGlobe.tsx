@@ -376,6 +376,9 @@ export default function FlightGlobe({ legs }: { legs: FlightLeg[] }) {
     let previousFrameTime = 0;
     // A reader who has asked for less motion never gets the spin at all.
     let spins = !prefersReducedMotion();
+    // Within `PREBUILD_MARGIN` of the viewport, as the observer last saw it,
+    // so a finished build knows whether to start the spin.
+    let visible = false;
 
     // Read here and never during render: dark mode is pure `@media`, so there
     // is no class or cookie the server could match and a branch in JSX would
@@ -506,6 +509,8 @@ export default function FlightGlobe({ legs }: { legs: FlightLeg[] }) {
         map.on('mouseenter', layer, pointer(true));
         map.on('mouseleave', layer, pointer(false));
       }
+
+      if (visible) startSpin();
     };
 
     /**
@@ -535,7 +540,8 @@ export default function FlightGlobe({ legs }: { legs: FlightLeg[] }) {
     const observer = new IntersectionObserver(
       entries => {
         for (const entry of entries) {
-          if (!entry.isIntersecting) {
+          visible = entry.isIntersecting;
+          if (!visible) {
             stopSpin();
             continue;
           }
