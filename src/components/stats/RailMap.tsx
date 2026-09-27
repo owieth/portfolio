@@ -36,7 +36,7 @@ import { prefersReducedMotion } from '@/lib/wo-haere/motion';
  * What was ridden comes two ways. A line ridden end to end is its own feature
  * in that file, picked out by id. A stretch between two stops was cut out of
  * the same file on the server by `rideStretches`, and arrives as a prop: only
- * the track ridden, which is a few points per ride.
+ * the track ridden, one feature per stretch ridden, however often.
  */
 
 const LINES_SOURCE_ID = 'rail-lines';
@@ -267,7 +267,7 @@ export default function RailMap({
   stations: RailStation[];
   /** Lines ridden end to end, drawn whole. */
   wholeIds: string[];
-  /** The track between the stops of every other ride. */
+  /** The track between two stops, once per stretch ridden. */
   stretches: RailStretch[];
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
