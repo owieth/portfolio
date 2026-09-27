@@ -114,11 +114,13 @@ export default function Wurfsteuerig({
       letschtRef.current = null;
       setZieht(true);
       setChraft(0);
+      // Only the ref can stop a tone, so never overwrite a running one.
+      tonUs();
       // The pointer press is the gesture that lets audio start at all.
       if (ton) ziehTonRef.current = startZieh();
       track({ name: 'throw_started', input_method: dragMethod });
     },
-    [dragMethod, gsperrt, startPixel, ton],
+    [dragMethod, gsperrt, startPixel, ton, tonUs],
   );
 
   const bewege = useCallback(
