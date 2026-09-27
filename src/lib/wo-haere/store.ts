@@ -67,8 +67,8 @@ function getServerSnapshot(): Schnappschuss {
   return SERVER;
 }
 
-function meldi() {
-  schnappschuss = läse();
+function setze(teil: Partial<Schnappschuss>) {
+  schnappschuss = { ...getSnapshot(), ...teil };
   for (const l of losenr) l();
 }
 
@@ -76,7 +76,8 @@ function subscribe(onChange: () => void) {
   losenr.add(onChange);
   // Another tab writing to localStorage should update this one too.
   const onStorage = (e: StorageEvent) => {
-    if (e.key === KEY_YSCHTELLIGE || e.key === KEY_WURFBUECH) meldi();
+    if (e.key === KEY_YSCHTELLIGE) setze({ yschtellige: ladeYschtellige() });
+    if (e.key === KEY_WURFBUECH) setze({ wurfbuech: ladeWurfbuech() });
   };
   window.addEventListener('storage', onStorage);
   return () => {
@@ -91,7 +92,6 @@ function speichere(key: string, value: unknown) {
   } catch {
     // A full or blocked localStorage must never break a dart throw.
   }
-  meldi();
 }
 
 export function useWoHaere() {
@@ -102,14 +102,19 @@ export function useWoHaere() {
   );
 
   const ändere = useCallback((teil: Partial<Yschtellige>) => {
-    speichere(KEY_YSCHTELLIGE, { ...ladeYschtellige(), ...teil });
+    const yschtellige = { ...getSnapshot().yschtellige, ...teil };
+    setze({ yschtellige });
+    speichere(KEY_YSCHTELLIGE, yschtellige);
   }, []);
 
   const merkWurf = useCallback((eintrag: WurfEintrag) => {
-    speichere(KEY_WURFBUECH, [eintrag, ...ladeWurfbuech()].slice(0, MAX_WUERF));
+    const wurfbuech = [eintrag, ...getSnapshot().wurfbuech].slice(0, MAX_WUERF);
+    setze({ wurfbuech });
+    speichere(KEY_WURFBUECH, wurfbuech);
   }, []);
 
   const leereWurfbuech = useCallback(() => {
+    setze({ wurfbuech: [] });
     speichere(KEY_WURFBUECH, []);
   }, []);
 
