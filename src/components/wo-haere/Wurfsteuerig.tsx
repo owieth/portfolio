@@ -64,6 +64,7 @@ export default function Wurfsteuerig({
   const voRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const letschtRef = useRef<Zug | null>(null);
   const ziehTonRef = useRef<ZiehTon | null>(null);
+  const pointerRef = useRef<number | null>(null);
 
   const tonUs = useCallback(() => {
     ziehTonRef.current?.stop();
@@ -108,22 +109,35 @@ export default function Wurfsteuerig({
   const aafah = useCallback(
     (e: React.PointerEvent<HTMLButtonElement>) => {
       if (gsperrt) return;
+      // One pointer per drag: a second finger must not restart it. A pointer
+      // that pressed again or lost capture never sent its release, so that
+      // drag is stale and this press restarts it.
+      const aktiv = pointerRef.current;
+      if (
+        aktiv !== null &&
+        aktiv !== e.pointerId &&
+        e.currentTarget.hasPointerCapture(aktiv)
+      )
+        return;
       e.currentTarget.setPointerCapture(e.pointerId);
+      pointerRef.current = e.pointerId;
       startRef.current = { x: e.clientX, y: e.clientY };
       voRef.current = startPixel();
       letschtRef.current = null;
       setZieht(true);
       setChraft(0);
+      // Only the ref can stop a tone, so never overwrite a running one.
+      tonUs();
       // The pointer press is the gesture that lets audio start at all.
       if (ton) ziehTonRef.current = startZieh();
       track({ name: 'throw_started', input_method: dragMethod });
     },
-    [dragMethod, gsperrt, startPixel, ton],
+    [dragMethod, gsperrt, startPixel, ton, tonUs],
   );
 
   const bewege = useCallback(
     (e: React.PointerEvent<HTMLButtonElement>) => {
-      if (!zieht) return;
+      if (!zieht || e.pointerId !== pointerRef.current) return;
       const zug = zugVo(e.clientX, e.clientY);
       if (!zug) return;
       letschtRef.current = zug;
@@ -143,29 +157,33 @@ export default function Wurfsteuerig({
     [art, brettRadius, onZug, zieht, zugVo],
   );
 
-  const loslah = useCallback(() => {
-    if (!zieht) return;
-    setZieht(false);
-    setChraft(0);
-    onZug(null);
-    tonUs();
-    startRef.current = null;
+  const loslah = useCallback(
+    (e: React.PointerEvent<HTMLButtonElement>) => {
+      if (!zieht || e.pointerId !== pointerRef.current) return;
+      pointerRef.current = null;
+      setZieht(false);
+      setChraft(0);
+      onZug(null);
+      tonUs();
+      startRef.current = null;
 
-    const zug = letschtRef.current;
-    letschtRef.current = null;
-    if (!zug) return;
+      const zug = letschtRef.current;
+      letschtRef.current = null;
+      if (!zug) return;
 
-    const v = vorschau(zug, art);
-    if (!v.gnue) {
-      track({ name: 'throw_abandoned', input_method: dragMethod });
-      return;
-    }
+      const v = vorschau(zug, art);
+      if (!v.gnue) {
+        track({ name: 'throw_abandoned', input_method: dragMethod });
+        return;
+      }
 
-    const erg = zugZieu(zug, art, nöieWind(), brettRadius());
-    if (ton) whoosh(v.chraft, erg.stil === 'chnorz');
-    track({ name: 'throw_input_method', input_method: dragMethod });
-    onWurf(erg);
-  }, [art, brettRadius, dragMethod, onWurf, onZug, ton, tonUs, zieht]);
+      const erg = zugZieu(zug, art, nöieWind(), brettRadius());
+      if (ton) whoosh(v.chraft, erg.stil === 'chnorz');
+      track({ name: 'throw_input_method', input_method: dragMethod });
+      onWurf(erg);
+    },
+    [art, brettRadius, dragMethod, onWurf, onZug, ton, tonUs, zieht],
+  );
 
   if (wurfart === 'tipp') {
     return (
