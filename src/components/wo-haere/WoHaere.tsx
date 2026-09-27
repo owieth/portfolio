@@ -1,7 +1,7 @@
 'use client';
 
 import { LazyMotion, domAnimation } from 'motion/react';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 
 import { track } from '@/lib/analytics/track';
 import Chopf from '@/components/wo-haere/Chopf';
@@ -58,6 +58,12 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
   // animation completes — a ref for the same reason as `stilRef`: nothing
   // renders it, so committing it would only re-render the whole game.
   const wartendOrtRef = useRef<LatLon | null>(null);
+  // Whether the dart in flight replays a shared ?wurf= link rather than being
+  // the visitor's own throw — a ref for the same reason as `stilRef`.
+  const replayRef = useRef(false);
+  // A replayed throw leaves its hole on the map but never joins the log, so it
+  // lives here rather than in the store.
+  const [replayEintrag, setReplayEintrag] = useState<WurfEintrag | null>(null);
   const [resultat, setResultat] = useState<Resultat | null>(null);
   const [laufend, setLaufend] = useState(false);
   const [fähler, setFähler] = useState(false);
@@ -70,7 +76,7 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
   } = useTeile(resultat?.wurf ?? null);
 
   const zeigResultat = useCallback(
-    (wurf: Wurf, ort: LatLon) => {
+    (wurf: Wurf, ort: LatLon, replay: boolean) => {
       const nz = wurf.art === 'preich' ? noechschtsZiu(ort) : null;
       const isPreich = Boolean(nz?.isPreich) && wurf.art === 'preich';
 
@@ -98,6 +104,14 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
         ziuName: nz?.ziu.name ?? null,
         isPreich,
       };
+
+      // The sender already logged and tracked this throw; `shared_throw_opened`
+      // is the recipient's record of it.
+      if (replay) {
+        setReplayEintrag(eintrag);
+        return;
+      }
+
       merkWurf(eintrag);
 
       spurWurf({ wurf, stil: stilRef.current, vorher: wurfbuech });
@@ -107,6 +121,9 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
 
   const holResultat = useCallback(
     async (ort: LatLon) => {
+      // Read before the request: a throw made before the map loaded can still
+      // be in flight when the replay starts and sets the flag.
+      const replay = replayRef.current;
       try {
         const res = await fetch(WURF_ENDPOINT, {
           method: 'POST',
@@ -114,7 +131,7 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
           body: JSON.stringify(ort),
         });
         if (!res.ok) throw new Error(String(res.status));
-        zeigResultat((await res.json()) as Wurf, ort);
+        zeigResultat((await res.json()) as Wurf, ort, replay);
       } catch (error) {
         setFähler(true);
         const status =
@@ -136,6 +153,7 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
       const handle = charteRef.current;
       if (!handle) return;
 
+      replayRef.current = false;
       setResultat(null);
       setFähler(false);
       teiletextZrugg();
@@ -206,6 +224,7 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
     handle?.zeigOrt(startWurf);
     setWurfNr(n => n + 1);
     wartendOrtRef.current = startWurf;
+    replayRef.current = true;
     setZiel(
       handle?.ortZuPixel(startWurf) ?? mitti(handle?.container() ?? null),
     );
@@ -213,6 +232,12 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
   }, [startWurf]);
 
   const gsammlet = gsammleteKantöne(wurfbuech);
+  // Memoised because every pointer move re-renders the game, and a fresh array
+  // would rebuild every marker on the map each frame.
+  const wuerfUfDerCharte = useMemo(
+    () => (replayEintrag ? [replayEintrag, ...wurfbuech] : wurfbuech),
+    [replayEintrag, wurfbuech],
+  );
 
   return (
     // `strict` makes the full `motion` component throw, so the split cannot
@@ -232,7 +257,7 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
           <Wandcharte
             ref={charteRef}
             aasicht={yschtellige.aasicht}
-            wuerf={wurfbuech}
+            wuerf={wuerfUfDerCharte}
             onZwaeg={charteZwaeg}
           />
           {zug && (
