@@ -93,11 +93,12 @@ const Field = ({ label, value }: { label: string; value: string }) => (
 /**
  * What the card falls back to when there is nothing to put on it.
  *
- * `loadFlights` answers an empty list for an unconfigured deploy, an
- * unreachable database and a genuinely empty log alike — the same three shapes
- * `/stats` collapses into one empty state. A passport reading `0 FLIGHTS` with
- * an MRZ of zeros is a worse share card than the site's generic one, so this
- * is the generic one.
+ * `loadFlights` answers an empty list for an unconfigured deploy, a failed
+ * read at `next build` and a genuinely empty log alike — the same three shapes
+ * `/stats` collapses into one empty state. A failed read during the hourly
+ * regeneration throws instead, so the last good passport stays up rather than
+ * this card. A passport reading `0 FLIGHTS` with an MRZ of zeros is a worse
+ * share card than the site's generic one, so this is the generic one.
  */
 const generic = () => (
   <div

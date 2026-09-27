@@ -463,7 +463,9 @@ export default async function StatsPage() {
         Each empty state covers all three failure shapes at once — Supabase
         unconfigured, the read failed, or the table is empty — because the page
         renders the same thing for each. A preview deploy without env vars is
-        the everyday case. Neither section hides the other.
+        the everyday case. A failed read only lands here at `next build`,
+        though: at runtime the loaders throw, and the hourly regeneration keeps
+        the last good page instead. Neither section hides the other.
       */}
       {legs.length > 0 ? (
         <Flights legs={legs} />
