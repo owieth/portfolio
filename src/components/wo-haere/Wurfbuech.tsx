@@ -3,7 +3,11 @@
 import { AlertDialog } from '@base-ui/react/alert-dialog';
 
 import { track } from '@/lib/analytics/track';
-import { WURFBUECH as TEXT, kantonsName } from '@/lib/wo-haere/data/bern';
+import {
+  DERNAEBE,
+  WURFBUECH as TEXT,
+  kantonsName,
+} from '@/lib/wo-haere/data/bern';
 import { cn } from '@/lib/wo-haere/cn';
 import type { WurfEintrag } from '@/lib/wo-haere/types';
 
@@ -53,7 +57,7 @@ export default function Wurfbuech({
                     {eintrag.isPreich && '🔔 '}
                     {eintrag.wurf.art === 'preich'
                       ? (eintrag.ziuName ?? eintrag.wurf.gmeind)
-                      : TEXT.titu}
+                      : DERNAEBE.titu}
                   </span>
                   <span className="shrink-0 text-xs text-stone-500 dark:text-stone-400">
                     {eintrag.wurf.art === 'preich' && eintrag.wurf.kanton
