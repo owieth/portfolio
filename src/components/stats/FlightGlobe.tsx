@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-// maplibre-gl v6 has no default export — named imports only.
+// Types only. The library itself comes from `loadMaplibre`, and one value
+// import here would put all of it back in the page's initial JS.
 import type {
   Map as MlMap,
   MapGeoJSONFeature,
