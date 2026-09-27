@@ -24,4 +24,21 @@ describe('formatShare', () => {
     expect(formatShare(57, 100)).toBe('57%');
     expect(formatShare(29, 50)).toBe('58%');
   });
+
+  it('prints every exact share up to 300 stops exactly', () => {
+    const mismatches: string[] = [];
+
+    for (let stops = 1; stops <= 300; stops++) {
+      for (let covered = 0; covered <= stops; covered++) {
+        if ((100 * covered) % stops !== 0) continue;
+
+        const printed = formatShare(covered, stops);
+        if (printed !== `${(100 * covered) / stops}%`) {
+          mismatches.push(`${covered}/${stops} → ${printed}`);
+        }
+      }
+    }
+
+    expect(mismatches).toEqual([]);
+  });
 });
