@@ -72,6 +72,7 @@ export const Shot = ({ shot }: { shot: Screenshot }) => (
       width={shot.width}
       height={shot.height}
       alt={shot.alt}
+      sizes={COLUMN_SIZES}
       className="border-foreground/20 w-full rounded-lg border"
     />
     <figcaption className="text-muted text-sm text-pretty">
