@@ -252,6 +252,25 @@ describe('sliceLine', () => {
     expect(backward.coordinates).toEqual(reversed(forward.coordinates));
   });
 
+  it('starts on the stop’s own part rather than at a junction beside it', () => {
+    // 11 m south of the trunk and 23 m short of the junction, which is the
+    // nearest point of both the east part and the branch.
+    expect(sliceLine(PARTS, at(7.0197, 46.9999), at(7.035))).toEqual({
+      ok: true,
+      coordinates: [
+        [
+          [7.0197, 47],
+          [7.02, 47],
+        ],
+        [
+          [7.02, 47],
+          [7.03, 47],
+          [7.035, 47],
+        ],
+      ],
+    });
+  });
+
   it('refuses a stop lying off the geometry', () => {
     // Over a kilometre south of the line.
     expect(sliceLine(PARTS, at(7.005), at(7.015, 46.99))).toEqual({

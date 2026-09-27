@@ -127,7 +127,9 @@ interface Edge {
  * alone reaches a stop placed on the other only by way of a terminus. Near is
  * at most `JOIN_M` farther off than the nearest part: parallel tracks are
  * metres apart, and any wider would let a stop start down a branch it is not
- * on.
+ * on. A part that comes nearest at one of its ends does not pass the stop but
+ * starts beside it, at a junction the nearest part reaches anyway, so it is
+ * left out rather than let the cut skip the track to that junction.
  */
 export function sliceLine(
   parts: Position[][],
@@ -138,6 +140,10 @@ export function sliceLine(
     lat: (from.lat + to.lat) / 2,
     lon: (from.lon + to.lon) / 2,
   });
+  const onPartEnd = ({ part, position }: Snap) =>
+    [parts[part][0], parts[part][parts[part].length - 1]].some(
+      (end) => end[0] === position[0] && end[1] === position[1],
+    );
   const candidates: Snap[][] = [];
 
   for (const [index, point] of [from, to].entries()) {
@@ -165,7 +171,12 @@ export function sliceLine(
 
     const reach = Math.min(OFF_LINE_M, best.metres + JOIN_M);
 
-    candidates.push(snaps.filter(({ metres }) => metres <= reach));
+    candidates.push(
+      snaps.filter(
+        (placed) =>
+          placed === best || (placed.metres <= reach && !onPartEnd(placed)),
+      ),
+    );
   }
 
   const [starts, ends] = candidates;
