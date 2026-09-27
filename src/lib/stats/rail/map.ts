@@ -19,8 +19,9 @@ export interface RailMapLine {
 }
 
 /**
- * Pinned for the reason `format.ts` pins `de-CH`: the list renders on the
- * server and hydrates. Numeric, so the S2 comes before the S10.
+ * Pinned rather than left to the server's default locale, so the order is the
+ * same whichever machine renders the page. Numeric, so the S2 comes before
+ * the S10.
  */
 const COLLATOR = new Intl.Collator('de-CH', { numeric: true });
 
