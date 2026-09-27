@@ -108,8 +108,17 @@ export default function Wurfsteuerig({
 
   const aafah = useCallback(
     (e: React.PointerEvent<HTMLButtonElement>) => {
-      // One pointer per drag: a second finger must not restart it.
-      if (gsperrt || pointerRef.current !== null) return;
+      if (gsperrt) return;
+      // One pointer per drag: a second finger must not restart it. A pointer
+      // that pressed again or lost capture never sent its release, so that
+      // drag is stale and this press restarts it.
+      const aktiv = pointerRef.current;
+      if (
+        aktiv !== null &&
+        aktiv !== e.pointerId &&
+        e.currentTarget.hasPointerCapture(aktiv)
+      )
+        return;
       e.currentTarget.setPointerCapture(e.pointerId);
       pointerRef.current = e.pointerId;
       startRef.current = { x: e.clientX, y: e.clientY };
