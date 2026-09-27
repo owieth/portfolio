@@ -1,13 +1,14 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-// maplibre-gl v6 has no default export — named imports only.
-import {
+// Types only. The library itself comes from `loadMaplibre`, and one value
+// import here would put all of it back in the page's initial JS.
+import type {
   Map as MlMap,
-  type MapGeoJSONFeature,
-  type Point as Point2D,
-  type StyleSpecification,
-  type TransformStyleFunction,
+  MapGeoJSONFeature,
+  Point as Point2D,
+  StyleSpecification,
+  TransformStyleFunction,
 } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
@@ -18,7 +19,7 @@ import type {
   Point,
 } from 'geojson';
 
-import { ensureMaplibreWorker } from '@/lib/maplibre/worker';
+import { loadMaplibre } from '@/lib/maplibre/load';
 import { globeStyle } from '@/lib/stats/maplibre/styles';
 import { formatDistanceKm } from '@/lib/stats/flights/format';
 import { greatCirclePath } from '@/lib/stats/flights/geo';
@@ -376,6 +377,15 @@ export default function FlightGlobe({ legs }: { legs: FlightLeg[] }) {
     let previousFrameTime = 0;
     // A reader who has asked for less motion never gets the spin at all.
     let spins = !prefersReducedMotion();
+    // Within `PREBUILD_MARGIN` of the viewport, as the observer last saw it,
+    // so a finished build knows whether to start the spin.
+    let visible = false;
+    // One build at a time: scrolling out and back within `PREBUILD_MARGIN`
+    // fires the observer again while the library is still downloading.
+    let building = false;
+    // Set first in the cleanup, so a build still waiting on the library
+    // stands down rather than opening a map nothing will remove.
+    let disposed = false;
 
     // Read here and never during render: dark mode is pure `@media`, so there
     // is no class or cookie the server could match and a branch in JSX would
@@ -446,9 +456,11 @@ export default function FlightGlobe({ legs }: { legs: FlightLeg[] }) {
       if (map) map.getCanvas().style.cursor = over ? 'pointer' : '';
     };
 
-    const build = () => {
-      ensureMaplibreWorker();
-      map = new MlMap({
+    const build = async () => {
+      const maplibre = await loadMaplibre();
+      if (disposed) return;
+
+      map = new maplibre.Map({
         container,
         style: styleFor(),
         // The Atlantic, where most of the arcs are, front and centre.
@@ -506,6 +518,8 @@ export default function FlightGlobe({ legs }: { legs: FlightLeg[] }) {
         map.on('mouseenter', layer, pointer(true));
         map.on('mouseleave', layer, pointer(false));
       }
+
+      if (visible) startSpin();
     };
 
     /**
@@ -535,11 +549,20 @@ export default function FlightGlobe({ legs }: { legs: FlightLeg[] }) {
     const observer = new IntersectionObserver(
       entries => {
         for (const entry of entries) {
-          if (!entry.isIntersecting) {
+          visible = entry.isIntersecting;
+          if (!visible) {
             stopSpin();
             continue;
           }
-          if (!map) build();
+          if (!map && !building) {
+            building = true;
+            build().catch((error: unknown) => {
+              // No error UI: the box stays empty, and the next time it nears
+              // the viewport the build is tried again.
+              building = false;
+              console.error(error);
+            });
+          }
           startSpin();
         }
       },
@@ -548,6 +571,7 @@ export default function FlightGlobe({ legs }: { legs: FlightLeg[] }) {
     observer.observe(container);
 
     return () => {
+      disposed = true;
       observer.disconnect();
       dark.removeEventListener('change', onThemeChange);
       stopSpin();
