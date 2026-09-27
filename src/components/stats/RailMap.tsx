@@ -2,7 +2,7 @@
 
 import { Combobox } from '@base-ui/react/combobox';
 import { useEffect, useMemo, useRef, useState } from 'react';
-// maplibre-gl v6 has no default export — named imports only.
+// Types only, for the reason FlightGlobe gives.
 import type {
   Map as MlMap,
   LngLatBoundsLike,
