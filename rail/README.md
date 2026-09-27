@@ -1038,9 +1038,12 @@ dry-run before applying it.
    nor `pnpm diff:data` writes to Supabase.
 
 The `Rail data` workflow in `.github/workflows/rail.yml` runs the same build
-from a fresh checkout on every pull request that touches the pipeline, and on
-demand. It writes `pnpm diff:data` into the run's summary and uploads the
-artifacts, so a refresh can also be started from the Actions tab.
+from a fresh checkout, on demand only. Run it before the December refresh, and
+on a branch that changes fetching, Overpass or ingest, or bumps
+`@duckdb/node-api`: Actions → Rail data → Run workflow, or
+`gh workflow run rail.yml --ref <branch>`. It writes `pnpm diff:data` into the
+run's summary and uploads the artifacts, so a refresh can also be started from
+the Actions tab.
 
 ## Layout
 
