@@ -2,8 +2,10 @@ import { formatShare } from '@/lib/stats/rail/format';
 import type { RailLineProgress } from '@/lib/stats/rail/types';
 
 /**
- * What `RailMap` needs of each line, worked out once on the way in so the
- * component only paints and names. Pure, like the rest of this folder.
+ * What `RailMap` needs of each line, worked out on the server and passed in
+ * as a prop, so the page ships four fields per line drawn rather than every
+ * line's full row, and the component only paints and names. Pure, like the
+ * rest of this folder.
  */
 
 export interface RailMapLine {
