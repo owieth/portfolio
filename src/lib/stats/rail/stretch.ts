@@ -39,10 +39,7 @@ const RADIANS = Math.PI / 180;
 /** The precision of `lines.geojson`, so a cut point is no finer than the rest. */
 const PRECISION = 1e5;
 
-export type RailStretch = Feature<
-  MultiLineString,
-  { id: string; rideId: string }
->;
+export type RailStretch = Feature<MultiLineString, { id: string }>;
 
 export type Slice =
   | { ok: true; coordinates: Position[][] }
@@ -289,21 +286,33 @@ function shortestPath(
   return path.reverse();
 }
 
-const skip = ({ ride }: RailRideCoverage, reason: string) =>
+/** The rides over one stretch of one line, whichever way each went. */
+interface Ridden {
+  first: RailRideCoverage;
+  fromDidok: string;
+  toDidok: string;
+  rides: number;
+}
+
+const skip = ({ first: { ride }, rides }: Ridden, reason: string) =>
   console.warn(
-    `[stats/rail] skipping the stretch of ride ${ride.id} on ${ride.riddenOn}: ${reason}`,
+    `[stats/rail] skipping the stretch of ride ${ride.id} on ${ride.riddenOn}${rides > 1 ? ` and ${rides - 1} more` : ''}: ${reason}`,
   );
 
 /**
- * Segment rides to the track they covered, one feature each, for the map to
- * draw over the muted network. A whole-line ride has no stretch: the map draws
- * the line's own feature, which `wholeLineIds` names.
+ * Segment rides to the track they covered, for the map to draw over the muted
+ * network: one feature per stretch, however often and whichever way it was
+ * ridden. A stretch is a line and two stops, cut in the stops' sorted order so
+ * the track does not depend on which ride came first, and the features follow
+ * the order their stretches first appear in. A whole-line ride has no
+ * stretch: the map draws the line's own feature, which `wholeLineIds` names.
  *
  * Off the coverage, so every ride here already resolved against its line and
  * its stops. What can still go wrong is the geometry: a stop with no position,
  * a line with no feature, a stop too far from its track, or two stops on parts
- * nothing joins. Each drops the stretch with a warning, the same as
- * `toCoverage` drops a ride. The ride still counts towards the line's share.
+ * nothing joins. Each drops the stretch with one warning, naming its first
+ * ride and how many more, the same as `toCoverage` drops a ride. The rides
+ * still count towards the line's share.
  *
  * A Didok number listed twice on a line places the first stop to list it, the
  * same one `toCoverage` walks from.
@@ -323,43 +332,56 @@ export function rideStretches(
     positions.set(key, lat === null || lon === null ? null : { lat, lon });
   }
 
-  const stretches: RailStretch[] = [];
+  const byStretch = new Map<string, Ridden>();
 
   for (const entry of coverage) {
     const { ride, line } = entry;
 
     if (ride.fromDidok === null || ride.toDidok === null) continue;
 
-    const from = positions.get(`${line.id} ${ride.fromDidok}`);
-    const to = positions.get(`${line.id} ${ride.toDidok}`);
+    const [fromDidok, toDidok] = [ride.fromDidok, ride.toDidok].sort();
+    const key = `${line.id} ${fromDidok} ${toDidok}`;
+    const known = byStretch.get(key);
+
+    if (known) known.rides += 1;
+    else byStretch.set(key, { first: entry, fromDidok, toDidok, rides: 1 });
+  }
+
+  const stretches: RailStretch[] = [];
+
+  for (const ridden of byStretch.values()) {
+    const { line } = ridden.first;
+    const { fromDidok, toDidok } = ridden;
+    const from = positions.get(`${line.id} ${fromDidok}`);
+    const to = positions.get(`${line.id} ${toDidok}`);
 
     if (!from || !to) {
-      const unplaced = [!from && ride.fromDidok, !to && ride.toDidok]
+      const unplaced = [!from && fromDidok, !to && toDidok]
         .filter(Boolean)
         .join(', ');
 
-      skip(entry, `${unplaced} has no position`);
+      skip(ridden, `${unplaced} has no position`);
       continue;
     }
 
     const parts = geometry.get(line.id);
 
     if (!parts) {
-      skip(entry, `${line.id} has no geometry`);
+      skip(ridden, `${line.id} has no geometry`);
       continue;
     }
 
     const slice = sliceLine(parts, from, to);
 
     if (!slice.ok) {
-      skip(entry, `${ride.fromDidok} → ${ride.toDidok}: ${slice.reason}`);
+      skip(ridden, `${fromDidok} → ${toDidok}: ${slice.reason}`);
       continue;
     }
 
     stretches.push({
       type: 'Feature',
       geometry: { type: 'MultiLineString', coordinates: slice.coordinates },
-      properties: { id: line.id, rideId: ride.id },
+      properties: { id: line.id },
     });
   }
 
