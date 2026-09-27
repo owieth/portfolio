@@ -74,6 +74,12 @@ describe('mapLines', () => {
     expect(s1).toMatchObject({ touched: true, detail: '4 of 10 stops · 40%' });
   });
 
+  it('describes an exact share without float error', () => {
+    const [s1] = mapLines([progress(line('test:S1', 'S1'), 29, 100)]);
+
+    expect(s1.detail).toBe('29 of 100 stops · 29%');
+  });
+
   it('never rounds a line up to 100%', () => {
     const [s1] = mapLines([progress(line('test:S1', 'S1'), 249, 250)]);
 
