@@ -4,5 +4,8 @@
  *
  * Floored rather than rounded, so 100% only ever means every stop: a line with
  * one stop left out of 300 would otherwise read as done.
+ *
+ * Takes the counts rather than their quotient, since `0.29 * 100` floors to 28.
  */
-export const formatShare = (share: number) => `${Math.floor(share * 100)}%`;
+export const formatShare = (covered: number, stops: number) =>
+  `${Math.floor((100 * covered) / stops)}%`;

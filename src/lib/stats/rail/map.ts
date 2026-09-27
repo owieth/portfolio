@@ -23,11 +23,11 @@ export interface RailMapLine {
 const COLLATOR = new Intl.Collator('de-CH', { numeric: true });
 
 /** A line with no stops can still be ridden, but has nothing to count. */
-function detailOf({ touched, covered, stops, share }: RailLineProgress) {
+function detailOf({ touched, covered, stops }: RailLineProgress) {
   if (!touched) return 'Not ridden yet';
   if (stops === 0) return 'Ridden';
 
-  return `${covered} of ${stops} ${stops === 1 ? 'stop' : 'stops'} · ${formatShare(share)}`;
+  return `${covered} of ${stops} ${stops === 1 ? 'stop' : 'stops'} · ${formatShare(covered, stops)}`;
 }
 
 /**
