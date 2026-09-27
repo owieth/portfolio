@@ -25,17 +25,12 @@ export const metadata: Metadata = {
   description,
   openGraph: {
     type: 'website',
-    url: SITE_URL,
-    title,
-    description,
     siteName: 'Olivier Winkler',
     locale: 'en_US',
   },
   twitter: {
     card: 'summary_large_image',
     creator: '@_owieth',
-    title,
-    description,
   },
   robots: {
     index: true,
