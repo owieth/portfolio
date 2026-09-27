@@ -12,6 +12,7 @@ import { Map as MlMap, Marker, type StyleSpecification } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
 import { track } from '@/lib/analytics/track';
+import { ensureMaplibreWorker } from '@/lib/maplibre/worker';
 import { CH_BOUNDS, type LatLon } from '@/lib/wo-haere/geo/ch';
 import {
   CHARTE_STYLE,
@@ -214,6 +215,7 @@ export default function Wandcharte({
     const container = containerRef.current;
     if (!container || mapRef.current) return;
 
+    ensureMaplibreWorker();
     const map = new MlMap({
       container,
       style: styleFor(aasichtRef.current),
