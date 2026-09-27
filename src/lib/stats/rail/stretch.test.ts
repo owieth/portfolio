@@ -280,6 +280,7 @@ describe('rideStretches', () => {
         ),
       ),
     );
+    expect(warn).not.toHaveBeenCalledWith(expect.stringContaining(' more'));
   });
 
   it('skips a ride with a stop that has no position, with a warning', () => {
@@ -313,6 +314,61 @@ describe('rideStretches', () => {
         geometry.coordinates[0][0],
       ]),
     ).toEqual([[S1.id, [7.015, 47]]]);
+  });
+
+  it('draws a stretch ridden many times once', () => {
+    expect(
+      rideStretches(
+        [
+          covered('8500002', '8500001'),
+          covered('8500001', '8500002'),
+          covered('8500001', '8500002'),
+        ],
+        S1_STOPS,
+        GEOMETRY,
+      ),
+    ).toEqual([
+      {
+        type: 'Feature',
+        geometry: {
+          type: 'MultiLineString',
+          coordinates: [
+            [
+              [7.005, 47],
+              [7.01, 47],
+              [7.015, 47],
+            ],
+          ],
+        },
+        properties: { id: S1.id },
+      },
+    ]);
+  });
+
+  it('keeps two stretches of one line apart', () => {
+    expect(
+      rideStretches(
+        [covered('8500001', '8500002'), covered('8500002', '8500003')],
+        S1_STOPS,
+        GEOMETRY,
+      ),
+    ).toHaveLength(2);
+  });
+
+  it('warns once for a stretch skipped on several rides', () => {
+    const first = covered('8500001', '8500005');
+
+    expect(
+      rideStretches([first, covered('8500005', '8500001')], S1_STOPS, GEOMETRY),
+    ).toEqual([]);
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringMatching(
+        new RegExp(
+          `^\\[stats/rail\\] skipping the stretch of ride ${first.ride.id} on 2026-09-24 and 1 more: 8500001 → 8500005: the to stop is \\d+ m off the line$`,
+        ),
+      ),
+    );
   });
 });
 
