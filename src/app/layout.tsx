@@ -25,7 +25,6 @@ export const metadata: Metadata = {
   description,
   openGraph: {
     type: 'website',
-    url: SITE_URL,
     title,
     description,
     siteName: 'Olivier Winkler',
