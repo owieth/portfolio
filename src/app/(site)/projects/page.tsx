@@ -1,3 +1,4 @@
+import { COLUMN_SIZES } from '@/components/projects/Prose';
 import { projects } from '@/data/projects';
 import type { Metadata } from 'next';
 import Image from 'next/image';
@@ -31,6 +32,7 @@ export default function ProjectsPage() {
                 width={project.cover.width}
                 height={project.cover.height}
                 alt={project.cover.alt}
+                sizes={COLUMN_SIZES}
                 className="border-foreground/20 group-hover:border-foreground/50 w-full rounded-lg border transition-colors"
                 // Only the first cover is above the fold; preloading the rest
                 // just makes them compete for the same connection.
