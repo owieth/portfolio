@@ -61,6 +61,10 @@ export const Table = ({ head, rows }: { head: string[]; rows: Row[] }) => (
   </div>
 );
 
+/** Mirrors SiteChrome's gutters around the max-w-3xl column. */
+export const COLUMN_SIZES =
+  '(min-width: 54rem) 48rem, (min-width: 40rem) calc(100vw - 6rem), calc(100vw - 3rem)';
+
 export const Shot = ({ shot }: { shot: Screenshot }) => (
   <figure className="mt-2 flex flex-col gap-2">
     <Image
@@ -68,6 +72,7 @@ export const Shot = ({ shot }: { shot: Screenshot }) => (
       width={shot.width}
       height={shot.height}
       alt={shot.alt}
+      sizes={COLUMN_SIZES}
       className="border-foreground/20 w-full rounded-lg border"
     />
     <figcaption className="text-muted text-sm text-pretty">

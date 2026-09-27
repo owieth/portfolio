@@ -7,7 +7,7 @@ import remarkGfm from 'remark-gfm';
 
 import { mdxComponents } from '@/components/projects/Mdx';
 import ProjectLinks from '@/components/projects/Links';
-import { P } from '@/components/projects/Prose';
+import { COLUMN_SIZES, P } from '@/components/projects/Prose';
 import type { Project } from '@/data/projects';
 import type { ReactNode } from 'react';
 
@@ -68,6 +68,7 @@ export default async function CaseStudy({
         width={project.cover.width}
         height={project.cover.height}
         alt={project.cover.alt}
+        sizes={COLUMN_SIZES}
         className="border-foreground/20 mt-12 w-full rounded-lg border"
         priority
       />
