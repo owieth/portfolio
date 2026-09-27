@@ -19,8 +19,9 @@ export const LINES_PATH = join(process.cwd(), 'public', 'rail', 'lines.geojson')
 
 /**
  * Line id to the parts of its `MultiLineString`. A result, never an exception,
- * for the reason `RailResult` gives: a missing file only means no stretches,
- * and the rest of the rail section renders as it would without them.
+ * even at runtime: a missing file is not a failed read. It only means no
+ * stretches, and the rest of the rail section renders as it would without
+ * them.
  */
 export async function loadRailGeometry(
   path = LINES_PATH,

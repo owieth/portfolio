@@ -6,6 +6,7 @@ import type {
   RailStop,
   RailStopVia,
 } from '@/lib/stats/rail/types';
+import { readFailed } from '@/lib/stats/read-failure';
 import type { Tables } from '@/lib/supabase/database.types';
 import { getSupabaseClient } from '@/lib/supabase/server';
 
@@ -17,9 +18,10 @@ import { getSupabaseClient } from '@/lib/supabase/server';
  */
 
 /**
- * A result, never an exception, for the reason `FlightsResult` gives: /stats is
- * prerendered at `next build`, so a throw here would break the build rather
- * than a request.
+ * A result at build time, an exception at runtime, for the reasons
+ * `FlightsResult` gives: a throw at `next build` would break the build rather
+ * than a request, and only a throw during the hourly regeneration keeps the
+ * last good /stats. An unset env is still `configured: false`, silently.
  *
  * All or nothing. A failed read of any one table empties all three, because
  * lines without their stops, or rides without their lines, would render as
@@ -129,8 +131,13 @@ export async function loadRail(): Promise<RailResult> {
 
   if (!supabase) return { configured: false, ...empty() };
 
+  let reads: [
+    ReadAll<Tables<'rail_lines'>>,
+    ReadAll<Tables<'rail_line_stops'>>,
+    ReadAll<Tables<'rail_rides'>>,
+  ];
   try {
-    const [lines, stops, rides] = await Promise.all([
+    reads = await Promise.all([
       readAll((from, to) =>
         supabase
           .from('rail_lines')
@@ -160,18 +167,31 @@ export async function loadRail(): Promise<RailResult> {
           .range(from, to),
       ),
     ]);
-
-    if (lines.error !== null) return failed(lines.error);
-    if (stops.error !== null) return failed(stops.error);
-    if (rides.error !== null) return failed(rides.error);
-
-    return {
-      configured: true,
-      lines: lines.rows.map(toLine),
-      stops: stops.rows.map(toStop),
-      rides: rides.rows.map(toRide),
-    };
-  } catch {
+  } catch (thrown) {
+    // Rarely reached, for the reason `loadFlights` gives.
+    readFailed('stats/rail', String(thrown));
     return failed('unreachable');
   }
+
+  const [lines, stops, rides] = reads;
+
+  if (lines.error !== null) {
+    readFailed('stats/rail', lines.error);
+    return failed(lines.error);
+  }
+  if (stops.error !== null) {
+    readFailed('stats/rail', stops.error);
+    return failed(stops.error);
+  }
+  if (rides.error !== null) {
+    readFailed('stats/rail', rides.error);
+    return failed(rides.error);
+  }
+
+  return {
+    configured: true,
+    lines: lines.rows.map(toLine),
+    stops: stops.rows.map(toStop),
+    rides: rides.rows.map(toRide),
+  };
 }
