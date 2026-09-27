@@ -25,8 +25,6 @@ export const metadata: Metadata = {
   description,
   openGraph: {
     type: 'website',
-    title,
-    description,
     siteName: 'Olivier Winkler',
     locale: 'en_US',
   },
