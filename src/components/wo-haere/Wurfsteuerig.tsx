@@ -64,6 +64,7 @@ export default function Wurfsteuerig({
   const voRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const letschtRef = useRef<Zug | null>(null);
   const ziehTonRef = useRef<ZiehTon | null>(null);
+  const pointerRef = useRef<number | null>(null);
 
   const tonUs = useCallback(() => {
     ziehTonRef.current?.stop();
@@ -107,8 +108,10 @@ export default function Wurfsteuerig({
 
   const aafah = useCallback(
     (e: React.PointerEvent<HTMLButtonElement>) => {
-      if (gsperrt) return;
+      // One pointer per drag: a second finger must not restart it.
+      if (gsperrt || pointerRef.current !== null) return;
       e.currentTarget.setPointerCapture(e.pointerId);
+      pointerRef.current = e.pointerId;
       startRef.current = { x: e.clientX, y: e.clientY };
       voRef.current = startPixel();
       letschtRef.current = null;
@@ -125,7 +128,7 @@ export default function Wurfsteuerig({
 
   const bewege = useCallback(
     (e: React.PointerEvent<HTMLButtonElement>) => {
-      if (!zieht) return;
+      if (!zieht || e.pointerId !== pointerRef.current) return;
       const zug = zugVo(e.clientX, e.clientY);
       if (!zug) return;
       letschtRef.current = zug;
@@ -145,29 +148,33 @@ export default function Wurfsteuerig({
     [art, brettRadius, onZug, zieht, zugVo],
   );
 
-  const loslah = useCallback(() => {
-    if (!zieht) return;
-    setZieht(false);
-    setChraft(0);
-    onZug(null);
-    tonUs();
-    startRef.current = null;
+  const loslah = useCallback(
+    (e: React.PointerEvent<HTMLButtonElement>) => {
+      if (!zieht || e.pointerId !== pointerRef.current) return;
+      pointerRef.current = null;
+      setZieht(false);
+      setChraft(0);
+      onZug(null);
+      tonUs();
+      startRef.current = null;
 
-    const zug = letschtRef.current;
-    letschtRef.current = null;
-    if (!zug) return;
+      const zug = letschtRef.current;
+      letschtRef.current = null;
+      if (!zug) return;
 
-    const v = vorschau(zug, art);
-    if (!v.gnue) {
-      track({ name: 'throw_abandoned', input_method: dragMethod });
-      return;
-    }
+      const v = vorschau(zug, art);
+      if (!v.gnue) {
+        track({ name: 'throw_abandoned', input_method: dragMethod });
+        return;
+      }
 
-    const erg = zugZieu(zug, art, nöieWind(), brettRadius());
-    if (ton) whoosh(v.chraft, erg.stil === 'chnorz');
-    track({ name: 'throw_input_method', input_method: dragMethod });
-    onWurf(erg);
-  }, [art, brettRadius, dragMethod, onWurf, onZug, ton, tonUs, zieht]);
+      const erg = zugZieu(zug, art, nöieWind(), brettRadius());
+      if (ton) whoosh(v.chraft, erg.stil === 'chnorz');
+      track({ name: 'throw_input_method', input_method: dragMethod });
+      onWurf(erg);
+    },
+    [art, brettRadius, dragMethod, onWurf, onZug, ton, tonUs, zieht],
+  );
 
   if (wurfart === 'tipp') {
     return (
