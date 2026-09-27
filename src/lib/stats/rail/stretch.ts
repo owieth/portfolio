@@ -116,11 +116,18 @@ interface Edge {
  * crossed, in the order it crossed them. Either stop order gives the same
  * track, walked the other way.
  *
- * Each stop is placed at the nearest point of any part, and the cut runs along
- * the shortest way between the two over the parts and their junctions. Not
+ * Each stop is placed on every part near it, and the cut runs along the
+ * shortest way between the two over the parts and their junctions. Not
  * `toCoverage`'s walk over the stops: two stops only fix the ends, and the
- * shortest track between them is the one a train takes on a line that is a
- * tree of trunk and branches.
+ * shortest track between them is the one a train takes, down a trunk and its
+ * branches or along one track of a double-track line.
+ *
+ * Every part near it, not only the nearest: a double-track line is two
+ * parallel parts that meet only at the termini, and a stop placed on one track
+ * alone reaches a stop placed on the other only by way of a terminus. Near is
+ * at most `JOIN_M` farther off than the nearest part: parallel tracks are
+ * metres apart, and any wider would let a stop start down a branch it is not
+ * on.
  */
 export function sliceLine(
   parts: Position[][],
@@ -131,21 +138,37 @@ export function sliceLine(
     lat: (from.lat + to.lat) / 2,
     lon: (from.lon + to.lon) / 2,
   });
-  const ends = [snap(parts, plane, from), snap(parts, plane, to)] as const;
+  const candidates: Snap[][] = [];
 
-  for (const [index, end] of ends.entries()) {
+  for (const [index, point] of [from, to].entries()) {
     const which = index === 0 ? 'from' : 'to';
+    const snaps = parts.flatMap((part, partIndex) => {
+      const placed = snap([part], plane, point);
 
-    if (!end) return { ok: false, reason: 'the line has no geometry' };
-    if (end.metres > OFF_LINE_M) {
+      return placed ? [{ ...placed, part: partIndex }] : [];
+    });
+
+    if (snaps.length === 0) {
+      return { ok: false, reason: 'the line has no geometry' };
+    }
+
+    const best = snaps.reduce((nearest, placed) =>
+      placed.metres < nearest.metres ? placed : nearest,
+    );
+
+    if (best.metres > OFF_LINE_M) {
       return {
         ok: false,
-        reason: `the ${which} stop is ${Math.round(end.metres)} m off the line`,
+        reason: `the ${which} stop is ${Math.round(best.metres)} m off the line`,
       };
     }
+
+    const reach = Math.min(OFF_LINE_M, best.metres + JOIN_M);
+
+    candidates.push(snaps.filter(({ metres }) => metres <= reach));
   }
 
-  const [start, end] = ends as readonly [Snap, Snap];
+  const [starts, ends] = candidates;
   const positions: Position[] = [];
   const offsets: number[] = [];
 
@@ -154,8 +177,10 @@ export function sliceLine(
     positions.push(...part);
   }
 
-  const startNode = positions.push(start.position) - 1;
-  const endNode = positions.push(end.position) - 1;
+  const source = positions.push([from.lon, from.lat]) - 1;
+  const sink = positions.push([to.lon, to.lat]) - 1;
+  const startNodes = starts.map(({ position }) => positions.push(position) - 1);
+  const endNodes = ends.map(({ position }) => positions.push(position) - 1);
   const edges: Edge[][] = positions.map(() => []);
   const distance = (a: number, b: number) => {
     const [ax, ay] = plane(positions[a]);
@@ -163,9 +188,12 @@ export function sliceLine(
 
     return Math.hypot(bx - ax, by - ay);
   };
-  const link = (a: number, b: number, join = false) => {
-    const metres = distance(a, b);
-
+  const link = (
+    a: number,
+    b: number,
+    join = false,
+    metres = distance(a, b),
+  ) => {
     edges[a].push({ to: b, metres, join });
     edges[b].push({ to: a, metres, join });
   };
@@ -188,27 +216,34 @@ export function sliceLine(
     }
   }
 
-  for (const [node, { part, segment }] of [
-    [startNode, start],
-    [endNode, end],
+  for (const [stop, snaps, nodes] of [
+    [source, starts, startNodes],
+    [sink, ends, endNodes],
   ] as const) {
-    link(node, offsets[part] + segment);
-    link(node, offsets[part] + segment + 1);
+    for (const [index, { part, segment, metres }] of snaps.entries()) {
+      link(stop, nodes[index], false, metres);
+      link(nodes[index], offsets[part] + segment);
+      link(nodes[index], offsets[part] + segment + 1);
+    }
   }
 
-  if (start.part === end.part && start.segment === end.segment) {
-    link(startNode, endNode);
+  for (const [startIndex, start] of starts.entries()) {
+    for (const [endIndex, end] of ends.entries()) {
+      if (start.part === end.part && start.segment === end.segment) {
+        link(startNodes[startIndex], endNodes[endIndex]);
+      }
+    }
   }
 
-  const path = shortestPath(edges, startNode, endNode);
+  const path = shortestPath(edges, source, sink);
 
   if (!path) {
     return { ok: false, reason: 'nothing connects the two stops on the line' };
   }
 
-  const runs: Position[][] = [[positions[startNode]]];
+  const runs: Position[][] = [[positions[path[0].node]]];
 
-  for (const { node, join } of path) {
+  for (const { node, join } of path.slice(1, -1)) {
     const position = positions[node];
     const run = runs[runs.length - 1];
     const last = run[run.length - 1];
