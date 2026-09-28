@@ -4,7 +4,7 @@ import { join } from 'node:path';
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import { openGtfs, STORE } from './db.ts';
+import { literal, openGtfs, STORE } from './db.ts';
 
 /**
  * A two-column feed is enough here: what is being tested is the wiring — that a
@@ -56,6 +56,18 @@ describe('openGtfs', () => {
     try {
       expect(await db.query(`select route_short_name from routes`)).toEqual([
         { route_short_name: '007' },
+      ]);
+    } finally {
+      db.close();
+    }
+  });
+
+  it('keeps a quote and a backslash inside a literal', async () => {
+    const db = await openGtfs(directory, []);
+
+    try {
+      expect(await db.query(`select ${literal("it's")} as a, ${literal('C:\\x')} as b`)).toEqual([
+        { a: "it's", b: 'C:\\x' },
       ]);
     } finally {
       db.close();
