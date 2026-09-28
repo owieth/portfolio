@@ -286,6 +286,17 @@ describe('resolveHit', () => {
       });
     });
 
+    it('still reports the municipality when the height stalls', async () => {
+      laufAbSofort();
+      stubSwisstopo({ identify: { body: thun }, hoechi: { hanget: true } });
+
+      expect(await resolveHit(THUN)).toMatchObject({
+        art: 'preich',
+        gmeind: 'Thun',
+        hoechi: null,
+      });
+    });
+
     it('rounds the height to whole metres', async () => {
       stubSwisstopo({
         identify: { body: thun },
