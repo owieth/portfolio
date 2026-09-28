@@ -326,6 +326,18 @@ describe('resolveHit', () => {
         identifyUrls().map(url => url.searchParams.get('timeInstant')),
       ).toEqual(['2026', null]);
     });
+
+    it('throws on a failed first query without a second one', async () => {
+      stubSwisstopo({
+        identifyJahr: { ok: false, status: 500 },
+        identify: { body: thun },
+      });
+
+      await expect(resolveHit(THUN)).rejects.toThrow(
+        'swisstopo identify failed with 500',
+      );
+      expect(identifyUrls()).toHaveLength(1);
+    });
   });
 
   describe('the mapExtent trap', () => {
