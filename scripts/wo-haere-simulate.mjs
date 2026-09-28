@@ -48,11 +48,10 @@ const PADDING = 24;
 const BRETT_RADIUS = Math.min(SICHT.breiti, SICHT.hööchi) / 2;
 
 /**
- * The shooting bias is drawn once per module instance and stands for one
- * player's wonky arm, so a run needs many instances to describe a population
- * rather than a single thrower. It is the number of arms, not the number of
- * throws, that settles the off-board tail. Re-importing is most of the run
- * time, so this trades a few thousand arms against a script that finishes.
+ * Each session draws its own shooting bias, which stands for one player's
+ * wonky arm, so a run needs many sessions to describe a population rather
+ * than a single thrower. It is the number of arms, not the number of throws,
+ * that settles the off-board tail.
  */
 const PRO_SESSION = flag('session', 400);
 const SESSIONE = Math.max(1, Math.round(WUERF / PRO_SESSION));
