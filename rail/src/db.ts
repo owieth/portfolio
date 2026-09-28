@@ -110,6 +110,67 @@ async function assertPresent(gtfsDir: string, files: readonly GtfsFile[]): Promi
   }
 }
 
+interface ColumnRow {
+  column_name: string;
+}
+
+interface TableRow {
+  table_name: string;
+}
+
+function columns(file: GtfsFile): string {
+  return `select column_name from (describe ${file})`;
+}
+
+const TABLES = `
+  select table_name
+  from information_schema.tables
+  where table_catalog = '${STORE}'
+`;
+
+/**
+ * The geOps mirror re-derives the feed, and a column it does not carry has to
+ * arrive as a sentence naming the file rather than as a binder error from inside
+ * a query over millions of rows. Every missing column of every file is named at
+ * once, in the order `required` lists the files.
+ */
+export async function assertColumns(
+  db: Gtfs,
+  required: Partial<Record<GtfsFile, readonly string[]>>,
+): Promise<void> {
+  const files = Object.keys(required) as GtfsFile[];
+
+  const missing = await Promise.all(
+    files.map(async file => {
+      const present = new Set(
+        (await db.query<ColumnRow>(columns(file))).map(row => row.column_name),
+      );
+      const absent = (required[file] ?? []).filter(column => !present.has(column));
+      return absent.length === 0 ? null : `${file}.txt is missing ${absent.join(', ')}`;
+    }),
+  );
+
+  const sentences = missing.filter(sentence => sentence !== null);
+
+  if (sentences.length > 0) {
+    throw new Error(
+      `${sentences.join('; ')}; rerun pnpm recon:data to see what the feed does carry`,
+    );
+  }
+}
+
+/**
+ * The tables of `tables` the attached store does not hold, in the order given.
+ * The sentence is left to the step, which knows which earlier step writes them.
+ */
+export async function missingStoreTables(
+  db: Gtfs,
+  tables: readonly string[],
+): Promise<string[]> {
+  const present = new Set((await db.query<TableRow>(TABLES)).map(row => row.table_name));
+  return tables.filter(table => !present.has(table));
+}
+
 /**
  * The buffer pool is only pinned when there is a store, because that is the only
  * path that handles a file measured in gigabytes. The feed-reading steps scan
