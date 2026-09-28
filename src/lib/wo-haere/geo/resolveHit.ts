@@ -58,7 +58,7 @@ export type Wurf =
       richtig: string;
     };
 
-function identifyUrl(lon: number, lat: number): string {
+function identifyUrl(lon: number, lat: number, jahr?: number): string {
   // mapExtent and imageDisplay are required by the API even with tolerance=0;
   // a bogus extent silently returns zero results, so keep it around the point.
   const d = 0.05;
@@ -72,11 +72,16 @@ function identifyUrl(lon: number, lat: number): string {
     sr: '4326',
     returnGeometry: 'false',
   });
+  if (jahr !== undefined) params.set('timeInstant', String(jahr));
   return `${IDENTIFY_URL}?${params}`;
 }
 
-async function identify(lon: number, lat: number): Promise<IdentifyRecord[]> {
-  const res = await fetch(identifyUrl(lon, lat), {
+async function identify(
+  lon: number,
+  lat: number,
+  jahr?: number,
+): Promise<IdentifyRecord[]> {
+  const res = await fetch(identifyUrl(lon, lat, jahr), {
     ...CACHE,
     signal: AbortSignal.timeout(IDENTIFY_TIMEOUT_MS),
   });
