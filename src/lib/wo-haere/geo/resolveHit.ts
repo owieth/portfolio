@@ -144,6 +144,11 @@ async function fetchHoechi(lon: number, lat: number): Promise<number | null> {
  *   - historical records only -> border water such as the French part of Léman
  *   - nothing at all          -> abroad
  *
+ * Most throws are settled by the current year alone. Without a named current
+ * record in that answer, the full history is fetched: it tells the last two
+ * apart, and still finds the municipality when the year answer is empty or out
+ * of date, as it is after New Year until swisstopo publishes the new year.
+ *
  * The layer also holds a few foreign municipalities as current records
  * (BFS 7xxx: Liechtenstein, Büsingen, Campione). Those count as abroad too.
  *
