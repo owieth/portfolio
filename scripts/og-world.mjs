@@ -7,8 +7,8 @@
  * into a single SVG path in the card's own pixel space.
  *
  * Run it when `MAP_WINDOW` or `MAP_SIZE` changes. Nothing runs it in CI —
- * `world-path.test.ts` asserts the generated window still matches the constant
- * instead, which is the same guarantee for none of the build time.
+ * `world-path.test.ts` asserts the generated window and size still match the
+ * constants instead, which is the same guarantee for none of the build time.
  *
  *   pnpm og:world
  */
@@ -19,7 +19,7 @@ import { registerAlias } from './lib/ts-alias.mjs';
 
 registerAlias();
 
-const { MAP_WINDOW, projectEquirectangular } =
+const { MAP_SIZE, MAP_WINDOW, projectEquirectangular } =
   await import('@/lib/stats/flights/projection');
 
 /**
@@ -53,10 +53,14 @@ function ringToPath(ring) {
     // only thing crossing an edge is Antarctica and the top of Greenland —
     // and a clamped vertex there just flattens against the frame, which is
     // what every banded world map does anyway.
-    const [x, y] = projectEquirectangular({
-      lat: clamp(lat, MAP_WINDOW.south, MAP_WINDOW.north),
-      lon: clamp(lon, MAP_WINDOW.west, MAP_WINDOW.east),
-    });
+    const [x, y] = projectEquirectangular(
+      {
+        lat: clamp(lat, MAP_WINDOW.south, MAP_WINDOW.north),
+        lon: clamp(lon, MAP_WINDOW.west, MAP_WINDOW.east),
+      },
+      MAP_WINDOW,
+      MAP_SIZE,
+    );
 
     const point = [round(x), round(y)];
     const previous = points.at(-1);
@@ -129,12 +133,20 @@ import type { MapWindow } from '@/lib/stats/flights/projection';
 
 /**
  * The window the path was generated against. \`world-path.test.ts\` holds it
- * equal to \`MAP_WINDOW\`, which is the only thing standing between a retuned
- * window and land that silently no longer lines up with the routes.
+ * equal to \`MAP_WINDOW\` and \`WORLD_PATH_SIZE\` equal to \`MAP_SIZE\`, which is
+ * the only thing standing between a retuned window or size and land that
+ * silently no longer lines up with the routes.
  */
 export const WORLD_PATH_WINDOW: MapWindow = {
 ${Object.entries(MAP_WINDOW)
   .map(([edge, degrees]) => `  ${edge}: ${degrees},`)
+  .join('\n')}
+};
+
+/** The size the path was projected at, in pixels. */
+export const WORLD_PATH_SIZE = {
+${Object.entries(MAP_SIZE)
+  .map(([side, pixels]) => `  ${side}: ${pixels},`)
   .join('\n')}
 };
 

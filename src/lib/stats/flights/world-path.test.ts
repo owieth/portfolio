@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
 import { MAP_SIZE, MAP_WINDOW } from '@/lib/stats/flights/projection';
-import { WORLD_PATH, WORLD_PATH_WINDOW } from '@/lib/stats/flights/world-path';
+import {
+  WORLD_PATH,
+  WORLD_PATH_SIZE,
+  WORLD_PATH_WINDOW,
+} from '@/lib/stats/flights/world-path';
 
 const numbers = WORLD_PATH.split(/[MLZ]/)
   .flatMap(pair => pair.split(' '))
@@ -10,11 +14,21 @@ const numbers = WORLD_PATH.split(/[MLZ]/)
 
 describe('WORLD_PATH_WINDOW', () => {
   it('is the window the path was generated against', () => {
-    // The drift guard, and the whole reason the generator writes the window
-    // out beside the path. Retune MAP_WINDOW without `pnpm og:world` and the
-    // coastlines stop lining up with the routes drawn over them — silently,
-    // because both halves still render perfectly well on their own.
+    // One half of the drift guard, and the reason the generator writes the
+    // window and the size out beside the path. Retune MAP_WINDOW without
+    // `pnpm og:world` and the coastlines stop lining up with the routes drawn
+    // over them — silently, because both halves still render perfectly well
+    // on their own.
     expect(WORLD_PATH_WINDOW).toEqual(MAP_WINDOW);
+  });
+});
+
+describe('WORLD_PATH_SIZE', () => {
+  it('is the size the path was projected at', () => {
+    // The frame check below only bounds the path from above, so a larger
+    // MAP_SIZE slips past it. Scale MAP_SIZE up without `pnpm og:world` and
+    // every route and airport dot lands off the land drawn underneath it.
+    expect(WORLD_PATH_SIZE).toEqual(MAP_SIZE);
   });
 });
 
