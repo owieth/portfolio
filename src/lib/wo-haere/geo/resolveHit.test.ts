@@ -21,6 +21,8 @@ interface Antwort {
   body?: unknown;
   /** Simulates the request rejecting outright. */
   chlöpft?: boolean;
+  /** Simulates a request that never answers until its signal aborts. */
+  hanget?: boolean;
 }
 
 let fetchMock: ReturnType<typeof vi.fn>;
@@ -33,12 +35,22 @@ function stubSwisstopo(antworte: { identify?: Antwort; hoechi?: Antwort }) {
       json: () => Promise.resolve(body),
     });
 
-  fetchMock = vi.fn((url: string) => {
+  const haenge = (signal?: AbortSignal | null) =>
+    new Promise<never>((_, reject) => {
+      if (signal?.aborted) return reject(signal.reason);
+      signal?.addEventListener('abort', () => reject(signal.reason), {
+        once: true,
+      });
+    });
+
+  fetchMock = vi.fn((url: string, init?: RequestInit) => {
     const soll = url.includes('/height')
       ? (antworte.hoechi ?? { body: { height: '560.2' } })
       : (antworte.identify ?? { body: leer });
 
-    return soll.chlöpft ? Promise.reject(new Error('offline')) : antwort(soll);
+    if (soll.chlöpft) return Promise.reject(new Error('offline'));
+    if (soll.hanget) return haenge(init?.signal);
+    return antwort(soll);
   });
 
   vi.stubGlobal('fetch', fetchMock);
