@@ -350,6 +350,21 @@ describe('resolveHit', () => {
       );
       expect(identifyUrls()).toHaveLength(2);
     });
+
+    it('bounds the fallback with a timeout too', async () => {
+      const timeout = laufAbSofort();
+      stubSwisstopo({
+        identifyJahr: { body: leer },
+        identify: { body: numeHistorisch },
+      });
+      await resolveHit({ lat: 46.4, lon: 6.4 });
+
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+      for (const [, init] of fetchMock.mock.calls) {
+        expect((init as RequestInit).signal).toBeInstanceOf(AbortSignal);
+      }
+      expect(timeout.mock.calls).toEqual([[4000], [4000]]);
+    });
   });
 
   describe('the mapExtent trap', () => {
