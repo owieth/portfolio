@@ -19,6 +19,26 @@ The site deploys on Vercel.
   from 22.18.
 - **The Supabase CLI**, installed separately. It is not a package dependency.
 
+## Setup
+
+```sh
+pnpm install
+cp .env.example .env.local
+```
+
+[`.env.example`](.env.example) lists every key the repo reads. Each one can stay
+unset for local work:
+
+| Key                         | What it does                                                                                     |
+| --------------------------- | ------------------------------------------------------------------------------------------------ |
+| `NEXT_PUBLIC_GTM_ID`        | Loads the Tag Manager container. Unset, the analytics layer is a no-op that logs to the console. |
+| `NEXT_PUBLIC_GA_ID`         | The GA4 property. GA4 is configured inside the Tag Manager container.                            |
+| `GA4_API_SECRET`            | Server-only, for the GA4 Measurement Protocol.                                                   |
+| `SUPABASE_URL`              | Server-only. Unset, the Supabase layer is a no-op and the client is never constructed.           |
+| `SUPABASE_PUBLISHABLE_KEY`  | Server-only, with `SUPABASE_URL`.                                                                |
+| `DATABASE_URL`              | Only for `pnpm reconcile:data`. It is the database password; never set it on Vercel.             |
+| `NEXT_PUBLIC_STATS_ENABLED` | Unset hides `/stats` from the nav, the footer and the sitemap. The route stays reachable.        |
+
 ## Inspiration
 
 https://linusrogge.com/
