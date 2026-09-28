@@ -196,6 +196,8 @@ describe('isWasser', () => {
     ['Thun', 942],
     ['the number just below the range', 8999],
     ['the number just above the range', 10000],
+    ['a record without a number', null],
+    ['a record without the field', undefined],
   ])('leaves %s (%s) on dry land', (_name, gdeNr) => {
     expect(isWasser(gdeNr)).toBe(false);
   });
