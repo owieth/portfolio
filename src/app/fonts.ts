@@ -32,4 +32,5 @@ export const GeistMono = localFont({
     'monospace',
   ],
   weight: '100 900',
+  preload: false,
 });
