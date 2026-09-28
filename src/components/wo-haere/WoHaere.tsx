@@ -172,8 +172,8 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
       }
 
       // Aim at where the coordinate currently sits on screen; if it is not
-      // visible (zoomed out globe, other hemisphere) the dart lands in the
-      // middle and the map flies there afterwards.
+      // visible (off screen, far side of the globe) the dart lands in the
+      // middle and the map flies there as the dart is thrown.
       const p = handle.ortZuPixel(zieu.ort);
       const rect = container?.getBoundingClientRect();
       const sichtbar =
@@ -184,6 +184,7 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
         p.x <= rect.width &&
         p.y <= rect.height;
 
+      if (!sichtbar) handle.zeigOrt(zieu.ort);
       wartendOrtRef.current = zieu.ort;
       setZiel(sichtbar ? p : mitti(container));
       setLaufend(true);
@@ -225,9 +226,7 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
     setWurfNr(n => n + 1);
     wartendOrtRef.current = startWurf;
     replayRef.current = true;
-    setZiel(
-      handle?.ortZuPixel(startWurf) ?? mitti(handle?.container() ?? null),
-    );
+    setZiel(mitti(handle?.container() ?? null));
     setLaufend(true);
   }, [startWurf]);
 
