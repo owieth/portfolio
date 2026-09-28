@@ -583,22 +583,22 @@ function resolve(
     }
   };
 
+  const open = new Map(targets.map(target => [target.line.id, { target, claim: claimFor(target) }]));
+
   for (;;) {
-    const open = targets
-      .filter(target => !settled.has(target.line.id))
-      .map(target => ({ target, claim: claimFor(target) }));
-    const [winner] = open
+    const [winner] = [...open.values()]
       .flatMap(({ target, claim }) => (claim?.accepted === true ? [{ target, claim }] : []))
       .sort(strongerFirst);
 
     if (winner === undefined) {
-      for (const { target, claim } of open) {
+      for (const { target, claim } of open.values()) {
         settled.set(target.line.id, claim);
       }
 
       return { claims: settled, lostTo };
     }
 
+    open.delete(winner.target.line.id);
     settled.set(winner.target.line.id, winner.claim);
 
     for (const option of winner.claim.options) {
@@ -606,6 +606,16 @@ function resolve(
         ...(holders.get(option.relation) ?? []),
         { id: winner.target.line.id, ref: option.ref },
       ]);
+    }
+
+    // Only a new holder can take something off a claim, and only off an
+    // accepted one, so every other claim would come out of claimFor as it is.
+    const won = new Set(winner.claim.options.map(option => option.relation));
+
+    for (const entry of open.values()) {
+      if (entry.claim?.accepted === true && entry.claim.options.some(option => won.has(option.relation))) {
+        entry.claim = claimFor(entry.target);
+      }
     }
   }
 }
