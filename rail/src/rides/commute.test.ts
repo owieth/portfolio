@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { allocate, classify, spread } from './commute.ts';
+import { allocate, classify, POOLS, spread } from './commute.ts';
 
 function tally(dealt: string[]): Record<string, number> {
   return dealt.reduce<Record<string, number>>(
@@ -77,6 +77,14 @@ describe('allocate', () => {
       { key: 'b', count: 2 },
       { key: 'c', count: 1 },
     ]);
+  });
+
+  it('sums the Zürich–Zug pool to every total', () => {
+    for (let total = 30; total <= 800; total += 1) {
+      const sum = allocate(POOLS.zurichZug, total).reduce((acc, { count }) => acc + count, 0);
+
+      expect(sum, `pool of ${total}`).toBe(total);
+    }
   });
 
   it('gives a single line the whole pool', () => {
