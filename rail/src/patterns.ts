@@ -19,7 +19,7 @@
 
 import { join, relative } from 'node:path';
 
-import { openGtfs } from './db.ts';
+import { assertColumns, missingStoreTables, openGtfs } from './db.ts';
 import type { Gtfs } from './db.ts';
 import { gtfsPath } from './fetch/record.ts';
 import { STORE_FILE } from './ingest.ts';
@@ -32,18 +32,13 @@ import {
   READ_PATTERNS,
   REQUIRED_COLUMNS,
   STORE_TABLES,
-  TABLES,
   UNRESOLVED,
-  columns,
   keyTable,
 } from './patterns/queries.ts';
 import type {
   CollisionRow,
-  ColumnRow,
   FingerprintRow,
-  PatternFile,
   PatternRow,
-  TableRow,
   TripsRow,
   UnresolvedRow,
 } from './patterns/queries.ts';
@@ -102,36 +97,13 @@ function here(path: string): string {
   return relative(RAIL_DIR, path);
 }
 
-async function assertColumns(db: Gtfs): Promise<void> {
-  const files = Object.keys(REQUIRED_COLUMNS) as PatternFile[];
-
-  const missing = await Promise.all(
-    files.map(async file => {
-      const present = new Set(
-        (await db.query<ColumnRow>(columns(file))).map(row => row.column_name),
-      );
-      const absent = REQUIRED_COLUMNS[file].filter(column => !present.has(column));
-      return absent.length === 0 ? null : `${file}.txt is missing ${absent.join(', ')}`;
-    }),
-  );
-
-  const sentences = missing.filter(sentence => sentence !== null);
-
-  if (sentences.length > 0) {
-    throw new Error(
-      `${sentences.join('; ')}; rerun pnpm recon:data to see what the feed does carry`,
-    );
-  }
-}
-
 /**
  * The step reads what the ingest and calendar steps wrote, and a store without
  * one of their tables is a build run out of order, which deserves to be told so
  * rather than meet a catalog error.
  */
 async function assertStore(db: Gtfs, store: string): Promise<void> {
-  const present = new Set((await db.query<TableRow>(TABLES)).map(row => row.table_name));
-  const missing = STORE_TABLES.filter(table => !present.has(table));
+  const missing = await missingStoreTables(db, STORE_TABLES);
 
   if (missing.length > 0) {
     throw new Error(
@@ -173,7 +145,7 @@ export async function derivePatterns(
   const db = await openGtfs(gtfsPath(feedDir), ['stops', 'trips'], { store });
 
   try {
-    await Promise.all([assertColumns(db), assertStore(db, store)]);
+    await Promise.all([assertColumns(db, REQUIRED_COLUMNS), assertStore(db, store)]);
 
     await db.run(keyTable('allowed', 'route_id', input.routeIds));
     await db.run(keyTable('swiss', 'didok', input.didoks));

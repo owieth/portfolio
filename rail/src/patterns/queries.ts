@@ -24,28 +24,8 @@ export const REQUIRED_COLUMNS = {
   stops: ['stop_id', 'parent_station', 'didok'],
 } as const satisfies Partial<Record<GtfsFile, readonly string[]>>;
 
-export type PatternFile = keyof typeof REQUIRED_COLUMNS;
-
-export function columns(file: PatternFile): string {
-  return `select column_name from (describe ${file})`;
-}
-
-export interface ColumnRow {
-  column_name: string;
-}
-
 /** The store tables this step reads, written by the ingest and calendar steps. */
 export const STORE_TABLES = ['stop_times', 'service_days'] as const;
-
-export const TABLES = `
-  select table_name
-  from information_schema.tables
-  where table_catalog = '${STORE}'
-`;
-
-export interface TableRow {
-  table_name: string;
-}
 
 /** Single-quoted SQL literal, the same escaping `db.ts` uses for a path. */
 function literal(value: string): string {
