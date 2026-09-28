@@ -102,6 +102,14 @@ describe('renderRidesFrom', () => {
     );
   });
 
+  it('refuses two office events on one date rather than counting the day twice', async () => {
+    await writeFile(path, ics(office('20260924'), office('20260924')));
+
+    await expect(renderRidesFrom({ ics: path, dir, through: '2026-09-26' })).rejects.toThrow(
+      /two office events on 2026-09-24/,
+    );
+  });
+
   it('refuses a ride whose stop is not on its line', async () => {
     await writeFile(join(dir, 'line_stops.csv'), STOPS.replace('8502204', '8502299'));
     await writeFile(path, ics(office('20260924')));

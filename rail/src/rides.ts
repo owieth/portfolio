@@ -118,9 +118,18 @@ export async function renderRidesFrom({
   const last = through ?? isoDate((await stat(ics)).mtime);
   const { events } = parseIcs(text);
   const days: OfficeDay[] = [];
+  const seen = new Set<string>();
 
   for (const event of events) {
     if (event.summary !== OFFICE_SUMMARY || event.date > last) continue;
+
+    if (seen.has(event.date)) {
+      throw new Error(
+        `two office events on ${event.date}; merge them in the calendar and export again`,
+      );
+    }
+
+    seen.add(event.date);
 
     if (event.recurs) {
       throw new Error(
