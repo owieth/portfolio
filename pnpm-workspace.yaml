@@ -3,6 +3,8 @@
 
 # Quarantine every release for its first seven days, so a compromised publish has
 # to survive a week of public scrutiny before it can enter the lockfile.
+# Dependabot's `cooldown` in `.github/dependabot.yml` keeps its proposals at least
+# as old as the quarantine.
 minimumReleaseAge: 10080
 
 # Refuse transitive dependencies resolved from git, file or tarball URLs; those
