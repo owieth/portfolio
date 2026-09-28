@@ -13,8 +13,9 @@ import type { MapWindow } from '@/lib/stats/flights/projection';
 
 /**
  * The window the path was generated against. `world-path.test.ts` holds it
- * equal to `MAP_WINDOW`, which is the only thing standing between a retuned
- * window and land that silently no longer lines up with the routes.
+ * equal to `MAP_WINDOW` and `WORLD_PATH_SIZE` equal to `MAP_SIZE`, which is
+ * the only thing standing between a retuned window or size and land that
+ * silently no longer lines up with the routes.
  */
 export const WORLD_PATH_WINDOW: MapWindow = {
   west: -180,
