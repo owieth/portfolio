@@ -104,7 +104,13 @@ async function fetchFromPortal(
   headers?: Record<string, string>,
   signal?: AbortSignal,
 ): Promise<Response> {
-  return fetchWithRetry(url, headers, signal);
+  try {
+    return await fetchWithRetry(url, headers, signal);
+  } catch (error) {
+    throw new Error(`${url} failed; retry, or rerun with --source geops to use the mirror`, {
+      cause: error,
+    });
+  }
 }
 
 async function readCacheState(dir: string): Promise<CacheState> {
