@@ -1,5 +1,5 @@
 import { isStatsEnabled } from '@/lib/stats/config';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import Clock from './Clock';
 import CustomLink from './Link';
 
