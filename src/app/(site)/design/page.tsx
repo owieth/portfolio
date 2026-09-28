@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { MDXRemote } from 'next-mdx-remote/rsc';
 import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
+import remarkGfm from 'remark-gfm';
 
 import { trackServer } from '@/lib/analytics/server/track-server';
 
@@ -37,7 +38,10 @@ export default async function DesignPage() {
 
   return (
     <div className="flex flex-col justify-start">
-      <MDXRemote source={markdown} />
+      <MDXRemote
+        source={markdown}
+        options={{ mdxOptions: { remarkPlugins: [remarkGfm] } }}
+      />
     </div>
   );
 }
