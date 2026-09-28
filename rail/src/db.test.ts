@@ -4,7 +4,7 @@ import { join } from 'node:path';
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import { literal, openGtfs, STORE } from './db.ts';
+import { assertColumns, literal, missingStoreTables, openGtfs, STORE } from './db.ts';
 
 /**
  * A two-column feed is enough here: what is being tested is the wiring — that a
@@ -115,6 +115,55 @@ describe('openGtfs', () => {
       ).toEqual([]);
     } finally {
       reopened.close();
+    }
+  });
+});
+
+describe('assertColumns', () => {
+  it('names every missing column of every file, then points at recon:data', async () => {
+    const db = await openGtfs(directory, ['routes', 'agency']);
+
+    try {
+      await expect(
+        assertColumns(db, {
+          routes: ['route_id', 'route_color'],
+          agency: ['agency_id', 'agency_url'],
+        }),
+      ).rejects.toThrow(
+        'routes.txt is missing route_color; agency.txt is missing agency_url; rerun pnpm recon:data to see what the feed does carry',
+      );
+    } finally {
+      db.close();
+    }
+  });
+
+  it('passes a feed that has every column', async () => {
+    const db = await openGtfs(directory, ['routes']);
+
+    try {
+      await expect(
+        assertColumns(db, { routes: ['route_id', 'route_short_name'] }),
+      ).resolves.toBeUndefined();
+    } finally {
+      db.close();
+    }
+  });
+});
+
+describe('missingStoreTables', () => {
+  it('lists the store tables that are not there', async () => {
+    const db = await openGtfs(directory, ['routes'], {
+      store: join(directory, 'store.duckdb'),
+    });
+
+    try {
+      await db.run(`create table ${STORE}.stop_times as select route_id from routes`);
+
+      expect(await missingStoreTables(db, ['stop_times', 'service_days'])).toEqual([
+        'service_days',
+      ]);
+    } finally {
+      db.close();
     }
   });
 });

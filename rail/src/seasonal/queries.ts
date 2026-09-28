@@ -23,28 +23,8 @@ export const REQUIRED_COLUMNS = {
   frequencies: ['trip_id', 'start_time', 'end_time', 'headway_secs'],
 } as const satisfies Partial<Record<GtfsFile, readonly string[]>>;
 
-export type SeasonalFile = keyof typeof REQUIRED_COLUMNS;
-
-export function columns(file: SeasonalFile): string {
-  return `select column_name from (describe ${file})`;
-}
-
-export interface ColumnRow {
-  column_name: string;
-}
-
 /** The store table this step reads, written by the calendar step. */
 export const STORE_TABLES = ['service_days'] as const;
-
-export const TABLES = `
-  select table_name
-  from information_schema.tables
-  where table_catalog = '${STORE}'
-`;
-
-export interface TableRow {
-  table_name: string;
-}
 
 function list(values: readonly string[]): string {
   return `[${values.map(literal).join(', ')}]::varchar[]`;

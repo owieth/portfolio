@@ -18,7 +18,7 @@
 
 import { join, relative } from 'node:path';
 
-import { openGtfs } from './db.ts';
+import { assertColumns, openGtfs } from './db.ts';
 import type { Gtfs } from './db.ts';
 import {
   REQUIRED_COLUMNS,
@@ -26,12 +26,9 @@ import {
   TOTALS,
   UNRESOLVED,
   WINDOW,
-  columns,
   serviceDays,
 } from './calendar/queries.ts';
 import type {
-  CalendarFile,
-  ColumnRow,
   RouteServiceRow,
   TotalsRow,
   UnresolvedRow,
@@ -83,33 +80,6 @@ function here(path: string): string {
 }
 
 /**
- * The geOps mirror re-derives the feed, and a column it does not carry has to
- * arrive as a sentence naming the file rather than as a binder error from inside
- * a query over eleven million rows.
- */
-async function assertColumns(db: Gtfs): Promise<void> {
-  const files = Object.keys(REQUIRED_COLUMNS) as CalendarFile[];
-
-  const missing = await Promise.all(
-    files.map(async file => {
-      const present = new Set(
-        (await db.query<ColumnRow>(columns(file))).map(row => row.column_name),
-      );
-      const absent = REQUIRED_COLUMNS[file].filter(column => !present.has(column));
-      return absent.length === 0 ? null : `${file}.txt is missing ${absent.join(', ')}`;
-    }),
-  );
-
-  const sentences = missing.filter(sentence => sentence !== null);
-
-  if (sentences.length > 0) {
-    throw new Error(
-      `${sentences.join('; ')}; rerun pnpm recon:data to see what the feed does carry`,
-    );
-  }
-}
-
-/**
  * Exactly one row, with both dates readable. GTFS allows `feed_info.txt` a row
  * per language; the Swiss feed has one, and a second row that disagreed about
  * the period would leave the feed year undefined rather than merely ambiguous.
@@ -152,7 +122,7 @@ export async function expandCalendar(feedDir: string, log: Log): Promise<Calenda
   );
 
   try {
-    await assertColumns(db);
+    await assertColumns(db, REQUIRED_COLUMNS);
 
     const window = await feedWindow(db);
     // Before the expansion rather than after it, so a feed that cannot name the

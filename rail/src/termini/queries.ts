@@ -23,28 +23,8 @@ export const REQUIRED_COLUMNS = {
   stops: ['stop_id', 'stop_name', 'parent_station', 'didok'],
 } as const satisfies Partial<Record<GtfsFile, readonly string[]>>;
 
-export type TerminiFile = keyof typeof REQUIRED_COLUMNS;
-
-export function columns(file: TerminiFile): string {
-  return `select column_name from (describe ${file})`;
-}
-
-export interface ColumnRow {
-  column_name: string;
-}
-
 /** The store tables this step reads, written by the ingest and calendar steps. */
 export const STORE_TABLES = ['stop_times', 'service_days'] as const;
-
-export const TABLES = `
-  select table_name
-  from information_schema.tables
-  where table_catalog = '${STORE}'
-`;
-
-export interface TableRow {
-  table_name: string;
-}
 
 /**
  * Per line, per Swiss end a trip leaves the country at, every station its trips

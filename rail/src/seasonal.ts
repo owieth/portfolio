@@ -25,7 +25,7 @@ import { createHash } from 'node:crypto';
 import { join, relative } from 'node:path';
 
 import type { DateRange } from './calendar/week.ts';
-import { openGtfs } from './db.ts';
+import { assertColumns, missingStoreTables, openGtfs } from './db.ts';
 import type { Gtfs } from './db.ts';
 import { gtfsPath } from './fetch/record.ts';
 import { STORE_FILE } from './ingest.ts';
@@ -37,18 +37,10 @@ import {
   INVALID_FREQUENCIES,
   REQUIRED_COLUMNS,
   STORE_TABLES,
-  TABLES,
-  columns,
   lineRoutes,
   lineService,
 } from './seasonal/queries.ts';
-import type {
-  ColumnRow,
-  InvalidRow,
-  LineServiceRow,
-  SeasonalFile,
-  TableRow,
-} from './seasonal/queries.ts';
+import type { InvalidRow, LineServiceRow } from './seasonal/queries.ts';
 import type { SequencedFeedLine, SequencedLine } from './sequence.ts';
 
 /**
@@ -146,31 +138,8 @@ export function weeksIn(range: DateRange): number {
   return Math.ceil(daysIn(range) / 7);
 }
 
-async function assertColumns(db: Gtfs): Promise<void> {
-  const files = Object.keys(REQUIRED_COLUMNS) as SeasonalFile[];
-
-  const missing = await Promise.all(
-    files.map(async file => {
-      const present = new Set(
-        (await db.query<ColumnRow>(columns(file))).map(row => row.column_name),
-      );
-      const absent = REQUIRED_COLUMNS[file].filter(column => !present.has(column));
-      return absent.length === 0 ? null : `${file}.txt is missing ${absent.join(', ')}`;
-    }),
-  );
-
-  const sentences = missing.filter(sentence => sentence !== null);
-
-  if (sentences.length > 0) {
-    throw new Error(
-      `${sentences.join('; ')}; rerun pnpm recon:data to see what the feed does carry`,
-    );
-  }
-}
-
 async function assertStore(db: Gtfs, store: string): Promise<void> {
-  const present = new Set((await db.query<TableRow>(TABLES)).map(row => row.table_name));
-  const missing = STORE_TABLES.filter(table => !present.has(table));
+  const missing = await missingStoreTables(db, STORE_TABLES);
 
   if (missing.length > 0) {
     throw new Error(
@@ -202,7 +171,7 @@ async function readLineService(
   const db = await openGtfs(gtfsPath(feedDir), ['trips', 'frequencies'], { store });
 
   try {
-    await Promise.all([assertColumns(db), assertStore(db, store)]);
+    await Promise.all([assertColumns(db, REQUIRED_COLUMNS), assertStore(db, store)]);
 
     await db.run(
       lineRoutes(lines.flatMap(line => line.routeIds.map(routeId => ({ lineId: line.id, routeId })))),

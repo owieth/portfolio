@@ -26,7 +26,7 @@
 import { createHash } from 'node:crypto';
 import { join, relative } from 'node:path';
 
-import { openGtfs } from './db.ts';
+import { assertColumns, missingStoreTables, openGtfs } from './db.ts';
 import type { Gtfs } from './db.ts';
 import { gtfsPath } from './fetch/record.ts';
 import { STORE_FILE } from './ingest.ts';
@@ -39,16 +39,9 @@ import type { Station } from './stations.ts';
 import {
   REQUIRED_COLUMNS,
   STORE_TABLES,
-  TABLES,
   TRUE_ENDS,
-  columns,
 } from './termini/queries.ts';
-import type {
-  ColumnRow,
-  TableRow,
-  TerminiFile,
-  TrueEndRow,
-} from './termini/queries.ts';
+import type { TrueEndRow } from './termini/queries.ts';
 
 /** How many lines the log names. */
 const SHOWN = 5;
@@ -101,37 +94,8 @@ function same(a: Terminus, b: Terminus): boolean {
   return a.didok === b.didok && a.name === b.name;
 }
 
-async function assertColumns(db: Gtfs): Promise<void> {
-  const files = Object.keys(REQUIRED_COLUMNS) as TerminiFile[];
-
-  const missing = await Promise.all(
-    files.map(async file => {
-      const present = new Set(
-        (await db.query<ColumnRow>(columns(file))).map(row => row.column_name),
-      );
-      const absent = REQUIRED_COLUMNS[file].filter(
-        column => !present.has(column),
-      );
-      return absent.length === 0
-        ? null
-        : `${file}.txt is missing ${absent.join(', ')}`;
-    }),
-  );
-
-  const sentences = missing.filter(sentence => sentence !== null);
-
-  if (sentences.length > 0) {
-    throw new Error(
-      `${sentences.join('; ')}; rerun pnpm recon:data to see what the feed does carry`,
-    );
-  }
-}
-
 async function assertStore(db: Gtfs, store: string): Promise<void> {
-  const present = new Set(
-    (await db.query<TableRow>(TABLES)).map(row => row.table_name),
-  );
-  const missing = STORE_TABLES.filter(table => !present.has(table));
+  const missing = await missingStoreTables(db, STORE_TABLES);
 
   if (missing.length > 0) {
     throw new Error(
@@ -149,7 +113,10 @@ async function readTrueEnds(
   const db = await openGtfs(gtfsPath(feedDir), ['trips', 'stops'], { store });
 
   try {
-    await Promise.all([assertColumns(db), assertStore(db, store)]);
+    await Promise.all([
+      assertColumns(db, REQUIRED_COLUMNS),
+      assertStore(db, store),
+    ]);
 
     await db.run(
       lineRoutes(

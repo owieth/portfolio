@@ -39,16 +39,6 @@ export const REQUIRED_COLUMNS = {
   trips: ['route_id', 'service_id'],
 } as const satisfies Partial<Record<GtfsFile, readonly string[]>>;
 
-export type CalendarFile = keyof typeof REQUIRED_COLUMNS;
-
-export function columns(file: CalendarFile): string {
-  return `select column_name from (describe ${file})`;
-}
-
-export interface ColumnRow {
-  column_name: string;
-}
-
 /**
  * The feed year is what `feed_info.txt` says it is, not the span of the calendar
  * rows. It is the one statement of the period both the official feed and the
