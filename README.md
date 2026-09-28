@@ -39,6 +39,24 @@ unset for local work:
 | `DATABASE_URL`              | Only for `pnpm reconcile:data`. It is the database password; never set it on Vercel.             |
 | `NEXT_PUBLIC_STATS_ENABLED` | Unset hides `/stats` from the nav, the footer and the sitemap. The route stays reachable.        |
 
+## Local data
+
+[`supabase/config.toml`](supabase/config.toml) runs a local Postgres 17 on port
+54322 and the API on port 54321.
+
+```sh
+supabase start
+supabase status
+```
+
+Put the API URL and the publishable key that `supabase status` prints into
+`SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` in `.env.local`. Then
+`supabase db reset` re-applies the migrations and loads both seeds,
+`seeds/rail.sql` and `seeds/rail_rides.sql`.
+
+Production migrations and seeds are pushed by hand, with
+`supabase db push --include-seed`. No CI job pushes them.
+
 ## Inspiration
 
 https://linusrogge.com/
