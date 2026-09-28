@@ -1,5 +1,6 @@
 import { ImageResponse } from 'next/og';
 
+import SiteImage from '@/app/(site)/opengraph-image';
 import { flagDataUri } from '@/lib/stats/flights/flag-data';
 import { formatDistanceKm, formatDuration } from '@/lib/stats/flights/format';
 import { passportMapDataUri } from '@/lib/stats/flights/passport-map';
@@ -90,56 +91,18 @@ const Field = ({ label, value }: { label: string; value: string }) => (
   </div>
 );
 
-/**
- * What the card falls back to when there is nothing to put on it.
- *
- * `loadFlights` answers an empty list for an unconfigured deploy, a failed
- * read at `next build` and a genuinely empty log alike — the same three shapes
- * `/stats` collapses into one empty state. A failed read during the hourly
- * regeneration throws instead, so the last good passport stays up rather than
- * this card. A passport reading `0 FLIGHTS` with an MRZ of zeros is a worse
- * share card than the site's generic one, so this is the generic one.
- */
-const generic = () => (
-  <div
-    style={{
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      width: '100%',
-      height: '100%',
-      backgroundColor: '#000',
-      color: '#fff',
-      fontFamily: 'Geist',
-    }}
-  >
-    <div style={{ display: 'flex', fontSize: 64, letterSpacing: '-0.02em' }}>
-      Olivier Winkler
-    </div>
-    <div
-      style={{
-        display: 'flex',
-        marginTop: 20,
-        fontSize: 28,
-        color: 'rgba(255,255,255,0.6)',
-      }}
-    >
-      Building Software for the Future.
-    </div>
-    <div
-      style={{ display: 'flex', marginTop: 20, fontSize: 22, color: ACCENT }}
-    >
-      frigg.eco
-    </div>
-  </div>
-);
-
 export default async function Image() {
   const { flights } = await loadFlights();
   const legs = toLegs(flights);
 
-  if (legs.length === 0) return new ImageResponse(generic(), { ...size });
+  // `loadFlights` answers an empty list for an unconfigured deploy, a failed
+  // read at `next build` and a genuinely empty log alike — the same three
+  // shapes `/stats` collapses into one empty state. A failed read during the
+  // hourly regeneration throws instead, so the last good passport stays up
+  // rather than this card. A passport reading `0 FLIGHTS` with an MRZ of zeros
+  // is a worse share card than the site's generic one, so this is the generic
+  // one.
+  if (legs.length === 0) return SiteImage();
 
   const totals = flightTotals(legs);
   const airlines = rankAirlines(legs).length;
