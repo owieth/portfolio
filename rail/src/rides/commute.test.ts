@@ -62,6 +62,23 @@ describe('allocate', () => {
     ]);
   });
 
+  it('sums to the pool when three shares all round down', () => {
+    expect(
+      allocate(
+        [
+          { line: 'a', share: 1 / 3 },
+          { line: 'b', share: 1 / 3 },
+          { line: 'c', share: 1 / 3 },
+        ],
+        5,
+      ),
+    ).toEqual([
+      { key: 'a', count: 2 },
+      { key: 'b', count: 2 },
+      { key: 'c', count: 1 },
+    ]);
+  });
+
   it('gives a single line the whole pool', () => {
     expect(allocate([{ line: 'S9' }], 7)).toEqual([{ key: 'S9', count: 7 }]);
   });
