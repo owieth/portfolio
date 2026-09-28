@@ -42,7 +42,7 @@ import { mulberry32, type Rand } from '@/lib/wo-haere/throw/rng';
  * seed draws an arm that pulls a little, which is worth a few percent. Hence the
  * ±8% band rather than a pin.
  *
- * The case-study page publishes 24/42/61 km and 0.1%/1.6%/7.8%. Those came from
+ * The case-study page publishes 23/40/57 km and 0.1%/1.6%/7.8%. Those came from
  * a run with a slightly wider map fit (~5.6% padding rather than the 3% that
  * `padding: 24` works out to), so the bands below are wide enough to hold both
  * sets of numbers. The one that matters is the guard at full force: an
@@ -173,7 +173,7 @@ describe('σ calibration', () => {
   });
 
   it('misses by roughly the published number of kilometres', () => {
-    // The page says 24 / 42 / 61; the app's own map fit gives 22 / 40 / 58.
+    // The page says 23 / 40 / 57; the app's own map fit gives 22 / 40 / 58.
     expect(lob.medianKm).toBeGreaterThan(19);
     expect(lob.medianKm).toBeLessThan(27);
     expect(haub.medianKm).toBeGreaterThan(34);
