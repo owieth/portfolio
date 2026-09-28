@@ -97,6 +97,11 @@ That URL is the Supabase CLI's public local default, not a secret. In CI, the
 `Database` workflow runs these tests on changes to the schema, the seeds or the
 reconcile.
 
+## Other docs
+
+- [`rail/README.md`](rail/README.md): the Swiss rail data pipeline.
+- [`gtm/README.md`](gtm/README.md): the Tag Manager container.
+
 ## Inspiration
 
 https://linusrogge.com/
