@@ -5,7 +5,7 @@ A dart lands on a screen pixel, the pixel becomes a coordinate, and swisstopo tu
 - **Tiles.** `wmts.geo.admin.ch` serves the swisstopo Landeskarte with no key.
 - **Reverse geocoding.** One `identify` request against the Gemeinde layer returns the municipality and canton. Only the record with `is_current_jahr === true` counts — the API also returns historical ones going back to 1850.
 - **Elevation.** The `height` endpoint needs LV95 coordinates, so the app converts them with swisstopo’s approximate formulas, checked against the reframe service and accurate to about 5 cm.
-- **Water.** swisstopo lists lakes in the Gemeinde layer under their own name, so _Thunersee_ comes back as a “municipality”. That is how the app detects a splash without shipping any polygons.
+- **Water.** The Gemeinde layer gives each canton’s share of the larger lakes its own record, numbered from 9000 up, so _Thunersee_ comes back as a “municipality” with the number 9073. That number is how the app detects a splash without shipping any polygons. The name would not do: the village of Greifensee and its lake share one.
 - **Abroad.** No records at all means the dart left the country. Records but none current means border water, like the French half of Lac Léman.
 
 One trap is worth writing down: `mapExtent` must bracket the queried point. A bogus extent makes `identify` return zero results instead of an error — which reads exactly like “abroad”.

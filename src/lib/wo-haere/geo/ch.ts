@@ -86,11 +86,12 @@ export function offset(origin: LatLon, km: number, bearing: number): LatLon {
 }
 
 /**
- * swisstopo returns lakes as "Gemeinden" too, with the lake as the name.
- * That is how the app detects water without shipping any polygons.
+ * The Gemeinde layer gives each canton's share of the larger lakes its own
+ * record, numbered from 9000. That is how the app detects water without
+ * shipping any polygons. The name is no help: Greifensee is both a village
+ * (194) and a lake (9040). Smaller lakes and some big ones are split into
+ * municipal territory instead and stay undetectable.
  */
-export function isWasser(gemname: string): boolean {
-  return (
-    /(see|seeli)$/i.test(gemname) || /^(lac|lago|lej|lai)\b/i.test(gemname)
-  );
+export function isWasser(gdeNr: number | null | undefined): boolean {
+  return typeof gdeNr === 'number' && gdeNr >= 9000 && gdeNr <= 9999;
 }
