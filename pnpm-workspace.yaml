@@ -5,6 +5,9 @@
 # to survive a week of public scrutiny before it can enter the lockfile.
 # Dependabot's `cooldown` in `.github/dependabot.yml` keeps its proposals at least
 # as old as the quarantine.
+# Security updates skip the cooldown, so a security fix younger than seven days
+# needs a temporary `minimumReleaseAgeExclude` entry, removed once the release
+# ages out.
 minimumReleaseAge: 10080
 
 # Refuse transitive dependencies resolved from git, file or tarball URLs; those
