@@ -75,6 +75,19 @@ function identifyUrl(lon: number, lat: number): string {
   return `${IDENTIFY_URL}?${params}`;
 }
 
+async function identify(lon: number, lat: number): Promise<IdentifyRecord[]> {
+  const res = await fetch(identifyUrl(lon, lat), {
+    ...CACHE,
+    signal: AbortSignal.timeout(IDENTIFY_TIMEOUT_MS),
+  });
+  if (!res.ok) {
+    throw new Error(`swisstopo identify failed with ${res.status}`);
+  }
+
+  const json = (await res.json()) as IdentifyResponse;
+  return json.results ?? [];
+}
+
 async function fetchHoechi(lon: number, lat: number): Promise<number | null> {
   const { easting, northing } = wgs84ToLv95(lon, lat);
   const params = new URLSearchParams({
@@ -120,16 +133,7 @@ export async function resolveHit(rawPoint: LatLon): Promise<Wurf> {
     return { art: 'dernaebe', grund: 'usland', lat, lon };
   }
 
-  const res = await fetch(identifyUrl(lon, lat), {
-    ...CACHE,
-    signal: AbortSignal.timeout(IDENTIFY_TIMEOUT_MS),
-  });
-  if (!res.ok) {
-    throw new Error(`swisstopo identify failed with ${res.status}`);
-  }
-
-  const json = (await res.json()) as IdentifyResponse;
-  const all = json.results ?? [];
+  const all = await identify(lon, lat);
   const current = all.find(r => r.attributes?.is_current_jahr === true);
 
   if (!current?.attributes?.gemname) {
