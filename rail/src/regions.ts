@@ -22,7 +22,8 @@ import { lineNumber } from './allowlist/categories.ts';
 import { openGtfs } from './db.ts';
 import { gtfsPath } from './fetch/record.ts';
 import { STORE_FILE } from './ingest.ts';
-import { AGENCIES, allowed, SERVED, STATION_NAMES } from './regions/queries.ts';
+import { keyTable } from './patterns/queries.ts';
+import { AGENCIES, SERVED, STATION_NAMES } from './regions/queries.ts';
 import type { AgencyRow, NameRow, ServedRow } from './regions/queries.ts';
 import { assign, loadRules, operatorSlug, RULES_FILE, verify } from './regions/rules.ts';
 import type { Rule } from './regions/rules.ts';
@@ -160,7 +161,7 @@ export async function assignRegions(
   });
 
   try {
-    await db.run(allowed(routes.map(route => route.routeId)));
+    await db.run(keyTable('allowed', 'route_id', routes.map(route => route.routeId)));
 
     const [served, stationNames, agencies] = await Promise.all([
       db.query<ServedRow>(SERVED),
