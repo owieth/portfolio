@@ -183,6 +183,8 @@ describe('isWasser', () => {
     ['Lac de Neuchâtel (NE)', 9155],
     ['Bodensee (SG)', 9328],
     ['Bodensee (TG)', 9329],
+    ['the first lake number', 9000],
+    ['the last lake number', 9999],
   ])('recognises %s (%s)', (_name, gdeNr) => {
     expect(isWasser(gdeNr)).toBe(true);
   });
@@ -192,6 +194,8 @@ describe('isWasser', () => {
     ['Beinwil am See', 4131],
     ['Oberhofen am Thunersee', 934],
     ['Thun', 942],
+    ['the number just below the range', 8999],
+    ['the number just above the range', 10000],
   ])('leaves %s (%s) on dry land', (_name, gdeNr) => {
     expect(isWasser(gdeNr)).toBe(false);
   });
