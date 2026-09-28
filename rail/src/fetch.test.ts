@@ -55,4 +55,13 @@ describe('fetchFeed from the official source', () => {
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
+  it('names the mirror when the portal cannot be reached', async () => {
+    stubFetch(() => Promise.reject(new TypeError('fetch failed')));
+
+    const failure = expect(fetchFeed(OFFICIAL, silent)).rejects.toThrow(/--source geops/);
+    await vi.advanceTimersByTimeAsync(2_000);
+
+    await failure;
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
 });
