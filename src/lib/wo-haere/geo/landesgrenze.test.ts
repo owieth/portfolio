@@ -12,4 +12,12 @@ describe('isInSchwyz', () => {
     expect(isInSchwyz({ lat, lon })).toBe(true);
   });
 
+  it.each([
+    ['Vaduz', 47.141, 9.5209],
+    ['Evian', 46.4, 6.59],
+    ['Paris', 48.8566, 2.3522],
+  ])('puts %s outside', (_, lat, lon) => {
+    expect(isInSchwyz({ lat, lon })).toBe(false);
+  });
+
 });
