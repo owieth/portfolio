@@ -7,6 +7,7 @@ import {
   distanceKm,
   himmurichtig,
   isInChBbox,
+  isUsland,
   isWasser,
   offset,
   type LatLon,
@@ -200,5 +201,26 @@ describe('isWasser', () => {
     ['a record without the field', undefined],
   ])('leaves %s (%s) on dry land', (_name, gdeNr) => {
     expect(isWasser(gdeNr)).toBe(false);
+  });
+});
+
+describe('isUsland', () => {
+  it.each([
+    ['Vaduz', 7001],
+    ['the last Liechtenstein number', 7011],
+    ['Büsingen am Hochrhein', 7101],
+    ["Campione d'Italia", 7301],
+  ])('sends %s (%s) abroad', (_name, gdeNr) => {
+    expect(isUsland(gdeNr)).toBe(true);
+  });
+
+  it.each([
+    ['Thun', 942],
+    ['the number just below the range', 6999],
+    ['Thunersee', 9073],
+    ['a record without a number', null],
+    ['a record without the field', undefined],
+  ])('keeps %s (%s) in Switzerland', (_name, gdeNr) => {
+    expect(isUsland(gdeNr)).toBe(false);
   });
 });

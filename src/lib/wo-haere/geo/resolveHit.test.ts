@@ -4,12 +4,14 @@ import { BAERN, distanceKm, himmurichtig } from '@/lib/wo-haere/geo/ch';
 import { resolveHit } from '@/lib/wo-haere/geo/resolveHit';
 
 import bielersee from './__fixtures__/identify-bielersee.json';
+import campione from './__fixtures__/identify-campione.json';
 import greifenseeDorf from './__fixtures__/identify-greifensee-dorf.json';
 import greifenseeSee from './__fixtures__/identify-greifensee-see.json';
 import leer from './__fixtures__/identify-leer.json';
 import numeHistorisch from './__fixtures__/identify-nume-historisch.json';
 import thun from './__fixtures__/identify-thun.json';
 import thunersee from './__fixtures__/identify-thunersee.json';
+import vaduz from './__fixtures__/identify-vaduz.json';
 
 const THUN = { lat: 46.7578, lon: 7.6281 };
 
@@ -146,6 +148,26 @@ describe('resolveHit', () => {
       grund: 'usland',
     });
   });
+
+  it.each([
+    ['Liechtenstein', vaduz, { lat: 47.141, lon: 9.5209 }],
+    ['an enclave', campione, { lat: 45.969, lon: 8.971 }],
+  ])(
+    'reads a foreign municipality in %s as abroad',
+    async (_name, body, point) => {
+      stubSwisstopo({ identify: { body } });
+
+      expect(await resolveHit(point)).toMatchObject({
+        art: 'dernaebe',
+        grund: 'usland',
+      });
+      expect(
+        fetchMock.mock.calls.some(([url]) =>
+          (url as string).includes('/height'),
+        ),
+      ).toBe(false);
+    },
+  );
 
   it('reads records with none current as border water', async () => {
     stubSwisstopo({ identify: { body: numeHistorisch } });
