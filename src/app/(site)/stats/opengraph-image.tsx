@@ -26,9 +26,9 @@ import {
  * The flight log as a travel document.
  *
  * A segment card, so it replaces the route group's generic one for /stats and
- * nowhere else. `nodejs` rather than the `edge` that card runs on: this one
- * reads the flights, and `loadFlights` pulls in `server-only` and the Supabase
- * client whose own fetch carries the hour of revalidation. No `dynamic` and no
+ * nowhere else. `nodejs` is stated rather than left to the default because
+ * this one reads the flights: `loadFlights` pulls in `server-only` and the
+ * Supabase client whose own fetch carries the hour of revalidation. No `dynamic` and no
  * `revalidate` export — the route touches no dynamic API, so Next prerenders
  * it at build and inherits that same hour, which is what puts a static PNG in
  * front of the unfurl bots.
