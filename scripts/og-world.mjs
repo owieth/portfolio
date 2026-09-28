@@ -19,7 +19,7 @@ import { registerAlias } from './lib/ts-alias.mjs';
 
 registerAlias();
 
-const { MAP_WINDOW, projectEquirectangular } =
+const { MAP_SIZE, MAP_WINDOW, projectEquirectangular } =
   await import('@/lib/stats/flights/projection');
 
 /**
@@ -53,10 +53,14 @@ function ringToPath(ring) {
     // only thing crossing an edge is Antarctica and the top of Greenland —
     // and a clamped vertex there just flattens against the frame, which is
     // what every banded world map does anyway.
-    const [x, y] = projectEquirectangular({
-      lat: clamp(lat, MAP_WINDOW.south, MAP_WINDOW.north),
-      lon: clamp(lon, MAP_WINDOW.west, MAP_WINDOW.east),
-    });
+    const [x, y] = projectEquirectangular(
+      {
+        lat: clamp(lat, MAP_WINDOW.south, MAP_WINDOW.north),
+        lon: clamp(lon, MAP_WINDOW.west, MAP_WINDOW.east),
+      },
+      MAP_WINDOW,
+      MAP_SIZE,
+    );
 
     const point = [round(x), round(y)];
     const previous = points.at(-1);
