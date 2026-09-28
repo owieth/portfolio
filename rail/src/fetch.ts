@@ -99,6 +99,14 @@ async function fetchWithRetry(
   }
 }
 
+async function fetchFromPortal(
+  url: string,
+  headers?: Record<string, string>,
+  signal?: AbortSignal,
+): Promise<Response> {
+  return fetchWithRetry(url, headers, signal);
+}
+
 async function readCacheState(dir: string): Promise<CacheState> {
   const [archive, gtfs] = await Promise.all([
     stat(archivePath(dir)).catch(() => null),
@@ -205,7 +213,7 @@ async function fetchOfficial(
 
   log(`resolving ${dataset} through the DCAT catalogue`);
 
-  const response = await fetchWithRetry(
+  const response = await fetchFromPortal(
     catalogUrl,
     { accept: 'application/ld+json' },
     AbortSignal.timeout(CATALOGUE_TIMEOUT_MS),
@@ -241,7 +249,7 @@ async function fetchOfficial(
     };
   }
 
-  const download = await fetchWithRetry(newest.downloadUrl);
+  const download = await fetchFromPortal(newest.downloadUrl);
 
   if (!download.ok) {
     throw new Error(
