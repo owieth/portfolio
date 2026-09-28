@@ -19,6 +19,8 @@ import { registerAlias } from './lib/ts-alias.mjs';
 registerAlias();
 
 const { CH_BOUNDS, distanceKm } = await import('@/lib/wo-haere/geo/ch');
+const mech = await import('@/lib/wo-haere/throw/mechanics');
+const { mulberry32 } = await import('@/lib/wo-haere/throw/rng');
 
 function flag(name, fallback) {
   const hit = process.argv.slice(2).find(a => a.startsWith(`--${name}=`));
@@ -67,6 +69,8 @@ function seedle(seed) {
 }
 
 Math.random = seedle(SEED);
+
+const rand = mulberry32(SEED);
 
 /**
  * MapLibre's Web Mercator, headless: normalised world coordinates in [0,1],
@@ -131,14 +135,18 @@ async function simuliere(chraft) {
   let sigma = 0;
 
   for (let session = 0; session < SESSIONE; session++) {
-    const mech = await import(
-      `@/lib/wo-haere/throw/mechanics?session=${chraft}-${session}`
-    );
+    const hang = mech.zieheHang(rand);
     const zug = zugUfsZiel(mech, chraft);
     sigma = mech.streuigSigma(BRETT_RADIUS, chraft);
 
     for (let i = 0; i < PRO_SESSION; i++) {
-      const { zieu } = mech.zugZieu(zug, 'häre', mech.nöieWind(), BRETT_RADIUS);
+      const { zieu } = mech.zugZieu(
+        zug,
+        'häre',
+        mech.nöieWind(rand),
+        BRETT_RADIUS,
+        { rand, hang },
+      );
       if (Math.hypot(zieu.x - ZIEL.x, zieu.y - ZIEL.y) > BRETT_RADIUS)
         abBrett++;
       missKm.push(distanceKm(ZIEL_ORT, zumOrt(zieu.x, zieu.y)));
