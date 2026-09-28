@@ -70,6 +70,14 @@ export default function PrivacyPage() {
                 'Remembers your analytics choice so the notice appears once.',
               ],
             },
+            {
+              id: 'ow_internal',
+              cells: [
+                <code key="owi">ow_internal</code>,
+                'This site',
+                "Set only on the site owner's own devices, so their visits stay out of the numbers.",
+              ],
+            },
           ]}
         />
         <P>
