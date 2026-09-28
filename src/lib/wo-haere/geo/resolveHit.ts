@@ -97,6 +97,23 @@ function currentRecord(records: IdentifyRecord[]): IdentifyRecord | undefined {
   return records.find(r => r.attributes?.is_current_jahr === true);
 }
 
+/**
+ * Asks for the current year first: one record of about 1 KB, against about
+ * 160 KB for every year since 1850. Anything short of a named current record
+ * falls back to the full history, because only the history tells border water
+ * (old records, no current one) from abroad (none at all). The same fallback
+ * covers a new year that swisstopo has not published yet.
+ */
+async function identifyGemeinde(
+  lon: number,
+  lat: number,
+): Promise<IdentifyRecord[]> {
+  const diesJahr = await identify(lon, lat, new Date().getUTCFullYear());
+  return currentRecord(diesJahr)?.attributes?.gemname
+    ? diesJahr
+    : identify(lon, lat);
+}
+
 async function fetchHoechi(lon: number, lat: number): Promise<number | null> {
   const { easting, northing } = wgs84ToLv95(lon, lat);
   const params = new URLSearchParams({
@@ -142,7 +159,7 @@ export async function resolveHit(rawPoint: LatLon): Promise<Wurf> {
     return { art: 'dernaebe', grund: 'usland', lat, lon };
   }
 
-  const all = await identify(lon, lat);
+  const all = await identifyGemeinde(lon, lat);
   const current = currentRecord(all);
 
   if (!current?.attributes?.gemname) {
