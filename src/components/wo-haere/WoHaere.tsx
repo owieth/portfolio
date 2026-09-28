@@ -121,8 +121,8 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
 
   const holResultat = useCallback(
     async (ort: LatLon) => {
-      // Read before the request: a throw made before the map loaded can still
-      // be in flight when the replay starts and sets the flag.
+      // Read before the request so the result is classified by the throw that
+      // made it, whatever a later throw does to the flag meanwhile.
       const replay = replayRef.current;
       try {
         const res = await fetch(WURF_ENDPOINT, {
@@ -217,10 +217,14 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
    * A shared ?wurf= link replays that throw once the map is able to project
    * coordinates — doing it here rather than in an effect avoids racing map
    * initialisation.
+   *
+   * A visitor who threw before the map loaded keeps their dart: the replay is
+   * skipped rather than taking over a throw that is still in flight.
    */
   const charteZwaeg = useCallback(() => {
     if (!startWurf) return;
     track({ name: 'shared_throw_opened' });
+    if (laufend) return;
     const handle = charteRef.current;
     handle?.zeigOrt(startWurf);
     setWurfNr(n => n + 1);
@@ -228,7 +232,7 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
     replayRef.current = true;
     setZiel(mitti(handle?.container() ?? null));
     setLaufend(true);
-  }, [startWurf]);
+  }, [laufend, startWurf]);
 
   const gsammlet = gsammleteKantöne(wurfbuech);
   // Memoised because every pointer move re-renders the game, and a fresh array
