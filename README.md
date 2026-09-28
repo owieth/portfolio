@@ -57,6 +57,30 @@ Put the API URL and the publishable key that `supabase status` prints into
 Production migrations and seeds are pushed by hand, with
 `supabase db push --include-seed`. No CI job pushes them.
 
+## Commands
+
+| Command                  | What it does                                                               |
+| ------------------------ | -------------------------------------------------------------------------- |
+| `pnpm dev`               | Runs the dev server on http://localhost:3000.                              |
+| `pnpm build`             | Builds the site for production.                                            |
+| `pnpm start`             | Serves the production build.                                               |
+| `pnpm test`              | Runs the tests once.                                                       |
+| `pnpm test:watch`        | Runs the tests in watch mode.                                              |
+| `pnpm lint`              | Runs ESLint.                                                               |
+| `pnpm react-doctor`      | Runs React Doctor over the components.                                     |
+| `pnpm og:world`          | Regenerates the land silhouette the passport share card is drawn on.       |
+| `pnpm og:flags`          | Regenerates the flags inlined into the passport share card.                |
+| `pnpm vocab:wo-haere`    | Checks the game's Berndeutsch words against the berndeutsch.ch dictionary. |
+| `pnpm coords:wo-haere`   | Verifies every curated destination against swisstopo.                      |
+| `pnpm simulate:wo-haere` | Reproduces the throw calibration table.                                    |
+
+The six `*:data` scripts (`build`, `diff`, `recon`, `seed`, `rides` and
+`reconcile`) run the rail pipeline; [`rail/README.md`](rail/README.md) documents
+each one.
+
+To check formatting, run `pnpm exec prettier --check <paths>`. Do not run
+`pnpm prettier`: it is `prettier --write .` and rewrites the whole repo.
+
 ## Inspiration
 
 https://linusrogge.com/
