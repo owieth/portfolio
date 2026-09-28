@@ -85,11 +85,17 @@ const KNOWN: LineRecord[] = [
     ...RIGI_OPERATOR,
     stops: [RIGI_KULM, VITZNAU],
   }),
-  line('pilatusbahnen:CC-R83', 'CC R83', 'CC', ['Pilatus Kulm', 'Alpnachstad PB'], {
-    operators: ['Pilatusbahnen'],
-    seasonal: true,
-    stops: [PILATUS_KULM, stop('8508458', 'Alpnachstad PB')],
-  }),
+  line(
+    'pilatusbahnen:CC-R83',
+    'CC R83',
+    'CC',
+    ['Pilatus Kulm', 'Alpnachstad PB'],
+    {
+      operators: ['Pilatusbahnen'],
+      seasonal: true,
+      stops: [PILATUS_KULM, stop('8508458', 'Alpnachstad PB')],
+    },
+  ),
   line(
     'poly-bahn-zuerich:FUN-24',
     'Standseilbahn Polybahn',
@@ -104,7 +110,9 @@ function without(id: string): LineRecord[] {
 }
 
 function changed(id: string, overrides: Partial<LineRecord>): LineRecord[] {
-  return KNOWN.map(record => (record.id === id ? { ...record, ...overrides } : record));
+  return KNOWN.map(record =>
+    record.id === id ? { ...record, ...overrides } : record,
+  );
 }
 
 describe('spotCheck', () => {
@@ -120,19 +128,30 @@ describe('spotCheck', () => {
 
   it('accepts the terminals in either order', () => {
     expect(
-      spotCheck(changed('fernverkehr:IC1', { terminal_a: 'St. Gallen', terminal_b: 'Genève-Aéroport' })),
+      spotCheck(
+        changed('fernverkehr:IC1', {
+          terminal_a: 'St. Gallen',
+          terminal_b: 'Genève-Aéroport',
+        }),
+      ),
     ).toEqual([]);
   });
 
   it('says what a line runs when its terminals are wrong', () => {
-    expect(spotCheck(changed('fernverkehr:IR15', { terminal_b: 'Basel SBB' }))).toEqual([
+    expect(
+      spotCheck(changed('fernverkehr:IR15', { terminal_b: 'Basel SBB' })),
+    ).toEqual([
       'IR15: expected fernverkehr:IR15 from Genève-Aéroport to Luzern, but fernverkehr:IR15 runs Genève-Aéroport to Basel SBB',
     ]);
   });
 
   it('says how a line is named when its name is wrong', () => {
     expect(
-      spotCheck(changed('poly-bahn-zuerich:FUN-24', { display_name: 'Standseilbahn Poly-Bahn Zürich' })),
+      spotCheck(
+        changed('poly-bahn-zuerich:FUN-24', {
+          display_name: 'Standseilbahn Poly-Bahn Zürich',
+        }),
+      ),
     ).toEqual([
       'Polybahn: expected poly-bahn-zuerich:FUN-24 from Zürich Central (Polybahn) to Zürich Polyterrasse, but poly-bahn-zuerich:FUN-24 is named Standseilbahn Poly-Bahn Zürich',
     ]);
@@ -150,7 +169,10 @@ describe('spotCheck', () => {
   });
 
   it('fails when the three S10s fuse into one', () => {
-    const fused = KNOWN.filter(record => record.id !== 'tilo:S10' && record.id !== 's-bahn-st-gallen:S10');
+    const fused = KNOWN.filter(
+      record =>
+        record.id !== 'tilo:S10' && record.id !== 's-bahn-st-gallen:S10',
+    );
 
     expect(spotCheck(fused)).toEqual([
       'S10 (Ticino and St. Gallen): expected tilo:S10 and s-bahn-st-gallen:S10 to stay lines of their own, but there is no line tilo:S10 or s-bahn-st-gallen:S10',
@@ -170,7 +192,13 @@ describe('spotCheck', () => {
   it('fails on a Rigi Bahnen line nobody has accounted for', () => {
     const extra = [
       ...KNOWN,
-      line('rigi-bahnen-ag:CC-89', 'CC 89', 'CC', ['Rigi Kulm', 'Rigi Staffel'], RIGI_OPERATOR),
+      line(
+        'rigi-bahnen-ag:CC-89',
+        'CC 89',
+        'CC',
+        ['Rigi Kulm', 'Rigi Staffel'],
+        RIGI_OPERATOR,
+      ),
     ];
 
     expect(spotCheck(extra)).toEqual([
@@ -181,9 +209,18 @@ describe('spotCheck', () => {
   it('fails when a Rigi cableway gets in, whatever its category', () => {
     const cableway = [
       ...KNOWN,
-      line('weggis-rigi-kaltbad:CC-LWRK', 'CC LWRK', 'CC', ['Weggis (Luftseilbahn)', 'Rigi Kaltbad (Luftseilbahn)'], {
-        stops: [stop('8530388', 'Weggis (Luftseilbahn)'), stop('8530687', 'Rigi Kaltbad (Luftseilbahn)')],
-      }),
+      line(
+        'weggis-rigi-kaltbad:CC-LWRK',
+        'CC LWRK',
+        'CC',
+        ['Weggis (Luftseilbahn)', 'Rigi Kaltbad (Luftseilbahn)'],
+        {
+          stops: [
+            stop('8530388', 'Weggis (Luftseilbahn)'),
+            stop('8530687', 'Rigi Kaltbad (Luftseilbahn)'),
+          ],
+        },
+      ),
     ];
 
     expect(spotCheck(cableway)).toEqual([
@@ -192,7 +229,9 @@ describe('spotCheck', () => {
   });
 
   it('fails when the Pilatus is not seasonal', () => {
-    expect(spotCheck(changed('pilatusbahnen:CC-R83', { seasonal: false }))).toEqual([
+    expect(
+      spotCheck(changed('pilatusbahnen:CC-R83', { seasonal: false })),
+    ).toEqual([
       'Pilatus rack railway: expected pilatusbahnen:CC-R83 from Alpnachstad PB to Pilatus Kulm, seasonal, but pilatusbahnen:CC-R83 has seasonal false',
     ]);
   });
@@ -200,9 +239,15 @@ describe('spotCheck', () => {
   it('fails when the Pilatus gondola gets in', () => {
     const gondola = [
       ...KNOWN,
-      line('pilatusbahnen:FUN-GB', 'Standseilbahn Pilatus', 'FUN', ['Fräkmüntegg', 'Pilatus Kulm'], {
-        stops: [stop('8508455', 'Fräkmüntegg'), PILATUS_KULM],
-      }),
+      line(
+        'pilatusbahnen:FUN-GB',
+        'Standseilbahn Pilatus',
+        'FUN',
+        ['Fräkmüntegg', 'Pilatus Kulm'],
+        {
+          stops: [stop('8508455', 'Fräkmüntegg'), PILATUS_KULM],
+        },
+      ),
     ];
 
     expect(spotCheck(gondola)).toEqual([
@@ -213,9 +258,15 @@ describe('spotCheck', () => {
   it('fails when anything else stops at Pilatus Kulm', () => {
     const dragon = [
       ...KNOWN,
-      line('pilatusbahnen:FUN-DR', 'Standseilbahn Pilatus', 'FUN', ['Pilatus Kulm', 'Pilatus Kulm'], {
-        stops: [PILATUS_KULM],
-      }),
+      line(
+        'pilatusbahnen:FUN-DR',
+        'Standseilbahn Pilatus',
+        'FUN',
+        ['Pilatus Kulm', 'Pilatus Kulm'],
+        {
+          stops: [PILATUS_KULM],
+        },
+      ),
     ];
 
     expect(spotCheck(dragon)).toEqual([
@@ -233,7 +284,10 @@ describe('spotCheck', () => {
   ])('names a %s line and why it does not belong', (category, reason) => {
     const leaked = [
       ...KNOWN,
-      line(`somewhere:${category}-1`, `${category} 1`, category as Category, ['A', 'B']),
+      line(`somewhere:${category}-1`, `${category} 1`, category as Category, [
+        'A',
+        'B',
+      ]),
     ];
 
     expect(spotCheck(leaked)).toEqual([
@@ -242,7 +296,10 @@ describe('spotCheck', () => {
   });
 
   it('names a category the allowlist has never heard of', () => {
-    const leaked = [...KNOWN, line('somewhere:X-1', 'X 1', 'X' as Category, ['A', 'B'])];
+    const leaked = [
+      ...KNOWN,
+      line('somewhere:X-1', 'X 1', 'X' as Category, ['A', 'B']),
+    ];
 
     expect(spotCheck(leaked)).toEqual([
       'Every line: expected a train, rack railway or funicular — no bus, tram, metro, boat or cable car, but somewhere:X-1 is X (not a category the allowlist includes)',
@@ -256,9 +313,14 @@ describe('assertSpotChecks', () => {
   });
 
   it('lists every failure, each on its own line', () => {
-    expect(() => assertSpotChecks(without('fernverkehr:IC1').filter(record => record.id !== 'fernverkehr:IR15')))
-      .toThrow(
-        `2 of ${SPOT_CHECKS.length} spot checks failed, so nothing was written:\n  IC1: expected fernverkehr:IC1 from Genève-Aéroport to St. Gallen, but there is no line fernverkehr:IC1\n  IR15: expected fernverkehr:IR15 from Genève-Aéroport to Luzern, but there is no line fernverkehr:IR15`,
-      );
+    expect(() =>
+      assertSpotChecks(
+        without('fernverkehr:IC1').filter(
+          record => record.id !== 'fernverkehr:IR15',
+        ),
+      ),
+    ).toThrow(
+      `2 of ${SPOT_CHECKS.length} spot checks failed, so nothing was written:\n  IC1: expected fernverkehr:IC1 from Genève-Aéroport to St. Gallen, but there is no line fernverkehr:IC1\n  IR15: expected fernverkehr:IR15 from Genève-Aéroport to Luzern, but there is no line fernverkehr:IR15`,
+    );
   });
 });

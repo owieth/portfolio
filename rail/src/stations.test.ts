@@ -117,7 +117,9 @@ describe('resolveStations', () => {
   it('keeps only the Swiss stops of a line that runs abroad', async () => {
     const { stations, foreign } = await resolveStations(directory, log);
 
-    expect(stations.map(station => station.name)).not.toContain('Karlsruhe Hbf');
+    expect(stations.map(station => station.name)).not.toContain(
+      'Karlsruhe Hbf',
+    );
     expect(foreign).toEqual([
       { country: '12', stations: 1 },
       { country: '80', stations: 1 },
@@ -194,9 +196,9 @@ describe('resolveStations', () => {
     logged.length = 0;
     await resolveStations(agreeing, log);
 
-    expect(logged.find(line => line.startsWith('every Swiss station'))).toContain(
-      'the country code and the position agree',
-    );
+    expect(
+      logged.find(line => line.startsWith('every Swiss station')),
+    ).toContain('the country code and the position agree');
   });
 
   /**

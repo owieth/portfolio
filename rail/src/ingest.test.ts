@@ -1,4 +1,11 @@
-import { appendFile, mkdir, mkdtemp, rm, stat, writeFile } from 'node:fs/promises';
+import {
+  appendFile,
+  mkdir,
+  mkdtemp,
+  rm,
+  stat,
+  writeFile,
+} from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -123,9 +130,11 @@ describe('ingestStopTimes', () => {
     });
 
     try {
-      expect(await db.query(`select count(*)::integer as n from ${STORE}.stop_times`)).toEqual([
-        { n: 5 },
-      ]);
+      expect(
+        await db.query(
+          `select count(*)::integer as n from ${STORE}.stop_times`,
+        ),
+      ).toEqual([{ n: 5 }]);
     } finally {
       db.close();
     }
@@ -144,17 +153,22 @@ describe('ingestStopTimes', () => {
     await ingestStopTimes(feedDir, log, { force: false });
 
     const path = join(feedDir, 'gtfs', 'stop_times.txt');
-    await appendFile(path, '"3.TA.91-10-A-j26-1.1.H","07:00:00","07:01:00","8503000","1","0","0"\n');
+    await appendFile(
+      path,
+      '"3.TA.91-10-A-j26-1.1.H","07:00:00","07:01:00","8503000","1","0","0"\n',
+    );
 
     // A same-second append would leave mtime unchanged on a coarse filesystem;
     // the size has moved either way, and the check reads both.
     expect((await stat(path)).size).toBeGreaterThan(STOP_TIMES.length);
 
-    expect(await ingestStopTimes(feedDir, log, { force: false })).toMatchObject({
-      rows: 6,
-      trips: 3,
-      skipped: false,
-    });
+    expect(await ingestStopTimes(feedDir, log, { force: false })).toMatchObject(
+      {
+        rows: 6,
+        trips: 3,
+        skipped: false,
+      },
+    );
   });
 
   it('re-reads an unchanged CSV when forced', async () => {
@@ -170,9 +184,9 @@ describe('ingestStopTimes', () => {
     const mirror = await writeFeed(NO_SEQUENCE);
 
     try {
-      await expect(ingestStopTimes(mirror, log, { force: false })).rejects.toThrow(
-        /missing stop_sequence/,
-      );
+      await expect(
+        ingestStopTimes(mirror, log, { force: false }),
+      ).rejects.toThrow(/missing stop_sequence/);
     } finally {
       await rm(mirror, { force: true, recursive: true });
     }
@@ -182,9 +196,9 @@ describe('ingestStopTimes', () => {
     const empty = await writeFeed(HEADER_ONLY);
 
     try {
-      await expect(ingestStopTimes(empty, log, { force: false })).rejects.toThrow(
-        /yielded no stop times/,
-      );
+      await expect(
+        ingestStopTimes(empty, log, { force: false }),
+      ).rejects.toThrow(/yielded no stop times/);
     } finally {
       await rm(empty, { force: true, recursive: true });
     }

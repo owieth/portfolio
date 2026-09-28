@@ -37,7 +37,12 @@ import {
   TOTALS,
   record,
 } from './ingest/queries.ts';
-import type { ColumnRow, CountRow, LedgerRow, TotalsRow } from './ingest/queries.ts';
+import type {
+  ColumnRow,
+  CountRow,
+  LedgerRow,
+  TotalsRow,
+} from './ingest/queries.ts';
 import type { IngestOptions } from './ingest/options.ts';
 import { RAIL_DIR } from './paths.ts';
 
@@ -106,7 +111,9 @@ function watchMemory(): () => number {
  * minutes reading.
  */
 async function assertColumns(db: Gtfs): Promise<void> {
-  const present = new Set((await db.query<ColumnRow>(COLUMNS)).map(row => row.column_name));
+  const present = new Set(
+    (await db.query<ColumnRow>(COLUMNS)).map(row => row.column_name),
+  );
   const missing = KEPT_COLUMNS.filter(column => !present.has(column));
 
   if (missing.length > 0) {

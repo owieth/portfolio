@@ -67,7 +67,10 @@ import type { Station } from './stations.ts';
  * in for the one next door. Against the 2026 feed, 300 m to 600 m and 100 m to
  * 200 m match the same lines to within one.
  */
-export const TOLERANCE_M: Readonly<Record<RouteType, number>> = { train: 500, funicular: 100 };
+export const TOLERANCE_M: Readonly<Record<RouteType, number>> = {
+  train: 500,
+  funicular: 100,
+};
 
 /**
  * The share of a relation's stops at Swiss stations that have to be stations of
@@ -260,8 +263,11 @@ function isTrack(role: string): boolean {
  * metres east to west here. So the cell a point is in and the eight around it
  * hold every station within the largest tolerance.
  */
-function stationGrid(stations: readonly LatLon[]): (point: LatLon, tolerance: number) => boolean {
-  const cell = (lat: number, lon: number): string => `${Math.floor(lat * 100)},${Math.floor(lon * 100)}`;
+function stationGrid(
+  stations: readonly LatLon[],
+): (point: LatLon, tolerance: number) => boolean {
+  const cell = (lat: number, lon: number): string =>
+    `${Math.floor(lat * 100)},${Math.floor(lon * 100)}`;
   const cells = new Map<string, LatLon[]>();
 
   for (const station of stations) {
@@ -272,9 +278,9 @@ function stationGrid(stations: readonly LatLon[]): (point: LatLon, tolerance: nu
   return (point, tolerance) =>
     [-1, 0, 1].some(dLat =>
       [-1, 0, 1].some(dLon =>
-        (cells.get(cell(point.lat + dLat / 100, point.lon + dLon / 100)) ?? []).some(station =>
-          near(point, station, tolerance),
-        ),
+        (
+          cells.get(cell(point.lat + dLat / 100, point.lon + dLon / 100)) ?? []
+        ).some(station => near(point, station, tolerance)),
       ),
     );
 }
@@ -290,7 +296,9 @@ function toCandidate(
   atStation: (point: LatLon, tolerance: number) => boolean,
 ): Candidate {
   const ways: Way[] = relation.members.flatMap(member =>
-    member.type === 'way' && isTrack(member.role) && member.geometry !== undefined
+    member.type === 'way' &&
+    isTrack(member.role) &&
+    member.geometry !== undefined
       ? [{ id: member.ref, points: member.geometry }]
       : [],
   );
@@ -307,7 +315,9 @@ function toCandidate(
   const anchors =
     stops.length > 0
       ? stops.filter(stop => atStation(stop, tolerance))
-      : parts.flatMap(part => [part[0], part.at(-1)].filter(point => point !== undefined));
+      : parts.flatMap(part =>
+          [part[0], part.at(-1)].filter(point => point !== undefined),
+        );
   const first = anchors[0];
   const last = anchors.at(-1);
 
@@ -328,14 +338,18 @@ function toCandidate(
  * The two ends of the trunk: its first stop and its last before the branch
  * blocks, which follow it. A hand-written line's are its first and last stop.
  */
-function terminalsOf(line: SeasonalLine, positions: ReadonlyMap<string, LatLon>): [LatLon, LatLon] | null {
+function terminalsOf(
+  line: SeasonalLine,
+  positions: ReadonlyMap<string, LatLon>,
+): [LatLon, LatLon] | null {
   if (line.source === 'manual') {
     const [first, last] = [line.stops[0], line.stops.at(-1)];
     return first === undefined || last === undefined ? null : [first, last];
   }
 
   const branchAt = line.sequence.findIndex(stop => stop.via === 'branch');
-  const trunk = branchAt === -1 ? line.sequence : line.sequence.slice(0, branchAt);
+  const trunk =
+    branchAt === -1 ? line.sequence : line.sequence.slice(0, branchAt);
   const first = positions.get(trunk[0]?.didok ?? '');
   const last = positions.get(trunk.at(-1)?.didok ?? '');
 
@@ -392,7 +406,9 @@ function nominate(
   candidate: Candidate,
   knownRefs: ReadonlySet<string>,
 ): { rule: Rule; ref: string | null } | null {
-  const ref = [...candidate.refs].sort(compare).find(value => target.refs.has(value));
+  const ref = [...candidate.refs]
+    .sort(compare)
+    .find(value => target.refs.has(value));
 
   if (ref !== undefined) {
     return { rule: 'ref', ref };
@@ -400,14 +416,20 @@ function nominate(
 
   if (
     [...candidate.refs].some(value => knownRefs.has(value)) ||
-    namesAnotherLine(candidate.refs, target.line.category, target.line.number) ||
+    namesAnotherLine(
+      candidate.refs,
+      target.line.category,
+      target.line.number,
+    ) ||
     !endsAtTerminals(target, candidate)
   ) {
     return null;
   }
 
   return {
-    rule: operatorMatches(candidate.operator, target.operators) ? 'operator' : 'endpoints',
+    rule: operatorMatches(candidate.operator, target.operators)
+      ? 'operator'
+      : 'endpoints',
     ref: null,
   };
 }
@@ -429,7 +451,8 @@ function precision(target: Target, candidate: Candidate): number {
 function reaches(target: Target, candidate: Candidate): Set<number> {
   return new Set(
     target.positions.flatMap((position, index) =>
-      inBox(candidate.box, position) && metresToLines(position, candidate.parts) <= target.tolerance
+      inBox(candidate.box, position) &&
+      metresToLines(position, candidate.parts) <= target.tolerance
         ? [index]
         : [],
     ),
@@ -474,7 +497,12 @@ function claimFrom(target: Target, rule: Rule, nominated: Option[]): Claim {
   const reached = new Set(nominated.flatMap(option => [...option.reaches]));
   const coverage = reached.size / target.positions.length;
 
-  return { rule, options: nominated, coverage, accepted: coverage >= MIN_COVERAGE };
+  return {
+    rule,
+    options: nominated,
+    coverage,
+    accepted: coverage >= MIN_COVERAGE,
+  };
 }
 
 /**
@@ -491,9 +519,12 @@ function claimOf(
   let nearest: Claim | null = null;
 
   for (const rule of RULES) {
-    const nominated = options.filter(option => option.rule === rule && !lost.has(option.relation));
+    const nominated = options.filter(
+      option => option.rule === rule && !lost.has(option.relation),
+    );
     const regular = nominated.filter(option => !option.alternate);
-    const tries = regular.length === nominated.length ? [nominated] : [regular, nominated];
+    const tries =
+      regular.length === nominated.length ? [nominated] : [regular, nominated];
 
     for (const attempt of tries.filter(options => options.length > 0)) {
       const claim = claimFrom(target, rule, attempt);
@@ -528,10 +559,14 @@ function strongerFirst(
  * always when none does, and otherwise only when it and each of them hold it
  * by a number of their own.
  */
-function canShare(ref: string | null, holders: readonly { ref: string | null }[]): boolean {
+function canShare(
+  ref: string | null,
+  holders: readonly { ref: string | null }[],
+): boolean {
   return (
     holders.length === 0 ||
-    (ref !== null && holders.every(holder => holder.ref !== null && holder.ref !== ref))
+    (ref !== null &&
+      holders.every(holder => holder.ref !== null && holder.ref !== ref))
   );
 }
 
@@ -549,8 +584,12 @@ function resolve(
   targets: readonly Target[],
   options: ReadonlyMap<string, Option[]>,
 ): { claims: Map<string, Claim | null>; lostTo: Map<string, Set<string>> } {
-  const lost = new Map(targets.map(target => [target.line.id, new Set<number>()]));
-  const lostTo = new Map(targets.map(target => [target.line.id, new Set<string>()]));
+  const lost = new Map(
+    targets.map(target => [target.line.id, new Set<number>()]),
+  );
+  const lostTo = new Map(
+    targets.map(target => [target.line.id, new Set<string>()]),
+  );
   const holders = new Map<number, Holder[]>();
   const settled = new Map<string, Claim | null>();
 
@@ -567,7 +606,9 @@ function resolve(
     for (;;) {
       const claim = claimOf(target, options.get(id) ?? [], without);
       const blocked =
-        claim?.accepted === true ? claim.options.filter(option => blockers(option).length > 0) : [];
+        claim?.accepted === true
+          ? claim.options.filter(option => blockers(option).length > 0)
+          : [];
 
       if (blocked.length === 0) {
         return claim;
@@ -583,11 +624,18 @@ function resolve(
     }
   };
 
-  const open = new Map(targets.map(target => [target.line.id, { target, claim: claimFor(target) }]));
+  const open = new Map(
+    targets.map(target => [
+      target.line.id,
+      { target, claim: claimFor(target) },
+    ]),
+  );
 
   for (;;) {
     const [winner] = [...open.values()]
-      .flatMap(({ target, claim }) => (claim?.accepted === true ? [{ target, claim }] : []))
+      .flatMap(({ target, claim }) =>
+        claim?.accepted === true ? [{ target, claim }] : [],
+      )
       .sort(strongerFirst);
 
     if (winner === undefined) {
@@ -613,7 +661,10 @@ function resolve(
     const won = new Set(winner.claim.options.map(option => option.relation));
 
     for (const entry of open.values()) {
-      if (entry.claim?.accepted === true && entry.claim.options.some(option => won.has(option.relation))) {
+      if (
+        entry.claim?.accepted === true &&
+        entry.claim.options.some(option => won.has(option.relation))
+      ) {
         entry.claim = claimFor(entry.target);
       }
     }
@@ -628,16 +679,23 @@ function matchOf(claim: Claim): Match {
   return {
     rule: claim.rule,
     confidence: round(claim.coverage),
-    relations: claim.options.map(option => option.relation).sort((a, b) => a - b),
+    relations: claim.options
+      .map(option => option.relation)
+      .sort((a, b) => a - b),
   };
 }
 
-function geometryOf(relations: readonly number[], byId: ReadonlyMap<number, Candidate>): Geometry {
+function geometryOf(
+  relations: readonly number[],
+  byId: ReadonlyMap<number, Candidate>,
+): Geometry {
   const ways = relations.flatMap(id => byId.get(id)?.ways ?? []);
 
   return {
     type: 'MultiLineString',
-    coordinates: linemerge(ways).map(part => part.map(({ lat, lon }): [number, number] => [lon, lat])),
+    coordinates: linemerge(ways).map(part =>
+      part.map(({ lat, lon }): [number, number] => [lon, lat]),
+    ),
   };
 }
 
@@ -673,10 +731,15 @@ export function matchLines(input: MatchInput, log: Log): Matched {
     .filter(relation => !isDisused(relation.tags))
     .map(relation => toCandidate(relation, atStation));
   const byId = new Map(candidates.map(candidate => [candidate.id, candidate]));
-  const targets = input.lines.map(line => toTarget(line, positions, input.operators));
+  const targets = input.lines.map(line =>
+    toTarget(line, positions, input.operators),
+  );
   const knownRefs = new Set(targets.flatMap(target => [...target.refs]));
   const options = new Map(
-    targets.map(target => [target.line.id, optionsFor(target, candidates, knownRefs)]),
+    targets.map(target => [
+      target.line.id,
+      optionsFor(target, candidates, knownRefs),
+    ]),
   );
   const { claims, lostTo } = resolve(targets, options);
 
@@ -693,7 +756,12 @@ export function matchLines(input: MatchInput, log: Log): Matched {
       byRule[match.rule] += 1;
       match.relations.forEach(id => taken.add(id));
 
-      return { ...line, hasGeometry: true, geometry: geometryOf(match.relations, byId), match };
+      return {
+        ...line,
+        hasGeometry: true,
+        geometry: geometryOf(match.relations, byId),
+        match,
+      };
     }
 
     const hadOptions = (options.get(line.id)?.length ?? 0) > 0;
@@ -701,7 +769,11 @@ export function matchLines(input: MatchInput, log: Log): Matched {
     unmatched.push({
       id: line.id,
       name: line.name,
-      reason: !hadOptions ? 'no-candidate' : lostToIds.length > 0 ? 'contested' : 'low-coverage',
+      reason: !hadOptions
+        ? 'no-candidate'
+        : lostToIds.length > 0
+          ? 'contested'
+          : 'low-coverage',
       best: claim === null ? null : matchOf(claim),
       lostTo: lostToIds,
     });
@@ -712,13 +784,22 @@ export function matchLines(input: MatchInput, log: Log): Matched {
   for (const line of lines) {
     // The one promise downstream relies on: a line says it has a shape exactly
     // when it has one, and a shape is never empty.
-    if (line.hasGeometry !== (line.geometry !== null) || line.geometry?.coordinates.length === 0) {
-      throw new Error(`line ${line.id} came out with has_geometry ${line.hasGeometry} and a geometry that disagrees; this is a bug in match.ts`);
+    if (
+      line.hasGeometry !== (line.geometry !== null) ||
+      line.geometry?.coordinates.length === 0
+    ) {
+      throw new Error(
+        `line ${line.id} came out with has_geometry ${line.hasGeometry} and a geometry that disagrees; this is a bug in match.ts`,
+      );
     }
   }
 
-  const fingerprint = fingerprintOf([...lines].sort((a, b) => compare(a.id, b.id)));
-  const unused = candidates.filter(candidate => !taken.has(candidate.id)).length;
+  const fingerprint = fingerprintOf(
+    [...lines].sort((a, b) => compare(a.id, b.id)),
+  );
+  const unused = candidates.filter(
+    candidate => !taken.has(candidate.id),
+  ).length;
   const matched = lines.length - unmatched.length;
 
   log(
@@ -726,7 +807,9 @@ export function matchLines(input: MatchInput, log: Log): Matched {
   );
 
   for (const reason of ['no-candidate', 'low-coverage', 'contested'] as const) {
-    const ids = unmatched.filter(entry => entry.reason === reason).map(entry => entry.id);
+    const ids = unmatched
+      .filter(entry => entry.reason === reason)
+      .map(entry => entry.id);
 
     if (ids.length > 0) {
       log(`${plural(ids.length, 'line')} unmatched, ${reason}: ${sample(ids)}`);

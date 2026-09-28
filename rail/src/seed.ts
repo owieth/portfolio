@@ -71,7 +71,9 @@ function toLine(seed: SeedLine): ManualLine {
     terminals,
     operators: [seed.operator],
     routeIds: [],
-    stations: [...new Set(seed.stops.flatMap(stop => stop.didok ?? []))].sort(compare),
+    stations: [...new Set(seed.stops.flatMap(stop => stop.didok ?? []))].sort(
+      compare,
+    ),
     name: seed.name,
     nameSource: 'manual',
     review: [],
@@ -90,7 +92,9 @@ function fingerprintOf(lines: readonly ManualLine[]): string {
         line.category,
         line.name,
         line.operators.join(','),
-        line.stops.map(stop => `${stop.didok ?? ''}@${stop.lat},${stop.lon}`).join(' '),
+        line.stops
+          .map(stop => `${stop.didok ?? ''}@${stop.lat},${stop.lon}`)
+          .join(' '),
       ].join('|'),
     );
     hash.update('\n');
@@ -105,7 +109,9 @@ export function seedLines(
   log: Log,
 ): Seeded {
   const feedIds = new Set(named.map(line => line.id));
-  const clashes = seed.filter(entry => feedIds.has(entry.id)).map(entry => entry.id);
+  const clashes = seed
+    .filter(entry => feedIds.has(entry.id))
+    .map(entry => entry.id);
 
   if (clashes.length > 0) {
     throw new Error(
@@ -134,7 +140,9 @@ export function seedLines(
 
   log(
     `${plural(manual.length, 'line')} seeded by hand from data/funiculars.json, fingerprint ${fingerprint}${
-      manual.length > 0 ? `: ${manual.map(line => `${line.id} "${line.name}"`).join('; ')}` : ''
+      manual.length > 0
+        ? `: ${manual.map(line => `${line.id} "${line.name}"`).join('; ')}`
+        : ''
     }`,
   );
 

@@ -81,7 +81,9 @@ describe('findDirectory', () => {
   });
 
   it('finds the record behind a zip comment', () => {
-    const tail = Buffer.concat([endOfCentralDirectory(2, 96, 40, 'built by geOps')]);
+    const tail = Buffer.concat([
+      endOfCentralDirectory(2, 96, 40, 'built by geOps'),
+    ]);
 
     expect(findDirectory(tail).entries).toBe(2);
   });
@@ -120,13 +122,15 @@ describe('findDirectory', () => {
 
 describe('readZip64Directory', () => {
   it('reads the 64-bit fields', () => {
-    expect(readZip64Directory(zip64EndOfCentralDirectory(70_000, 9_000_000_000, 12))).toEqual(
-      { entries: 70_000, bytes: 9_000_000_000, offset: 12 },
-    );
+    expect(
+      readZip64Directory(zip64EndOfCentralDirectory(70_000, 9_000_000_000, 12)),
+    ).toEqual({ entries: 70_000, bytes: 9_000_000_000, offset: 12 });
   });
 
   it('rejects a record the locator pointed at wrongly', () => {
-    expect(() => readZip64Directory(Buffer.alloc(ZIP64_EOCD_BYTES))).toThrow(/ZIP64/);
+    expect(() => readZip64Directory(Buffer.alloc(ZIP64_EOCD_BYTES))).toThrow(
+      /ZIP64/,
+    );
   });
 });
 
@@ -138,7 +142,11 @@ describe('listEntries', () => {
       centralHeader('shapes.txt'),
     ]);
 
-    expect(listEntries(directory, 3)).toEqual(['routes.txt', 'trips.txt', 'shapes.txt']);
+    expect(listEntries(directory, 3)).toEqual([
+      'routes.txt',
+      'trips.txt',
+      'shapes.txt',
+    ]);
   });
 
   /** geOps writes a UT extra field on every member; skipping it wrong shifts every later name. */
@@ -156,6 +164,8 @@ describe('listEntries', () => {
   });
 
   it('rejects bytes that are not a central directory', () => {
-    expect(() => listEntries(Buffer.alloc(64), 1)).toThrow(/no central directory header/);
+    expect(() => listEntries(Buffer.alloc(64), 1)).toThrow(
+      /no central directory header/,
+    );
   });
 });

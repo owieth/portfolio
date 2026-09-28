@@ -80,7 +80,9 @@ export interface FeedRecord {
 
 export function assertSafeFeedId(feedId: string): string {
   if (!SAFE_ID.test(feedId)) {
-    throw new Error(`refusing to use ${JSON.stringify(feedId)} as a directory name`);
+    throw new Error(
+      `refusing to use ${JSON.stringify(feedId)} as a directory name`,
+    );
   }
 
   return feedId;
@@ -211,7 +213,8 @@ export function decideCache(
   // The CKAN resource uuid is immutable per publication — a new zip is always a
   // new resource, never a new body behind the same id — so matching it is a
   // strictly stronger check than an ETag, and it costs no request.
-  return record.resource.id !== null && record.resource.id === expectedResourceId
+  return record.resource.id !== null &&
+    record.resource.id === expectedResourceId
     ? 'hit'
     : 'download';
 }

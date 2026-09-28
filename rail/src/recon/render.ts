@@ -179,7 +179,7 @@ function contradictions(findings: Findings): string[] {
       `The feed carries ${plural(routes, 'route')} under foreign categories` +
         ` (${foreign.map(row => `\`${row.route_desc}\``).join(', ')}), most of which are` +
         ' French, German and Austrian services that touch Switzerland or do not' +
-        ' enter it at all. The README\'s include list does not mention them, and' +
+        " enter it at all. The README's include list does not mention them, and" +
         ' "every Swiss train line" is not the same set as "every line in the feed".',
     );
   }
@@ -218,7 +218,10 @@ function sectionCombinations(findings: Findings): string {
         ' Filtering on `route_type` alone cannot express the include list; filtering' +
         ' on `route_desc` can.'
       : `**\`route_desc\` is not a function of \`route_type\`.** ${ambiguous
-          .map(([desc, types]) => `\`${desc}\` appears as ${[...types].join(' and ')}`)
+          .map(
+            ([desc, types]) =>
+              `\`${desc}\` appears as ${[...types].join(' and ')}`,
+          )
           .join('; ')}. Both fields are needed to identify a category.`;
 
   return [
@@ -263,11 +266,15 @@ function sectionSamples(findings: Findings): string {
   const { samples, variants, exceptions } = findings;
 
   const candidates = sum(variants.map(row => row.routes));
-  const categoryOnly = sum(variants.filter(row => row.category_only).map(row => row.routes));
+  const categoryOnly = sum(
+    variants.filter(row => row.category_only).map(row => row.routes),
+  );
   const share = ((categoryOnly / candidates) * 100).toFixed(0);
 
   const marked = variants.filter(row => row.y_variant);
-  const leaks = sum(marked.filter(row => !row.category_only).map(row => row.routes));
+  const leaks = sum(
+    marked.filter(row => !row.category_only).map(row => row.routes),
+  );
 
   const rule =
     leaks > 0
@@ -300,7 +307,11 @@ function sectionSamples(findings: Findings): string {
     '### Telling them apart without a string test',
     '',
     table(
-      ['`route_id` variant is `Y`', 'Short name is only the category', 'Routes'],
+      [
+        '`route_id` variant is `Y`',
+        'Short name is only the category',
+        'Routes',
+      ],
       variants.map(row => [
         row.y_variant ? 'yes' : 'no',
         row.category_only ? 'yes' : 'no',
@@ -338,7 +349,9 @@ function sectionLineNumber(findings: Findings): string {
   const longNames = sum(agencies.map(agency => agency.long_name));
 
   const weighted =
-    sum(agencies.map(agency => agency.trip_short_name_per_route * agency.routes)) / routes;
+    sum(
+      agencies.map(agency => agency.trip_short_name_per_route * agency.routes),
+    ) / routes;
 
   const clean = agencies.filter(agency => agency.category_only === 0).length;
 
@@ -476,7 +489,7 @@ function sectionFuniculars(findings: Findings): string {
       ]),
     ),
     '',
-    'Note the short names: a funicular\'s `route_short_name` is a BAV line number' +
+    "Note the short names: a funicular's `route_short_name` is a BAV line number" +
       ' (`2350`), a local code (`TG`), or the bare category — never something a' +
       ' passenger would say. #475 has to name all 53 of these from the operator.',
   ];

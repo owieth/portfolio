@@ -30,10 +30,23 @@ function route(
   region: string,
   operator: string,
 ): RegionedRoute {
-  return { routeId, agencyId: null, shortName, category, operator, region, source: 'rule' };
+  return {
+    routeId,
+    agencyId: null,
+    shortName,
+    category,
+    operator,
+    region,
+    source: 'rule',
+  };
 }
 
-function pattern(routeId: string, stations: string[], runs = 300, trips = 10): Pattern {
+function pattern(
+  routeId: string,
+  stations: string[],
+  runs = 300,
+  trips = 10,
+): Pattern {
   return { routeId, hash: stations.join('').slice(-16), stations, trips, runs };
 }
 
@@ -107,7 +120,9 @@ describe('mergeLines', () => {
     const { lines } = mergeLines(ROUTES, PATTERNS, log);
 
     expect(
-      lines.filter(line => line.number === 'S10').map(line => [line.id, line.operators]),
+      lines
+        .filter(line => line.number === 'S10')
+        .map(line => [line.id, line.operators]),
     ).toEqual([
       ['s-bahn-st-gallen:S10', [THURBO]],
       ['s-bahn-zuerich:S10', [SZU]],
@@ -118,14 +133,18 @@ describe('mergeLines', () => {
   it('merges routes that share no station, and reports them rather than hiding it', () => {
     const { lines, suspect } = mergeLines(ROUTES, PATTERNS, log);
 
-    expect(lines.filter(line => line.number === 'S5').map(line => line.id)).toEqual([
-      's-bahn-zuerich:S5',
-    ]);
+    expect(
+      lines.filter(line => line.number === 'S5').map(line => line.id),
+    ).toEqual(['s-bahn-zuerich:S5']);
     expect(suspect).toEqual([
       {
         id: 's-bahn-zuerich:S5',
         parts: [
-          { routeIds: ['91-5-A-j26-1'], operators: [SBB], terminals: ['8503000', '8503016'] },
+          {
+            routeIds: ['91-5-A-j26-1'],
+            operators: [SBB],
+            terminals: ['8503000', '8503016'],
+          },
           {
             routeIds: ['91-5-B-j26-1'],
             operators: [THURBO],
@@ -143,14 +162,21 @@ describe('mergeLines', () => {
     const { lines } = mergeLines(ROUTES, PATTERNS, log);
     const ic = lines.filter(line => line.category === 'IC');
 
-    expect(ic.map(line => [line.id, line.number, line.terminals, line.routeIds])).toEqual([
+    expect(
+      ic.map(line => [line.id, line.number, line.terminals, line.routeIds]),
+    ).toEqual([
       [
         'fernverkehr:IC:8501008-8503000',
         null,
         ['8501008', '8503000'],
         ['91-19-Y-j26-1', '91-2H-Y-j26-1'],
       ],
-      ['fernverkehr:IC:8503000-8506302', null, ['8503000', '8506302'], ['91-29-Y-j26-1']],
+      [
+        'fernverkehr:IC:8503000-8506302',
+        null,
+        ['8503000', '8506302'],
+        ['91-29-Y-j26-1'],
+      ],
     ]);
   });
 
@@ -159,7 +185,9 @@ describe('mergeLines', () => {
 
     expect(lines.some(line => line.category === 'TGV')).toBe(false);
     expect(dropped).toBe(1);
-    expect(logged).toContain('1 route without a stop pattern left out of the lines');
+    expect(logged).toContain(
+      '1 route without a stop pattern left out of the lines',
+    );
   });
 
   it('never puts a route_id into an id', () => {
@@ -198,10 +226,9 @@ describe('mergeLines', () => {
     ];
     const patterns = [pattern('a', ['1', '2']), pattern('b', ['1', '2'])];
 
-    expect(mergeLines(routes, patterns, log).lines.map(line => line.id)).toEqual([
-      'fernverkehr:ICE-3',
-      'fernverkehr:NJ-3',
-    ]);
+    expect(
+      mergeLines(routes, patterns, log).lines.map(line => line.id),
+    ).toEqual(['fernverkehr:ICE-3', 'fernverkehr:NJ-3']);
   });
 
   it('stops when two categories would still share one id', () => {
@@ -225,6 +252,8 @@ describe('mergeLines', () => {
   });
 
   it('stops when no route made a pattern', () => {
-    expect(() => mergeLines(ROUTES, [], log)).toThrow(/none of 12 routes made a stop pattern/);
+    expect(() => mergeLines(ROUTES, [], log)).toThrow(
+      /none of 12 routes made a stop pattern/,
+    );
   });
 });

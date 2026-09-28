@@ -42,7 +42,9 @@ interface ExpectedLine {
  * is a line of its own because the feed gives it a number of its own, and it is
  * allowed here so that the Rigi check still fails on anything else.
  */
-const KNOWN_RIGI_EXTRAS: ReadonlySet<string> = new Set(['rigi-bahnen-ag:CC-88']);
+const KNOWN_RIGI_EXTRAS: ReadonlySet<string> = new Set([
+  'rigi-bahnen-ag:CC-88',
+]);
 
 const RIGI_BAHNEN = 'rigi-bahnen-ag';
 const VITZNAU = '8508464';
@@ -72,7 +74,10 @@ function runs(record: LineRecord): string {
   return `${record.terminal_a} to ${record.terminal_b}`;
 }
 
-function sameTerminals(record: LineRecord, [a, b]: readonly [string, string]): boolean {
+function sameTerminals(
+  record: LineRecord,
+  [a, b]: readonly [string, string],
+): boolean {
   return (
     (record.terminal_a === a && record.terminal_b === b) ||
     (record.terminal_a === b && record.terminal_b === a)
@@ -104,11 +109,17 @@ function mismatches(record: LineRecord, expected: ExpectedLine): string[] {
     found.push(`runs ${runs(record)}`);
   }
 
-  if (expected.operator !== undefined && !record.operators.includes(expected.operator)) {
+  if (
+    expected.operator !== undefined &&
+    !record.operators.includes(expected.operator)
+  ) {
     found.push(`is operated by ${record.operators.join(' and ')}`);
   }
 
-  if (expected.seasonal !== undefined && record.seasonal !== expected.seasonal) {
+  if (
+    expected.seasonal !== undefined &&
+    record.seasonal !== expected.seasonal
+  ) {
     found.push(`has seasonal ${record.seasonal}`);
   }
 
@@ -172,10 +183,13 @@ export const SPOT_CHECKS: readonly SpotCheck[] = [
   },
   {
     line: 'S10 (Uetlibergbahn)',
-    expectation: 'one line, s-bahn-zuerich:S10 from Zürich HB to Uetliberg, run by SZU',
+    expectation:
+      'one line, s-bahn-zuerich:S10 from Zürich HB to Uetliberg, run by SZU',
     check: lines => {
       const s10s = lines.filter(
-        line => line.network_region === 's-bahn-zuerich' && line.display_name === 'S10',
+        line =>
+          line.network_region === 's-bahn-zuerich' &&
+          line.display_name === 'S10',
       );
 
       return s10s.length > 1
@@ -191,7 +205,9 @@ export const SPOT_CHECKS: readonly SpotCheck[] = [
         id => !lines.some(line => line.id === id),
       );
 
-      return missing.length === 0 ? null : `there is no line ${missing.join(' or ')}`;
+      return missing.length === 0
+        ? null
+        : `there is no line ${missing.join(' or ')}`;
     },
   },
   {
@@ -218,18 +234,26 @@ export const SPOT_CHECKS: readonly SpotCheck[] = [
     line: 'Rigi rack railways',
     expectation: `two lines, not one, and no other Rigi Bahnen line than ${[...KNOWN_RIGI_EXTRAS].join(', ')}`,
     check: lines => {
-      const fused = lines.filter(line => serves(line, VITZNAU) && serves(line, ARTH_GOLDAU_RB));
+      const fused = lines.filter(
+        line => serves(line, VITZNAU) && serves(line, ARTH_GOLDAU_RB),
+      );
 
       if (fused.length > 0) {
         return `${list(fused.map(line => line.id))} stops at both Vitznau and Arth-Goldau RB`;
       }
 
-      const expected = new Set(['rigi-bahnen-ag:CC-81', 'rigi-bahnen-ag:CC-82', ...KNOWN_RIGI_EXTRAS]);
+      const expected = new Set([
+        'rigi-bahnen-ag:CC-81',
+        'rigi-bahnen-ag:CC-82',
+        ...KNOWN_RIGI_EXTRAS,
+      ]);
       const others = lines.filter(
         line => line.network_region === RIGI_BAHNEN && !expected.has(line.id),
       );
 
-      return others.length === 0 ? null : `there is also ${list(others.map(line => line.id))}`;
+      return others.length === 0
+        ? null
+        : `there is also ${list(others.map(line => line.id))}`;
     },
   },
   {
@@ -239,7 +263,8 @@ export const SPOT_CHECKS: readonly SpotCheck[] = [
   },
   {
     line: 'Pilatus rack railway',
-    expectation: 'pilatusbahnen:CC-R83 from Alpnachstad PB to Pilatus Kulm, seasonal',
+    expectation:
+      'pilatusbahnen:CC-R83 from Alpnachstad PB to Pilatus Kulm, seasonal',
     check: expectLine({
       id: 'pilatusbahnen:CC-R83',
       displayName: 'CC R83',
@@ -250,7 +275,8 @@ export const SPOT_CHECKS: readonly SpotCheck[] = [
   },
   {
     line: 'Pilatus gondola',
-    expectation: 'no line to Krienseregg or Fräkmüntegg, and only the rack railway at Pilatus Kulm',
+    expectation:
+      'no line to Krienseregg or Fräkmüntegg, and only the rack railway at Pilatus Kulm',
     check: lines => {
       const gondola = expectAbsent(PILATUS_GONDOLA_STOPS)(lines);
 
@@ -259,7 +285,8 @@ export const SPOT_CHECKS: readonly SpotCheck[] = [
       }
 
       const others = lines.filter(
-        line => line.id !== 'pilatusbahnen:CC-R83' && serves(line, PILATUS_KULM),
+        line =>
+          line.id !== 'pilatusbahnen:CC-R83' && serves(line, PILATUS_KULM),
       );
 
       return others.length === 0
@@ -269,7 +296,8 @@ export const SPOT_CHECKS: readonly SpotCheck[] = [
   },
   {
     line: 'Polybahn',
-    expectation: 'poly-bahn-zuerich:FUN-24 from Zürich Central (Polybahn) to Zürich Polyterrasse',
+    expectation:
+      'poly-bahn-zuerich:FUN-24 from Zürich Central (Polybahn) to Zürich Polyterrasse',
     check: expectLine({
       id: 'poly-bahn-zuerich:FUN-24',
       displayName: 'Standseilbahn Polybahn',
@@ -279,7 +307,8 @@ export const SPOT_CHECKS: readonly SpotCheck[] = [
   },
   {
     line: 'Every line',
-    expectation: 'a train, rack railway or funicular — no bus, tram, metro, boat or cable car',
+    expectation:
+      'a train, rack railway or funicular — no bus, tram, metro, boat or cable car',
     check: lines => {
       const found = lines
         .filter(line => !Object.hasOwn(CATEGORIES, line.category))
@@ -302,7 +331,9 @@ export function spotCheck(lines: readonly LineRecord[]): string[] {
   return SPOT_CHECKS.flatMap(({ line, expectation, check }) => {
     const found = check(lines);
 
-    return found === null ? [] : [`${line}: expected ${expectation}, but ${found}`];
+    return found === null
+      ? []
+      : [`${line}: expected ${expectation}, but ${found}`];
   });
 }
 

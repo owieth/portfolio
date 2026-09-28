@@ -64,7 +64,10 @@ const REASONS: readonly { reason: UnmatchedReason; says: string }[] = [
     reason: 'low-coverage',
     says: 'relations passed, but reach too few of the line’s stations',
   },
-  { reason: 'contested', says: 'its relations went to lines with a stronger claim' },
+  {
+    reason: 'contested',
+    says: 'its relations went to lines with a stronger claim',
+  },
 ];
 
 function count(value: number): string {
@@ -149,8 +152,14 @@ function sectionTotals(lines: readonly TerminiLine[]): string {
     table(
       ['', 'Trains', 'Funiculars', 'Lines'],
       [
-        ['From the feed', ...split(lines.filter(line => line.source === 'feed'))],
-        ['Seeded by hand', ...split(lines.filter(line => line.source === 'manual'))],
+        [
+          'From the feed',
+          ...split(lines.filter(line => line.source === 'feed')),
+        ],
+        [
+          'Seeded by hand',
+          ...split(lines.filter(line => line.source === 'manual')),
+        ],
         ['**All**', ...split(lines)],
       ],
     ),
@@ -161,11 +170,17 @@ function sectionCategories(lines: readonly TerminiLine[]): string {
   const categories = new Map<string, TerminiLine[]>();
 
   for (const line of lines) {
-    categories.set(line.category, [...(categories.get(line.category) ?? []), line]);
+    categories.set(line.category, [
+      ...(categories.get(line.category) ?? []),
+      line,
+    ]);
   }
 
   const rows = [...categories.entries()]
-    .sort(([a, first], [b, second]) => second.length - first.length || compare(a, b))
+    .sort(
+      ([a, first], [b, second]) =>
+        second.length - first.length || compare(a, b),
+    )
     .map(([category, members]): Cell[] => [
       code(category),
       members.length,
@@ -192,7 +207,9 @@ function sectionRegions(input: ReportInput): string {
 
   const slugs = [...regions.keys()].sort(compare);
   const named = slugs.filter(slug => Object.hasOwn(input.regionNames, slug));
-  const byOperator = slugs.filter(slug => !Object.hasOwn(input.regionNames, slug));
+  const byOperator = slugs.filter(
+    slug => !Object.hasOwn(input.regionNames, slug),
+  );
   const counts = (slug: string): Cell[] => {
     const members = regions.get(slug) ?? [];
     const funiculars = members.filter(isFunicular).length;
@@ -243,7 +260,10 @@ function unmatchedRow(
   ];
 
   if (reason === 'low-coverage') {
-    return [...row, entry.best === null ? null : percent(entry.best.confidence)];
+    return [
+      ...row,
+      entry.best === null ? null : percent(entry.best.confidence),
+    ];
   }
 
   if (reason === 'contested') {
@@ -272,42 +292,50 @@ function sectionUnmatched(input: ReportInput): string {
   const unmatched = byId(input.unmatched);
   const groups = REASONS.map(({ reason, says }) => {
     const entries = unmatched.filter(entry => entry.reason === reason);
-    const shortLived = entries.filter(entry => isShortLived(lines.get(entry.id)));
+    const shortLived = entries.filter(entry =>
+      isShortLived(lines.get(entry.id)),
+    );
     const lasting = entries.filter(entry => !isShortLived(lines.get(entry.id)));
 
     return { reason, says, entries, shortLived, lasting };
   });
 
-  const blocks = groups.flatMap(({ reason, says, entries, shortLived, lasting }) => {
-    if (entries.length === 0) {
-      return [];
-    }
+  const blocks = groups.flatMap(
+    ({ reason, says, entries, shortLived, lasting }) => {
+      if (entries.length === 0) {
+        return [];
+      }
 
-    const rows = (subset: readonly Unmatched[]): Cell[][] =>
-      subset.map(entry => unmatchedRow(entry, lines.get(entry.id), reason));
-    const folded =
-      shortLived.length === 0
-        ? []
-        : [
-            '',
-            '<details>',
-            `<summary>${plural(shortLived.length, 'short-lived line')}, running in ${SHORT_LIVED_WEEKS} weeks or fewer</summary>`,
-            '',
-            table(unmatchedHeaders(reason), rows(shortLived)),
-            '',
-            '</details>',
-          ];
+      const rows = (subset: readonly Unmatched[]): Cell[][] =>
+        subset.map(entry => unmatchedRow(entry, lines.get(entry.id), reason));
+      const folded =
+        shortLived.length === 0
+          ? []
+          : [
+              '',
+              '<details>',
+              `<summary>${plural(shortLived.length, 'short-lived line')}, running in ${SHORT_LIVED_WEEKS} weeks or fewer</summary>`,
+              '',
+              table(unmatchedHeaders(reason), rows(shortLived)),
+              '',
+              '</details>',
+            ];
 
-    return [
-      '',
-      `### ${code(reason)}`,
-      '',
-      `${says[0].toUpperCase()}${says.slice(1)}.`,
-      '',
-      listing(unmatchedHeaders(reason), rows(lasting), '_Only short-lived lines._'),
-      ...folded,
-    ];
-  });
+      return [
+        '',
+        `### ${code(reason)}`,
+        '',
+        `${says[0].toUpperCase()}${says.slice(1)}.`,
+        '',
+        listing(
+          unmatchedHeaders(reason),
+          rows(lasting),
+          '_Only short-lived lines._',
+        ),
+        ...folded,
+      ];
+    },
+  );
 
   return [
     '## Lines with no OSM match',
@@ -329,7 +357,9 @@ function sectionUnmatched(input: ReportInput): string {
 }
 
 function sectionSuspects(input: ReportInput): string {
-  const names = new Map(input.stations.map(station => [station.didok, station.name]));
+  const names = new Map(
+    input.stations.map(station => [station.didok, station.name]),
+  );
   const stationName = (didok: string): string => names.get(didok) ?? didok;
   const blocks = byId(input.suspect).flatMap(suspect => [
     '',
@@ -359,7 +389,9 @@ function sectionSuspects(input: ReportInput): string {
 
 function sectionNames(input: ReportInput): string {
   const inFeed = new Set(input.inFeed);
-  const derived = byId(input.lines.filter(line => line.nameSource === 'derived'));
+  const derived = byId(
+    input.lines.filter(line => line.nameSource === 'derived'),
+  );
   const flagged = derived.filter(line => line.review.length > 0);
   const plain = derived.filter(line => line.review.length === 0);
   const manual = byId(input.lines.filter(line => line.source === 'manual'));
@@ -379,7 +411,11 @@ function sectionNames(input: ReportInput): string {
     '',
     listing(
       ['Line', 'Name', 'Flags'],
-      flagged.map(line => [code(line.id), line.name, line.review.map(code).join(', ')]),
+      flagged.map(line => [
+        code(line.id),
+        line.name,
+        line.review.map(code).join(', '),
+      ]),
     ),
     '',
     '### Derived',
@@ -412,7 +448,9 @@ function sectionNames(input: ReportInput): string {
 function sectionFeed(input: ReportInput): string {
   const expected = '_None — the expected state._';
   const coordinate = (value: number | null): Cell => value?.toFixed(5) ?? null;
-  const misplaced = [...input.misplaced].sort((a, b) => compare(a.didok, b.didok));
+  const misplaced = [...input.misplaced].sort((a, b) =>
+    compare(a.didok, b.didok),
+  );
   const unknown = [...input.unknownRoutes].sort(
     (a, b) =>
       b.routes - a.routes ||

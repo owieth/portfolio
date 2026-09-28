@@ -81,14 +81,19 @@ describe('allocate', () => {
 
   it('sums the Zürich–Zug pool to every total', () => {
     for (let total = 30; total <= 800; total += 1) {
-      const sum = allocate(POOLS.zurichZug, total).reduce((acc, { count }) => acc + count, 0);
+      const sum = allocate(POOLS.zurichZug, total).reduce(
+        (acc, { count }) => acc + count,
+        0,
+      );
 
       expect(sum, `pool of ${total}`).toBe(total);
     }
   });
 
   it('gives one pre-move Zug day fewer its whole pool', () => {
-    expect(allocate(POOLS.zurichZug, 388).map(({ count }) => count)).toEqual([30, 251, 18, 89]);
+    expect(allocate(POOLS.zurichZug, 388).map(({ count }) => count)).toEqual([
+      30, 251, 18, 89,
+    ]);
   });
 
   it('gives a single line the whole pool', () => {
@@ -96,7 +101,9 @@ describe('allocate', () => {
   });
 
   it('refuses a pool too small for its fixed counts', () => {
-    expect(() => allocate([{ line: 'S24', count: 30 }], 12)).toThrow(/cannot hold 30/);
+    expect(() => allocate([{ line: 'S24', count: 30 }], 12)).toThrow(
+      /cannot hold 30/,
+    );
   });
 });
 

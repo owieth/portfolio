@@ -110,7 +110,9 @@ export function parseOperators(json: unknown, source: string): Operator[] {
   return json.operators as Operator[];
 }
 
-export async function loadOperators(path: string = OPERATORS_FILE): Promise<Operator[]> {
+export async function loadOperators(
+  path: string = OPERATORS_FILE,
+): Promise<Operator[]> {
   const text = await readFile(path, 'utf8');
 
   let json: unknown;
@@ -152,7 +154,9 @@ export function verifyOperators(
         `operator ${entry.id} ${entry.name} runs no allowed route in this feed; it may be stale`,
       );
     } else if (actual !== entry.name) {
-      found.push(`operator ${entry.id} is ${actual} in the feed, not ${entry.name}`);
+      found.push(
+        `operator ${entry.id} is ${actual} in the feed, not ${entry.name}`,
+      );
     }
   }
 

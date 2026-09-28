@@ -122,11 +122,31 @@ export const POOLS = {
 } satisfies Record<string, { line: string; share?: number; count?: number }[]>;
 
 const S9_OUT: Leg = { from: DIDOK.unterzollikofen, to: DIDOK.bern, pool: 's9' };
-const S9_BACK: Leg = { from: DIDOK.bern, to: DIDOK.unterzollikofen, pool: 's9' };
-const BERN_ZURICH: Leg = { from: DIDOK.bern, to: DIDOK.zurich, pool: 'bernZurich' };
-const ZURICH_BERN: Leg = { from: DIDOK.zurich, to: DIDOK.bern, pool: 'bernZurich' };
-const ZURICH_ZUG: Leg = { from: DIDOK.zurich, to: DIDOK.zug, pool: 'zurichZug' };
-const ZUG_ZURICH: Leg = { from: DIDOK.zug, to: DIDOK.zurich, pool: 'zurichZug' };
+const S9_BACK: Leg = {
+  from: DIDOK.bern,
+  to: DIDOK.unterzollikofen,
+  pool: 's9',
+};
+const BERN_ZURICH: Leg = {
+  from: DIDOK.bern,
+  to: DIDOK.zurich,
+  pool: 'bernZurich',
+};
+const ZURICH_BERN: Leg = {
+  from: DIDOK.zurich,
+  to: DIDOK.bern,
+  pool: 'bernZurich',
+};
+const ZURICH_ZUG: Leg = {
+  from: DIDOK.zurich,
+  to: DIDOK.zug,
+  pool: 'zurichZug',
+};
+const ZUG_ZURICH: Leg = {
+  from: DIDOK.zug,
+  to: DIDOK.zurich,
+  pool: 'zurichZug',
+};
 
 /** The three pre-move Zug legs, out and back the same way. */
 const ZUG_VIA_ZURICH = {
@@ -235,7 +255,12 @@ export function allocate(
  * 70/25/5 split as evenly as integers allow.
  */
 export function spread(counts: Allocation[], total: number): string[] {
-  const state = counts.map(({ key, count }) => ({ key, count, used: 0, credit: 0 }));
+  const state = counts.map(({ key, count }) => ({
+    key,
+    count,
+    used: 0,
+    credit: 0,
+  }));
   const dealt: string[] = [];
 
   for (let slot = 0; slot < total; slot += 1) {
@@ -244,7 +269,8 @@ export function spread(counts: Allocation[], total: number): string[] {
     for (const entry of state) {
       entry.credit += entry.count / total;
 
-      if (entry.used < entry.count && (!best || entry.credit > best.credit)) best = entry;
+      if (entry.used < entry.count && (!best || entry.credit > best.credit))
+        best = entry;
     }
 
     if (!best) throw new Error(`counts sum to fewer than ${total} legs`);

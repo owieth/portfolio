@@ -61,7 +61,10 @@ function compact(value: string): string {
  * the Léman Express as `R` lines numbered `RL1` to `RL7`, and OSM calls them
  * `L1` to `L7`.
  */
-export function lineRefs(category: Category, number: string | null): Set<string> {
+export function lineRefs(
+  category: Category,
+  number: string | null,
+): Set<string> {
   if (number === null) {
     return new Set();
   }
@@ -92,7 +95,10 @@ export function relationRefs(ref: string | undefined): Set<string> {
  * files the same trains under: ÖBB's railjets are `RJ` on OSM and `RJX` in the
  * feed, its EuroNights `EN` on OSM and `NJ` in the feed.
  */
-const OSM_CATEGORIES: Readonly<Record<string, Category>> = { RJ: 'RJX', EN: 'NJ' };
+const OSM_CATEGORIES: Readonly<Record<string, Category>> = {
+  RJ: 'RJX',
+  EN: 'NJ',
+};
 
 /**
  * Every code a ref can open with, longest first, so `ICE 20` reads as an ICE
@@ -189,7 +195,9 @@ export function operatorNames(
 
   return [
     ...new Set(
-      operators.flatMap(name => [name, short.get(name) ?? name].map(normaliseOperator)),
+      operators.flatMap(name =>
+        [name, short.get(name) ?? name].map(normaliseOperator),
+      ),
     ),
   ].filter(name => name !== '');
 }
@@ -201,7 +209,10 @@ export function operatorNames(
  * Bundesbahnen SBB`, `bls` inside `BLS AG (bls)`. Never a fragment of a word, so
  * `RB` does not run the `RBS`.
  */
-export function operatorMatches(tag: string | undefined, names: readonly string[]): boolean {
+export function operatorMatches(
+  tag: string | undefined,
+  names: readonly string[],
+): boolean {
   const tagged = (tag ?? '')
     .split(';')
     .map(normaliseOperator)

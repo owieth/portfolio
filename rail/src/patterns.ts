@@ -133,7 +133,9 @@ function patternCounts(patterns: readonly Pattern[]): [string, number][] {
     counts.set(pattern.routeId, (counts.get(pattern.routeId) ?? 0) + 1);
   }
 
-  return [...counts.entries()].sort(([a, x], [b, y]) => y - x || a.localeCompare(b));
+  return [...counts.entries()].sort(
+    ([a, x], [b, y]) => y - x || a.localeCompare(b),
+  );
 }
 
 export async function derivePatterns(
@@ -145,7 +147,10 @@ export async function derivePatterns(
   const db = await openGtfs(gtfsPath(feedDir), ['stops', 'trips'], { store });
 
   try {
-    await Promise.all([assertColumns(db, REQUIRED_COLUMNS), assertStore(db, store)]);
+    await Promise.all([
+      assertColumns(db, REQUIRED_COLUMNS),
+      assertStore(db, store),
+    ]);
 
     await db.run(keyTable('allowed', 'route_id', input.routeIds));
     await db.run(keyTable('swiss', 'didok', input.didoks));
@@ -205,7 +210,9 @@ export async function derivePatterns(
     // has no Swiss segment to ride. Counted because a jump in it is how a broken
     // station join would show up.
     if (dropped > 0) {
-      log(`${count(dropped)} allowed trips serve fewer than two Swiss stations and make no pattern`);
+      log(
+        `${count(dropped)} allowed trips serve fewer than two Swiss stations and make no pattern`,
+      );
     }
 
     // The geographic cut the allowlist could not make from routes.txt: a DB Regio

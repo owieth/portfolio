@@ -114,7 +114,10 @@ function stopsByLine({ stops }: Plan): Cell[][] {
     .map(([lineId, counts]) => [code(lineId), ...counts]);
 }
 
-export function renderReconcile(plan: Plan, { applied }: RenderOptions): string {
+export function renderReconcile(
+  plan: Plan,
+  { applied }: RenderOptions,
+): string {
   const head = [
     `# Rail lines — reconcile${applied ? '' : ' (dry run)'}`,
     '',

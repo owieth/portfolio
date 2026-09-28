@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
 import type { Pattern } from '../patterns.ts';
-import { backbone, canonicalSequence, firstVisits, poolPatterns } from './order.ts';
+import {
+  backbone,
+  canonicalSequence,
+  firstVisits,
+  poolPatterns,
+} from './order.ts';
 import type { PooledPattern, Sequence } from './order.ts';
 
 /**
@@ -57,7 +62,10 @@ function didoks(sequence: Sequence): string[] {
 }
 
 /** Nothing a pattern serves may go missing, and nothing may appear twice. */
-function expectComplete(sequence: Sequence, pool: readonly PooledPattern[]): void {
+function expectComplete(
+  sequence: Sequence,
+  pool: readonly PooledPattern[],
+): void {
   const served = new Set(pool.flatMap(pattern => pattern.stations));
 
   expect(new Set(didoks(sequence))).toEqual(served);
@@ -97,7 +105,10 @@ describe('backbone', () => {
 
 describe('firstVisits', () => {
   it('keeps the first visit of a station the pattern comes back to', () => {
-    expect(firstVisits([A, B, C, B])).toEqual({ stations: [A, B, C], loop: true });
+    expect(firstVisits([A, B, C, B])).toEqual({
+      stations: [A, B, C],
+      loop: true,
+    });
     expect(firstVisits([A, B])).toEqual({ stations: [A, B], loop: false });
   });
 });
@@ -113,10 +124,14 @@ describe('canonicalSequence', () => {
     const sequence = canonicalSequence(pool);
 
     expect(didoks(sequence)).toEqual(IC1);
-    expect(sequence.stops.every(stop => stop.via === 'backbone' && stop.junction === null)).toBe(
-      true,
-    );
-    expect(sequence.patterns.map(pattern => [pattern.stations[0], pattern.reversed])).toEqual([
+    expect(
+      sequence.stops.every(
+        stop => stop.via === 'backbone' && stop.junction === null,
+      ),
+    ).toBe(true);
+    expect(
+      sequence.patterns.map(pattern => [pattern.stations[0], pattern.reversed]),
+    ).toEqual([
       [ST_GALLEN, true],
       [GENEVE_AEROPORT, false],
       [ST_GALLEN, true],
@@ -144,8 +159,9 @@ describe('canonicalSequence', () => {
       { didok: SCHAFFHAUSEN, via: 'branch', junction: WINTERTHUR },
     ]);
     expect(
-      sequence.patterns.find(pattern => pattern.stations[0] === SCHAFFHAUSEN && pattern.runs === 500)
-        ?.reversed,
+      sequence.patterns.find(
+        pattern => pattern.stations[0] === SCHAFFHAUSEN && pattern.runs === 500,
+      )?.reversed,
     ).toBe(true);
     expectComplete(sequence, pool);
   });
@@ -214,12 +230,20 @@ describe('canonicalSequence', () => {
     const pool = [pooled([A, B, C, D], 300), pooled([A, B, Z], 40)];
     const sequence = canonicalSequence(pool);
 
-    expect(sequence.stops.at(-1)).toEqual({ didok: Z, via: 'branch', junction: B });
+    expect(sequence.stops.at(-1)).toEqual({
+      didok: Z,
+      via: 'branch',
+      junction: B,
+    });
     expect(didoks(sequence)).toEqual([A, B, C, D, Z]);
   });
 
   it('extends the trunk at either end, even from a pattern that shares only the end', () => {
-    const pool = [pooled([B, C, D], 300), pooled([B, A], 50), pooled([E, D], 50)];
+    const pool = [
+      pooled([B, C, D], 300),
+      pooled([B, A], 50),
+      pooled([E, D], 50),
+    ];
     const sequence = canonicalSequence(pool);
 
     expect(sequence.stops).toEqual([
@@ -237,16 +261,28 @@ describe('canonicalSequence', () => {
     const sequence = canonicalSequence(pool);
 
     expect(didoks(sequence)).toEqual([A, B, C, D, E, X]);
-    expect(sequence.stops.at(-1)).toEqual({ didok: X, via: 'branch', junction: C });
+    expect(sequence.stops.at(-1)).toEqual({
+      didok: X,
+      via: 'branch',
+      junction: C,
+    });
     expect(sequence.conflicts).toEqual([disagreeing.hash]);
   });
 
   it('does not call a pattern that comes in off a branch through its junction a conflict', () => {
     // The IC1's Romont FR starts: Romont to St. Gallen, then one that stops at Zürich.
-    const pool = [pooled([A, B, C, D], 300), pooled([Z, B, C, D], 200), pooled([Z, B, C], 1)];
+    const pool = [
+      pooled([A, B, C, D], 300),
+      pooled([Z, B, C, D], 200),
+      pooled([Z, B, C], 1),
+    ];
     const sequence = canonicalSequence(pool);
 
-    expect(sequence.stops.at(-1)).toEqual({ didok: Z, via: 'branch', junction: B });
+    expect(sequence.stops.at(-1)).toEqual({
+      didok: Z,
+      via: 'branch',
+      junction: B,
+    });
     expect(sequence.conflicts).toEqual([]);
   });
 
@@ -280,11 +316,18 @@ describe('canonicalSequence', () => {
     const first = canonicalSequence(pool);
 
     expect(canonicalSequence([...pool].reverse())).toEqual(first);
-    expect(canonicalSequence([...pool.slice(2), ...pool.slice(0, 2)])).toEqual(first);
+    expect(canonicalSequence([...pool.slice(2), ...pool.slice(0, 2)])).toEqual(
+      first,
+    );
     expectComplete(first, pool);
   });
 
   it('has nothing to say about no patterns', () => {
-    expect(canonicalSequence([])).toEqual({ stops: [], patterns: [], conflicts: [], loop: false });
+    expect(canonicalSequence([])).toEqual({
+      stops: [],
+      patterns: [],
+      conflicts: [],
+      loop: false,
+    });
   });
 });

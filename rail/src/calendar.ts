@@ -113,7 +113,10 @@ function toRoute(row: RouteServiceRow): RouteService {
   };
 }
 
-export async function expandCalendar(feedDir: string, log: Log): Promise<Calendar> {
+export async function expandCalendar(
+  feedDir: string,
+  log: Log,
+): Promise<Calendar> {
   const store = join(feedDir, STORE_FILE);
   const db = await openGtfs(
     gtfsPath(feedDir),
@@ -136,7 +139,9 @@ export async function expandCalendar(feedDir: string, log: Log): Promise<Calenda
     // Sequential: each is a scan of the table or of trips.txt, and DuckDB already
     // parallelises inside a query — two at once would only compete for the pool.
     const [totals] = await db.query<TotalsRow>(TOTALS);
-    const routes = (await db.query<RouteServiceRow>(ROUTE_SERVICE)).map(toRoute);
+    const routes = (await db.query<RouteServiceRow>(ROUTE_SERVICE)).map(
+      toRoute,
+    );
     const [unresolved] = await db.query<UnresolvedRow>(UNRESOLVED);
 
     const elapsedMs = performance.now() - startedAt;
@@ -174,7 +179,9 @@ export async function expandCalendar(feedDir: string, log: Log): Promise<Calenda
       );
     }
 
-    log(`trips per week are counted over the reference week, ${week.first} to ${week.last}`);
+    log(
+      `trips per week are counted over the reference week, ${week.first} to ${week.last}`,
+    );
 
     return {
       window,

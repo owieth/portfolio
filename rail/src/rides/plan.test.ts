@@ -61,13 +61,17 @@ describe('planRides', () => {
 
     expect(viaLuzern).toHaveLength(10);
     // Scattered through the run, not bunched at one end of it.
-    expect(new Set(viaLuzern.map(ride => ride.riddenOn.slice(0, 7))).size).toBeGreaterThan(1);
+    expect(
+      new Set(viaLuzern.map(ride => ride.riddenOn.slice(0, 7))).size,
+    ).toBeGreaterThan(1);
   });
 
   it('takes the post-move Wildegg day out over Olten and home over Zofingen', () => {
     const { rides } = planRides(days('wildegg', ['2026-07-15']));
 
-    expect(rides.map(ride => [ride.lineId, ride.fromDidok, ride.toDidok])).toEqual([
+    expect(
+      rides.map(ride => [ride.lineId, ride.fromDidok, ride.toDidok]),
+    ).toEqual([
       ['fernverkehr:IC21', '8505000', '8500218'],
       ['s-bahn-aargau:S29', '8500218', '8502115'],
       ['s-bahn-aargau:S29', '8502115', '8502001'],
@@ -93,6 +97,8 @@ describe('planRides', () => {
 
   it('refuses a day whose era and destination have no route', () => {
     // Luzern became home at the move; a Luzern office day after it is a mistake.
-    expect(() => planRides(days('luzern', ['2026-09-24']))).toThrow(/post:luzern/);
+    expect(() => planRides(days('luzern', ['2026-09-24']))).toThrow(
+      /post:luzern/,
+    );
   });
 });

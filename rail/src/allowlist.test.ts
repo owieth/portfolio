@@ -67,12 +67,42 @@ describe('allowRoutes', () => {
     const allowed = await allowRoutes(directory, log);
 
     expect(allowed.routes).toEqual([
-      { routeId: '91-2A-Y-j26-1', agencyId: '11', shortName: 'EC', category: 'EC' },
-      { routeId: '91-2N-Y-j26-1', agencyId: '11', shortName: 'TGV', category: 'TGV' },
-      { routeId: '91-3-B-j26-1', agencyId: '11', shortName: 'S3', category: 'S' },
-      { routeId: '91-8R-Y-j26-1', agencyId: '800693', shortName: 'RB', category: 'RB' },
-      { routeId: '91-ZZ-Y-j26-1', agencyId: '87_LEX', shortName: 'ZUG', category: 'ZUG' },
-      { routeId: '93-24-j26-1', agencyId: '165', shortName: '24', category: 'FUN' },
+      {
+        routeId: '91-2A-Y-j26-1',
+        agencyId: '11',
+        shortName: 'EC',
+        category: 'EC',
+      },
+      {
+        routeId: '91-2N-Y-j26-1',
+        agencyId: '11',
+        shortName: 'TGV',
+        category: 'TGV',
+      },
+      {
+        routeId: '91-3-B-j26-1',
+        agencyId: '11',
+        shortName: 'S3',
+        category: 'S',
+      },
+      {
+        routeId: '91-8R-Y-j26-1',
+        agencyId: '800693',
+        shortName: 'RB',
+        category: 'RB',
+      },
+      {
+        routeId: '91-ZZ-Y-j26-1',
+        agencyId: '87_LEX',
+        shortName: 'ZUG',
+        category: 'ZUG',
+      },
+      {
+        routeId: '93-24-j26-1',
+        agencyId: '165',
+        shortName: '24',
+        category: 'FUN',
+      },
     ]);
   });
 
@@ -84,9 +114,19 @@ describe('allowRoutes', () => {
     expect(allowed.excluded).toEqual([
       { routeType: '700', routeDesc: 'B', routes: 1, reason: 'bus' },
       { routeType: '705', routeDesc: 'BN', routes: 1, reason: 'night bus' },
-      { routeType: '117', routeDesc: 'EXT', routes: 1, reason: 'special-event train' },
+      {
+        routeType: '117',
+        routeDesc: 'EXT',
+        routes: 1,
+        reason: 'special-event train',
+      },
       { routeType: '1300', routeDesc: 'SL', routes: 1, reason: 'chairlift' },
-      { routeType: '106', routeDesc: 'TER', routes: 1, reason: 'French regional network' },
+      {
+        routeType: '106',
+        routeDesc: 'TER',
+        routes: 1,
+        reason: 'French regional network',
+      },
     ]);
   });
 
@@ -120,8 +160,12 @@ describe('allowRoutes', () => {
     logged.length = 0;
     await allowRoutes(directory, log);
 
-    expect(logged.find(line => line.startsWith('unrecognised'))).toContain('QQ');
-    expect(logged.find(line => line.startsWith('unrecognised'))).toContain('pnpm recon:data');
+    expect(logged.find(line => line.startsWith('unrecognised'))).toContain(
+      'QQ',
+    );
+    expect(logged.find(line => line.startsWith('unrecognised'))).toContain(
+      'pnpm recon:data',
+    );
   });
 
   it('flags ZUG for #475, which has to name it', async () => {
@@ -136,6 +180,8 @@ describe('allowRoutes', () => {
    * `lines.csv` and a clean exit, which is the one failure that looks like success.
    */
   it('fails when nothing survives rather than emitting an empty inventory', async () => {
-    await expect(allowRoutes(empty, log)).rejects.toThrow(/no rideable routes survived/);
+    await expect(allowRoutes(empty, log)).rejects.toThrow(
+      /no rideable routes survived/,
+    );
   });
 });

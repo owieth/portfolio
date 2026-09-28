@@ -146,7 +146,11 @@ interface Fixture {
   withoutCalendar?: boolean;
 }
 
-async function writeFeed({ id = same, stops = STOPS, withoutCalendar = false }: Fixture = {}): Promise<string> {
+async function writeFeed({
+  id = same,
+  stops = STOPS,
+  withoutCalendar = false,
+}: Fixture = {}): Promise<string> {
   const files = {
     feed_info: FEED_INFO,
     stops,
@@ -199,12 +203,16 @@ describe('derivePatterns', () => {
   it('collapses platforms into their station and leaves out stops the train only passes', async () => {
     const { patterns } = await derivePatterns(await writeFeed(), log, INPUT);
     const schaffhausen = patterns.find(
-      pattern => pattern.routeId === S12 && pattern.stations.at(-1) === SCHAFFHAUSEN,
+      pattern =>
+        pattern.routeId === S12 && pattern.stations.at(-1) === SCHAFFHAUSEN,
     );
 
     // Trips 1 and 2 differ in every platform, in Effretikon, and in calling at
     // Winterthur twice; as stations they are the same train.
-    expect(schaffhausen).toMatchObject({ stations: [BRUGG, WINTERTHUR, SCHAFFHAUSEN], trips: 2 });
+    expect(schaffhausen).toMatchObject({
+      stations: [BRUGG, WINTERTHUR, SCHAFFHAUSEN],
+      trips: 2,
+    });
   });
 
   it('weights each trip by the days its service runs', async () => {
@@ -225,11 +233,24 @@ describe('derivePatterns', () => {
     const result = await derivePatterns(await writeFeed(), log, INPUT);
 
     expect(result.patterns.filter(pattern => pattern.routeId === EC)).toEqual([
-      expect.objectContaining({ stations: [WINTERTHUR, SCHAFFHAUSEN], trips: 1 }),
+      expect.objectContaining({
+        stations: [WINTERTHUR, SCHAFFHAUSEN],
+        trips: 1,
+      }),
     ]);
-    expect(result.patterns.some(pattern => pattern.routeId === GERMAN)).toBe(false);
-    expect(result.patterns.some(pattern => pattern.routeId === BUS)).toBe(false);
-    expect(result).toMatchObject({ routes: 2, branched: 1, foreign: 1, dropped: 1, unresolved: 0 });
+    expect(result.patterns.some(pattern => pattern.routeId === GERMAN)).toBe(
+      false,
+    );
+    expect(result.patterns.some(pattern => pattern.routeId === BUS)).toBe(
+      false,
+    );
+    expect(result).toMatchObject({
+      routes: 2,
+      branched: 1,
+      foreign: 1,
+      dropped: 1,
+      unresolved: 0,
+    });
     expect(logged).toContain(
       '1 allowed routes make no pattern, because none of their trips serves two Swiss stations',
     );
@@ -264,11 +285,16 @@ describe('derivePatterns', () => {
     const [pattern] = patterns;
 
     expect(pattern?.hash).toBe(
-      createHash('sha256').update(pattern?.stations.join(' ') ?? '').digest('hex').slice(0, 16),
+      createHash('sha256')
+        .update(pattern?.stations.join(' ') ?? '')
+        .digest('hex')
+        .slice(0, 16),
     );
     expect(
       patterns.every(
-        other => other.stations.join(' ') !== pattern?.stations.join(' ') || other.hash === pattern?.hash,
+        other =>
+          other.stations.join(' ') !== pattern?.stations.join(' ') ||
+          other.hash === pattern?.hash,
       ),
     ).toBe(true);
   });
@@ -277,11 +303,15 @@ describe('derivePatterns', () => {
     const feedDir = await writeFeed();
     await derivePatterns(feedDir, log, INPUT);
 
-    const db = await openGtfs(join(feedDir, 'gtfs'), [], { store: join(feedDir, STORE_FILE) });
+    const db = await openGtfs(join(feedDir, 'gtfs'), [], {
+      store: join(feedDir, STORE_FILE),
+    });
 
     try {
       expect(
-        await db.query(`select column_name, column_type from (describe ${STORE}.patterns)`),
+        await db.query(
+          `select column_name, column_type from (describe ${STORE}.patterns)`,
+        ),
       ).toEqual([
         { column_name: 'route_id', column_type: 'VARCHAR' },
         { column_name: 'pattern_hash', column_type: 'VARCHAR' },

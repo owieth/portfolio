@@ -22,7 +22,9 @@ export function metres(a: LatLon, b: LatLon): number {
   const dLon = (b.lon - a.lon) * RADIANS;
   const h =
     Math.sin(dLat / 2) ** 2 +
-    Math.cos(a.lat * RADIANS) * Math.cos(b.lat * RADIANS) * Math.sin(dLon / 2) ** 2;
+    Math.cos(a.lat * RADIANS) *
+      Math.cos(b.lat * RADIANS) *
+      Math.sin(dLon / 2) ** 2;
 
   return 2 * EARTH_RADIUS_M * Math.asin(Math.min(1, Math.sqrt(h)));
 }
@@ -48,7 +50,10 @@ export function metresToLine(point: LatLon, line: readonly LatLon[]): number {
     const dx = bx - ax;
     const dy = by - ay;
     const length = dx * dx + dy * dy;
-    const t = length === 0 ? 0 : Math.min(1, Math.max(0, -(ax * dx + ay * dy) / length));
+    const t =
+      length === 0
+        ? 0
+        : Math.min(1, Math.max(0, -(ax * dx + ay * dy) / length));
 
     best = Math.min(best, Math.hypot(ax + t * dx, ay + t * dy));
   }
@@ -57,6 +62,12 @@ export function metresToLine(point: LatLon, line: readonly LatLon[]): number {
 }
 
 /** The shortest distance from `point` to any of `lines`. */
-export function metresToLines(point: LatLon, lines: readonly (readonly LatLon[])[]): number {
-  return lines.reduce((best, line) => Math.min(best, metresToLine(point, line)), Infinity);
+export function metresToLines(
+  point: LatLon,
+  lines: readonly (readonly LatLon[])[],
+): number {
+  return lines.reduce(
+    (best, line) => Math.min(best, metresToLine(point, line)),
+    Infinity,
+  );
 }

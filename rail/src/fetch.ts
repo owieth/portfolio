@@ -76,7 +76,9 @@ async function fetchOnce(
   const response = await fetch(url, { headers, signal });
 
   if (response.status >= 500) {
-    throw new Error(`${url} answered ${response.status} ${response.statusText}`);
+    throw new Error(
+      `${url} answered ${response.status} ${response.statusText}`,
+    );
   }
 
   return response;
@@ -107,9 +109,12 @@ async function fetchFromPortal(
   try {
     return await fetchWithRetry(url, headers, signal);
   } catch (error) {
-    throw new Error(`${url} failed; retry, or rerun with --source geops to use the mirror`, {
-      cause: error,
-    });
+    throw new Error(
+      `${url} failed; retry, or rerun with --source geops to use the mirror`,
+      {
+        cause: error,
+      },
+    );
   }
 }
 
@@ -145,7 +150,9 @@ async function store(
     declaredBytes ?? (Number(response.headers.get('content-length')) || null);
 
   if (expected !== null) {
-    log(`downloading ${megabytes(expected)} — this takes minutes on a home connection`);
+    log(
+      `downloading ${megabytes(expected)} — this takes minutes on a home connection`,
+    );
   }
 
   await mkdir(dir, { recursive: true });
@@ -159,7 +166,9 @@ async function store(
     );
   }
 
-  log(`wrote ${here(archivePath(dir))} — ${megabytes(bytes)}, sha256 ${sha256.slice(0, 12)}…`);
+  log(
+    `wrote ${here(archivePath(dir))} — ${megabytes(bytes)}, sha256 ${sha256.slice(0, 12)}…`,
+  );
 
   const entries = await extractArchive(archivePath(dir), gtfsPath(dir));
   log(`extracted ${entries.length} members into ${here(gtfsPath(dir))}`);
@@ -191,7 +200,10 @@ async function reportStaleFeeds(current: string, log: Log): Promise<void> {
   }
 
   const count = stale.length;
-  const bytes = stale.reduce((total, archive) => total + (archive?.size ?? 0), 0);
+  const bytes = stale.reduce(
+    (total, archive) => total + (archive?.size ?? 0),
+    0,
+  );
 
   log(
     `data/raw holds ${count} older feed${count === 1 ? '' : 's'}` +
@@ -238,11 +250,17 @@ async function fetchOfficial(
 
   log(
     `newest publication ${newest.filename}, issued ${newest.issued.slice(0, 10)}` +
-      (newest.declaredBytes === null ? '' : `, ${megabytes(newest.declaredBytes)}`),
+      (newest.declaredBytes === null
+        ? ''
+        : `, ${megabytes(newest.declaredBytes)}`),
   );
 
   const cached = await readRecord(dir);
-  const decision = decideCache(cached, newest.resourceId, await readCacheState(dir));
+  const decision = decideCache(
+    cached,
+    newest.resourceId,
+    await readCacheState(dir),
+  );
 
   if (decision === 'hit' && cached !== null) {
     log(`cache hit ${feedId} — downloaded ${cached.fetchedAt}, nothing to do`);
@@ -331,8 +349,13 @@ async function fetchGeops(log: Log, now: Date): Promise<FetchedFeed> {
 
     // A 304 only says the remote is unchanged. If the local copy went away since
     // the record was written, ask again without the validators.
-    if (state.archiveBytes === previous.record.archive.bytes && state.gtfsPresent) {
-      log(`cache hit ${previous.record.feedId} — the mirror answered 304 Not Modified`);
+    if (
+      state.archiveBytes === previous.record.archive.bytes &&
+      state.gtfsPresent
+    ) {
+      log(
+        `cache hit ${previous.record.feedId} — the mirror answered 304 Not Modified`,
+      );
       return {
         id: previous.record.feedId,
         dir: previous.dir,
@@ -342,12 +365,16 @@ async function fetchGeops(log: Log, now: Date): Promise<FetchedFeed> {
       };
     }
 
-    log(`the cached archive for ${previous.record.feedId} is gone; downloading again`);
+    log(
+      `the cached archive for ${previous.record.feedId} is gone; downloading again`,
+    );
     return fetchGeopsFresh(log, now);
   }
 
   if (!response.ok) {
-    throw new Error(`${GEOPS_URL} answered ${response.status} ${response.statusText}`);
+    throw new Error(
+      `${GEOPS_URL} answered ${response.status} ${response.statusText}`,
+    );
   }
 
   return storeGeops(response, log, now);
@@ -357,7 +384,9 @@ async function fetchGeopsFresh(log: Log, now: Date): Promise<FetchedFeed> {
   const response = await fetchWithRetry(GEOPS_URL);
 
   if (!response.ok) {
-    throw new Error(`${GEOPS_URL} answered ${response.status} ${response.statusText}`);
+    throw new Error(
+      `${GEOPS_URL} answered ${response.status} ${response.statusText}`,
+    );
   }
 
   return storeGeops(response, log, now);
@@ -372,7 +401,9 @@ async function storeGeops(
   const lastModified = response.headers.get('last-modified');
 
   if (etag === null && lastModified === null) {
-    log('the mirror sent neither ETag nor Last-Modified; this feed cannot be cached');
+    log(
+      'the mirror sent neither ETag nor Last-Modified; this feed cannot be cached',
+    );
   }
 
   const feedId = geopsFeedId(GEOPS_VARIANT, lastModified, etag, now);
@@ -421,7 +452,10 @@ async function storeGeops(
  * file, so there is one source of truth about what is cached and nothing to keep
  * in sync when a feed is deleted by hand.
  */
-async function newestGeopsRecord(): Promise<{ dir: string; record: FeedRecord } | null> {
+async function newestGeopsRecord(): Promise<{
+  dir: string;
+  record: FeedRecord;
+} | null> {
   const names = await readdir(RAW_DIR).catch(() => []);
 
   const dirs = names
@@ -433,9 +467,14 @@ async function newestGeopsRecord(): Promise<{ dir: string; record: FeedRecord } 
   const candidates = dirs
     .map((dir, index) => ({ dir, record: records[index] }))
     .filter(candidate => candidate.record?.source === 'geops')
-    .map(candidate => ({ dir: candidate.dir, record: candidate.record as FeedRecord }));
+    .map(candidate => ({
+      dir: candidate.dir,
+      record: candidate.record as FeedRecord,
+    }));
 
-  candidates.sort((a, b) => b.record.fetchedAt.localeCompare(a.record.fetchedAt));
+  candidates.sort((a, b) =>
+    b.record.fetchedAt.localeCompare(a.record.fetchedAt),
+  );
   return candidates[0] ?? null;
 }
 

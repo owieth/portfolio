@@ -56,9 +56,9 @@ describe('renderDiff', () => {
   });
 
   it('names the ref the committed files were read at', () => {
-    expect(renderDiff(compareSnapshots(BEFORE, BEFORE), { base: 'v2026' })).toContain(
-      'as generated, against `v2026`.',
-    );
+    expect(
+      renderDiff(compareSnapshots(BEFORE, BEFORE), { base: 'v2026' }),
+    ).toContain('as generated, against `v2026`.');
   });
 
   it('lists added and removed lines with their terminals', () => {
@@ -78,16 +78,26 @@ describe('renderDiff', () => {
       '## Added lines (1)\n\n| Id | Name | Category | Region | Terminals |\n| --- | --- | --- | --- | --- |\n| `fernverkehr:RE33` | RE33 | `RE` | fernverkehr | Bern – Olten |',
     );
     expect(markdown).toContain('## Removed lines (1)');
-    expect(markdown).toContain('| `fernverkehr:IR35` | IR35 | `IR` | fernverkehr | Bern – Luzern |');
-    expect(markdown).toContain('| Lines | 2 | 2 | 0 |\n| Line stops | 4 | 2 | −2 |');
+    expect(markdown).toContain(
+      '| `fernverkehr:IR35` | IR35 | `IR` | fernverkehr | Bern – Luzern |',
+    );
+    expect(markdown).toContain(
+      '| Lines | 2 | 2 | 0 |\n| Line stops | 4 | 2 | −2 |',
+    );
   });
 
   it('lists a renumbered pair once, under its own heading', () => {
-    const IR36: DiffLine = { ...IR35, id: 'fernverkehr:IR36', display_name: 'IR36' };
+    const IR36: DiffLine = {
+      ...IR35,
+      id: 'fernverkehr:IR36',
+      display_name: 'IR36',
+    };
     const markdown = render({ lines: [IR36, S12], stops: BEFORE.stops });
 
     expect(markdown).toContain('## Likely renumbered (1)');
-    expect(markdown).toContain('| `fernverkehr:IR35` IR35 | `fernverkehr:IR36` IR36 | Bern – Luzern |');
+    expect(markdown).toContain(
+      '| `fernverkehr:IR35` IR35 | `fernverkehr:IR36` IR36 | Bern – Luzern |',
+    );
     expect(markdown).not.toContain('## Added lines');
     expect(markdown).not.toContain('## Removed lines');
   });
@@ -119,15 +129,22 @@ describe('renderDiff', () => {
     });
 
     expect(markdown).toContain('## Stations changed (1)');
-    expect(markdown).toContain('| `s-bahn-zuerich:S12` | S12 | Winterthur, Schaffhausen | Wil SG |');
+    expect(markdown).toContain(
+      '| `s-bahn-zuerich:S12` | S12 | Winterthur, Schaffhausen | Wil SG |',
+    );
   });
 
   it('prints a dash when a line only gained stations', () => {
     const markdown = render({
       lines: BEFORE.lines,
-      stops: [...BEFORE.stops, { line_id: S12.id, stop_name: 'Winterthur', didok: '8506000' }],
+      stops: [
+        ...BEFORE.stops,
+        { line_id: S12.id, stop_name: 'Winterthur', didok: '8506000' },
+      ],
     });
 
-    expect(markdown).toContain('| `s-bahn-zuerich:S12` | S12 | Winterthur | — |');
+    expect(markdown).toContain(
+      '| `s-bahn-zuerich:S12` | S12 | Winterthur | — |',
+    );
   });
 });

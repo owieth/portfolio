@@ -306,5 +306,8 @@ export function operatorSearch(needle: string): string {
 
 /** Doubles the quote for SQL and neutralises the two LIKE wildcards. */
 export function escapeLike(value: string): string {
-  return value.replaceAll("'", "''").replaceAll('%', '\\%').replaceAll('_', '\\_');
+  return value
+    .replaceAll("'", "''")
+    .replaceAll('%', '\\%')
+    .replaceAll('_', '\\_');
 }

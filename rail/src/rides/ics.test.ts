@@ -23,7 +23,12 @@ describe('parseIcs', () => {
     );
 
     expect(events).toEqual([
-      { date: '2026-09-21', summary: 'Frigg', location: 'Zug\nSwitzerland', recurs: false },
+      {
+        date: '2026-09-21',
+        summary: 'Frigg',
+        location: 'Zug\nSwitzerland',
+        recurs: false,
+      },
     ]);
   });
 
@@ -50,7 +55,11 @@ describe('parseIcs', () => {
     const { events, skipped } = parseIcs(
       calendar(
         event('DTSTART;VALUE=DATE:20260921', 'SUMMARY:Ferien'),
-        event('DTSTART;TZID=Europe/Zurich:20260922T080000', 'SUMMARY:Frigg', 'STATUS:CANCELLED'),
+        event(
+          'DTSTART;TZID=Europe/Zurich:20260922T080000',
+          'SUMMARY:Frigg',
+          'STATUS:CANCELLED',
+        ),
         event('DTSTART;TZID=Europe/Zurich:20260923T080000', 'SUMMARY:Frigg'),
       ),
     );
@@ -62,7 +71,11 @@ describe('parseIcs', () => {
   it('flags a recurring event rather than counting it once', () => {
     const { events } = parseIcs(
       calendar(
-        event('DTSTART;TZID=Europe/Zurich:20260921T063000', 'SUMMARY:Frigg', 'RRULE:FREQ=WEEKLY'),
+        event(
+          'DTSTART;TZID=Europe/Zurich:20260921T063000',
+          'SUMMARY:Frigg',
+          'RRULE:FREQ=WEEKLY',
+        ),
         event(
           'DTSTART;TZID=Europe/Zurich:20260928T063000',
           'SUMMARY:Frigg',
@@ -76,7 +89,10 @@ describe('parseIcs', () => {
 
   it('ignores an event with no start, and one with an unparseable one', () => {
     const { events } = parseIcs(
-      calendar(event('SUMMARY:No start'), event('DTSTART:whenever', 'SUMMARY:Nonsense')),
+      calendar(
+        event('SUMMARY:No start'),
+        event('DTSTART:whenever', 'SUMMARY:Nonsense'),
+      ),
     );
 
     expect(events).toEqual([]);

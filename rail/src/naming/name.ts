@@ -66,7 +66,9 @@ function compareCandidates(a: Candidate, b: Candidate): number {
  * survives all four — two patterns with the same ends, length and trips that
  * differ only in the stations between — cannot change it.
  */
-export function namingCandidate(candidates: readonly Candidate[]): Candidate | null {
+export function namingCandidate(
+  candidates: readonly Candidate[],
+): Candidate | null {
   return [...candidates].sort(compareCandidates)[0] ?? null;
 }
 
@@ -118,5 +120,7 @@ export function derivedName(parts: NameParts): string {
  * `IR35` and the ICE `3` is `ICE 3`.
  */
 export function numberedName(category: Category, number: string): string {
-  return number.toUpperCase().startsWith(category) ? number : `${category} ${number}`;
+  return number.toUpperCase().startsWith(category)
+    ? number
+    : `${category} ${number}`;
 }

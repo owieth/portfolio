@@ -40,7 +40,11 @@ const CALENDAR = `﻿service_id,monday,tuesday,wednesday,thursday,friday,saturda
 function offSeason(): string {
   const rows: string[] = [];
 
-  for (let day = Date.UTC(2025, 11, 14); day <= Date.UTC(2026, 11, 12); day += 86_400_000) {
+  for (
+    let day = Date.UTC(2025, 11, 14);
+    day <= Date.UTC(2026, 11, 12);
+    day += 86_400_000
+  ) {
     const date = new Date(day).toISOString().slice(0, 10);
 
     if (date < '2026-06-13' || date > '2026-10-25') {
@@ -107,7 +111,9 @@ async function writeFeed(overrides: Fixture = {}): Promise<string> {
 }
 
 async function storedDays(feedDir: string, service: string): Promise<string[]> {
-  const db = await openGtfs(join(feedDir, 'gtfs'), [], { store: join(feedDir, STORE_FILE) });
+  const db = await openGtfs(join(feedDir, 'gtfs'), [], {
+    store: join(feedDir, STORE_FILE),
+  });
 
   try {
     const rows = await db.query<{ day: string }>(
@@ -130,8 +136,14 @@ describe('expandCalendar', () => {
   it('reads the feed year from feed_info.txt and names the reference week inside it', async () => {
     const calendar = await expandCalendar(await writeFeed(), log);
 
-    expect(calendar.window).toEqual({ first: '2025-12-14', last: '2026-12-12' });
-    expect(calendar.referenceWeek).toEqual({ first: '2026-09-07', last: '2026-09-13' });
+    expect(calendar.window).toEqual({
+      first: '2025-12-14',
+      last: '2026-12-12',
+    });
+    expect(calendar.referenceWeek).toEqual({
+      first: '2026-09-07',
+      last: '2026-09-13',
+    });
     expect(logged).toContain(
       'trips per week are counted over the reference week, 2026-09-07 to 2026-09-13',
     );
@@ -154,9 +166,15 @@ describe('expandCalendar', () => {
     const fridays = await storedDays(feedDir, 'TA+00000');
 
     // The 19th and 26th are Fridays taken out; the 27th is a Saturday put in.
-    expect(fridays.slice(0, 3)).toEqual(['2025-12-27', '2026-01-02', '2026-01-09']);
+    expect(fridays.slice(0, 3)).toEqual([
+      '2025-12-27',
+      '2026-01-02',
+      '2026-01-09',
+    ]);
     expect(fridays.at(-1)).toBe('2026-12-11');
-    expect(routes.find(route => route.routeId === '92-fri-j26-1')).toMatchObject({
+    expect(
+      routes.find(route => route.routeId === '92-fri-j26-1'),
+    ).toMatchObject({
       serviceDays: 52 - 2 + 1,
       firstDate: '2025-12-27',
     });
@@ -165,7 +183,9 @@ describe('expandCalendar', () => {
   it('counts a day two of a route’s services share once', async () => {
     const { routes } = await expandCalendar(await writeFeed(), log);
 
-    expect(routes.find(route => route.routeId === '91-10-A-j26-1')).toMatchObject({
+    expect(
+      routes.find(route => route.routeId === '91-10-A-j26-1'),
+    ).toMatchObject({
       serviceDays: 364,
     });
   });
@@ -195,7 +215,9 @@ describe('expandCalendar', () => {
       '92-wide-j26-1',
       '93-68-j26-1',
     ]);
-    expect(calendar.routes.find(route => route.routeId === '92-never-j26-1')).toEqual({
+    expect(
+      calendar.routes.find(route => route.routeId === '92-never-j26-1'),
+    ).toEqual({
       routeId: '92-never-j26-1',
       serviceDays: 0,
       firstDate: null,

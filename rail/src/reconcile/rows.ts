@@ -111,7 +111,11 @@ function cellsOf(row: CsvRow, where: string) {
     return value;
   };
 
-  const matching = (column: string, pattern: RegExp, kind: string): string | null => {
+  const matching = (
+    column: string,
+    pattern: RegExp,
+    kind: string,
+  ): string | null => {
     const value = cell(column);
 
     if (value !== null && !pattern.test(value)) {
@@ -139,11 +143,14 @@ function cellsOf(row: CsvRow, where: string) {
     optionalText: cell,
     text: (column: string): string => present(column, cell(column)),
     /** An empty list is written as an empty field. */
-    list: (column: string): string[] => cell(column)?.split(LIST_SEPARATOR) ?? [],
+    list: (column: string): string[] =>
+      cell(column)?.split(LIST_SEPARATOR) ?? [],
     optionalBoolean,
-    boolean: (column: string): boolean => present(column, optionalBoolean(column)),
+    boolean: (column: string): boolean =>
+      present(column, optionalBoolean(column)),
     optionalInteger,
-    integer: (column: string): number => present(column, optionalInteger(column)),
+    integer: (column: string): number =>
+      present(column, optionalInteger(column)),
     optionalNumber: (column: string): number | null => {
       const value = matching(column, NUMBER, 'a number');
 
@@ -188,6 +195,9 @@ export function feedStop(row: CsvRow, index: number): FeedStop {
   };
 }
 
-export function feedOf(lines: readonly CsvRow[], stops: readonly CsvRow[]): Feed {
+export function feedOf(
+  lines: readonly CsvRow[],
+  stops: readonly CsvRow[],
+): Feed {
   return { lines: lines.map(feedLine), stops: stops.map(feedStop) };
 }

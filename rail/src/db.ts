@@ -89,7 +89,10 @@ function view(gtfsDir: string, file: GtfsFile): string {
  * it, so a partially extracted feed is reported as such rather than as a SQL
  * error halfway through a report.
  */
-async function assertPresent(gtfsDir: string, files: readonly GtfsFile[]): Promise<void> {
+async function assertPresent(
+  gtfsDir: string,
+  files: readonly GtfsFile[],
+): Promise<void> {
   const missing: string[] = [];
 
   await Promise.all(
@@ -145,8 +148,12 @@ export async function assertColumns(
       const present = new Set(
         (await db.query<ColumnRow>(columns(file))).map(row => row.column_name),
       );
-      const absent = (required[file] ?? []).filter(column => !present.has(column));
-      return absent.length === 0 ? null : `${file}.txt is missing ${absent.join(', ')}`;
+      const absent = (required[file] ?? []).filter(
+        column => !present.has(column),
+      );
+      return absent.length === 0
+        ? null
+        : `${file}.txt is missing ${absent.join(', ')}`;
     }),
   );
 
@@ -167,7 +174,9 @@ export async function missingStoreTables(
   db: Gtfs,
   tables: readonly string[],
 ): Promise<string[]> {
-  const present = new Set((await db.query<TableRow>(TABLES)).map(row => row.table_name));
+  const present = new Set(
+    (await db.query<TableRow>(TABLES)).map(row => row.table_name),
+  );
   return tables.filter(table => !present.has(table));
 }
 
@@ -196,7 +205,10 @@ export async function openGtfs(
 
   // In-memory: the views are scaffolding over the CSVs and nothing is gained by
   // writing them down. What a step wants to keep goes into the attached store.
-  const instance = await DuckDBInstance.create(':memory:', settings(options.store));
+  const instance = await DuckDBInstance.create(
+    ':memory:',
+    settings(options.store),
+  );
   const connection: DuckDBConnection = await instance.connect();
 
   try {

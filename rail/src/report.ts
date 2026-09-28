@@ -57,7 +57,10 @@ export async function writeReport(
   await writeFile(join(dir, REPORT_MD), contents, 'utf8');
 
   const names = input.lines.filter(line => line.nameSource !== 'number').length;
-  const fingerprint = createHash('sha256').update(contents).digest('hex').slice(0, 16);
+  const fingerprint = createHash('sha256')
+    .update(contents)
+    .digest('hex')
+    .slice(0, 16);
 
   log(
     `wrote ${REPORT_MD}: ${plural(input.unmatched.length, 'line')} without a shape, ${plural(input.suspect.length, 'possible duplicate')}, ${plural(names, 'name')} to check, ${plural(input.misplaced.length, 'doubted station')} and ${plural(input.unknownRoutes.length, 'unrecognised route type')} — fingerprint ${fingerprint}`,

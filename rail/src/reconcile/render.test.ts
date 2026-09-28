@@ -14,7 +14,9 @@ const SEEDED: State = {
 
 describe('renderReconcile', () => {
   it('says nothing is to be written when the feed matches', () => {
-    const markdown = renderReconcile(planReconcile(FEED, SEEDED), { applied: false });
+    const markdown = renderReconcile(planReconcile(FEED, SEEDED), {
+      applied: false,
+    });
 
     expect(markdown).toContain('# Rail lines — reconcile (dry run)');
     expect(markdown).toContain('Nothing has been written.');
@@ -24,7 +26,9 @@ describe('renderReconcile', () => {
 
   it('counts each kind of change per table', () => {
     const next: Feed = { lines: [S12], stops: [stop(S12, 1, 'Brugg AG')] };
-    const markdown = renderReconcile(planReconcile(next, SEEDED), { applied: true });
+    const markdown = renderReconcile(planReconcile(next, SEEDED), {
+      applied: true,
+    });
 
     expect(markdown).toContain('# Rail lines — reconcile\n');
     expect(markdown).toContain('The changes below have been written.');
@@ -34,7 +38,9 @@ describe('renderReconcile', () => {
 
   it('lists new and flagged lines for review, and stops per line', () => {
     const next: Feed = { lines: [S12], stops: [stop(S12, 1, 'Brugg AG')] };
-    const markdown = renderReconcile(planReconcile(next, SEEDED), { applied: false });
+    const markdown = renderReconcile(planReconcile(next, SEEDED), {
+      applied: false,
+    });
 
     expect(markdown).toContain('## New lines (1)');
     expect(markdown).toContain(
@@ -50,10 +56,15 @@ describe('renderReconcile', () => {
     const state: State = {
       ...SEEDED,
       lines: [
-        storedLine({ ...IR35, operators: ['BLS'] }, { edited_fields: ['operators'] }),
+        storedLine(
+          { ...IR35, operators: ['BLS'] },
+          { edited_fields: ['operators'] },
+        ),
       ],
     };
-    const markdown = renderReconcile(planReconcile(FEED, state), { applied: false });
+    const markdown = renderReconcile(planReconcile(FEED, state), {
+      applied: false,
+    });
 
     expect(markdown).toContain('## Skipped because edited (1)');
     expect(markdown).toContain(
@@ -66,7 +77,9 @@ describe('renderReconcile', () => {
       ...FEED,
       lines: [{ ...IR35, trips_per_week: 200, seasonal: true }],
     };
-    const markdown = renderReconcile(planReconcile(next, SEEDED), { applied: false });
+    const markdown = renderReconcile(planReconcile(next, SEEDED), {
+      applied: false,
+    });
 
     expect(markdown).toContain(
       '| `fernverkehr:IR35` | IR35 | `seasonal`, `trips_per_week` |',

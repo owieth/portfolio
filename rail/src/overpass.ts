@@ -35,7 +35,12 @@ import {
   writeRecord,
 } from './overpass/cache.ts';
 import type { OverpassRecord } from './overpass/cache.ts';
-import { QUERY_TIMEOUT_S, ROUTE_TYPES, buildQuery, queryKey } from './overpass/query.ts';
+import {
+  QUERY_TIMEOUT_S,
+  ROUTE_TYPES,
+  buildQuery,
+  queryKey,
+} from './overpass/query.ts';
 import type { RouteType } from './overpass/query.ts';
 import {
   RetryableError,
@@ -53,7 +58,8 @@ export const OVERPASS_ENDPOINT = 'https://overpass-api.de/api/interpreter';
  * The operators ask heavy users to say who they are, so a query that misbehaves
  * can be traced to someone rather than blocked outright.
  */
-const USER_AGENT = 'owieth-portfolio-rail/1.0 (+https://github.com/owieth/portfolio)';
+const USER_AGENT =
+  'owieth-portfolio-rail/1.0 (+https://github.com/owieth/portfolio)';
 
 /** A minute longer than the server will run the query, so its own error arrives first. */
 const CLIENT_TIMEOUT_MS = (QUERY_TIMEOUT_S + 60) * 1000;
@@ -100,7 +106,12 @@ export interface OverpassDeps {
 interface OverpassResponse {
   osm3s?: { timestamp_osm_base?: string };
   remark?: string;
-  elements?: { type?: string; id?: number; tags?: Record<string, string>; members?: OsmMember[] }[];
+  elements?: {
+    type?: string;
+    id?: number;
+    tags?: Record<string, string>;
+    members?: OsmMember[];
+  }[];
 }
 
 interface Parsed {
@@ -137,19 +148,26 @@ export function parseResponse(raw: string, route: RouteType): Parsed {
   }
 
   if (response.remark?.includes('runtime error')) {
-    throw new RetryableError(`Overpass gave up part way: ${response.remark.trim()}`);
+    throw new RetryableError(
+      `Overpass gave up part way: ${response.remark.trim()}`,
+    );
   }
 
   const timestampOsmBase = response.osm3s?.timestamp_osm_base;
 
-  if (typeof timestampOsmBase !== 'string' || !Array.isArray(response.elements)) {
+  if (
+    typeof timestampOsmBase !== 'string' ||
+    !Array.isArray(response.elements)
+  ) {
     throw new Error(
       'the response has no osm3s.timestamp_osm_base or elements; the Overpass reader needs revisiting',
     );
   }
 
   const relations = response.elements
-    .filter(element => element.type === 'relation' && typeof element.id === 'number')
+    .filter(
+      element => element.type === 'relation' && typeof element.id === 'number',
+    )
     .map(element => ({
       id: element.id as number,
       route,
@@ -189,7 +207,11 @@ async function request(
       signal: AbortSignal.timeout(CLIENT_TIMEOUT_MS),
     });
   } catch (error) {
-    throw new RetryableError('the request failed before an answer arrived', null, error);
+    throw new RetryableError(
+      'the request failed before an answer arrived',
+      null,
+      error,
+    );
   }
 
   if (isRetryableStatus(response.status)) {
@@ -226,7 +248,10 @@ async function request(
   }
 
   try {
-    return { parsed: parseResponse(await readFile(path, 'utf8'), route), ...stored };
+    return {
+      parsed: parseResponse(await readFile(path, 'utf8'), route),
+      ...stored,
+    };
   } catch (error) {
     // Never left behind: without a record it would not be read back, but it
     // would sit there looking like a cached answer to anyone listing the files.
@@ -316,7 +341,10 @@ export async function fetchOsmRelations(
   const attribution: Attribution = {
     ...OSM_ATTRIBUTION,
     osmBase: Object.fromEntries(
-      ROUTE_TYPES.map((route, index) => [route, loaded[index].timestampOsmBase]),
+      ROUTE_TYPES.map((route, index) => [
+        route,
+        loaded[index].timestampOsmBase,
+      ]),
     ),
   };
 
@@ -326,7 +354,9 @@ export async function fetchOsmRelations(
     `${JSON.stringify(attribution, null, 2)}\n`,
   );
 
-  const relations = loaded.flatMap(parsed => parsed.relations).sort((a, b) => a.id - b.id);
+  const relations = loaded
+    .flatMap(parsed => parsed.relations)
+    .sort((a, b) => a.id - b.id);
 
   log(
     `${count(relations.length)} OSM route relations ready, ${ROUTE_TYPES.map((route, index) => `${count(loaded[index].relations.length)} ${route}`).join(' and ')}, after ${count(counter.requests)} Overpass request${counter.requests === 1 ? '' : 's'}; geometry is ${attribution.text}, ${attribution.license}`,

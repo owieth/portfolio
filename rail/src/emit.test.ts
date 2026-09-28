@@ -42,7 +42,11 @@ async function emit(
   lines: readonly TerminiLine[] = LINES,
 ): Promise<Record<string, string>> {
   const dir = await outputDir();
-  await emitArtifacts({ lines, stations: STATIONS, attribution: ATTRIBUTION }, log, { dir });
+  await emitArtifacts(
+    { lines, stations: STATIONS, attribution: ATTRIBUTION },
+    log,
+    { dir },
+  );
 
   const names = await readdir(dir);
   const files = await Promise.all(
@@ -166,7 +170,10 @@ describe('emitArtifacts', () => {
     expect(geojson.features.map(feature => feature.properties.id)).toEqual(
       document.lines.filter(line => line.has_geometry).map(line => line.id),
     );
-    expect(geojson.features.map(feature => feature.properties.id)).toEqual([EC.id, S12.id]);
+    expect(geojson.features.map(feature => feature.properties.id)).toEqual([
+      EC.id,
+      S12.id,
+    ]);
   });
 
   it('logs what it wrote with a fingerprint per file', async () => {
@@ -180,10 +187,14 @@ describe('emitArtifacts', () => {
   it('hands verify the finished records, in id order', async () => {
     const verified: string[] = [];
 
-    await emitArtifacts({ lines: LINES, stations: STATIONS, attribution: ATTRIBUTION }, log, {
-      dir: await outputDir(),
-      verify: records => verified.push(...records.map(record => record.id)),
-    });
+    await emitArtifacts(
+      { lines: LINES, stations: STATIONS, attribution: ATTRIBUTION },
+      log,
+      {
+        dir: await outputDir(),
+        verify: records => verified.push(...records.map(record => record.id)),
+      },
+    );
 
     expect(verified).toEqual([EC.id, GELMERBAHN.id, S12.id].sort());
   });
@@ -192,12 +203,18 @@ describe('emitArtifacts', () => {
     const dir = await outputDir();
 
     await expect(
-      emitArtifacts({ lines: LINES, stations: STATIONS, attribution: ATTRIBUTION }, log, {
-        dir,
-        verify: () => {
-          throw new Error('IC1: expected fernverkehr:IC1, but there is no line fernverkehr:IC1');
+      emitArtifacts(
+        { lines: LINES, stations: STATIONS, attribution: ATTRIBUTION },
+        log,
+        {
+          dir,
+          verify: () => {
+            throw new Error(
+              'IC1: expected fernverkehr:IC1, but there is no line fernverkehr:IC1',
+            );
+          },
         },
-      }),
+      ),
     ).rejects.toThrow('IC1: expected fernverkehr:IC1');
     expect(await readdir(dir)).toEqual([]);
     expect(logged).toEqual([]);
@@ -209,10 +226,17 @@ describe('emitWebGeometry', () => {
     const source = await outputDir();
     const target = join(await outputDir(), 'public', 'rail');
 
-    await emitArtifacts({ lines: LINES, stations: STATIONS, attribution: ATTRIBUTION }, log, {
-      dir: source,
+    await emitArtifacts(
+      { lines: LINES, stations: STATIONS, attribution: ATTRIBUTION },
+      log,
+      {
+        dir: source,
+      },
+    );
+    await emitWebGeometry(log, {
+      source: join(source, LINES_GEOJSON),
+      dir: target,
     });
-    await emitWebGeometry(log, { source: join(source, LINES_GEOJSON), dir: target });
 
     return {
       full: await readFile(join(source, LINES_GEOJSON), 'utf8'),
@@ -274,7 +298,11 @@ describe('renderArtifacts', () => {
     const broken: TerminiLine = { ...S12, region: 'Not A Slug' };
 
     await expect(
-      emitArtifacts({ lines: [broken], stations: STATIONS, attribution: ATTRIBUTION }, log, { dir }),
+      emitArtifacts(
+        { lines: [broken], stations: STATIONS, attribution: ATTRIBUTION },
+        log,
+        { dir },
+      ),
     ).rejects.toThrow(
       /does not match lines\.schema\.json, so nothing was written:\n {2}\/lines\/0\/network_region must match pattern/,
     );
@@ -285,13 +313,21 @@ describe('renderArtifacts', () => {
     const lonely: TerminiLine = { ...S12, sequence: S12.sequence.slice(0, 1) };
 
     expect(() =>
-      renderArtifacts({ lines: [lonely], stations: STATIONS, attribution: ATTRIBUTION }),
+      renderArtifacts({
+        lines: [lonely],
+        stations: STATIONS,
+        attribution: ATTRIBUTION,
+      }),
     ).toThrow(/\/lines\/0\/stops must NOT have fewer than 2 items/);
   });
 
   it('refuses two lines on one id', () => {
     expect(() =>
-      renderArtifacts({ lines: [S12, S12], stations: STATIONS, attribution: ATTRIBUTION }),
+      renderArtifacts({
+        lines: [S12, S12],
+        stations: STATIONS,
+        attribution: ATTRIBUTION,
+      }),
     ).toThrow(/two lines share the id s-bahn-zuerich:S12/);
   });
 
@@ -299,7 +335,11 @@ describe('renderArtifacts', () => {
     const split: TerminiLine = { ...S12, operators: ['BLS AG;SBB'] };
 
     expect(() =>
-      renderArtifacts({ lines: [split], stations: STATIONS, attribution: ATTRIBUTION }),
+      renderArtifacts({
+        lines: [split],
+        stations: STATIONS,
+        attribution: ATTRIBUTION,
+      }),
     ).toThrow(/\/lines\/0\/operators\/0 must match pattern "\^\[\^;\]\*\$"/);
   });
 });

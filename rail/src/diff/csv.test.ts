@@ -18,7 +18,9 @@ describe('parseCsv', () => {
   it('unquotes a field and undoubles its quotes', () => {
     expect(
       parseCsv('comma,quote,newline\n"Brig, Bahnhof","Le ""Train""","a\nb"\n'),
-    ).toEqual([{ comma: 'Brig, Bahnhof', quote: 'Le "Train"', newline: 'a\nb' }]);
+    ).toEqual([
+      { comma: 'Brig, Bahnhof', quote: 'Le "Train"', newline: 'a\nb' },
+    ]);
   });
 
   it('reads a quoted empty field as an empty string, not null', () => {
@@ -39,7 +41,9 @@ describe('parseCsv', () => {
   });
 
   it('rejects a row with the wrong number of fields', () => {
-    expect(() => parseCsv('a,b\n1\n')).toThrow('row 2 has 1 fields where the header has 2');
+    expect(() => parseCsv('a,b\n1\n')).toThrow(
+      'row 2 has 1 fields where the header has 2',
+    );
   });
 
   it('rejects a quoted field that never closes', () => {
@@ -48,10 +52,22 @@ describe('parseCsv', () => {
 
   it('reads back what toCsv writes', () => {
     const rows = [
-      { id: 'fernverkehr:IR35', name: 'Brig, Bahnhof', note: 'Le "Train"', empty: null },
-      { id: 's-bahn-zuerich:S12', name: 'Zürich HB', note: 'a\nb', empty: null },
+      {
+        id: 'fernverkehr:IR35',
+        name: 'Brig, Bahnhof',
+        note: 'Le "Train"',
+        empty: null,
+      },
+      {
+        id: 's-bahn-zuerich:S12',
+        name: 'Zürich HB',
+        note: 'a\nb',
+        empty: null,
+      },
     ];
 
-    expect(parseCsv(toCsv(['id', 'name', 'note', 'empty'], rows))).toEqual(rows);
+    expect(parseCsv(toCsv(['id', 'name', 'note', 'empty'], rows))).toEqual(
+      rows,
+    );
   });
 });

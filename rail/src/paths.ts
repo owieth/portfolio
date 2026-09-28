@@ -22,4 +22,6 @@ export const DATA_DIR = fileURLToPath(new URL('../data/', import.meta.url));
 export const RAW_DIR = fileURLToPath(new URL('../data/raw/', import.meta.url));
 
 /** Served by Next.js as-is: what the browser downloads, outside the JS bundle. */
-export const PUBLIC_RAIL_DIR = fileURLToPath(new URL('../../public/rail/', import.meta.url));
+export const PUBLIC_RAIL_DIR = fileURLToPath(
+  new URL('../../public/rail/', import.meta.url),
+);

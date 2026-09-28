@@ -43,7 +43,11 @@ export async function renderSeedFrom(dir: string = RAIL_DIR): Promise<Seeded> {
     ),
   );
 
-  return { lines: lines.length, stops: stops.length, sql: renderSeed(lines, stops) };
+  return {
+    lines: lines.length,
+    stops: stops.length,
+    sql: renderSeed(lines, stops),
+  };
 }
 
 export async function writeSeed(

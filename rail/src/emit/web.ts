@@ -34,23 +34,37 @@ export type WebFeature = Feature<MultiLineString, WebProperties>;
 export type WebCollection = LineCollection<WebProperties>;
 
 /** `lines.geojson` as read back, its coordinates the `[lon, lat]` pairs it was written with. */
-export type SourceCollection = FeatureCollection<Geometry, FeatureProperties> & {
+export type SourceCollection = FeatureCollection<
+  Geometry,
+  FeatureProperties
+> & {
   attribution: Attribution;
 };
 
 export type SourceFeature = SourceCollection['features'][number];
 
-export function toWebFeature(feature: SourceFeature, toleranceM: number): WebFeature {
-  const coordinates = roundParts(simplifyParts(feature.geometry.coordinates, toleranceM));
+export function toWebFeature(
+  feature: SourceFeature,
+  toleranceM: number,
+): WebFeature {
+  const coordinates = roundParts(
+    simplifyParts(feature.geometry.coordinates, toleranceM),
+  );
 
   return {
     type: 'Feature',
-    properties: { id: feature.properties.id, category: feature.properties.category },
+    properties: {
+      id: feature.properties.id,
+      category: feature.properties.category,
+    },
     geometry: { type: 'MultiLineString', coordinates },
   };
 }
 
-export function toWebCollection(source: SourceCollection, toleranceM: number): WebCollection {
+export function toWebCollection(
+  source: SourceCollection,
+  toleranceM: number,
+): WebCollection {
   return {
     type: 'FeatureCollection',
     attribution: source.attribution,
@@ -65,19 +79,30 @@ export function toWebCollection(source: SourceCollection, toleranceM: number): W
  * attribution unchanged. A line missing from it would never show as ridden, and
  * a copy without the licence could not be published at all.
  */
-export function assertWebCollection(source: SourceCollection, web: WebCollection): void {
-  const expected = new Set(source.features.map(feature => feature.properties.id));
+export function assertWebCollection(
+  source: SourceCollection,
+  web: WebCollection,
+): void {
+  const expected = new Set(
+    source.features.map(feature => feature.properties.id),
+  );
   const actual = new Set(web.features.map(feature => feature.properties.id));
   const missing = [...expected].find(id => !actual.has(id));
   const stray = [...actual].find(id => !expected.has(id));
 
-  if (missing !== undefined || stray !== undefined || web.features.length !== actual.size) {
+  if (
+    missing !== undefined ||
+    stray !== undefined ||
+    web.features.length !== actual.size
+  ) {
     throw new Error(
       `the web copy draws ${web.features.length} lines where lines.geojson draws ${expected.size}${missing === undefined ? '' : `, missing ${missing}`}${stray === undefined ? '' : `, with ${stray} that lines.geojson does not have`}, so nothing was written`,
     );
   }
 
-  const empty = web.features.find(feature => feature.geometry.coordinates.length === 0);
+  const empty = web.features.find(
+    feature => feature.geometry.coordinates.length === 0,
+  );
 
   if (empty !== undefined) {
     throw new Error(

@@ -113,7 +113,10 @@ function patternsByRoute(patterns: readonly Pattern[]): Map<string, Pattern[]> {
   const byRoute = new Map<string, Pattern[]>();
 
   for (const pattern of patterns) {
-    byRoute.set(pattern.routeId, [...(byRoute.get(pattern.routeId) ?? []), pattern]);
+    byRoute.set(pattern.routeId, [
+      ...(byRoute.get(pattern.routeId) ?? []),
+      pattern,
+    ]);
   }
 
   return byRoute;
@@ -127,7 +130,9 @@ function endsOf(members: readonly Member[]): [string, string] {
   const dominant = dominantPattern(members.flatMap(member => member.patterns));
 
   if (dominant === null) {
-    throw new Error('a route without a pattern reached the merge; this is a bug in merge.ts');
+    throw new Error(
+      'a route without a pattern reached the merge; this is a bug in merge.ts',
+    );
   }
 
   return terminals(dominant);
@@ -184,7 +189,9 @@ function toLine(group: Group): Line {
 }
 
 function suspectOf(id: string, members: readonly Member[]): Suspect | null {
-  const byRoute = new Map(members.map(member => [member.route.routeId, member]));
+  const byRoute = new Map(
+    members.map(member => [member.route.routeId, member]),
+  );
   const parts = components(
     new Map(members.map(member => [member.route.routeId, member.stations])),
   );
@@ -285,7 +292,10 @@ export function mergeLines(
   for (const group of groups.values()) {
     const line = toLine(group);
     lines.push(line);
-    categoriesById.set(line.id, [...(categoriesById.get(line.id) ?? []), line.category]);
+    categoriesById.set(line.id, [
+      ...(categoriesById.get(line.id) ?? []),
+      line.category,
+    ]);
 
     const found = suspectOf(line.id, group.members);
 
@@ -294,13 +304,20 @@ export function mergeLines(
     }
   }
 
-  const collisions = [...categoriesById.entries()].filter(([, categories]) => categories.length > 1);
+  const collisions = [...categoriesById.entries()].filter(
+    ([, categories]) => categories.length > 1,
+  );
 
   if (collisions.length > 0) {
     throw new Error(
       `${collisions
-        .map(([id, categories]) => `${id} stands for ${categories.sort(compare).join(' and ')}`)
-        .join('; ')}; a number that starts with another category's code reads as that category's, so merge/key.ts has to spell those ids differently`,
+        .map(
+          ([id, categories]) =>
+            `${id} stands for ${categories.sort(compare).join(' and ')}`,
+        )
+        .join(
+          '; ',
+        )}; a number that starts with another category's code reads as that category's, so merge/key.ts has to spell those ids differently`,
     );
   }
 
@@ -312,7 +329,9 @@ export function mergeLines(
   const unnumbered = lines.filter(line => line.number === null).length;
   const shared = lines
     .filter(line => line.operators.length > 1)
-    .sort((a, b) => b.operators.length - a.operators.length || compare(a.id, b.id));
+    .sort(
+      (a, b) => b.operators.length - a.operators.length || compare(a.id, b.id),
+    );
 
   log(
     `${count(merged)} routes merged into ${plural(lines.length, 'line')}, ${count(unnumbered)} of them without a number, fingerprint ${fingerprint}`,
@@ -330,14 +349,18 @@ export function mergeLines(
   // Expected, and the patterns step has already said why: a route that reaches
   // one border station and no further has no Swiss segment to be a line of.
   if (dropped > 0) {
-    log(`${plural(dropped, 'route')} without a stop pattern left out of the lines`);
+    log(
+      `${plural(dropped, 'route')} without a stop pattern left out of the lines`,
+    );
   }
 
   for (const line of suspect) {
     log(
       `line ${line.id} merges ${line.parts.length} groups of routes that share no station — ${line.parts
         .map(describePart)
-        .join(' | ')}; if they are different lines, add a rule to data/regions.json`,
+        .join(
+          ' | ',
+        )}; if they are different lines, add a rule to data/regions.json`,
     );
   }
 

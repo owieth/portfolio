@@ -35,7 +35,10 @@ function squaredToSegment(
   const dx = bx - ax;
   const dy = by - ay;
   const length = dx * dx + dy * dy;
-  const t = length === 0 ? 0 : Math.min(1, Math.max(0, ((px - ax) * dx + (py - ay) * dy) / length));
+  const t =
+    length === 0
+      ? 0
+      : Math.min(1, Math.max(0, ((px - ax) * dx + (py - ay) * dy) / length));
   const ex = ax + t * dx - px;
   const ey = ay + t * dy - py;
 

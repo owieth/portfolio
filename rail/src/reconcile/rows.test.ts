@@ -48,7 +48,10 @@ describe('feedLine', () => {
 
   it('reads an empty list as an empty array and an empty count as null', () => {
     expect(
-      feedLine({ ...LINE, route_ids: null, seasonal: null, trips_per_week: null }, 0),
+      feedLine(
+        { ...LINE, route_ids: null, seasonal: null, trips_per_week: null },
+        0,
+      ),
     ).toMatchObject({ route_ids: [], seasonal: null, trips_per_week: null });
   });
 
@@ -56,7 +59,9 @@ describe('feedLine', () => {
     expect(() => feedLine({ ...LINE, trips_per_week: '1.5' }, 3)).toThrow(
       'lines.csv row 5 trips_per_week is "1.5", which is not an integer',
     );
-    expect(() => feedLine({ ...LINE, has_geometry: 'yes' }, 0)).toThrow('not a boolean');
+    expect(() => feedLine({ ...LINE, has_geometry: 'yes' }, 0)).toThrow(
+      'not a boolean',
+    );
   });
 
   it('refuses an empty required cell and a missing column', () => {
@@ -67,13 +72,20 @@ describe('feedLine', () => {
     const row = Object.fromEntries(
       Object.entries(LINE).filter(([column]) => column !== 'category'),
     );
-    expect(() => feedLine(row, 0)).toThrow('lines.csv row 2 has no category column');
+    expect(() => feedLine(row, 0)).toThrow(
+      'lines.csv row 2 has no category column',
+    );
   });
 });
 
 describe('feedStop', () => {
   it('reads the sequence and coordinates as numbers and keeps nulls', () => {
-    expect(feedStop(STOP, 0)).toEqual({ ...STOP, sequence: 2, lat: 47.05, lon: -8.31 });
+    expect(feedStop(STOP, 0)).toEqual({
+      ...STOP,
+      sequence: 2,
+      lat: 47.05,
+      lon: -8.31,
+    });
   });
 
   it('refuses a coordinate that is not a number', () => {

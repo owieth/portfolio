@@ -8,7 +8,11 @@ import type { SeedLine } from './seed/funiculars.ts';
  * Values rather than files: the step opens nothing, so its fixture is two named
  * feed lines either side of the Gelmerbahn by id, and the seed entry itself.
  */
-function feedLine(id: string, category: NamedLine['category'], stations: string[]): NamedLine {
+function feedLine(
+  id: string,
+  category: NamedLine['category'],
+  stations: string[],
+): NamedLine {
   return {
     id,
     category,
@@ -24,8 +28,14 @@ function feedLine(id: string, category: NamedLine['category'], stations: string[
   };
 }
 
-const POLYBAHN = feedLine('poly-bahn-zuerich:FUN-24', 'FUN', ['8503098', '8503099']);
-const HASLIBERG = feedLine('zentralbahn:R:8508480-8508485', 'R', ['8508480', '8508485']);
+const POLYBAHN = feedLine('poly-bahn-zuerich:FUN-24', 'FUN', [
+  '8503098',
+  '8503099',
+]);
+const HASLIBERG = feedLine('zentralbahn:R:8508480-8508485', 'R', [
+  '8508480',
+  '8508485',
+]);
 
 const GELMERBAHN: SeedLine = {
   id: 'kwo-seilbahnen:FUN:8531013-8531014',
@@ -81,7 +91,10 @@ describe('seedLines', () => {
   });
 
   it('has no terminals when an end has no Didok number', () => {
-    const stops = [GELMERBAHN.stops[0]!, { name: 'Handegg', lat: 46.613585, lon: 8.308709 }];
+    const stops = [
+      GELMERBAHN.stops[0]!,
+      { name: 'Handegg', lat: 46.613585, lon: 8.308709 },
+    ];
     const [line] = seedLines([], [{ ...GELMERBAHN, stops }], log).lines;
 
     expect(line?.terminals).toBeNull();
@@ -97,7 +110,10 @@ describe('seedLines', () => {
   });
 
   it('reports a seeded line the feed now serves under the same category', () => {
-    const gained = feedLine('kwo-seilbahnen:FUN-2380', 'FUN', ['8531013', '8531014']);
+    const gained = feedLine('kwo-seilbahnen:FUN-2380', 'FUN', [
+      '8531013',
+      '8531014',
+    ]);
     const seeded = seedLines([gained], [GELMERBAHN], log);
 
     expect(seeded.inFeed).toEqual(['kwo-seilbahnen:FUN:8531013-8531014']);
@@ -107,7 +123,10 @@ describe('seedLines', () => {
   });
 
   it('ignores a shared stop under another category', () => {
-    const bus = feedLine('postauto:R:8531013-8531099', 'R', ['8531013', '8531099']);
+    const bus = feedLine('postauto:R:8531013-8531099', 'R', [
+      '8531013',
+      '8531099',
+    ]);
 
     expect(seedLines([bus], [GELMERBAHN], log).inFeed).toEqual([]);
   });

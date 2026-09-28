@@ -23,9 +23,13 @@ import type { Ride } from './plan.ts';
  */
 function rideId(ride: Ride): string {
   const digest = createHash('sha1')
-    .update(`rail_rides:${ride.lineId}:${ride.riddenOn}:${ride.fromDidok}:${ride.toDidok}`)
+    .update(
+      `rail_rides:${ride.lineId}:${ride.riddenOn}:${ride.fromDidok}:${ride.toDidok}`,
+    )
     .digest('hex');
-  const variant = ((parseInt(digest.slice(16, 18), 16) & 0x3f) | 0x80).toString(16);
+  const variant = ((parseInt(digest.slice(16, 18), 16) & 0x3f) | 0x80).toString(
+    16,
+  );
 
   return [
     digest.slice(0, 8),
@@ -70,7 +74,13 @@ insert into public.rail_rides (id, line_id, ridden_on, from_didok, to_didok) val
 
 export function renderRides(rides: Ride[], context: SeedContext): string {
   const values = rides.map(ride => {
-    const cells = [rideId(ride), ride.lineId, ride.riddenOn, ride.fromDidok, ride.toDidok];
+    const cells = [
+      rideId(ride),
+      ride.lineId,
+      ride.riddenOn,
+      ride.fromDidok,
+      ride.toDidok,
+    ];
 
     return `(${cells.map(cell => `'${cell}'`).join(', ')})`;
   });

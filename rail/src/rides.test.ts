@@ -4,7 +4,12 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import { CALENDAR_ICS, RIDES_SQL, renderRidesFrom, writeRides } from './rides.ts';
+import {
+  CALENDAR_ICS,
+  RIDES_SQL,
+  renderRidesFrom,
+  writeRides,
+} from './rides.ts';
 
 const STOPS = [
   'line_id,sequence,stop_name,sloid,didok,lat,lon,via,junction',
@@ -17,7 +22,11 @@ function ics(...events: string[]): string {
   return ['BEGIN:VCALENDAR', ...events, 'END:VCALENDAR'].join('\r\n');
 }
 
-function office(date: string, location = 'Zug\\nSwitzerland', ...extra: string[]): string {
+function office(
+  date: string,
+  location = 'Zug\\nSwitzerland',
+  ...extra: string[]
+): string {
   return [
     'BEGIN:VEVENT',
     `DTSTART;TZID=Europe/Zurich:${date}T063000`,
@@ -71,17 +80,27 @@ describe('renderRidesFrom', () => {
       ),
     );
 
-    const rides = await renderRidesFrom({ ics: path, dir, through: '2026-09-26' });
+    const rides = await renderRidesFrom({
+      ics: path,
+      dir,
+      through: '2026-09-26',
+    });
 
     expect(rides.days).toBe(1);
     expect(rides.rides).toHaveLength(2);
-    expect(rides.sql).toContain("'fernverkehr:IR70', '2026-09-24', '8505000', '8502204'");
+    expect(rides.sql).toContain(
+      "'fernverkehr:IR70', '2026-09-24', '8505000', '8502204'",
+    );
   });
 
   it('drops days the export schedules but I have not ridden yet', async () => {
     await writeFile(path, ics(office('20260924'), office('20261218')));
 
-    const rides = await renderRidesFrom({ ics: path, dir, through: '2026-09-26' });
+    const rides = await renderRidesFrom({
+      ics: path,
+      dir,
+      through: '2026-09-26',
+    });
 
     expect(rides.days).toBe(1);
   });
@@ -89,34 +108,42 @@ describe('renderRidesFrom', () => {
   it('refuses an office day somewhere it has no route for', async () => {
     await writeFile(path, ics(office('20260924', 'Genève\\nSwitzerland')));
 
-    await expect(renderRidesFrom({ ics: path, dir, through: '2026-09-26' })).rejects.toThrow(
+    await expect(
+      renderRidesFrom({ ics: path, dir, through: '2026-09-26' }),
+    ).rejects.toThrow(
       /no destination for the 2026-09-24 office event at "Genève"/,
     );
   });
 
   it('refuses a recurring office day rather than counting it once', async () => {
-    await writeFile(path, ics(office('20260924', 'Zug\\nSwitzerland', 'RRULE:FREQ=WEEKLY')));
-
-    await expect(renderRidesFrom({ ics: path, dir, through: '2026-09-26' })).rejects.toThrow(
-      /recurs/,
+    await writeFile(
+      path,
+      ics(office('20260924', 'Zug\\nSwitzerland', 'RRULE:FREQ=WEEKLY')),
     );
+
+    await expect(
+      renderRidesFrom({ ics: path, dir, through: '2026-09-26' }),
+    ).rejects.toThrow(/recurs/);
   });
 
   it('refuses two office events on one date rather than counting the day twice', async () => {
     await writeFile(path, ics(office('20260924'), office('20260924')));
 
-    await expect(renderRidesFrom({ ics: path, dir, through: '2026-09-26' })).rejects.toThrow(
-      /two office events on 2026-09-24/,
-    );
+    await expect(
+      renderRidesFrom({ ics: path, dir, through: '2026-09-26' }),
+    ).rejects.toThrow(/two office events on 2026-09-24/);
   });
 
   it('refuses a ride whose stop is not on its line', async () => {
-    await writeFile(join(dir, 'line_stops.csv'), STOPS.replace('8502204', '8502299'));
+    await writeFile(
+      join(dir, 'line_stops.csv'),
+      STOPS.replace('8502204', '8502299'),
+    );
     await writeFile(path, ics(office('20260924')));
 
-    await expect(renderRidesFrom({ ics: path, dir, through: '2026-09-26' })).rejects.toThrow(
-      /fernverkehr:IR70 does not stop at 8502204/,
-    );
+    await expect(
+      renderRidesFrom({ ics: path, dir, through: '2026-09-26' }),
+    ).rejects.toThrow(/fernverkehr:IR70 does not stop at 8502204/);
   });
 });
 

@@ -42,14 +42,19 @@ export interface Diffed {
 type Log = (message: string) => void;
 
 async function git(dir: string, args: string[]): Promise<string> {
-  const { stdout } = await run('git', args, { cwd: dir, maxBuffer: MAX_BUFFER });
+  const { stdout } = await run('git', args, {
+    cwd: dir,
+    maxBuffer: MAX_BUFFER,
+  });
 
   return stdout;
 }
 
 async function resolveCommit(dir: string, base: string): Promise<string> {
   try {
-    return (await git(dir, ['rev-parse', '--verify', '--quiet', `${base}^{commit}`])).trim();
+    return (
+      await git(dir, ['rev-parse', '--verify', '--quiet', `${base}^{commit}`])
+    ).trim();
   } catch (error) {
     throw new Error(`--base ${base} does not name a commit`, { cause: error });
   }
@@ -59,7 +64,11 @@ async function resolveCommit(dir: string, base: string): Promise<string> {
  * A file the commit does not have reads as empty, so the first diff after the
  * artifacts are added lists every line as new rather than failing.
  */
-async function committed(dir: string, commit: string, file: string): Promise<string> {
+async function committed(
+  dir: string,
+  commit: string,
+  file: string,
+): Promise<string> {
   const listed = await git(dir, ['ls-tree', '--name-only', commit, '--', file]);
 
   return listed.trim() === '' ? '' : git(dir, ['show', `${commit}:./${file}`]);
@@ -69,7 +78,9 @@ async function generated(dir: string, file: string): Promise<string> {
   try {
     return await readFile(join(dir, file), 'utf8');
   } catch (error) {
-    throw new Error(`${file} is missing; run pnpm build:data first`, { cause: error });
+    throw new Error(`${file} is missing; run pnpm build:data first`, {
+      cause: error,
+    });
   }
 }
 

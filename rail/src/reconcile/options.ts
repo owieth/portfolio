@@ -60,7 +60,10 @@ export function parseReconcileOptions(
   }
 
   if (!POSTGRES_URL.test(databaseUrl)) {
-    return { ok: false, error: 'DATABASE_URL is not a postgresql:// connection string' };
+    return {
+      ok: false,
+      error: 'DATABASE_URL is not a postgresql:// connection string',
+    };
   }
 
   return {

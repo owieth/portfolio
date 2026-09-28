@@ -125,7 +125,9 @@ const log = (message: string): void => {
 
 const directories: string[] = [];
 
-async function writeFeed({ frequencies = FREQUENCIES }: Fixture = {}): Promise<string> {
+async function writeFeed({
+  frequencies = FREQUENCIES,
+}: Fixture = {}): Promise<string> {
   const files = {
     feed_info: FEED_INFO,
     calendar: CALENDAR,
@@ -151,14 +153,20 @@ async function run(fixture: Fixture = {}): Promise<Map<string, SeasonalLine>> {
 
   const { lines } = await flagSeasonal(
     feedDir,
-    { lines: LINES, window: calendar.window, referenceWeek: calendar.referenceWeek },
+    {
+      lines: LINES,
+      window: calendar.window,
+      referenceWeek: calendar.referenceWeek,
+    },
     log,
   );
 
   return new Map(lines.map(line => [line.id, line]));
 }
 
-function numbers(line: SeasonalLine | undefined): Partial<SeasonalFeedLine> | undefined {
+function numbers(
+  line: SeasonalLine | undefined,
+): Partial<SeasonalFeedLine> | undefined {
   return (
     line && {
       serviceDays: line.serviceDays ?? undefined,
@@ -223,14 +231,20 @@ describe('flagSeasonal', () => {
     const lines = await run();
 
     // 72 up, 30 + 21 down, and the one ordinary trip, on seven days.
-    expect(numbers(lines.get('test:fun'))).toMatchObject({ tripsPerWeek: (72 + 51 + 1) * 7 });
-    expect(logged).toContain('3 trips on 2 lines run from frequencies.txt and are counted by their departures');
+    expect(numbers(lines.get('test:fun'))).toMatchObject({
+      tripsPerWeek: (72 + 51 + 1) * 7,
+    });
+    expect(logged).toContain(
+      '3 trips on 2 lines run from frequencies.txt and are counted by their departures',
+    );
   });
 
   it('reads a frequency window that runs past midnight', async () => {
     const lines = await run();
 
-    expect(numbers(lines.get('test:late'))).toMatchObject({ tripsPerWeek: 3 * 7 });
+    expect(numbers(lines.get('test:late'))).toMatchObject({
+      tripsPerWeek: 3 * 7,
+    });
   });
 
   it('lists a seasonal line that runs no trip in the reference week', async () => {
@@ -276,7 +290,11 @@ describe('flagSeasonal', () => {
     await expect(
       flagSeasonal(
         feedDir,
-        { lines: LINES, window: calendar.window, referenceWeek: calendar.referenceWeek },
+        {
+          lines: LINES,
+          window: calendar.window,
+          referenceWeek: calendar.referenceWeek,
+        },
         log,
       ),
     ).rejects.toThrow(
@@ -305,7 +323,11 @@ describe('flagSeasonal', () => {
   it('comes out the same on a second run', async () => {
     const feedDir = await writeFeed();
     const calendar = await expandCalendar(feedDir, log);
-    const input = { lines: LINES, window: calendar.window, referenceWeek: calendar.referenceWeek };
+    const input = {
+      lines: LINES,
+      window: calendar.window,
+      referenceWeek: calendar.referenceWeek,
+    };
 
     const first = await flagSeasonal(feedDir, input, log);
     const second = await flagSeasonal(feedDir, input, log);

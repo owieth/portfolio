@@ -85,7 +85,12 @@ const LINE_FIELDS = [
   'terminal_b',
 ] as const;
 
-function required(row: CsvRow, column: string, file: string, index: number): string {
+function required(
+  row: CsvRow,
+  column: string,
+  file: string,
+  index: number,
+): string {
   const value = row[column];
 
   if (value === undefined || value === null) {
@@ -96,13 +101,29 @@ function required(row: CsvRow, column: string, file: string, index: number): str
 }
 
 /** The columns the diff reads, checked so a renamed column fails loudly. */
-export function snapshotOf(lines: readonly CsvRow[], stops: readonly CsvRow[]): Snapshot {
+export function snapshotOf(
+  lines: readonly CsvRow[],
+  stops: readonly CsvRow[],
+): Snapshot {
   return {
     lines: lines.map((row, index) => {
-      const [id, display_name, category, network_region, terminal_a, terminal_b] =
-        LINE_FIELDS.map(column => required(row, column, 'lines.csv', index));
+      const [
+        id,
+        display_name,
+        category,
+        network_region,
+        terminal_a,
+        terminal_b,
+      ] = LINE_FIELDS.map(column => required(row, column, 'lines.csv', index));
 
-      return { id, display_name, category, network_region, terminal_a, terminal_b };
+      return {
+        id,
+        display_name,
+        category,
+        network_region,
+        terminal_a,
+        terminal_b,
+      };
     }),
     stops: stops.map((row, index) => ({
       line_id: required(row, 'line_id', 'line_stops.csv', index),
@@ -125,7 +146,10 @@ function terminalPair(line: DiffLine): string {
   return [line.terminal_a, line.terminal_b].sort(compare).join('\u0000');
 }
 
-function groupBy<T>(items: readonly T[], key: (item: T) => string): Map<string, T[]> {
+function groupBy<T>(
+  items: readonly T[],
+  key: (item: T) => string,
+): Map<string, T[]> {
   const groups = new Map<string, T[]>();
 
   for (const item of items) {
@@ -168,13 +192,19 @@ function shifts(
   key: (line: DiffLine) => string,
 ): Shift[] {
   const counted = (lines: readonly DiffLine[]) =>
-    new Map([...groupBy(lines, key)].map(([value, group]) => [value, group.length]));
+    new Map(
+      [...groupBy(lines, key)].map(([value, group]) => [value, group.length]),
+    );
   const was = counted(before);
   const is = counted(after);
 
   return [...new Set([...was.keys(), ...is.keys()])]
     .sort(compare)
-    .map(value => ({ key: value, before: was.get(value) ?? 0, after: is.get(value) ?? 0 }))
+    .map(value => ({
+      key: value,
+      before: was.get(value) ?? 0,
+      after: is.get(value) ?? 0,
+    }))
     .filter(shift => shift.before !== shift.after);
 }
 
@@ -216,19 +246,26 @@ function stopChanges(
     .filter(change => change.added.length > 0 || change.removed.length > 0);
 }
 
-export function compareSnapshots(before: Snapshot, after: Snapshot): Comparison {
+export function compareSnapshots(
+  before: Snapshot,
+  after: Snapshot,
+): Comparison {
   const was = byId(before.lines);
   const is = byId(after.lines);
   const kept = sortById(after.lines.filter(line => was.has(line.id)));
   const removed = sortById(before.lines.filter(line => !is.has(line.id)));
   const added = sortById(after.lines.filter(line => !was.has(line.id)));
   const renumbered = pairRenumbered(removed, added);
-  const paired = new Set(renumbered.flatMap(pair => [pair.before.id, pair.after.id]));
+  const paired = new Set(
+    renumbered.flatMap(pair => [pair.before.id, pair.after.id]),
+  );
   const changed = (field: 'display_name' | 'category'): Renamed[] =>
     kept.flatMap(line => {
       const old = was.get(line.id)![field];
 
-      return old === line[field] ? [] : [{ id: line.id, before: old, after: line[field] }];
+      return old === line[field]
+        ? []
+        : [{ id: line.id, before: old, after: line[field] }];
     });
 
   return {

@@ -53,7 +53,12 @@ const ROUTES: AllowedRoute[] = [
   { routeId: '91-1-V-j26-1', agencyId: '11', shortName: 'S1', category: 'S' },
   { routeId: '91-1-Z-j26-1', agencyId: '11', shortName: 'S1', category: 'S' },
   { routeId: '91-2-X-j26-1', agencyId: '11', shortName: 'S2', category: 'S' },
-  { routeId: '91-FUN-j26-1', agencyId: '849', shortName: '2020', category: 'FUN' },
+  {
+    routeId: '91-FUN-j26-1',
+    agencyId: '849',
+    shortName: '2020',
+    category: 'FUN',
+  },
 ];
 
 const RULES = {
@@ -64,7 +69,10 @@ const RULES = {
   },
   rules: [
     { byOperator: true, categories: ['FUN'] },
-    { region: 's-bahn-zuerich', serves: [{ didok: '8503000', name: 'Zürich HB' }] },
+    {
+      region: 's-bahn-zuerich',
+      serves: [{ didok: '8503000', name: 'Zürich HB' }],
+    },
     { region: 's-bahn-bern', serves: [{ didok: '8507000', name: 'Bern' }] },
     { region: 'rer-vaud', serves: [{ didok: '8501120', name: 'Lausanne' }] },
   ],
@@ -128,7 +136,9 @@ describe('assignRegions', () => {
     const { routes } = await assignRegions(feedDir, ROUTES, log, rules);
     const s1 = routes.filter(route => route.shortName === 'S1');
 
-    expect(s1.map(route => [route.routeId, route.region, route.source])).toEqual([
+    expect(
+      s1.map(route => [route.routeId, route.region, route.source]),
+    ).toEqual([
       ['91-1-E-j26-1', 's-bahn-bern', 'rule'],
       ['91-1-V-j26-1', 'rer-vaud', 'rule'],
       ['91-1-Z-j26-1', 's-bahn-zuerich', 'rule'],
@@ -136,13 +146,20 @@ describe('assignRegions', () => {
   });
 
   it('files a byOperator route under its operator without calling it unassigned', async () => {
-    const { routes, unassigned } = await assignRegions(feedDir, ROUTES, log, rules);
+    const { routes, unassigned } = await assignRegions(
+      feedDir,
+      ROUTES,
+      log,
+      rules,
+    );
 
     expect(routes.find(route => route.category === 'FUN')).toMatchObject({
       region: 'verkehrsbetriebe-zuerich',
       source: 'operator',
     });
-    expect(unassigned.map(route => route.routeId)).not.toContain('91-FUN-j26-1');
+    expect(unassigned.map(route => route.routeId)).not.toContain(
+      '91-FUN-j26-1',
+    );
   });
 
   /**
@@ -150,7 +167,12 @@ describe('assignRegions', () => {
    * would file the line under Zürich, which is the wrong answer and a silent one.
    */
   it('does not count a station the train passes without stopping', async () => {
-    const { routes, unassigned } = await assignRegions(feedDir, ROUTES, log, rules);
+    const { routes, unassigned } = await assignRegions(
+      feedDir,
+      ROUTES,
+      log,
+      rules,
+    );
 
     expect(routes.find(route => route.shortName === 'S2')).toMatchObject({
       region: 'schweizerische-bundesbahnen-sbb',
@@ -197,7 +219,11 @@ describe('assignRegions', () => {
         name: 'Schweizerische Bundesbahnen SBB',
         routes: 1,
       },
-      { region: 'verkehrsbetriebe-zuerich', name: 'Verkehrsbetriebe Zürich', routes: 1 },
+      {
+        region: 'verkehrsbetriebe-zuerich',
+        name: 'Verkehrsbetriebe Zürich',
+        routes: 1,
+      },
     ]);
   });
 
@@ -206,7 +232,10 @@ describe('assignRegions', () => {
       ...RULES,
       rules: [
         ...RULES.rules,
-        { region: 'rer-vaud', serves: [{ didok: '8500218', name: 'Olten Bahnhof' }] },
+        {
+          region: 'rer-vaud',
+          serves: [{ didok: '8500218', name: 'Olten Bahnhof' }],
+        },
       ],
     });
 

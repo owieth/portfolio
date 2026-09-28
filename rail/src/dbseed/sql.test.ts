@@ -39,7 +39,9 @@ describe('renderSeed', () => {
     expect(lines).toMatch(
       /^insert into public\.rail_lines \(id, display_name, category,/,
     );
-    expect(stops).toMatch(/^insert into public\.rail_line_stops \(line_id, sequence,/);
+    expect(stops).toMatch(
+      /^insert into public\.rail_line_stops \(line_id, sequence,/,
+    );
   });
 
   it('skips a row that is already there instead of overwriting it', () => {
@@ -62,7 +64,9 @@ describe('renderSeed', () => {
     expect(sql).toContain(
       "('fernverkehr:IR35', 1, 'Bern', 'ch:1:sloid:7000', '8507000', 46.94883, 7.43913, 'backbone', null)",
     );
-    expect(sql).toContain("null, '8505000', -47.05, 8.31, 'branch', '8507000')");
+    expect(sql).toContain(
+      "null, '8505000', -47.05, 8.31, 'branch', '8507000')",
+    );
   });
 
   it('writes the same bytes for the same rows', () => {
@@ -75,8 +79,12 @@ describe('renderSeed', () => {
     expect(() => renderSeed([{ ...line, trips_per_week: 'many' }], [])).toThrow(
       'lines.csv row 2 trips_per_week is "many", which is not an integer',
     );
-    expect(() => renderSeed([{ ...line, seasonal: 'yes' }], [])).toThrow('not a boolean');
-    expect(() => renderSeed([], [{ ...STOPS[0], lat: '46,9' }])).toThrow('not a number');
+    expect(() => renderSeed([{ ...line, seasonal: 'yes' }], [])).toThrow(
+      'not a boolean',
+    );
+    expect(() => renderSeed([], [{ ...STOPS[0], lat: '46,9' }])).toThrow(
+      'not a number',
+    );
   });
 
   it('refuses a file that is missing a column', () => {
@@ -84,6 +92,8 @@ describe('renderSeed', () => {
       Object.entries(LINES[0]).filter(([column]) => column !== 'has_geometry'),
     );
 
-    expect(() => renderSeed([line], [])).toThrow('lines.csv has no has_geometry column');
+    expect(() => renderSeed([line], [])).toThrow(
+      'lines.csv has no has_geometry column',
+    );
   });
 });

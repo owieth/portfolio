@@ -86,7 +86,10 @@ function patternsByRoute(patterns: readonly Pattern[]): Map<string, Pattern[]> {
   const byRoute = new Map<string, Pattern[]>();
 
   for (const pattern of patterns) {
-    byRoute.set(pattern.routeId, [...(byRoute.get(pattern.routeId) ?? []), pattern]);
+    byRoute.set(pattern.routeId, [
+      ...(byRoute.get(pattern.routeId) ?? []),
+      pattern,
+    ]);
   }
 
   return byRoute;
@@ -98,7 +101,10 @@ function patternsByRoute(patterns: readonly Pattern[]): Map<string, Pattern[]> {
  * a bug in the rules, and a stop silently lost from a line is exactly what this
  * step exists to prevent.
  */
-function assertComplete(line: FeedLine, sequence: readonly SequenceStop[]): void {
+function assertComplete(
+  line: FeedLine,
+  sequence: readonly SequenceStop[],
+): void {
   const placed = sequence.map(stop => stop.didok);
   const unique = new Set(placed);
   const expected = new Set(line.stations);
@@ -124,7 +130,9 @@ function fingerprintOf(lines: readonly SequencedFeedLine[]): string {
     hash.update(
       [
         line.id,
-        line.sequence.map(stop => `${stop.didok}:${stop.via}:${stop.junction ?? ''}`).join(' '),
+        line.sequence
+          .map(stop => `${stop.didok}:${stop.via}:${stop.junction ?? ''}`)
+          .join(' '),
         line.patterns
           .map(
             pattern =>
@@ -162,7 +170,9 @@ export function sequenceLines(input: SequenceInput, log: Log): Sequenced {
       return line;
     }
 
-    const pool = poolPatterns(line.routeIds.flatMap(routeId => byRoute.get(routeId) ?? []));
+    const pool = poolPatterns(
+      line.routeIds.flatMap(routeId => byRoute.get(routeId) ?? []),
+    );
 
     if (pool.length === 0) {
       throw new Error(
@@ -189,12 +199,18 @@ export function sequenceLines(input: SequenceInput, log: Log): Sequenced {
       loops.push(line.id);
     }
 
-    const done: SequencedFeedLine = { ...line, sequence: sequence.stops, patterns: sequence.patterns };
+    const done: SequencedFeedLine = {
+      ...line,
+      sequence: sequence.stops,
+      patterns: sequence.patterns,
+    };
     feed.push(done);
     return done;
   });
 
-  const fingerprint = fingerprintOf([...feed].sort((a, b) => compare(a.id, b.id)));
+  const fingerprint = fingerprintOf(
+    [...feed].sort((a, b) => compare(a.id, b.id)),
+  );
 
   log(
     `${plural(feed.length, 'feed line')} put in order, ${count(branched.length)} with a branch and ${count(detoured.length)} with a detour, fingerprint ${fingerprint}`,
@@ -218,5 +234,12 @@ export function sequenceLines(input: SequenceInput, log: Log): Sequenced {
     );
   }
 
-  return { lines: sequenced, branched, detoured, conflicts, loops, fingerprint };
+  return {
+    lines: sequenced,
+    branched,
+    detoured,
+    conflicts,
+    loops,
+    fingerprint,
+  };
 }

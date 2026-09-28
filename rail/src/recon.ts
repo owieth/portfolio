@@ -89,7 +89,9 @@ export async function recon(options: FetchOptions, log: Log): Promise<string> {
     // Sequential on purpose: every one of these scans trips.txt, and running them
     // together would multiply peak memory to finish no sooner.
     const categories = await db.query<CategoryRow>(CATEGORIES);
-    log(`${categories.length} (route_type, route_desc) combinations in the feed`);
+    log(
+      `${categories.length} (route_type, route_desc) combinations in the feed`,
+    );
 
     const combinations = await db.query<CombinationRow>(COMBINATIONS);
     const samples = await db.query<SampleRow>(CATEGORY_ONLY_SAMPLES);
@@ -99,7 +101,9 @@ export async function recon(options: FetchOptions, log: Log): Promise<string> {
     const variants = await db.query<VariantRow>(VARIANT_RULE);
     const exceptions = await db.query<SampleRow>(VARIANT_EXCEPTIONS);
 
-    log(`${funiculars.length} funicular routes, ${agencies.length} operators in the candidate set`);
+    log(
+      `${funiculars.length} funicular routes, ${agencies.length} operators in the candidate set`,
+    );
 
     const operators: OperatorProbe[] = [];
 

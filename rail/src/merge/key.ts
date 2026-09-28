@@ -78,7 +78,12 @@ export function compactNumber(number: string): string | null {
 
 export type LineKey =
   | { region: string; category: Category; number: string }
-  | { region: string; category: Category; number: null; terminals: [string, string] };
+  | {
+      region: string;
+      category: Category;
+      number: null;
+      terminals: [string, string];
+    };
 
 /**
  * `s-bahn-zuerich:S10` for a numbered line, and for one with no number the
