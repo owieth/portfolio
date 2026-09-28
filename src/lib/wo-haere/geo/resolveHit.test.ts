@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { BAERN, distanceKm, himmurichtig } from '@/lib/wo-haere/geo/ch';
 import { resolveHit } from '@/lib/wo-haere/geo/resolveHit';
 
+import bielersee from './__fixtures__/identify-bielersee.json';
 import greifenseeDorf from './__fixtures__/identify-greifensee-dorf.json';
 import greifenseeSee from './__fixtures__/identify-greifensee-see.json';
 import leer from './__fixtures__/identify-leer.json';
@@ -123,6 +124,16 @@ describe('resolveHit', () => {
       art: 'preich',
       gmeind: 'Greifensee',
       gdeNr: 9040,
+      wasser: true,
+    });
+  });
+
+  it('flags a lake that carries a canton suffix', async () => {
+    stubSwisstopo({ identify: { body: bielersee } });
+
+    expect(await resolveHit({ lat: 47.0861, lon: 7.1715 })).toMatchObject({
+      art: 'preich',
+      gmeind: 'Bielersee (BE)',
       wasser: true,
     });
   });
