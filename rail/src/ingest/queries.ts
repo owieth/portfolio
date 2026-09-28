@@ -12,7 +12,7 @@
  * crosses into JavaScript is the row count.
  */
 
-import { STORE } from '../db.ts';
+import { literal, STORE } from '../db.ts';
 
 /**
  * The columns the pipeline keeps, and the only ones it reads.
@@ -110,11 +110,6 @@ export const COUNT_ROWS = `select count(*)::integer as rows from ${STORE}.stop_t
 
 export interface CountRow {
   rows: number;
-}
-
-/** Single-quoted SQL literal, the same escaping `db.ts` uses for a path. */
-function literal(value: string): string {
-  return `'${value.replaceAll("'", "''")}'`;
 }
 
 export interface Ledger {

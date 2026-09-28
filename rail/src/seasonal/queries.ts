@@ -10,7 +10,7 @@
  * line crosses into JavaScript.
  */
 
-import { STORE } from '../db.ts';
+import { literal, STORE } from '../db.ts';
 import type { GtfsFile } from '../db.ts';
 import type { DateRange } from '../calendar/week.ts';
 
@@ -25,11 +25,6 @@ export const REQUIRED_COLUMNS = {
 
 /** The store table this step reads, written by the calendar step. */
 export const STORE_TABLES = ['service_days'] as const;
-
-/** Single-quoted SQL literal, the same escaping `db.ts` uses for a path. */
-function literal(value: string): string {
-  return `'${value.replaceAll("'", "''")}'`;
-}
 
 function list(values: readonly string[]): string {
   return `[${values.map(literal).join(', ')}]::varchar[]`;

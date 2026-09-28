@@ -13,7 +13,7 @@
  * actually runs, which is the only shape a later step can count from.
  */
 
-import { STORE } from '../db.ts';
+import { literal, STORE } from '../db.ts';
 import type { GtfsFile } from '../db.ts';
 import type { DateRange } from './week.ts';
 
@@ -59,11 +59,6 @@ export const WINDOW = `
 export interface WindowRow {
   first: string | null;
   last: string | null;
-}
-
-/** Single-quoted SQL literal, the same escaping `db.ts` uses for a path. */
-function literal(value: string): string {
-  return `'${value.replaceAll("'", "''")}'`;
 }
 
 /**

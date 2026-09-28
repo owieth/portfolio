@@ -24,8 +24,15 @@ const nextConfig = {
   },
   // `loadRailGeometry` reads the rail web geometry off the disk, and /stats
   // revalidates hourly in a function that would otherwise ship without it.
+  // The wo-haere share card reads its Geist TTFs off the disk per request for
+  // the same reason, since the bundled `ImageResponse` has no bold weights.
   outputFileTracingIncludes: {
     '/stats': ['./public/rail/lines.geojson'],
+    '/api/wo-haere/og': [
+      './node_modules/geist/dist/fonts/geist-sans/Geist-Regular.ttf',
+      './node_modules/geist/dist/fonts/geist-sans/Geist-Bold.ttf',
+      './node_modules/geist/dist/fonts/geist-sans/Geist-Black.ttf',
+    ],
   },
   async headers() {
     return [
