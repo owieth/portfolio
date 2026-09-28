@@ -297,6 +297,26 @@ describe('matchLines', () => {
     ]);
   });
 
+  it('gives a relation to the next claim when the line that won it drops out', () => {
+    const { lines, unmatched } = run(
+      [
+        feedLine({ id: 'b:S1', number: 'S1', stops: [0, 1, 2, 3, 4] }),
+        feedLine({ id: 'c:S1', number: 'S1', stops: [0, 1] }),
+        feedLine({ id: 'a:S1', number: 'S1', stops: [2, 3, 4] }),
+      ],
+      [
+        relation({ id: 1, tags: { ref: 'S1' }, through: [0, 1] }),
+        relation({ id: 2, tags: { ref: 'S1' }, through: [2, 3, 4] }),
+      ],
+    );
+
+    expect(find(lines, 'c:S1').match).toEqual({ rule: 'ref', confidence: 1, relations: [1] });
+    expect(find(lines, 'a:S1').match).toEqual({ rule: 'ref', confidence: 1, relations: [2] });
+    expect(unmatched).toEqual([
+      { id: 'b:S1', name: 'S1', reason: 'contested', best: { rule: 'ref', confidence: 0.4, relations: [1] }, lostTo: ['a:S1'] },
+    ]);
+  });
+
   it('keeps a relation named for one line from a line with no number', () => {
     const numbered = feedLine({ id: 's-bahn-bern:S4', number: 'S4', stops: [0, 1, 2] });
     const unnumbered = feedLine({ id: 's-bahn-bern:S:8507000-8507002', stops: [0, 1, 2] });

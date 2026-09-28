@@ -204,6 +204,12 @@ interface Claim {
   accepted: boolean;
 }
 
+/** A settled line's hold on a relation, by the `ref` that named it or none. */
+interface Holder {
+  id: string;
+  ref: string | null;
+}
+
 function count(value: number): string {
   return value.toLocaleString('en-US');
 }
@@ -518,10 +524,26 @@ function strongerFirst(
 }
 
 /**
- * Hands every contested relation to the strongest claim on it, and takes it off
- * the others, until no relation is claimed twice. Losing a relation can drop a
- * line to a weaker rule, which can make it a contender somewhere else, so it is
- * run until nothing changes. Relations only ever leave a claim, so it ends.
+ * Whether a line may hold a relation by `ref` next to the lines that hold it:
+ * always when none does, and otherwise only when it and each of them hold it
+ * by a number of their own.
+ */
+function canShare(ref: string | null, holders: readonly { ref: string | null }[]): boolean {
+  return (
+    holders.length === 0 ||
+    (ref !== null && holders.every(holder => holder.ref !== null && holder.ref !== ref))
+  );
+}
+
+/**
+ * Settles the lines one at a time, the strongest accepted claim first. Before
+ * each pick, an open line's claim gives up the relations that settled lines
+ * hold and will not share, and is taken again, which can drop it to a weaker
+ * rule or below `MIN_COVERAGE`. Only an accepted claim gives any up, so a line
+ * is contested only when it could have been drawn. A settled line never
+ * changes, so no winner drops out and leaves a relation to nobody, and it ends
+ * after at most one round per line and one more, which settles the rest with
+ * the claim they came nearest with, for the report.
  */
 function resolve(
   targets: readonly Target[],
@@ -529,58 +551,71 @@ function resolve(
 ): { claims: Map<string, Claim | null>; lostTo: Map<string, Set<string>> } {
   const lost = new Map(targets.map(target => [target.line.id, new Set<number>()]));
   const lostTo = new Map(targets.map(target => [target.line.id, new Set<string>()]));
+  const holders = new Map<number, Holder[]>();
+  const settled = new Map<string, Claim | null>();
+
+  const blockers = (option: Option): Holder[] => {
+    const held = holders.get(option.relation) ?? [];
+
+    return canShare(option.ref, held) ? [] : held;
+  };
+
+  const claimFor = (target: Target): Claim | null => {
+    const id = target.line.id;
+    const without = lost.get(id) ?? new Set<number>();
+
+    for (;;) {
+      const claim = claimOf(target, options.get(id) ?? [], without);
+      const blocked =
+        claim?.accepted === true ? claim.options.filter(option => blockers(option).length > 0) : [];
+
+      if (blocked.length === 0) {
+        return claim;
+      }
+
+      for (const option of blocked) {
+        without.add(option.relation);
+
+        for (const holder of blockers(option)) {
+          lostTo.get(id)?.add(holder.id);
+        }
+      }
+    }
+  };
+
+  const open = new Map(targets.map(target => [target.line.id, { target, claim: claimFor(target) }]));
 
   for (;;) {
-    const claims = new Map(
-      targets.map(target => [
-        target.line.id,
-        claimOf(target, options.get(target.line.id) ?? [], lost.get(target.line.id) ?? new Set()),
-      ]),
-    );
-    const claimants = new Map<number, { target: Target; claim: Claim; ref: string | null }[]>();
+    const [winner] = [...open.values()]
+      .flatMap(({ target, claim }) => (claim?.accepted === true ? [{ target, claim }] : []))
+      .sort(strongerFirst);
 
-    for (const target of targets) {
-      const claim = claims.get(target.line.id);
-
-      if (claim?.accepted !== true) {
-        continue;
+    if (winner === undefined) {
+      for (const { target, claim } of open.values()) {
+        settled.set(target.line.id, claim);
       }
 
-      for (const option of claim.options) {
-        claimants.set(option.relation, [
-          ...(claimants.get(option.relation) ?? []),
-          { target, claim, ref: option.ref },
-        ]);
-      }
+      return { claims: settled, lostTo };
     }
 
-    let changed = false;
+    open.delete(winner.target.line.id);
+    settled.set(winner.target.line.id, winner.claim);
 
-    for (const [relation, contenders] of claimants) {
-      const kept: { target: Target; ref: string | null }[] = [];
-
-      for (const contender of [...contenders].sort(strongerFirst)) {
-        const shares =
-          kept.length === 0 ||
-          (contender.ref !== null && kept.every(holder => holder.ref !== null && holder.ref !== contender.ref));
-
-        if (shares) {
-          kept.push(contender);
-          continue;
-        }
-
-        lost.get(contender.target.line.id)?.add(relation);
-
-        for (const holder of kept) {
-          lostTo.get(contender.target.line.id)?.add(holder.target.line.id);
-        }
-
-        changed = true;
-      }
+    for (const option of winner.claim.options) {
+      holders.set(option.relation, [
+        ...(holders.get(option.relation) ?? []),
+        { id: winner.target.line.id, ref: option.ref },
+      ]);
     }
 
-    if (!changed) {
-      return { claims, lostTo };
+    // Only a new holder can take something off a claim, and only off an
+    // accepted one, so every other claim would come out of claimFor as it is.
+    const won = new Set(winner.claim.options.map(option => option.relation));
+
+    for (const entry of open.values()) {
+      if (entry.claim?.accepted === true && entry.claim.options.some(option => won.has(option.relation))) {
+        entry.claim = claimFor(entry.target);
+      }
     }
   }
 }
