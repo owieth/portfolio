@@ -81,6 +81,22 @@ each one.
 To check formatting, run `pnpm exec prettier --check <paths>`. Do not run
 `pnpm prettier`: it is `prettier --write .` and rewrites the whole repo.
 
+## Tests
+
+`pnpm test` runs Vitest over `src/**/*.test.ts` and `rail/src/**/*.test.ts`.
+
+The rail tests that need a database are opt-in locally. After
+`supabase db reset`, point `RAIL_TEST_DATABASE_URL` at the local Supabase, and
+they run in transactions that are rolled back:
+
+```sh
+RAIL_TEST_DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres pnpm test
+```
+
+That URL is the Supabase CLI's public local default, not a secret. In CI, the
+`Database` workflow runs these tests on changes to the schema, the seeds or the
+reconcile.
+
 ## Inspiration
 
 https://linusrogge.com/
