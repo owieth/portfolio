@@ -226,6 +226,19 @@ describe('resolveHit', () => {
     await expect(resolveHit(THUN)).rejects.toThrow();
   });
 
+  it('bounds both requests with a timeout', async () => {
+    const timeout = laufAbSofort();
+    stubSwisstopo({ identify: { body: thun } });
+    await resolveHit(THUN);
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    for (const [, init] of fetchMock.mock.calls) {
+      expect((init as RequestInit).signal).toBeInstanceOf(AbortSignal);
+    }
+    expect(timeout).toHaveBeenCalledWith(4000);
+    expect(timeout).toHaveBeenCalledWith(2000);
+  });
+
   it('falls back to a missing canton and gde_nr instead of undefined', async () => {
     stubSwisstopo({
       identify: {
