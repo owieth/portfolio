@@ -273,6 +273,21 @@ describe('resolveHit', () => {
       expect(urls).toHaveLength(1);
       expect(urls[0].searchParams.get('timeInstant')).toBe('2026');
     });
+
+    it('falls back to all years for border water', async () => {
+      stubSwisstopo({
+        identifyJahr: { body: leer },
+        identify: { body: numeHistorisch },
+      });
+
+      expect(await resolveHit({ lat: 46.4, lon: 6.4 })).toMatchObject({
+        art: 'dernaebe',
+        grund: 'grenzwasser',
+      });
+      expect(
+        identifyUrls().map(url => url.searchParams.get('timeInstant')),
+      ).toEqual(['2026', null]);
+    });
   });
 
   describe('the mapExtent trap', () => {
