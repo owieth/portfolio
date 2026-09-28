@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { BAERN, distanceKm, himmurichtig } from '@/lib/wo-haere/geo/ch';
 import { resolveHit } from '@/lib/wo-haere/geo/resolveHit';
 
+import greifenseeDorf from './__fixtures__/identify-greifensee-dorf.json';
 import leer from './__fixtures__/identify-leer.json';
 import numeHistorisch from './__fixtures__/identify-nume-historisch.json';
 import thun from './__fixtures__/identify-thun.json';
@@ -100,6 +101,17 @@ describe('resolveHit', () => {
       art: 'preich',
       gmeind: 'Thunersee',
       wasser: true,
+    });
+  });
+
+  it('leaves a village named after its lake on dry land', async () => {
+    stubSwisstopo({ identify: { body: greifenseeDorf } });
+
+    expect(await resolveHit({ lat: 47.367, lon: 8.68 })).toMatchObject({
+      art: 'preich',
+      gmeind: 'Greifensee',
+      gdeNr: 194,
+      wasser: false,
     });
   });
 
