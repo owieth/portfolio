@@ -10,7 +10,7 @@
  * line crosses into JavaScript.
  */
 
-import { STORE } from '../db.ts';
+import { literal, STORE } from '../db.ts';
 import type { GtfsFile } from '../db.ts';
 import type { DateRange } from '../calendar/week.ts';
 
@@ -44,11 +44,6 @@ export const TABLES = `
 
 export interface TableRow {
   table_name: string;
-}
-
-/** Single-quoted SQL literal, the same escaping `db.ts` uses for a path. */
-function literal(value: string): string {
-  return `'${value.replaceAll("'", "''")}'`;
 }
 
 function list(values: readonly string[]): string {
