@@ -4,7 +4,7 @@ import IconLink from '@/icons/Link';
 import { track } from '@/lib/analytics/track';
 import { handledMarker, linkFields } from '@/lib/analytics/links';
 import Link from 'next/link';
-import { MouseEvent, ReactNode } from 'react';
+import type { MouseEvent, ReactNode } from 'react';
 
 /**
  * The content-link chokepoint: home page and footer route through here, so it is
