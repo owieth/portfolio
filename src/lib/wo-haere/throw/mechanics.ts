@@ -53,8 +53,8 @@ const NOVIZ_SIGMA = 0.38;
  * "Dernäbe!" card. Aimed at the middle of the map, about a fifth of full-force
  * throws leave the country, and that is intended.
  *
- * The earlier calibration ran to 23% off-board at full force, which buried the
- * player in "Dernäbe!" cards — far more than the paper's "occasionally".
+ * The earlier calibration ran to 23% off the board at full force — far more
+ * than the paper's beginner who "will occasionally miss the board entirely".
  */
 const SIGMA_BI_CHRAFT = { min: 0.4, max: 1.0 } as const;
 
