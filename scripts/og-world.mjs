@@ -7,8 +7,8 @@
  * into a single SVG path in the card's own pixel space.
  *
  * Run it when `MAP_WINDOW` or `MAP_SIZE` changes. Nothing runs it in CI —
- * `world-path.test.ts` asserts the generated window still matches the constant
- * instead, which is the same guarantee for none of the build time.
+ * `world-path.test.ts` asserts the generated window and size still match the
+ * constants instead, which is the same guarantee for none of the build time.
  *
  *   pnpm og:world
  */
