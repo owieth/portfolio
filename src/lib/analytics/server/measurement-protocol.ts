@@ -5,6 +5,7 @@ import {
 } from '@/lib/analytics/config';
 import { CONSENT_COOKIE } from '@/lib/analytics/consent';
 import { MAX_EVENT_NAME_LENGTH, MAX_EVENT_PARAMS } from '@/lib/analytics/events';
+import { INTERNAL_TRAFFIC_COOKIE } from '@/lib/analytics/internal-traffic';
 
 /**
  * The server-side event contract, delivered to GA4 through the Measurement
@@ -175,6 +176,9 @@ export const buildPayload = (
     client_source: clientSource,
   };
   if (sessionId) params.session_id = sessionId;
+  if (parseCookieHeader(cookieHeader)[INTERNAL_TRAFFIC_COOKIE] === '1') {
+    params.traffic_type = 'internal';
+  }
 
   return { client_id: clientId, events: [{ name, params }] };
 };
