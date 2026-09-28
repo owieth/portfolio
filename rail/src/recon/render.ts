@@ -12,7 +12,7 @@
  * December diff shows feed changes rather than run timestamps.
  */
 
-import { cell, table } from '../markdown.ts';
+import { table } from '../markdown.ts';
 import type {
   AgencyRow,
   CategoryRow,
