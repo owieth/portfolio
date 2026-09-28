@@ -10,8 +10,8 @@
  * the constants the game actually uses. Change NOVIZ_SIGMA or SIGMA_BI_CHRAFT
  * and the numbers here move with them.
  *
- * The app draws its scatter from Math.random, so seeding that is enough to
- * make a run reproducible without the mechanics knowing anything about it.
+ * Every throw draws from one seeded mulberry32 handed to zugZieu(), so a run
+ * repeats exactly for a given seed.
  */
 
 import { registerAlias } from './lib/ts-alias.mjs';
@@ -19,6 +19,8 @@ import { registerAlias } from './lib/ts-alias.mjs';
 registerAlias();
 
 const { CH_BOUNDS, distanceKm } = await import('@/lib/wo-haere/geo/ch');
+const mech = await import('@/lib/wo-haere/throw/mechanics');
+const { mulberry32 } = await import('@/lib/wo-haere/throw/rng');
 
 function flag(name, fallback) {
   const hit = process.argv.slice(2).find(a => a.startsWith(`--${name}=`));
@@ -46,27 +48,15 @@ const PADDING = 24;
 const BRETT_RADIUS = Math.min(SICHT.breiti, SICHT.hööchi) / 2;
 
 /**
- * The shooting bias is drawn once per module instance and stands for one
- * player's wonky arm, so a run needs many instances to describe a population
- * rather than a single thrower. It is the number of arms, not the number of
- * throws, that settles the off-board tail. Re-importing is most of the run
- * time, so this trades a few thousand arms against a script that finishes.
+ * Each session draws its own shooting bias, which stands for one player's
+ * wonky arm, so a run needs many sessions to describe a population rather
+ * than a single thrower. It is the number of arms, not the number of throws,
+ * that settles the off-board tail.
  */
 const PRO_SESSION = flag('session', 400);
 const SESSIONE = Math.max(1, Math.round(WUERF / PRO_SESSION));
 
-/** mulberry32. */
-function seedle(seed) {
-  let s = seed;
-  return () => {
-    s = (s + 0x6d2b79f5) | 0;
-    let t = Math.imul(s ^ (s >>> 15), 1 | s);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-Math.random = seedle(SEED);
+const rand = mulberry32(SEED);
 
 /**
  * MapLibre's Web Mercator, headless: normalised world coordinates in [0,1],
@@ -125,20 +115,23 @@ function zugUfsZiel(mech, chraft) {
   return { vo: { x: ZIEL.x - flug.x, y: ZIEL.y - flug.y }, delta };
 }
 
-async function simuliere(chraft) {
+function simuliere(chraft) {
   const missKm = [];
   let abBrett = 0;
-  let sigma = 0;
+  const zug = zugUfsZiel(mech, chraft);
+  const sigma = mech.streuigSigma(BRETT_RADIUS, chraft);
 
   for (let session = 0; session < SESSIONE; session++) {
-    const mech = await import(
-      `@/lib/wo-haere/throw/mechanics?session=${chraft}-${session}`
-    );
-    const zug = zugUfsZiel(mech, chraft);
-    sigma = mech.streuigSigma(BRETT_RADIUS, chraft);
+    const hang = mech.zieheHang(rand);
 
     for (let i = 0; i < PRO_SESSION; i++) {
-      const { zieu } = mech.zugZieu(zug, 'häre', mech.nöieWind(), BRETT_RADIUS);
+      const { zieu } = mech.zugZieu(
+        zug,
+        'häre',
+        mech.nöieWind(rand),
+        BRETT_RADIUS,
+        { rand, hang },
+      );
       if (Math.hypot(zieu.x - ZIEL.x, zieu.y - ZIEL.y) > BRETT_RADIUS)
         abBrett++;
       missKm.push(distanceKm(ZIEL_ORT, zumOrt(zieu.x, zieu.y)));
@@ -160,7 +153,7 @@ const zeile = (a, b, c, d) =>
 console.log(zeile('Force', 'σ', 'Median miss', 'Off the board'));
 
 for (const chraft of CHREFT) {
-  const r = await simuliere(chraft);
+  const r = simuliere(chraft);
   console.log(
     zeile(
       `${Math.round(r.chraft * 100)}%`,
