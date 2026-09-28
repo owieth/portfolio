@@ -933,7 +933,8 @@ Connect dialog, which `pnpm reconcile:data` reads from `.env.local`. It is the
 database password, so it belongs on the laptop that runs the refresh and not
 on Vercel.
 
-The tests that need a database are opt-in, because CI has none. Point
+The `Database` workflow runs the tests that need a database on changes to the
+schema, the seeds or the reconcile. Locally they are opt-in: point
 `RAIL_TEST_DATABASE_URL` at a local Supabase after `supabase db reset`, for
 example `postgresql://postgres:postgres@127.0.0.1:54322/postgres`, and they run
 in transactions that are rolled back.

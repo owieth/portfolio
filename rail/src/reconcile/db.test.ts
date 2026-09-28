@@ -14,9 +14,10 @@ import type { Feed } from './rows.ts';
 /**
  * Against a real database, because what matters here is what Postgres hands
  * back: whether a `text[]`, a `double precision` and a null read back equal to
- * the feed's values, and whether the trigger records an edit. Opt-in, since CI
- * has no database: point `RAIL_TEST_DATABASE_URL` at a local Supabase after
- * `supabase db reset`, for example
+ * the feed's values, and whether the trigger records an edit. The `Database`
+ * workflow runs these on changes to the schema, the seeds or the reconcile.
+ * Locally they are opt-in: point `RAIL_TEST_DATABASE_URL` at a local Supabase
+ * after `supabase db reset`, for example
  * `postgresql://postgres:postgres@127.0.0.1:54322/postgres`.
  *
  * Every test runs in a transaction that is rolled back, so the tables are left
