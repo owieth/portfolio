@@ -18,6 +18,9 @@ const HEIGHT_URL = 'https://api3.geo.admin.ch/rest/services/height';
 /** Boundaries and terrain do not move, so cache hard. */
 const CACHE = { next: { revalidate: 60 * 60 * 24 * 30 } } as const;
 
+const IDENTIFY_TIMEOUT_MS = 4000;
+const HOECHI_TIMEOUT_MS = 2000;
+
 interface IdentifyAttributes {
   gemname?: string;
   kanton?: string;
@@ -77,7 +80,10 @@ async function fetchHoechi(lon: number, lat: number): Promise<number | null> {
   });
 
   try {
-    const res = await fetch(`${HEIGHT_URL}?${params}`, CACHE);
+    const res = await fetch(`${HEIGHT_URL}?${params}`, {
+      ...CACHE,
+      signal: AbortSignal.timeout(HOECHI_TIMEOUT_MS),
+    });
     if (!res.ok) return null;
     const json = (await res.json()) as { height?: string };
     const height = Number.parseFloat(json.height ?? '');
@@ -110,7 +116,10 @@ export async function resolveHit(rawPoint: LatLon): Promise<Wurf> {
     return { art: 'dernaebe', grund: 'usland', lat, lon };
   }
 
-  const res = await fetch(identifyUrl(lon, lat), CACHE);
+  const res = await fetch(identifyUrl(lon, lat), {
+    ...CACHE,
+    signal: AbortSignal.timeout(IDENTIFY_TIMEOUT_MS),
+  });
   if (!res.ok) {
     throw new Error(`swisstopo identify failed with ${res.status}`);
   }

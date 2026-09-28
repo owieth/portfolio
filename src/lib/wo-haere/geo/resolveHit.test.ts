@@ -21,6 +21,8 @@ interface Antwort {
   body?: unknown;
   /** Simulates the request rejecting outright. */
   chlöpft?: boolean;
+  /** Simulates a request that never answers until its signal aborts. */
+  hanget?: boolean;
 }
 
 let fetchMock: ReturnType<typeof vi.fn>;
@@ -33,12 +35,22 @@ function stubSwisstopo(antworte: { identify?: Antwort; hoechi?: Antwort }) {
       json: () => Promise.resolve(body),
     });
 
-  fetchMock = vi.fn((url: string) => {
+  const haenge = (signal?: AbortSignal | null) =>
+    new Promise<never>((_, reject) => {
+      if (signal?.aborted) return reject(signal.reason);
+      signal?.addEventListener('abort', () => reject(signal.reason), {
+        once: true,
+      });
+    });
+
+  fetchMock = vi.fn((url: string, init?: RequestInit) => {
     const soll = url.includes('/height')
       ? (antworte.hoechi ?? { body: { height: '560.2' } })
       : (antworte.identify ?? { body: leer });
 
-    return soll.chlöpft ? Promise.reject(new Error('offline')) : antwort(soll);
+    if (soll.chlöpft) return Promise.reject(new Error('offline'));
+    if (soll.hanget) return haenge(init?.signal);
+    return antwort(soll);
   });
 
   vi.stubGlobal('fetch', fetchMock);
@@ -51,12 +63,20 @@ const identifyUrl = () =>
       .find(url => url.includes('/identify'))!,
   );
 
+const laufAbSofort = () =>
+  vi
+    .spyOn(AbortSignal, 'timeout')
+    .mockImplementation(() =>
+      AbortSignal.abort(new DOMException('timed out', 'TimeoutError')),
+    );
+
 beforeEach(() => {
   stubSwisstopo({});
 });
 
 afterEach(() => {
   vi.unstubAllGlobals();
+  vi.restoreAllMocks();
 });
 
 describe('resolveHit', () => {
@@ -199,6 +219,26 @@ describe('resolveHit', () => {
     );
   });
 
+  it('rejects when identify stalls', async () => {
+    laufAbSofort();
+    stubSwisstopo({ identify: { hanget: true } });
+
+    await expect(resolveHit(THUN)).rejects.toThrow();
+  });
+
+  it('bounds both requests with a timeout', async () => {
+    const timeout = laufAbSofort();
+    stubSwisstopo({ identify: { body: thun } });
+    await resolveHit(THUN);
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    for (const [, init] of fetchMock.mock.calls) {
+      expect((init as RequestInit).signal).toBeInstanceOf(AbortSignal);
+    }
+    expect(timeout).toHaveBeenCalledWith(4000);
+    expect(timeout).toHaveBeenCalledWith(2000);
+  });
+
   it('falls back to a missing canton and gde_nr instead of undefined', async () => {
     stubSwisstopo({
       identify: {
@@ -251,6 +291,17 @@ describe('resolveHit', () => {
       ['rejects outright', { chlöpft: true }],
     ])('still reports the municipality when it %s', async (_name, hoechi) => {
       stubSwisstopo({ identify: { body: thun }, hoechi });
+
+      expect(await resolveHit(THUN)).toMatchObject({
+        art: 'preich',
+        gmeind: 'Thun',
+        hoechi: null,
+      });
+    });
+
+    it('still reports the municipality when the height stalls', async () => {
+      laufAbSofort();
+      stubSwisstopo({ identify: { body: thun }, hoechi: { hanget: true } });
 
       expect(await resolveHit(THUN)).toMatchObject({
         art: 'preich',
