@@ -152,6 +152,39 @@ describe('buildPayload', () => {
     expect(payload.events[0].name).toBe('swisstopo_error_server');
     expect(payload.events[0].params.client_source).toBe('synthetic');
   });
+
+  it('tags internal traffic from the ow_internal cookie', async () => {
+    const { buildPayload } = await importModule();
+
+    const payload = buildPayload(
+      { name: 'swisstopo_error_server', upstream_ms: 12 },
+      'ow_internal=1; _ga=GA1.1.10.20',
+    );
+
+    expect(payload.events[0].params.traffic_type).toBe('internal');
+  });
+
+  it('adds no traffic_type without the cookie', async () => {
+    const { buildPayload } = await importModule();
+
+    const payload = buildPayload(
+      { name: 'swisstopo_error_server', upstream_ms: 12 },
+      '_ga=GA1.1.10.20',
+    );
+
+    expect(payload.events[0].params).not.toHaveProperty('traffic_type');
+  });
+
+  it('ignores ow_internal values other than 1', async () => {
+    const { buildPayload } = await importModule();
+
+    const payload = buildPayload(
+      { name: 'swisstopo_error_server', upstream_ms: 12 },
+      'ow_internal=0; _ga=GA1.1.10.20',
+    );
+
+    expect(payload.events[0].params).not.toHaveProperty('traffic_type');
+  });
 });
 
 describe('isServerConsentGranted', () => {

@@ -18,6 +18,12 @@ const makeStorage = (initial: Record<string, string> = {}) => {
   };
 };
 
+const stubDocument = () => {
+  const document = { cookie: '' };
+  vi.stubGlobal('document', document);
+  return document;
+};
+
 afterEach(() => {
   vi.unstubAllGlobals();
 });
@@ -54,5 +60,47 @@ describe('internal-traffic', () => {
 
   it('is false on the server, where there is no window', () => {
     expect(isInternalTraffic()).toBe(false);
+  });
+
+  it('sets the ow_internal cookie on ?ow_internal=1', () => {
+    vi.stubGlobal('window', { localStorage: makeStorage() });
+    const document = stubDocument();
+
+    syncInternalTrafficFlag('ow_internal=1');
+
+    expect(document.cookie).toContain('ow_internal=1');
+    expect(document.cookie).toContain('max-age=31536000');
+  });
+
+  it('expires the cookie on ?ow_internal=0', () => {
+    vi.stubGlobal('window', {
+      localStorage: makeStorage({ ow_internal: '1' }),
+    });
+    const document = stubDocument();
+
+    syncInternalTrafficFlag('ow_internal=0');
+
+    expect(document.cookie).toContain('max-age=0');
+  });
+
+  it('mirrors an existing flag into the cookie', () => {
+    vi.stubGlobal('window', {
+      localStorage: makeStorage({ ow_internal: '1' }),
+    });
+    const document = stubDocument();
+
+    syncInternalTrafficFlag('foo=bar');
+
+    expect(document.cookie).toContain('ow_internal=1');
+    expect(document.cookie).toContain('max-age=31536000');
+  });
+
+  it('writes no cookie on an unmarked device', () => {
+    vi.stubGlobal('window', { localStorage: makeStorage() });
+    const document = stubDocument();
+
+    syncInternalTrafficFlag('foo=bar');
+
+    expect(document.cookie).toBe('');
   });
 });

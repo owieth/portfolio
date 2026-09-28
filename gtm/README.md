@@ -96,6 +96,9 @@ history events"*. Leaving it on double-counts every client-side navigation.
   traffic** — matching `traffic_type` **equals** `internal`, then add the
   matching **Data Filter** (Admin → **Data Settings → Data Filters**) and set it
   to *Active*.
+- Server `*_server` events (Measurement Protocol) carry `traffic_type: internal`
+  too: `?ow_internal=1` also sets an `ow_internal` cookie, which the server
+  reads from the request, so the same data filter excludes them.
 - Confirm list-based **bot filtering** is enabled (Admin → Data Settings → Data
   Collection); it excludes known bots and spiders.
 
