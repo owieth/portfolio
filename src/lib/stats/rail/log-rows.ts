@@ -1,3 +1,5 @@
+import type { RailLogTable } from '@/lib/stats/rail/log';
+
 /**
  * The browser's half of `./log`: the packed table unpacked into the rows the
  * ride log renders. Apart from `./log` so the client bundle carries none of
@@ -16,4 +18,22 @@ export interface RailLogRow {
   code: string;
   terminals: string;
   stretch: string;
+}
+
+/** One row per packed ride, in the order the rides were packed. */
+export function logRows({
+  days,
+  lines,
+  stretches,
+  rides,
+}: RailLogTable): RailLogRow[] {
+  return rides.map(([day, line, stretch]) => ({
+    dayRank: day,
+    lineRank: line,
+    stretchRank: stretch,
+    day: days[day],
+    code: lines[line][0],
+    terminals: lines[line][1],
+    stretch: stretches[stretch],
+  }));
 }
