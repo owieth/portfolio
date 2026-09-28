@@ -9,6 +9,8 @@
 
   --animate-slide: slide 2.5s linear infinite;
 
+  /* These resolve on :root, so the next/font variable classes that define
+     `--font-geist-*` have to sit on <html>. On <body> both come out empty. */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 
