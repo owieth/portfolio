@@ -1,4 +1,5 @@
 import { CH_BOUNDS, offset, type LatLon } from '@/lib/wo-haere/geo/ch';
+import { isInSchwyz } from '@/lib/wo-haere/geo/landesgrenze';
 import { ZIU } from '@/lib/wo-haere/data/ziu';
 import type { Rand } from '@/lib/wo-haere/throw/rng';
 
@@ -230,36 +231,50 @@ function clampInsCh(ort: LatLon): LatLon {
   };
 }
 
+function kuratiertsZieu(wind: Wind, rand: Rand): LatLon {
+  const ziu = ZIU[Math.floor(rand() * ZIU.length)];
+  const streuig = rand() * 6;
+  const richtig = rand() * 360;
+  const ort = offset({ lat: ziu.lat, lon: ziu.lon }, streuig, richtig);
+  return clampInsCh(mitWind(ort, wind));
+}
+
+/** The share of Ei Tipp throws that ignore the curated destinations. */
+const ZUEFAU_ANTEIL = 0.15;
+
+/**
+ * How many uniform draws over `CH_BOUNDS` a random Ei Tipp gets before it
+ * falls back to a curated destination. About 46% of the rectangle is abroad,
+ * so all of them miss about once in 220,000 random throws (0.463^16).
+ */
+const ZUEFAU_VERSUECH = 16;
+
+function zuefäuigsOrtInDerSchwyz(rand: Rand): LatLon | null {
+  for (let versuech = 0; versuech < ZUEFAU_VERSUECH; versuech++) {
+    const ort = {
+      lat: CH_BOUNDS.south + rand() * (CH_BOUNDS.north - CH_BOUNDS.south),
+      lon: CH_BOUNDS.west + rand() * (CH_BOUNDS.east - CH_BOUNDS.west),
+    };
+    if (isInSchwyz(ort)) return ort;
+  }
+  return null;
+}
+
 /**
  * Ei Tipp — one tap, pure luck.
  *
  * Mostly lands near a curated destination so a single tap gives a usable
- * answer, but a fifth of the throws go somewhere entirely random, which is
- * where the "middle of a field" jokes come from.
+ * answer, but about one throw in seven goes anywhere in Switzerland, which is
+ * where the "middle of a field" jokes come from. The wind still pushes those
+ * after they are drawn, unclamped, so a draw on the border can drift across it.
  */
 export function tippZieu(wind: Wind, rand: Rand = Math.random): WurfErgebnis {
   const stil: WurfStil =
     rand() < CHNORZ_WAHRSCHYNLECHKEIT ? 'chnorz' : 'gschlämpert';
 
-  if (rand() < 0.8) {
-    const ziu = ZIU[Math.floor(rand() * ZIU.length)];
-    const streuig = rand() * 6;
-    const richtig = rand() * 360;
-    const ort = offset({ lat: ziu.lat, lon: ziu.lon }, streuig, richtig);
-    return { zieu: { kind: 'ort', ort: clampInsCh(mitWind(ort, wind)) }, stil };
-  }
+  const zuefau =
+    rand() < 1 - ZUEFAU_ANTEIL ? null : zuefäuigsOrtInDerSchwyz(rand);
+  const ort = zuefau ? mitWind(zuefau, wind) : kuratiertsZieu(wind, rand);
 
-  return {
-    zieu: {
-      kind: 'ort',
-      ort: mitWind(
-        {
-          lat: CH_BOUNDS.south + rand() * (CH_BOUNDS.north - CH_BOUNDS.south),
-          lon: CH_BOUNDS.west + rand() * (CH_BOUNDS.east - CH_BOUNDS.west),
-        },
-        wind,
-      ),
-    },
-    stil,
-  };
+  return { zieu: { kind: 'ort', ort }, stil };
 }

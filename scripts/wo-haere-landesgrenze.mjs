@@ -1,15 +1,14 @@
 /**
- * Regenerates `src/lib/wo-haere/geo/landesgrenze-data.ts` — the Swiss border
- * that decides whether a throw left the country.
+ * Regenerates `src/lib/wo-haere/geo/landesgrenze-data.ts` — the national
+ * border Ei Tipp samples its random throws inside.
  *
- * swisstopo's national border is 52,000 vertices and 1.2 MB, far more than a
- * point-in-polygon check needs. Douglas–Peucker at 0.01° brings it to a few
- * hundred vertices that disagree with the full polygon on about half a
- * percent of points inside `CH_BOUNDS`. Do not go coarser: at 0.02° the
- * Campione hole collapses and Campione reads as Swiss.
+ * `CH_BOUNDS` is a rectangle, and nearly half of it is France, Germany, Italy,
+ * Austria or Liechtenstein. The game needs the real outline, but the full
+ * swissBOUNDARIES3D polygon is 1.2 MB, so it is simplified once, here, into a
+ * few hundred vertices that ship with the client.
  *
- * The raw response's SHA-256 goes into the header, so a rerun shows at a
- * glance whether swisstopo changed the border or only the fetch date moved.
+ * Run it when swisstopo publishes a new boundary release. Nothing runs it in
+ * CI; the header of the generated file records which response it was cut from.
  *
  *   node scripts/wo-haere-landesgrenze.mjs
  */
@@ -19,7 +18,7 @@ import { writeFileSync } from 'node:fs';
 
 const LAYER = 'ch.swisstopo.swissboundaries3d-land-flaeche.fill';
 
-/** An identify at Bern, the one point every version of the border contains. */
+/** An identify on the Zytglogge returns the one feature that is Switzerland. */
 const SOURCE =
   'https://api3.geo.admin.ch/rest/services/api/MapServer/identify' +
   '?geometry=7.4474,46.948&geometryType=esriGeometryPoint' +
@@ -32,134 +31,119 @@ const TARGET = new URL(
   import.meta.url,
 );
 
-/** In degrees, the unit the check works in. */
-const TOLERANZ = 0.01;
+/**
+ * About 1 km. It keeps the result near 370 vertices and within 0.5% of the full
+ * polygon over `CH_BOUNDS`. At 0.02° the Campione hole collapses and a point
+ * in Campione reads as Swiss.
+ */
+const TOLERANZ_GRAD = 0.01;
 
-/** A thousandth of a degree is about 100 m, well under the tolerance. */
+/** Three decimals is ~100 m, a tenth of the tolerance. */
 const round = value => Math.round(value * 1000) / 1000;
 
-function squaredToSegment([px, py], [ax, ay], [bx, by]) {
+function distanceToSegment([px, py], [ax, ay], [bx, by]) {
   const dx = bx - ax;
   const dy = by - ay;
-  const length = dx * dx + dy * dy;
+  const length2 = dx * dx + dy * dy;
   const t =
-    length === 0
+    length2 === 0
       ? 0
-      : Math.min(1, Math.max(0, ((px - ax) * dx + (py - ay) * dy) / length));
-  const ex = ax + t * dx - px;
-  const ey = ay + t * dy - py;
-
-  return ex * ex + ey * ey;
+      : Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / length2));
+  return Math.hypot(px - (ax + t * dx), py - (ay + t * dy));
 }
 
 /**
- * Iterative rather than recursive, so a 52,000-vertex ring cannot run out of
- * stack. A closed ring starts and ends on the same vertex, and both are kept.
+ * Douglas-Peucker. Iterative, because the outer ring has 52,000 vertices. A
+ * closed ring starts and ends on the same point, which the segment distance
+ * above handles as a distance to that point.
  */
 function simplify(ring, tolerance) {
-  const kept = new Uint8Array(ring.length);
-  const pending = [[0, ring.length - 1]];
-  const limit = tolerance * tolerance;
+  const keep = new Uint8Array(ring.length);
+  keep[0] = 1;
+  keep[ring.length - 1] = 1;
+  const stack = [[0, ring.length - 1]];
 
-  kept[0] = 1;
-  kept[ring.length - 1] = 1;
+  while (stack.length > 0) {
+    const [first, last] = stack.pop();
+    let furthest = -1;
+    let furthestDistance = tolerance;
 
-  for (let span = pending.pop(); span !== undefined; span = pending.pop()) {
-    const [first, last] = span;
-    let farthest = -1;
-    let distance = -1;
-
-    for (let index = first + 1; index < last; index++) {
-      const squared = squaredToSegment(ring[index], ring[first], ring[last]);
-      if (squared > distance) {
-        farthest = index;
-        distance = squared;
+    for (let i = first + 1; i < last; i++) {
+      const distance = distanceToSegment(ring[i], ring[first], ring[last]);
+      if (distance > furthestDistance) {
+        furthest = i;
+        furthestDistance = distance;
       }
     }
 
-    if (distance > limit) {
-      kept[farthest] = 1;
-      pending.push([first, farthest], [farthest, last]);
+    if (furthest !== -1) {
+      keep[furthest] = 1;
+      stack.push([first, furthest], [furthest, last]);
     }
   }
 
-  return ring.filter((_, index) => kept[index]);
+  return ring.filter((_, i) => keep[i]);
 }
 
 function roundRing(ring) {
-  const points = [];
-
+  const rounded = [];
   for (const [lon, lat] of ring) {
     const point = [round(lon), round(lat)];
-    const previous = points.at(-1);
-
-    if (previous && previous[0] === point[0] && previous[1] === point[1]) {
-      continue;
-    }
-
-    points.push(point);
+    const previous = rounded.at(-1);
+    if (previous?.[0] === point[0] && previous?.[1] === point[1]) continue;
+    rounded.push(point);
   }
-
-  return points;
+  return rounded;
 }
 
 const response = await fetch(SOURCE);
-
 if (!response.ok) {
-  throw new Error(`${SOURCE} answered ${response.status}`);
+  throw new Error(`swisstopo answered ${response.status}`);
 }
-
 const raw = Buffer.from(await response.arrayBuffer());
 const sha256 = createHash('sha256').update(raw).digest('hex');
+
 const { results } = JSON.parse(raw.toString('utf8'));
-
-// The data file and the test assume Switzerland is one outline with the
-// Büsingen and Campione holes. Anything else needs a human, not a rerun.
-if (results?.length !== 1 || results[0].id !== 'CH') {
-  throw new Error(`expected one result with id CH, got ${results?.length}`);
+const feature = results.find(result => result.layerBodId === LAYER);
+if (feature?.geometry.type !== 'MultiPolygon') {
+  throw new Error(`expected one MultiPolygon from ${LAYER}`);
 }
 
-const { geometry } = results[0];
+const rings = feature.geometry.coordinates
+  .flat()
+  .map(ring => roundRing(simplify(ring, TOLERANZ_GRAD)));
+const vertices = rings.reduce((sum, ring) => sum + ring.length, 0);
 
-if (
-  geometry.type !== 'MultiPolygon' ||
-  geometry.coordinates.length !== 1 ||
-  geometry.coordinates[0].length !== 3
-) {
-  throw new Error(
-    `expected a MultiPolygon of one polygon with three rings, got ${geometry.type}`,
-  );
-}
+const body = rings
+  .map(
+    ring =>
+      `  [\n${ring.map(([lon, lat]) => `    [${lon}, ${lat}],`).join('\n')}\n  ],`,
+  )
+  .join('\n');
 
-const [rings] = geometry.coordinates;
-const simplified = rings.map(ring => roundRing(simplify(ring, TOLERANZ)));
-const vertices = simplified.reduce((sum, ring) => sum + ring.length, 0);
-const fetched = new Date().toISOString().slice(0, 10);
-
-const file = `/**
- * The Swiss national border: an outer ring, then the Büsingen and Campione
- * holes, each as [lon, lat] in WGS 84.
+const output = `/**
+ * Generated by scripts/wo-haere-landesgrenze.mjs. Do not edit by hand.
  *
- * Generated by scripts/wo-haere-landesgrenze.mjs. Do not edit by hand — rerun
- * the script.
+ * Switzerland's national border as [lon, lat] rings in WGS84: the outer ring
+ * first, then the holes for Büsingen am Hochrhein and Campione d'Italia.
+ * Liechtenstein lies outside it.
  *
  * Layer:     ${LAYER}
  * Source:    ${SOURCE}
- * Fetched:   ${fetched}
- * Tolerance: Douglas–Peucker at ${TOLERANZ}°, rounded to 3 decimals
+ * Fetched:   ${new Date().toISOString().slice(0, 10)}
  * SHA-256:   ${sha256}
+ * Tolerance: ${TOLERANZ_GRAD}° (Douglas-Peucker per ring), rounded to 3 decimals
+ * Vertices:  ${vertices} in ${rings.length} rings
  *
  * © swisstopo
  */
 
-export const LANDESGRENZE: readonly (readonly (readonly [number, number])[])[] =
-  ${JSON.stringify(simplified)};
+export const LANDESGRENZE: readonly (readonly (readonly [number, number])[])[] = [
+${body}
+];
 `;
 
-writeFileSync(TARGET, file);
-
+writeFileSync(TARGET, output);
 console.log(
-  `${TARGET.pathname}: ${rings.map(r => r.length).join(' + ')} vertices in, ` +
-    `${simplified.map(r => r.length).join(' + ')} = ${vertices} out, ` +
-    `${file.length} chars · sha256 ${sha256.slice(0, 12)}…`,
+  `Wrote ${vertices} vertices in ${rings.length} rings (${rings.map(ring => ring.length).join(', ')}) to ${TARGET.pathname}`,
 );

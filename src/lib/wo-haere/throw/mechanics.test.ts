@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { CH_BOUNDS, distanceKm, isInChBbox } from '@/lib/wo-haere/geo/ch';
+import { isInSchwyz } from '@/lib/wo-haere/geo/landesgrenze';
 import { ZIU } from '@/lib/wo-haere/data/ziu';
 import {
   MAX_ZUG_PX,
@@ -265,7 +266,7 @@ describe('tippZieu', () => {
     }
   });
 
-  it('sends about four fifths of throws to a curated destination', () => {
+  it('sends about 85% of throws to a curated destination', () => {
     const rand = mulberry32(13);
     let nöch = 0;
     const n = 20_000;
@@ -281,7 +282,7 @@ describe('tippZieu', () => {
       if (nöchscht <= 8.2) nöch++;
     }
 
-    expect(nöch / n).toBeGreaterThan(0.8);
+    expect(nöch / n).toBeGreaterThan(0.85);
   });
 
   it('keeps almost every throw inside the country under a real breeze', () => {
@@ -292,13 +293,36 @@ describe('tippZieu', () => {
     for (let i = 0; i < n; i++) {
       const { zieu } = tippZieu(nöieWind(rand), rand);
       if (zieu.kind !== 'ort') throw new Error('unerwartet');
-      if (isInChBbox(zieu.ort)) dinne++;
+      if (isInSchwyz(zieu.ort)) dinne++;
     }
 
     expect(dinne / n).toBeGreaterThan(0.95);
   });
 
-  it('clamps the curated branch but lets the uniform fifth drift', () => {
+  it('samples the random share inside Switzerland', () => {
+    for (let seed = 1; seed <= 1000; seed++) {
+      const rest = mulberry32(seed);
+      // A calm stil, then the uniform branch, then whatever the seed draws.
+      const züg = [0.5, 0.9];
+      const { zieu } = tippZieu(WIND, () => züg.shift() ?? rest());
+      if (zieu.kind !== 'ort') throw new Error('unerwartet');
+
+      expect(isInSchwyz(zieu.ort)).toBe(true);
+    }
+  });
+
+  it('falls back to a curated destination when every draw is abroad', () => {
+    // 0 is the south-west corner of CH_BOUNDS, which is France.
+    const züg = [0.5, 0.9];
+    const { zieu } = tippZieu(WIND, () => züg.shift() ?? 0);
+    if (zieu.kind !== 'ort') throw new Error('unerwartet');
+
+    expect(
+      distanceKm(zieu.ort, { lat: ZIU[0].lat, lon: ZIU[0].lon }),
+    ).toBeLessThan(0.001);
+  });
+
+  it('clamps the curated branch but lets the random share drift', () => {
     // A 500 km gale is absurd, but the clamp is private and this is the only door
     // to it: it pushes every throw far past the border, so anything that comes
     // back inside came back because it was clamped. Only the curated branch is.
@@ -313,9 +337,9 @@ describe('tippZieu', () => {
       if (isInChBbox(zieu.ort)) dinne++;
     }
 
-    // The 80% curated share is pulled back; the 20% uniform share is not.
-    expect(dinne / n).toBeGreaterThan(0.75);
-    expect(dinne / n).toBeLessThan(0.85);
+    // The 85% curated share is pulled back; the 15% random share is not.
+    expect(dinne / n).toBeGreaterThan(0.8);
+    expect(dinne / n).toBeLessThan(0.9);
   });
 
   it('never clamps to the very edge of the bounding box', () => {
