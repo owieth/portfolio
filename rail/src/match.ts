@@ -518,6 +518,18 @@ function strongerFirst(
 }
 
 /**
+ * Whether a line may hold a relation by `ref` next to the lines that hold it:
+ * always when none does, and otherwise only when it and each of them hold it
+ * by a number of their own.
+ */
+function canShare(ref: string | null, holders: readonly { ref: string | null }[]): boolean {
+  return (
+    holders.length === 0 ||
+    (ref !== null && holders.every(holder => holder.ref !== null && holder.ref !== ref))
+  );
+}
+
+/**
  * Hands every contested relation to the strongest claim on it, and takes it off
  * the others, until no relation is claimed twice. Losing a relation can drop a
  * line to a weaker rule, which can make it a contender somewhere else, so it is
@@ -560,11 +572,7 @@ function resolve(
       const kept: { target: Target; ref: string | null }[] = [];
 
       for (const contender of [...contenders].sort(strongerFirst)) {
-        const shares =
-          kept.length === 0 ||
-          (contender.ref !== null && kept.every(holder => holder.ref !== null && holder.ref !== contender.ref));
-
-        if (shares) {
+        if (canShare(contender.ref, kept)) {
           kept.push(contender);
           continue;
         }
