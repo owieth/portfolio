@@ -90,9 +90,9 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="en">
+    <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`}>
       <AnalyticsScripts />
-      <body className={`${GeistSans.variable} ${GeistMono.variable} font-sans`}>
+      <body className="font-sans">
         {/* Every value above is a module literal, so nothing here can carry a
             `</script>`. Escaping `<` anyway costs nothing and keeps that true
             if the graph ever grows a field fed from outside. */}
