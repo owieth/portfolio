@@ -1,4 +1,6 @@
-type Maplibre = typeof import('@/lib/maplibre/subset');
+const MAPLIBRE_URL = '/maplibre/maplibre-gl.mjs';
+
+type Maplibre = typeof import('maplibre-gl');
 
 let loading: Promise<Maplibre> | null = null;
 
@@ -22,18 +24,14 @@ let loading: Promise<Maplibre> | null = null;
  * bundler's chunk cache.
  */
 export function loadMaplibre(): Promise<Maplibre> {
-  loading ??= Promise.all([
-    import('@/lib/maplibre/subset'),
-    import('@/lib/maplibre/worker'),
-  ])
-    .then(([maplibre, { ensureMaplibreWorker }]) => {
-      ensureMaplibreWorker();
-      return maplibre;
-    })
-    .catch((error: unknown) => {
-      loading = null;
-      throw error;
-    });
+  loading ??= (
+    import(
+      /* turbopackIgnore: true */ /* webpackIgnore: true */ MAPLIBRE_URL
+    ) as Promise<Maplibre>
+  ).catch((error: unknown) => {
+    loading = null;
+    throw error;
+  });
 
   return loading;
 }
