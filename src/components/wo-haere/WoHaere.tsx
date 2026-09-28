@@ -121,6 +121,8 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
 
   const holResultat = useCallback(
     async (ort: LatLon) => {
+      // Read before the request so the result is classified by the throw that
+      // made it, whatever a later throw does to the flag meanwhile.
       const replay = replayRef.current;
       try {
         const res = await fetch(WURF_ENDPOINT, {
