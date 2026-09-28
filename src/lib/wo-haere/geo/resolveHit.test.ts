@@ -27,7 +27,12 @@ interface Antwort {
 
 let fetchMock: ReturnType<typeof vi.fn>;
 
-function stubSwisstopo(antworte: { identify?: Antwort; hoechi?: Antwort }) {
+function stubSwisstopo(antworte: {
+  identify?: Antwort;
+  /** The current-year query; defaults to the `identify` answer. */
+  identifyJahr?: Antwort;
+  hoechi?: Antwort;
+}) {
   const antwort = ({ ok = true, status = 200, body = {} }: Antwort) =>
     Promise.resolve({
       ok,
@@ -44,9 +49,12 @@ function stubSwisstopo(antworte: { identify?: Antwort; hoechi?: Antwort }) {
     });
 
   fetchMock = vi.fn((url: string, init?: RequestInit) => {
+    const identify = antworte.identify ?? { body: leer };
     const soll = url.includes('/height')
       ? (antworte.hoechi ?? { body: { height: '560.2' } })
-      : (antworte.identify ?? { body: leer });
+      : url.includes('timeInstant=')
+        ? (antworte.identifyJahr ?? identify)
+        : identify;
 
     if (soll.chlöpft) return Promise.reject(new Error('offline'));
     if (soll.hanget) return haenge(init?.signal);
