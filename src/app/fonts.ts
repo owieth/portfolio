@@ -15,3 +15,22 @@ export const GeistSans = localFont({
   ],
   variable: '--font-geist-sans',
 });
+
+export const GeistMono = localFont({
+  src: './fonts/GeistMono-Variable.woff2',
+  variable: '--font-geist-mono',
+  adjustFontFallback: false,
+  fallback: [
+    'ui-monospace',
+    'SFMono-Regular',
+    'Roboto Mono',
+    'Menlo',
+    'Monaco',
+    'Liberation Mono',
+    'DejaVu Sans Mono',
+    'Courier New',
+    'monospace',
+  ],
+  weight: '100 900',
+  preload: false,
+});
