@@ -536,10 +536,14 @@ function canShare(ref: string | null, holders: readonly { ref: string | null }[]
 }
 
 /**
- * Hands every contested relation to the strongest claim on it, and takes it off
- * the others, until no relation is claimed twice. Losing a relation can drop a
- * line to a weaker rule, which can make it a contender somewhere else, so it is
- * run until nothing changes. Relations only ever leave a claim, so it ends.
+ * Settles the lines one at a time, the strongest accepted claim first. Before
+ * each pick, an open line's claim gives up the relations that settled lines
+ * hold and will not share, and is taken again, which can drop it to a weaker
+ * rule or below `MIN_COVERAGE`. Only an accepted claim gives any up, so a line
+ * is contested only when it could have been drawn. A settled line never
+ * changes, so no winner drops out and leaves a relation to nobody, and it ends
+ * after at most one round per line and one more, which settles the rest with
+ * the claim they came nearest with, for the report.
  */
 function resolve(
   targets: readonly Target[],
