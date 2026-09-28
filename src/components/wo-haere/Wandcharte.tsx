@@ -8,7 +8,12 @@ import {
   type RefObject,
 } from 'react';
 // maplibre-gl v6 has no default export — named imports only.
-import { Map as MlMap, Marker, type StyleSpecification } from 'maplibre-gl';
+import {
+  LngLat,
+  Map as MlMap,
+  Marker,
+  type StyleSpecification,
+} from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
 import { track } from '@/lib/analytics/track';
@@ -48,6 +53,12 @@ export interface WandcharteHandle {
    * land back on the same pixel.
    */
   pixelZuOrt(x: number, y: number): LatLon | null;
+  /**
+   * Coordinate to screen pixel. Returns null when the coordinate is on the far
+   * side of the globe — projecting it still yields a pixel inside the globe
+   * disc, so the pixel is unprojected and rejected if it does not land back
+   * near the coordinate.
+   */
   ortZuPixel(ort: LatLon): { x: number; y: number } | null;
   zeigOrt(ort: LatLon): void;
   container(): HTMLDivElement | null;
@@ -153,9 +164,14 @@ export default function Wandcharte({
       const map = mapRef.current;
       if (!map) return null;
       const p = map.project([ort.lon, ort.lat]);
-      return Number.isFinite(p.x) && Number.isFinite(p.y)
-        ? { x: p.x, y: p.y }
-        : null;
+      if (!Number.isFinite(p.x) || !Number.isFinite(p.y)) return null;
+
+      // Far-side guard: on the globe, unproject returns the near-side point
+      // under a pixel, so a coordinate behind the horizon comes back elsewhere.
+      const back = map.unproject(p);
+      if (back.distanceTo(new LngLat(ort.lon, ort.lat)) > 1000) return null;
+
+      return { x: p.x, y: p.y };
     },
     zeigOrt(ort) {
       const map = mapRef.current;
