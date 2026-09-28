@@ -116,7 +116,7 @@ function zugUfsZiel(mech, chraft) {
   return { vo: { x: ZIEL.x - flug.x, y: ZIEL.y - flug.y }, delta };
 }
 
-async function simuliere(chraft) {
+function simuliere(chraft) {
   const missKm = [];
   let abBrett = 0;
   const zug = zugUfsZiel(mech, chraft);
@@ -154,7 +154,7 @@ const zeile = (a, b, c, d) =>
 console.log(zeile('Force', 'σ', 'Median miss', 'Off the board'));
 
 for (const chraft of CHREFT) {
-  const r = await simuliere(chraft);
+  const r = simuliere(chraft);
   console.log(
     zeile(
       `${Math.round(r.chraft * 100)}%`,
