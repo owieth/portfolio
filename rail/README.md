@@ -902,6 +902,13 @@ its id, a stop by its line and its sequence number. It is a dry run unless
 - A row in both gets the feed's value in every field it changed, except the
   fields in its `edited_fields`. Those keep the edit and are listed as skipped,
   with both values.
+- A stop that carries a hand edit, and whose sequence number now names a
+  different station, stops the reconcile, both the dry run and `--apply`. That
+  happens when the feed inserts a station into the middle of a line: the edit
+  was made on the station that moved to the next number. The station is told
+  apart by its Didok, or its Sloid when either side lacks one. The error lists
+  every such stop. Clear `edited_fields` on those rows, apply, then redo the
+  edit on the row where the station is now.
 - A row in the table and not in the CSVs gets `missing_since`, the day a
   reconcile first found it gone, and stays. Rides may already reference it. If
   it comes back, the date is cleared.
