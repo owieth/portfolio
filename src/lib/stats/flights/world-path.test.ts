@@ -14,10 +14,11 @@ const numbers = WORLD_PATH.split(/[MLZ]/)
 
 describe('WORLD_PATH_WINDOW', () => {
   it('is the window the path was generated against', () => {
-    // The drift guard, and the whole reason the generator writes the window
-    // out beside the path. Retune MAP_WINDOW without `pnpm og:world` and the
-    // coastlines stop lining up with the routes drawn over them — silently,
-    // because both halves still render perfectly well on their own.
+    // One half of the drift guard, and the reason the generator writes the
+    // window and the size out beside the path. Retune MAP_WINDOW without
+    // `pnpm og:world` and the coastlines stop lining up with the routes drawn
+    // over them — silently, because both halves still render perfectly well
+    // on their own.
     expect(WORLD_PATH_WINDOW).toEqual(MAP_WINDOW);
   });
 });
