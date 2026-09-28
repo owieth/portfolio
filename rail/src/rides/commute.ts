@@ -213,7 +213,9 @@ export function allocate(
     .map((value, index) => ({ index, fraction: value - Math.floor(value) }))
     .sort((a, b) => b.fraction - a.fraction || a.index - b.index);
 
-  for (let i = 0; i < rest - counts.reduce((sum, count) => sum + count, 0); i += 1) {
+  const deficit = rest - counts.reduce((sum, count) => sum + count, 0);
+
+  for (let i = 0; i < deficit; i += 1) {
     counts[order[i % order.length].index] += 1;
   }
 
