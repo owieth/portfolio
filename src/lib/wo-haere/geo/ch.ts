@@ -95,3 +95,13 @@ export function offset(origin: LatLon, km: number, bearing: number): LatLon {
 export function isWasser(gdeNr: number | null | undefined): boolean {
   return typeof gdeNr === 'number' && gdeNr >= 9000 && gdeNr <= 9999;
 }
+
+/**
+ * The Gemeinde layer also carries a few foreign municipalities as current
+ * records with an empty canton, numbered from 7000: Liechtenstein (7001-7011),
+ * Büsingen am Hochrhein (7101) and Campione d'Italia (7301). Swiss numbers
+ * end in the 68xx range, so the whole block is abroad.
+ */
+export function isUsland(gdeNr: number | null | undefined): boolean {
+  return typeof gdeNr === 'number' && gdeNr >= 7000 && gdeNr <= 7999;
+}
