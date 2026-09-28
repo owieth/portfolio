@@ -63,12 +63,20 @@ const identifyUrl = () =>
       .find(url => url.includes('/identify'))!,
   );
 
+const laufAbSofort = () =>
+  vi
+    .spyOn(AbortSignal, 'timeout')
+    .mockImplementation(() =>
+      AbortSignal.abort(new DOMException('timed out', 'TimeoutError')),
+    );
+
 beforeEach(() => {
   stubSwisstopo({});
 });
 
 afterEach(() => {
   vi.unstubAllGlobals();
+  vi.restoreAllMocks();
 });
 
 describe('resolveHit', () => {
@@ -209,6 +217,13 @@ describe('resolveHit', () => {
     await expect(resolveHit(THUN)).rejects.toThrow(
       'swisstopo identify failed with 500',
     );
+  });
+
+  it('rejects when identify stalls', async () => {
+    laufAbSofort();
+    stubSwisstopo({ identify: { hanget: true } });
+
+    await expect(resolveHit(THUN)).rejects.toThrow();
   });
 
   it('falls back to a missing canton and gde_nr instead of undefined', async () => {
