@@ -18,7 +18,11 @@ import { copyFile, mkdir } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
 
-const FILES = ['maplibre-gl-worker.mjs', 'maplibre-gl-shared.mjs'];
+const FILES = [
+  'maplibre-gl.mjs',
+  'maplibre-gl-worker.mjs',
+  'maplibre-gl-shared.mjs',
+];
 
 const dist = dirname(
   createRequire(import.meta.url).resolve('maplibre-gl/dist/maplibre-gl.mjs'),
