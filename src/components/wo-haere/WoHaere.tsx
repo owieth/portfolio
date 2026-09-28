@@ -121,8 +121,6 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
 
   const holResultat = useCallback(
     async (ort: LatLon) => {
-      // Read before the request: a throw made before the map loaded can still
-      // be in flight when the replay starts and sets the flag.
       const replay = replayRef.current;
       try {
         const res = await fetch(WURF_ENDPOINT, {
