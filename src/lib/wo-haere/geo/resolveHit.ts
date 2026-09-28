@@ -4,6 +4,7 @@ import {
   distanceKm,
   himmurichtig,
   isInChBbox,
+  isUsland,
   isWasser,
   snapToGrid,
   type LatLon,
@@ -94,6 +95,9 @@ async function fetchHoechi(lon: number, lat: number): Promise<number | null> {
  *   - historical records only -> border water such as the French part of Léman
  *   - nothing at all          -> abroad
  *
+ * The layer also holds a few foreign municipalities as current records
+ * (BFS 7xxx: Liechtenstein, Büsingen, Campione). Those count as abroad too.
+ *
  * The point is snapped to the grid first: this is the only place the app talks
  * to swisstopo, so snapping here keeps every upstream URL cache-aligned and
  * stops a caller from walking coordinates to generate unbounded requests.
@@ -125,6 +129,11 @@ export async function resolveHit(rawPoint: LatLon): Promise<Wurf> {
   }
 
   const { gemname, kanton, gde_nr: gdeNr } = current.attributes;
+
+  if (isUsland(gdeNr)) {
+    return { art: 'dernaebe', grund: 'usland', lat, lon };
+  }
+
   const hoechi = await fetchHoechi(lon, lat);
 
   return {
