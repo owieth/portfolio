@@ -262,12 +262,13 @@ describe('resolveHit', () => {
     // A bogus extent makes identify return zero results instead of an error,
     // which is indistinguishable from "abroad". These assertions are the only
     // thing standing between a typo here and every Swiss throw reading as usland.
+    // An empty year answer forces the all-years fallback, so both URLs are checked.
     it('brackets the queried point', async () => {
-      stubSwisstopo({ identify: { body: thun } });
+      stubSwisstopo({ identifyJahr: { body: leer }, identify: { body: thun } });
       await resolveHit(THUN);
 
       const urls = identifyUrls();
-      expect(urls).toHaveLength(1);
+      expect(urls).toHaveLength(2);
 
       for (const url of urls) {
         const [west, south, east, north] = url.searchParams
@@ -283,11 +284,11 @@ describe('resolveHit', () => {
     });
 
     it('asks in the same reference system it sends coordinates in', async () => {
-      stubSwisstopo({ identify: { body: thun } });
+      stubSwisstopo({ identifyJahr: { body: leer }, identify: { body: thun } });
       await resolveHit(THUN);
 
       const urls = identifyUrls();
-      expect(urls).toHaveLength(1);
+      expect(urls).toHaveLength(2);
 
       for (const url of urls) {
         const params = url.searchParams;
