@@ -157,6 +157,81 @@ describe('planReconcile', () => {
     expect(isEmpty(plan)).toBe(false);
   });
 
+  it('refuses to carry a stop edit onto the station that took its place', () => {
+    const state: State = {
+      lines: [storedLine(IR35)],
+      stops: [
+        storedStop(stop(IR35, 1, 'Bern')),
+        storedStop(
+          { ...stop(IR35, 2, 'Luzern'), didok: '8505000', stop_name: 'Luzern (corrected)' },
+          { edited_fields: ['stop_name'] },
+        ),
+      ],
+    };
+    const next: Feed = {
+      lines: [IR35],
+      stops: [
+        stop(IR35, 1, 'Bern'),
+        { ...stop(IR35, 2, 'Olten'), didok: '8500218' },
+        { ...stop(IR35, 3, 'Luzern'), didok: '8505000' },
+      ],
+    };
+
+    expect(() => planReconcile(next, state)).toThrow(
+      /fernverkehr:IR35 #2 is now Olten \(8500218\), but its edits to stop_name were made on Luzern \(corrected\) \(8505000\)/,
+    );
+  });
+
+  it('plans a shifted stop normally when nobody edited it', () => {
+    const state: State = {
+      lines: [storedLine(IR35)],
+      stops: [
+        storedStop(stop(IR35, 1, 'Bern')),
+        storedStop({ ...stop(IR35, 2, 'Luzern'), didok: '8505000' }),
+      ],
+    };
+    const next: Feed = {
+      lines: [IR35],
+      stops: [
+        stop(IR35, 1, 'Bern'),
+        { ...stop(IR35, 2, 'Olten'), didok: '8500218' },
+        { ...stop(IR35, 3, 'Luzern'), didok: '8505000' },
+      ],
+    };
+
+    const plan = planReconcile(next, state);
+
+    expect(plan.stops.inserts.map(row => [row.sequence, row.didok])).toEqual([
+      [3, '8505000'],
+    ]);
+    expect(plan.stops.updates.map(update => [update.label, update.set])).toEqual([
+      ['fernverkehr:IR35 #2', { stop_name: 'Olten', didok: '8500218' }],
+    ]);
+  });
+
+  it('keeps a hand-corrected didok as a skipped field', () => {
+    const state: State = {
+      lines: [storedLine(IR35)],
+      stops: [
+        storedStop(
+          { ...stop(IR35, 2, 'Luzern'), didok: '8505999' },
+          { edited_fields: ['didok'] },
+        ),
+      ],
+    };
+    const next: Feed = {
+      lines: [IR35],
+      stops: [{ ...stop(IR35, 2, 'Luzern'), didok: '8505000' }],
+    };
+
+    const plan = planReconcile(next, state);
+
+    expect(plan.stops.skipped.map(skip => [skip.field, skip.kept, skip.feed])).toEqual([
+      ['didok', '8505999', '8505000'],
+    ]);
+    expect(plan.stops.updates).toEqual([]);
+  });
+
   it('refuses a feed with one key twice', () => {
     expect(() => planReconcile({ ...FEED, lines: [IR35, IR35] }, seeded())).toThrow(
       'lines.csv has fernverkehr:IR35 twice',
