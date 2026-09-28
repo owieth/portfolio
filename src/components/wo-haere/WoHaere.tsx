@@ -217,6 +217,9 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
    * A shared ?wurf= link replays that throw once the map is able to project
    * coordinates — doing it here rather than in an effect avoids racing map
    * initialisation.
+   *
+   * A visitor who threw before the map loaded keeps their dart: the replay is
+   * skipped rather than taking over a throw that is still in flight.
    */
   const charteZwaeg = useCallback(() => {
     if (!startWurf) return;
