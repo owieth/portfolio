@@ -37,4 +37,22 @@ describe('fetchFeed from the official source', () => {
     await expect(fetchFeed(OFFICIAL, silent)).rejects.toThrow(/no such timetable year/);
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
+
+  it('names the mirror when the portal answers 5xx', async () => {
+    stubFetch(() =>
+      Promise.resolve(new Response('down', { status: 503, statusText: 'Service Unavailable' })),
+    );
+
+    const failure = expect(fetchFeed(OFFICIAL, silent)).rejects.toThrow(
+      expect.objectContaining({
+        message: expect.stringMatching(/--source geops/),
+        cause: expect.objectContaining({ message: expect.stringContaining('answered 503') }),
+      }),
+    );
+    await vi.advanceTimersByTimeAsync(2_000);
+
+    await failure;
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
 });
