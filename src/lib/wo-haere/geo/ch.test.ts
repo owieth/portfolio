@@ -175,37 +175,24 @@ describe('isInChBbox', () => {
 
 describe('isWasser', () => {
   it.each([
-    'Thunersee',
-    'Bielersee',
-    'Zürichsee',
-    'Vierwaldstättersee',
-    'Brienzersee',
-    'Seeli',
-    'Lac Léman',
-    'Lac de Neuchâtel',
-    'Lago Maggiore',
-    'Lago di Lugano',
-    'Lej da Segl',
-    'Lai da Marmorera',
-  ])('recognises %s', name => {
-    expect(isWasser(name)).toBe(true);
+    ['Greifensee lake', 9040],
+    ['Zürichsee (ZH)', 9051],
+    ['Thunersee', 9073],
+    ['Brienzersee', 9089],
+    ['Bielersee (BE)', 9149],
+    ['Lac de Neuchâtel (NE)', 9155],
+    ['Bodensee (SG)', 9328],
+    ['Bodensee (TG)', 9329],
+  ])('recognises %s (%s)', (_name, gdeNr) => {
+    expect(isWasser(gdeNr)).toBe(true);
   });
 
   it.each([
-    'Bärn',
-    'Seedorf',
-    'Seengen',
-    'Sempach',
-    'Zermatt',
-    'Lausanne',
-    'Locarno',
-    'Laax',
-  ])('leaves %s on dry land', name => {
-    expect(isWasser(name)).toBe(false);
-  });
-
-  it('ignores case, since swisstopo is not consistent about it', () => {
-    expect(isWasser('THUNERSEE')).toBe(true);
-    expect(isWasser('lago maggiore')).toBe(true);
+    ['Greifensee village', 194],
+    ['Beinwil am See', 4131],
+    ['Oberhofen am Thunersee', 934],
+    ['Thun', 942],
+  ])('leaves %s (%s) on dry land', (_name, gdeNr) => {
+    expect(isWasser(gdeNr)).toBe(false);
   });
 });

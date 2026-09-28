@@ -89,8 +89,6 @@ export function offset(origin: LatLon, km: number, bearing: number): LatLon {
  * swisstopo returns lakes as "Gemeinden" too, with the lake as the name.
  * That is how the app detects water without shipping any polygons.
  */
-export function isWasser(gemname: string): boolean {
-  return (
-    /(see|seeli)$/i.test(gemname) || /^(lac|lago|lej|lai)\b/i.test(gemname)
-  );
+export function isWasser(gdeNr: number | null | undefined): boolean {
+  return typeof gdeNr === 'number' && gdeNr >= 9000 && gdeNr <= 9999;
 }

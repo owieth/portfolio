@@ -135,7 +135,7 @@ export async function resolveHit(rawPoint: LatLon): Promise<Wurf> {
     kanton: kanton ?? '',
     gdeNr: gdeNr ?? null,
     hoechi,
-    wasser: isWasser(gemname),
+    wasser: isWasser(gdeNr),
     distanzKm: distanceKm(BAERN, point),
     richtig: himmurichtig(BAERN, point),
   };
