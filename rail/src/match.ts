@@ -204,6 +204,12 @@ interface Claim {
   accepted: boolean;
 }
 
+/** A settled line's hold on a relation, by the `ref` that named it or none. */
+interface Holder {
+  id: string;
+  ref: string | null;
+}
+
 function count(value: number): string {
   return value.toLocaleString('en-US');
 }
@@ -541,54 +547,61 @@ function resolve(
 ): { claims: Map<string, Claim | null>; lostTo: Map<string, Set<string>> } {
   const lost = new Map(targets.map(target => [target.line.id, new Set<number>()]));
   const lostTo = new Map(targets.map(target => [target.line.id, new Set<string>()]));
+  const holders = new Map<number, Holder[]>();
+  const settled = new Map<string, Claim | null>();
+
+  const blockers = (option: Option): Holder[] => {
+    const held = holders.get(option.relation) ?? [];
+
+    return canShare(option.ref, held) ? [] : held;
+  };
+
+  const claimFor = (target: Target): Claim | null => {
+    const id = target.line.id;
+    const without = lost.get(id) ?? new Set<number>();
+
+    for (;;) {
+      const claim = claimOf(target, options.get(id) ?? [], without);
+      const blocked =
+        claim?.accepted === true ? claim.options.filter(option => blockers(option).length > 0) : [];
+
+      if (blocked.length === 0) {
+        return claim;
+      }
+
+      for (const option of blocked) {
+        without.add(option.relation);
+
+        for (const holder of blockers(option)) {
+          lostTo.get(id)?.add(holder.id);
+        }
+      }
+    }
+  };
 
   for (;;) {
-    const claims = new Map(
-      targets.map(target => [
-        target.line.id,
-        claimOf(target, options.get(target.line.id) ?? [], lost.get(target.line.id) ?? new Set()),
-      ]),
-    );
-    const claimants = new Map<number, { target: Target; claim: Claim; ref: string | null }[]>();
+    const open = targets
+      .filter(target => !settled.has(target.line.id))
+      .map(target => ({ target, claim: claimFor(target) }));
+    const [winner] = open
+      .flatMap(({ target, claim }) => (claim?.accepted === true ? [{ target, claim }] : []))
+      .sort(strongerFirst);
 
-    for (const target of targets) {
-      const claim = claims.get(target.line.id);
-
-      if (claim?.accepted !== true) {
-        continue;
+    if (winner === undefined) {
+      for (const { target, claim } of open) {
+        settled.set(target.line.id, claim);
       }
 
-      for (const option of claim.options) {
-        claimants.set(option.relation, [
-          ...(claimants.get(option.relation) ?? []),
-          { target, claim, ref: option.ref },
-        ]);
-      }
+      return { claims: settled, lostTo };
     }
 
-    let changed = false;
+    settled.set(winner.target.line.id, winner.claim);
 
-    for (const [relation, contenders] of claimants) {
-      const kept: { target: Target; ref: string | null }[] = [];
-
-      for (const contender of [...contenders].sort(strongerFirst)) {
-        if (canShare(contender.ref, kept)) {
-          kept.push(contender);
-          continue;
-        }
-
-        lost.get(contender.target.line.id)?.add(relation);
-
-        for (const holder of kept) {
-          lostTo.get(contender.target.line.id)?.add(holder.target.line.id);
-        }
-
-        changed = true;
-      }
-    }
-
-    if (!changed) {
-      return { claims, lostTo };
+    for (const option of winner.claim.options) {
+      holders.set(option.relation, [
+        ...(holders.get(option.relation) ?? []),
+        { id: winner.target.line.id, ref: option.ref },
+      ]);
     }
   }
 }
