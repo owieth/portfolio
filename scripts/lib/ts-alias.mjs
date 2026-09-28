@@ -9,9 +9,6 @@
  * top-level `await import()` rather than a static import: Node resolves an
  * entire static import graph before evaluating a single line of it, so a
  * static import would hit an unresolved `@/` long before the hook is armed.
- *
- * The query string is carried through so a caller can force a fresh module
- * instance with `@/…/mechanics?session=3`.
  */
 
 import { registerHooks } from 'node:module';
