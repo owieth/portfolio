@@ -23,14 +23,20 @@ import { mulberry32, type Rand } from '@/lib/wo-haere/throw/rng';
  * The geometry mirrors the app: a 1280×800 map, so `brettRadius` is
  * min(1280, 800) / 2 = 400 (Wurfsteuerig.tsx), with `CH_BOUNDS` fitted into it
  * at `padding: 24` (Wandcharte.tsx). That fit is what turns a pixel miss into
- * kilometres and decides whether a dart left the country.
+ * kilometres and places each landing on the map.
  *
  * Measured at SEED = 20260817, 50k throws per force:
  *
  *   force    σ          median miss        off Switzerland
- *     0%     60.8 px     76.0 px / 22.4 km    0.04%
- *    50%    106.4 px    135.8 px / 40.0 km    1.40%
- *   100%    152.0 px    196.7 px / 57.9 km    7.25%
+ *     0%     60.8 px     76.0 px / 22.4 km    1.60%
+ *    50%    106.4 px    135.8 px / 40.0 km    7.76%
+ *   100%    152.0 px    196.7 px / 57.9 km   20.72%
+ *
+ * "Off Switzerland" is measured against swisstopo's national border
+ * (`isInSchwyz`), which is where the app fires a Dernäbe card. The `CH_BOUNDS`
+ * rectangle takes in large parts of the neighbours and reads only 7.25% at full
+ * force. About a fifth of full-force throws at the middle of the map leaving
+ * the country is intended.
  *
  * Averaged over the arm bias the pixel medians come out at 76 / 133 / 190; this
  * seed draws an arm that pulls a little, which is worth a few percent. Hence the
@@ -39,9 +45,10 @@ import { mulberry32, type Rand } from '@/lib/wo-haere/throw/rng';
  * The case-study page publishes 24/42/61 km and 0.1%/1.6%/7.8%. Those came from
  * a run with a slightly wider map fit (~5.6% padding rather than the 3% that
  * `padding: 24` works out to), so the bands below are wide enough to hold both
- * sets of numbers. The one that matters is the upper bound at full force: an
- * earlier calibration ran to 23% off-board, and that is what this file exists
- * to catch.
+ * sets of numbers. The one that matters is the guard at full force: an
+ * earlier calibration ran to 23% off the board, and that is what this file
+ * exists to catch. At today's σ the border rate is about 2.4 times the board
+ * rate, so that calibration would land well above the guard's 25%.
  */
 const SEED = 20260817;
 const WÜRF = 50_000;
@@ -183,7 +190,8 @@ describe('σ calibration', () => {
   });
 
   it('never goes back to burying the player in Dernäbe cards', () => {
-    // The regression this whole file exists for.
+    // The regression this whole file exists for. The old calibration's 23% off
+    // the board would be well past this.
     expect(vou.dernaebeAateil).toBeLessThan(0.25);
   });
 
