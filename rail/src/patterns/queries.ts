@@ -10,7 +10,7 @@
  * thousand patterns, and that is all the step reads back.
  */
 
-import { STORE } from '../db.ts';
+import { literal, STORE } from '../db.ts';
 import type { GtfsFile } from '../db.ts';
 
 /**
@@ -45,11 +45,6 @@ export const TABLES = `
 
 export interface TableRow {
   table_name: string;
-}
-
-/** Single-quoted SQL literal, the same escaping `db.ts` uses for a path. */
-function literal(value: string): string {
-  return `'${value.replaceAll("'", "''")}'`;
 }
 
 /**
