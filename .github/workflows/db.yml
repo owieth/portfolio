@@ -1,0 +1,86 @@
+name: Database
+
+# Applies the migrations and both seeds to a local Supabase, then runs the rail
+# tests that need a database: the reconcile's reads and writes, and the
+# edit-tracking trigger. Only on changes to the schema, the seeds or the
+# reconcile, so `build.yml` stays fast. Never touches the hosted project:
+# production migrations and seeds stay a manual push.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - supabase/**
+      - rail/src/reconcile/**
+      - rail/src/reconcile.ts
+      - rail/src/diff/csv.ts
+      - rail/src/emit/csv.ts
+      - rail/src/merge/key.ts
+      - rail/src/dbseed/**
+      - rail/src/dbseed.ts
+      - rail/lines.csv
+      - rail/line_stops.csv
+      - pnpm-lock.yaml
+      - .github/workflows/db.yml
+  pull_request:
+    paths:
+      - supabase/**
+      - rail/src/reconcile/**
+      - rail/src/reconcile.ts
+      - rail/src/diff/csv.ts
+      - rail/src/emit/csv.ts
+      - rail/src/merge/key.ts
+      - rail/src/dbseed/**
+      - rail/src/dbseed.ts
+      - rail/lines.csv
+      - rail/line_stops.csv
+      - pnpm-lock.yaml
+      - .github/workflows/db.yml
+
+concurrency:
+  group: db-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  db:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - uses: supabase/setup-cli@46f7f98c7f948ad727d22c1e67fab04c223a0520 # v3.0.0
+        with:
+          version: 2.117.0
+
+      # On a fresh runner this applies the migrations, then the `[db.seed]` files.
+      - run: supabase db start
+
+      # Against the seed's own tuple count, so the December refresh needs no edit here.
+      - name: Check the rides seed loaded
+        env:
+          URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
+        run: |
+          loaded="$(psql "$URL" -tAc 'select count(*) from public.rail_rides')"
+          seeded="$(grep -c '^  (' supabase/seeds/rail_rides.sql)"
+          echo "rail_rides: $loaded loaded, $seeded in the seed"
+          test "$loaded" -eq "$seeded"
+
+      - name: Run the database tests
+        env:
+          RAIL_TEST_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
+        run: >
+          pnpm exec vitest run rail/src/reconcile/db.test.ts rail/src/reconcile.test.ts
+          --reporter=default --reporter=json --outputFile.json=vitest-db.json
+
+      # A skipped suite passes silently, so a mistyped variable name fails here.
+      - name: Check no test was skipped
+        run: jq -e '.numPendingTests == 0 and .numFailedTests == 0' vitest-db.json
