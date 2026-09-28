@@ -87,6 +87,10 @@ describe('allocate', () => {
     }
   });
 
+  it('gives one pre-move Zug day fewer its whole pool', () => {
+    expect(allocate(POOLS.zurichZug, 388).map(({ count }) => count)).toEqual([30, 251, 18, 89]);
+  });
+
   it('gives a single line the whole pool', () => {
     expect(allocate([{ line: 'S9' }], 7)).toEqual([{ key: 'S9', count: 7 }]);
   });
