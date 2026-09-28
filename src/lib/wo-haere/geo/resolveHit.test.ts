@@ -56,12 +56,11 @@ function stubSwisstopo(antworte: { identify?: Antwort; hoechi?: Antwort }) {
   vi.stubGlobal('fetch', fetchMock);
 }
 
-const identifyUrl = () =>
-  new URL(
-    fetchMock.mock.calls
-      .map(([url]) => url as string)
-      .find(url => url.includes('/identify'))!,
-  );
+const identifyUrls = () =>
+  fetchMock.mock.calls
+    .map(([url]) => url as string)
+    .filter(url => url.includes('/identify'))
+    .map(url => new URL(url));
 
 const laufAbSofort = () =>
   vi
@@ -259,27 +258,37 @@ describe('resolveHit', () => {
       stubSwisstopo({ identify: { body: thun } });
       await resolveHit(THUN);
 
-      const [west, south, east, north] = identifyUrl()
-        .searchParams.get('mapExtent')!
-        .split(',')
-        .map(Number);
+      const urls = identifyUrls();
+      expect(urls).toHaveLength(1);
 
-      expect(west).toBeLessThan(THUN.lon);
-      expect(east).toBeGreaterThan(THUN.lon);
-      expect(south).toBeLessThan(THUN.lat);
-      expect(north).toBeGreaterThan(THUN.lat);
+      for (const url of urls) {
+        const [west, south, east, north] = url.searchParams
+          .get('mapExtent')!
+          .split(',')
+          .map(Number);
+
+        expect(west).toBeLessThan(THUN.lon);
+        expect(east).toBeGreaterThan(THUN.lon);
+        expect(south).toBeLessThan(THUN.lat);
+        expect(north).toBeGreaterThan(THUN.lat);
+      }
     });
 
     it('asks in the same reference system it sends coordinates in', async () => {
       stubSwisstopo({ identify: { body: thun } });
       await resolveHit(THUN);
 
-      const params = identifyUrl().searchParams;
+      const urls = identifyUrls();
+      expect(urls).toHaveLength(1);
 
-      expect(params.get('sr')).toBe('4326');
-      expect(params.get('tolerance')).toBe('0');
-      expect(params.get('geometry')).toBe(`${THUN.lon},${THUN.lat}`);
-      expect(params.get('imageDisplay')).toBe('800,600,96');
+      for (const url of urls) {
+        const params = url.searchParams;
+
+        expect(params.get('sr')).toBe('4326');
+        expect(params.get('tolerance')).toBe('0');
+        expect(params.get('geometry')).toBe(`${THUN.lon},${THUN.lat}`);
+        expect(params.get('imageDisplay')).toBe('800,600,96');
+      }
     });
   });
 
