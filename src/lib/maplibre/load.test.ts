@@ -1,11 +1,13 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-
-import { ensureMaplibreWorker } from '@/lib/maplibre/worker';
+import { describe, expect, it, vi } from 'vitest';
 
 const MlMap = vi.hoisted(() => vi.fn());
+const worker = vi.hoisted(() => ({ loads: 0, ensureMaplibreWorker: vi.fn() }));
 
-vi.mock('@/lib/maplibre/subset', () => ({ Map: MlMap }));
-vi.mock('@/lib/maplibre/worker', () => ({ ensureMaplibreWorker: vi.fn() }));
+vi.mock('/maplibre/maplibre-gl.mjs', () => ({ Map: MlMap }));
+vi.mock('@/lib/maplibre/worker', () => {
+  worker.loads += 1;
+  return { ensureMaplibreWorker: worker.ensureMaplibreWorker };
+});
 
 /**
  * The memo lives at module scope, so each case re-imports the loader after
@@ -17,10 +19,6 @@ const importLoader = async () => {
   return (await import('@/lib/maplibre/load')).loadMaplibre;
 };
 
-beforeEach(() => {
-  vi.mocked(ensureMaplibreWorker).mockReset();
-});
-
 describe('loadMaplibre', () => {
   it('returns one promise however often it is called', async () => {
     const loadMaplibre = await importLoader();
@@ -31,28 +29,26 @@ describe('loadMaplibre', () => {
     const maplibre = await first;
     expect(loadMaplibre()).toBe(first);
     expect(maplibre.Map).toBe(MlMap);
-    expect(ensureMaplibreWorker).toHaveBeenCalledOnce();
   });
 
-  it('points the worker before it resolves', async () => {
+  it('does not configure the bundled worker', async () => {
     const loadMaplibre = await importLoader();
-    const order: string[] = [];
-    vi.mocked(ensureMaplibreWorker).mockImplementation(() => {
-      order.push('worker');
-    });
 
-    await loadMaplibre().then(() => order.push('resolved'));
+    await loadMaplibre();
 
-    expect(order).toEqual(['worker', 'resolved']);
+    // Importing `worker.ts` at all, called or not, would bundle MapLibre back
+    // into /stats.
+    expect(worker.loads).toBe(0);
+    expect(worker.ensureMaplibreWorker).not.toHaveBeenCalled();
   });
 
   it('retries after a failed import', async () => {
     // Re-registered here because the hoisted mock has already loaded, and
     // vitest keeps a mocked module that loaded across `vi.resetModules()`.
     let imports = 0;
-    vi.doMock('@/lib/maplibre/subset', () => {
+    vi.doMock('/maplibre/maplibre-gl.mjs', () => {
       imports += 1;
-      if (imports === 1) throw new Error('chunk failed to load');
+      if (imports === 1) throw new Error('module failed to load');
       return { Map: MlMap };
     });
     const loadMaplibre = await importLoader();
