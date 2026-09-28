@@ -8,7 +8,9 @@
  * - in the feed and not the database: inserted, and listed for review;
  * - in both: every field the feed changed is written, unless the field is in
  *   the row's `edited_fields`, in which case the edit stays and the field is
- *   listed as skipped;
+ *   listed as skipped. A hand-edited stop whose sequence number now names a
+ *   different station refuses the whole plan, because its edit was made on the
+ *   station that moved;
  * - in the database and not the feed: flagged with `missing_since`, never
  *   deleted, because rides may already reference it. A row that was flagged and
  *   is back in the feed has the flag cleared.
@@ -76,6 +78,10 @@ interface Table<Row> {
   fields: readonly (keyof Row & string)[];
   label: (row: Row) => string;
   name: (row: Row) => string;
+  /** Whether a key-matched row still describes the same place. */
+  sameStation?: (feed: Row, stored: Row & Tracked) => boolean;
+  /** The row's place, as a refusal names it. */
+  station?: (row: Row) => string;
 }
 
 const LINES: Table<FeedLine> = {
@@ -86,12 +92,29 @@ const LINES: Table<FeedLine> = {
   name: line => line.display_name,
 };
 
+/** A stop's station, by the first of these both sides have and nobody edited. */
+const STATION_IDS = ['didok', 'sloid'] as const;
+
 const STOPS: Table<FeedStop> = {
   file: 'line_stops.csv',
   keys: ['line_id', 'sequence'],
   fields: STOP_FIELDS,
   label: stop => `${stop.line_id} #${stop.sequence}`,
   name: stop => stop.stop_name,
+  sameStation: (feed, stored) => {
+    for (const field of STATION_IDS) {
+      if (stored.edited_fields.includes(field)) {
+        continue;
+      }
+
+      if (feed[field] !== null && stored[field] !== null) {
+        return feed[field] === stored[field];
+      }
+    }
+
+    return true;
+  },
+  station: stop => `${stop.stop_name} (${stop.didok ?? stop.sloid ?? 'no Didok'})`,
 };
 
 function targetOf<Row>(table: Table<Row>, row: Row): Target {
@@ -128,6 +151,7 @@ function planTable<Row>(
 ): TablePlan<Row> {
   const stored = new Map(database.map(row => [identity(table, row), row]));
   const seen = new Set<string>();
+  const moved: string[] = [];
   const plan: TablePlan<Row> = {
     inserts: [],
     updates: [],
@@ -151,6 +175,15 @@ function planTable<Row>(
 
     if (current === undefined) {
       plan.inserts.push(row);
+      continue;
+    }
+
+    if (current.edited_fields.length > 0 && table.sameStation?.(row, current) === false) {
+      const station = table.station ?? table.name;
+      moved.push(
+        `${table.label(row)} is now ${station(row)}, but its edits to ` +
+          `${current.edited_fields.join(', ')} were made on ${station(current)}`,
+      );
       continue;
     }
 
@@ -182,6 +215,16 @@ function planTable<Row>(
     } else if (current.missing_since === null) {
       plan.unchanged += 1;
     }
+  }
+
+  if (moved.length > 0) {
+    throw new Error(
+      [
+        `${table.file} would move hand edits onto another station:`,
+        ...moved.map(row => `- ${row}`),
+        'Clear edited_fields on those rows, apply, then redo the edit where the station moved.',
+      ].join('\n'),
+    );
   }
 
   for (const [id, row] of stored) {
