@@ -23,8 +23,7 @@ export function registerAlias() {
     resolve(specifier, context, nextResolve) {
       if (!specifier.startsWith('@/')) return nextResolve(specifier, context);
 
-      const [path, query] = specifier.slice(2).split('?');
-      const ziel = new URL(`${path}.ts${query ? `?${query}` : ''}`, SRC);
+      const ziel = new URL(`${specifier.slice(2)}.ts`, SRC);
       return nextResolve(ziel.href, context);
     },
   });
