@@ -4,7 +4,9 @@ import AirlineChip from '@/components/stats/AirlineChip';
 import CountryFlags from '@/components/stats/CountryFlags';
 import FlightGlobe from '@/components/stats/FlightGlobe';
 import HaulMix from '@/components/stats/HaulMix';
+import Named from '@/components/stats/Named';
 import RailMap from '@/components/stats/RailMap';
+import RideLog from '@/components/stats/RideLog';
 import { aircraft as aircraftType } from '@/lib/stats/flights/aircraft';
 import { airline } from '@/lib/stats/flights/airlines';
 import {
@@ -26,6 +28,7 @@ import {
 import type { FlightLeg } from '@/lib/stats/flights/types';
 import { formatShare } from '@/lib/stats/rail/format';
 import { loadRailGeometry } from '@/lib/stats/rail/geometry';
+import { toLogTable } from '@/lib/stats/rail/log';
 import { mapLines } from '@/lib/stats/rail/map';
 import { loadRail } from '@/lib/stats/rail/query';
 import {
@@ -86,18 +89,6 @@ const Stat = ({
       {hint && <span className="text-muted block text-sm">{hint}</span>}
     </dd>
   </div>
-);
-
-/**
- * A log cell that keeps its code and gains its name: `LX 316` stays the thing
- * you scan for, because it is what is on the boarding pass, and `Swiss` sits
- * under it in the body colour the table already uses.
- */
-const Named = ({ code, name }: { code: string; name?: string }) => (
-  <>
-    <span className="text-foreground">{code}</span>
-    {name && <span className="mt-0.5 block text-xs">{name}</span>}
-  </>
 );
 
 /**
@@ -236,21 +227,7 @@ const Rail = ({
 
       <Section title="Ride log">
         {log.length > 0 ? (
-          <Table
-            head={['Date', 'Line', 'Stretch']}
-            rows={log.map(({ ride, line, from, to }) => ({
-              id: ride.id,
-              cells: [
-                formatDay(ride.riddenOn),
-                <Named
-                  key="line"
-                  code={line.displayName}
-                  name={`${line.terminalA} – ${line.terminalB}`}
-                />,
-                from && to ? `${from} → ${to}` : 'Whole line',
-              ],
-            }))}
-          />
+          <RideLog log={toLogTable(log, formatDay)} />
         ) : (
           <P>No rides logged yet.</P>
         )}
