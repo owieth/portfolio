@@ -10,8 +10,8 @@
  * the constants the game actually uses. Change NOVIZ_SIGMA or SIGMA_BI_CHRAFT
  * and the numbers here move with them.
  *
- * The app draws its scatter from Math.random, so seeding that is enough to
- * make a run reproducible without the mechanics knowing anything about it.
+ * Every throw draws from one seeded mulberry32 handed to zugZieu(), so a run
+ * repeats exactly for a given seed.
  */
 
 import { registerAlias } from './lib/ts-alias.mjs';
