@@ -2,7 +2,7 @@
 
 import { track } from '@/lib/analytics/track';
 import { handledMarker, linkFields } from '@/lib/analytics/links';
-import { MouseEvent, ReactNode } from 'react';
+import type { MouseEvent, ReactNode } from 'react';
 
 /**
  * Citations mid-sentence. Links that are calls to action belong in Project.links.
