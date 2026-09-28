@@ -1,3 +1,4 @@
+import { formatCount } from '@/lib/stats/flights/format';
 import type { RailLogTable } from '@/lib/stats/rail/log';
 
 /**
@@ -36,4 +37,21 @@ export function logRows({
     terminals: lines[line][1],
     stretch: stretches[stretch],
   }));
+}
+
+/**
+ * Which rides a page shows, out of how many: `11–20 of 1’436 rides`. A page of
+ * one ride names it alone rather than as a range of one.
+ */
+export function logRange(pageIndex: number, pageSize: number, total: number) {
+  const rides = `${formatCount(total)} ${total === 1 ? 'ride' : 'rides'}`;
+
+  if (total === 0) return rides;
+
+  const first = pageIndex * pageSize + 1;
+  const last = Math.min(total, first + pageSize - 1);
+
+  return first === last
+    ? `${formatCount(first)} of ${rides}`
+    : `${formatCount(first)}–${formatCount(last)} of ${rides}`;
 }

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { toLogTable, type RailLogTable } from '@/lib/stats/rail/log';
-import { logRows } from '@/lib/stats/rail/log-rows';
+import { logRange, logRows } from '@/lib/stats/rail/log-rows';
 import type { RailLine, RailRideLogEntry } from '@/lib/stats/rail/types';
 
 const TABLE: RailLogTable = {
@@ -84,5 +84,31 @@ describe('logRows', () => {
 
   it('unpacks no rides into no rows', () => {
     expect(logRows({ ...TABLE, rides: [] })).toEqual([]);
+  });
+});
+
+describe('logRange', () => {
+  it('counts the first page from one', () => {
+    expect(logRange(0, 10, 1436)).toBe('1–10 of 1’436 rides');
+  });
+
+  it('counts a later page on from the one before', () => {
+    expect(logRange(1, 10, 1436)).toBe('11–20 of 1’436 rides');
+  });
+
+  it('ends a short last page at the last ride', () => {
+    expect(logRange(143, 10, 1436)).toBe('1’431–1’436 of 1’436 rides');
+  });
+
+  it('names a page of one ride alone', () => {
+    expect(logRange(1, 10, 11)).toBe('11 of 11 rides');
+  });
+
+  it('says ride for a single one', () => {
+    expect(logRange(0, 10, 1)).toBe('1 of 1 ride');
+  });
+
+  it('counts no rides without a range', () => {
+    expect(logRange(0, 10, 0)).toBe('0 rides');
   });
 });
