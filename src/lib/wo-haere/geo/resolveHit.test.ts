@@ -338,6 +338,18 @@ describe('resolveHit', () => {
       );
       expect(identifyUrls()).toHaveLength(1);
     });
+
+    it('throws when the all-years fallback fails', async () => {
+      stubSwisstopo({
+        identifyJahr: { body: leer },
+        identify: { ok: false, status: 503 },
+      });
+
+      await expect(resolveHit(THUN)).rejects.toThrow(
+        'swisstopo identify failed with 503',
+      );
+      expect(identifyUrls()).toHaveLength(2);
+    });
   });
 
   describe('the mapExtent trap', () => {
