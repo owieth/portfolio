@@ -135,13 +135,18 @@ export function poolPatterns(patterns: readonly Pattern[]): PooledPattern[] {
 export function backbone(pool: readonly PooledPattern[]): PooledPattern | null {
   return (
     [...pool].sort(
-      (a, b) => new Set(b.stations).size - new Set(a.stations).size || compareRank(a, b),
+      (a, b) =>
+        new Set(b.stations).size - new Set(a.stations).size ||
+        compareRank(a, b),
     )[0] ?? null
   );
 }
 
 /** The stations of a pattern with every revisit dropped, and whether there was one. */
-export function firstVisits(stations: readonly string[]): { stations: string[]; loop: boolean } {
+export function firstVisits(stations: readonly string[]): {
+  stations: string[];
+  loop: boolean;
+} {
   const kept = [...new Set(stations)];
 
   return { stations: kept, loop: kept.length < stations.length };
@@ -219,7 +224,10 @@ function reordered(layout: Layout, stations: readonly string[]): number {
  * Whichever way most of its steps within blocks run; a tie goes to its steps
  * between a branch and its junction, and a tie in both is undecided.
  */
-function orientation(layout: Layout, stations: readonly string[]): Orientation | null {
+function orientation(
+  layout: Layout,
+  stations: readonly string[],
+): Orientation | null {
   const { blocks, junction } = steps(layout, stations);
   let along = 0;
   let against = 0;
@@ -257,21 +265,39 @@ function fallback(layout: Layout, stations: readonly string[]): Orientation {
     const last = stations.length - 1;
     const startsTrunk = layout.segments[0]?.stops[0]?.didok === junction;
 
-    return (startsTrunk ? position >= last : position <= last) ? 'forward' : 'reverse';
+    return (startsTrunk ? position >= last : position <= last)
+      ? 'forward'
+      : 'reverse';
   }
 
-  return compare(stations[0] ?? '', stations.at(-1) ?? '') <= 0 ? 'forward' : 'reverse';
+  return compare(stations[0] ?? '', stations.at(-1) ?? '') <= 0
+    ? 'forward'
+    : 'reverse';
 }
 
-function stopIn(layout: Layout, segment: number, didok: string, via: Via, junction: string): SequenceStop {
+function stopIn(
+  layout: Layout,
+  segment: number,
+  didok: string,
+  via: Via,
+  junction: string,
+): SequenceStop {
   if (segment === 0) {
     return { didok, via, junction };
   }
 
-  return { didok, via: 'branch', junction: layout.segments[segment]?.junction ?? null };
+  return {
+    didok,
+    via: 'branch',
+    junction: layout.segments[segment]?.junction ?? null,
+  };
 }
 
-function branch(layout: Layout, junction: string | null, run: readonly string[]): void {
+function branch(
+  layout: Layout,
+  junction: string | null,
+  run: readonly string[],
+): void {
   layout.segments.push({
     junction,
     stops: run.map(didok => ({ didok, via: 'branch', junction })),
@@ -279,11 +305,20 @@ function branch(layout: Layout, junction: string | null, run: readonly string[])
 }
 
 /** New stops after `before` and nothing placed after them: an extension if it is an end, else a branch. */
-function hangAfter(layout: Layout, before: string, at: Place, run: readonly string[]): void {
+function hangAfter(
+  layout: Layout,
+  before: string,
+  at: Place,
+  run: readonly string[],
+): void {
   const segment = layout.segments[at.segment];
 
   if (segment !== undefined && at.index === segment.stops.length - 1) {
-    segment.stops.push(...run.map(didok => stopIn(layout, at.segment, didok, 'extension', before)));
+    segment.stops.push(
+      ...run.map(didok =>
+        stopIn(layout, at.segment, didok, 'extension', before),
+      ),
+    );
     return;
   }
 
@@ -294,11 +329,18 @@ function hangAfter(layout: Layout, before: string, at: Place, run: readonly stri
  * New stops before `after` and nothing placed before them: an extension if that
  * is where the trunk starts, else a branch, turned to read outward from `after`.
  */
-function hangBefore(layout: Layout, after: string, at: Place, run: readonly string[]): void {
+function hangBefore(
+  layout: Layout,
+  after: string,
+  at: Place,
+  run: readonly string[],
+): void {
   const trunk = layout.segments[0];
 
   if (trunk !== undefined && at.segment === 0 && at.index === 0) {
-    trunk.stops.unshift(...run.map(didok => stopIn(layout, 0, didok, 'extension', after)));
+    trunk.stops.unshift(
+      ...run.map(didok => stopIn(layout, 0, didok, 'extension', after)),
+    );
     return;
   }
 
@@ -311,7 +353,10 @@ function hangBefore(layout: Layout, after: string, at: Place, run: readonly stri
  * country, where the error is far smaller than the gap between two stations.
  */
 function distance(a: Position, b: Position): number {
-  return Math.hypot(a.lat - b.lat, (a.lon - b.lon) * Math.cos((46.8 * Math.PI) / 180));
+  return Math.hypot(
+    a.lat - b.lat,
+    (a.lon - b.lon) * Math.cos((46.8 * Math.PI) / 180),
+  );
 }
 
 /**
@@ -324,7 +369,13 @@ function distance(a: Position, b: Position): number {
  * station coordinates. The gap just before the rejoin stop wins a tie, and wins
  * outright when a coordinate is missing.
  */
-function detourGap(layout: Layout, segment: Segment, from: number, to: number, run: readonly string[]): number {
+function detourGap(
+  layout: Layout,
+  segment: Segment,
+  from: number,
+  to: number,
+  run: readonly string[],
+): number {
   const first = layout.positions.get(run[0] ?? '');
   const last = layout.positions.get(run.at(-1) ?? '');
   let best = to;
@@ -342,7 +393,8 @@ function detourGap(layout: Layout, segment: Segment, from: number, to: number, r
       return to;
     }
 
-    const added = distance(left, first) + distance(last, right) - distance(left, right);
+    const added =
+      distance(left, first) + distance(last, right) - distance(left, right);
 
     if (added < cost) {
       best = gap;
@@ -404,7 +456,10 @@ function place(layout: Layout, stations: readonly string[]): void {
 
     let end = index;
 
-    while (end + 1 < stations.length && !layout.places.has(stations[end + 1] ?? '')) {
+    while (
+      end + 1 < stations.length &&
+      !layout.places.has(stations[end + 1] ?? '')
+    ) {
       end += 1;
     }
 
@@ -438,12 +493,16 @@ export function canonicalSequence(
   }
 
   const visits = firstVisits(spine.stations);
-  const reversed = compare(visits.stations[0] ?? '', visits.stations.at(-1) ?? '') > 0;
+  const reversed =
+    compare(visits.stations[0] ?? '', visits.stations.at(-1) ?? '') > 0;
   const trunk = reversed ? [...visits.stations].reverse() : visits.stations;
 
   const layout: Layout = {
     segments: [
-      { junction: null, stops: trunk.map(didok => ({ didok, via: 'backbone', junction: null })) },
+      {
+        junction: null,
+        stops: trunk.map(didok => ({ didok, via: 'backbone', junction: null })),
+      },
     ],
     places: new Map(),
     positions,
@@ -454,7 +513,11 @@ export function canonicalSequence(
   const conflicts: string[] = [];
   let loop = visits.loop;
 
-  const apply = (pattern: PooledPattern, stations: readonly string[], way: Orientation): void => {
+  const apply = (
+    pattern: PooledPattern,
+    stations: readonly string[],
+    way: Orientation,
+  ): void => {
     const oriented = way === 'reverse' ? [...stations].reverse() : stations;
 
     if (reordered(layout, oriented) > 0) {
@@ -504,9 +567,10 @@ export function canonicalSequence(
 
   return {
     stops: layout.segments.flatMap(segment => segment.stops),
-    patterns: [...pool]
-      .sort(compareRank)
-      .map(pattern => ({ ...pattern, reversed: turned.get(pattern.hash) ?? false })),
+    patterns: [...pool].sort(compareRank).map(pattern => ({
+      ...pattern,
+      reversed: turned.get(pattern.hash) ?? false,
+    })),
     conflicts: conflicts.sort(compare),
     loop,
   };

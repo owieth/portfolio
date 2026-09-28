@@ -25,7 +25,13 @@ import { STORE_FILE } from './ingest.ts';
 import { keyTable } from './patterns/queries.ts';
 import { AGENCIES, SERVED, STATION_NAMES } from './regions/queries.ts';
 import type { AgencyRow, NameRow, ServedRow } from './regions/queries.ts';
-import { assign, loadRules, operatorSlug, RULES_FILE, verify } from './regions/rules.ts';
+import {
+  assign,
+  loadRules,
+  operatorSlug,
+  RULES_FILE,
+  verify,
+} from './regions/rules.ts';
 import type { Rule } from './regions/rules.ts';
 
 export interface RegionedRoute extends AllowedRoute {
@@ -105,7 +111,11 @@ function tallies(routes: RegionedRoute[], names: Map<string, string>): Tally[] {
   }
 
   return [...counts.entries()]
-    .map(([region, routes]) => ({ region, name: names.get(region) ?? region, routes }))
+    .map(([region, routes]) => ({
+      region,
+      name: names.get(region) ?? region,
+      routes,
+    }))
     .sort((a, b) => b.routes - a.routes || a.region.localeCompare(b.region));
 }
 
@@ -113,7 +123,10 @@ function tallies(routes: RegionedRoute[], names: Map<string, string>): Tally[] {
  * How many line numbers appear in more than one region — the collisions the
  * region exists to keep apart, and the number to watch between Decembers.
  */
-function recurring(routes: RegionedRoute[]): { numbers: number; widest: string } {
+function recurring(routes: RegionedRoute[]): {
+  numbers: number;
+  widest: string;
+} {
   const regionsByNumber = new Map<string, Set<string>>();
 
   for (const route of routes) {
@@ -161,7 +174,13 @@ export async function assignRegions(
   });
 
   try {
-    await db.run(keyTable('allowed', 'route_id', routes.map(route => route.routeId)));
+    await db.run(
+      keyTable(
+        'allowed',
+        'route_id',
+        routes.map(route => route.routeId),
+      ),
+    );
 
     const [served, stationNames, agencies] = await Promise.all([
       db.query<ServedRow>(SERVED),
@@ -169,7 +188,9 @@ export async function assignRegions(
       db.query<AgencyRow>(AGENCIES),
     ]);
 
-    const agencyNames = new Map(agencies.map(row => [row.agency_id, row.agency_name]));
+    const agencyNames = new Map(
+      agencies.map(row => [row.agency_id, row.agency_name]),
+    );
 
     for (const problem of verify(rules, {
       stations: new Map(stationNames.map(row => [row.didok, row.name])),
@@ -186,7 +207,9 @@ export async function assignRegions(
 
     for (const route of routes) {
       const operator =
-        (route.agencyId === null ? undefined : agencyNames.get(route.agencyId)) ??
+        (route.agencyId === null
+          ? undefined
+          : agencyNames.get(route.agencyId)) ??
         route.agencyId ??
         'unknown operator';
       const match = assign(
@@ -204,7 +227,12 @@ export async function assignRegions(
       }
 
       if (match?.rule.region !== undefined) {
-        regioned.push({ ...route, operator, region: match.rule.region, source: 'rule' });
+        regioned.push({
+          ...route,
+          operator,
+          region: match.rule.region,
+          source: 'rule',
+        });
         continue;
       }
 
@@ -227,7 +255,9 @@ export async function assignRegions(
     }
 
     const placed = regioned.filter(route => route.source === 'rule');
-    const byOperator = regioned.filter(route => route.source === 'operator').length;
+    const byOperator = regioned.filter(
+      route => route.source === 'operator',
+    ).length;
     const named = new Set(placed.map(route => route.region)).size;
 
     log(

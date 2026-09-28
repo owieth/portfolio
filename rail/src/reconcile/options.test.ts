@@ -4,7 +4,9 @@ import { describe, expect, it } from 'vitest';
 import { RAIL_DIR } from '../paths.ts';
 import { parseReconcileOptions } from './options.ts';
 
-const ENV = { DATABASE_URL: 'postgresql://postgres:secret@localhost:54322/postgres' };
+const ENV = {
+  DATABASE_URL: 'postgresql://postgres:secret@localhost:54322/postgres',
+};
 
 describe('parseReconcileOptions', () => {
   it('is a dry run over the committed CSVs by default', () => {
@@ -29,7 +31,9 @@ describe('parseReconcileOptions', () => {
   });
 
   it('reads the CSVs from another directory, relative to where it was run', () => {
-    expect(parseReconcileOptions({ dir: '.context/feed-2027' }, ENV)).toMatchObject({
+    expect(
+      parseReconcileOptions({ dir: '.context/feed-2027' }, ENV),
+    ).toMatchObject({
       ok: true,
       value: { dir: resolve('.context/feed-2027') },
     });
@@ -48,7 +52,10 @@ describe('parseReconcileOptions', () => {
       error: expect.stringContaining('DATABASE_URL is not set'),
     });
     expect(
-      parseReconcileOptions({}, { DATABASE_URL: 'https://example.supabase.co' }),
+      parseReconcileOptions(
+        {},
+        { DATABASE_URL: 'https://example.supabase.co' },
+      ),
     ).toEqual({
       ok: false,
       error: 'DATABASE_URL is not a postgresql:// connection string',

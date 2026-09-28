@@ -26,10 +26,11 @@ export interface DiffOptions {
 }
 
 export type ParsedDiffOptions =
-  | { ok: true; value: DiffOptions }
-  | { ok: false; error: string };
+  { ok: true; value: DiffOptions } | { ok: false; error: string };
 
-export function parseDiffOptions(values: Record<string, FlagValue>): ParsedDiffOptions {
+export function parseDiffOptions(
+  values: Record<string, FlagValue>,
+): ParsedDiffOptions {
   const base = single('base', values.base);
 
   if (!base.ok) {

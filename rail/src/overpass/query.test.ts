@@ -30,6 +30,8 @@ describe('queryKey', () => {
 
   // An edited query must never be answered by the cache entry of the old one.
   it('changes with the query', () => {
-    expect(queryKey(buildQuery('train'))).not.toBe(queryKey(buildQuery('funicular')));
+    expect(queryKey(buildQuery('train'))).not.toBe(
+      queryKey(buildQuery('funicular')),
+    );
   });
 });

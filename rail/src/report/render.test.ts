@@ -47,9 +47,15 @@ function input(overrides: Partial<ReportInput> = {}): ReportInput {
       filename: 'GTFS_FP2026_20260919.zip',
       issued: '2026-09-21T09:00:00+02:00',
     },
-    osmBase: { train: '2026-09-21T08:00:00Z', funicular: '2026-09-21T08:05:00Z' },
+    osmBase: {
+      train: '2026-09-21T08:00:00Z',
+      funicular: '2026-09-21T08:05:00Z',
+    },
     lines: [S12, SHORT_S5, UNDRAWN_EC, POLYBAHN, GELMERBAHN],
-    regionNames: { fernverkehr: 'Long distance', 's-bahn-zuerich': 'S-Bahn Zürich (ZVV)' },
+    regionNames: {
+      fernverkehr: 'Long distance',
+      's-bahn-zuerich': 'S-Bahn Zürich (ZVV)',
+    },
     stations: STATIONS,
     unmatched: [
       {
@@ -59,7 +65,13 @@ function input(overrides: Partial<ReportInput> = {}): ReportInput {
         best: { rule: 'operator', confidence: 0.34, relations: [7] },
         lostTo: [],
       },
-      { id: SHORT_S5.id, name: SHORT_S5.name, reason: 'no-candidate', best: null, lostTo: [] },
+      {
+        id: SHORT_S5.id,
+        name: SHORT_S5.name,
+        reason: 'no-candidate',
+        best: null,
+        lostTo: [],
+      },
       {
         id: GELMERBAHN.id,
         name: GELMERBAHN.name,
@@ -106,15 +118,21 @@ describe('renderReport', () => {
 
     expect(categories).toContain('| `S` | 2 | 1 | 1 |');
     expect(categories.indexOf('`S`')).toBeLessThan(categories.indexOf('`EC`'));
-    expect(categories.indexOf('`FUN`')).toBeLessThan(categories.indexOf('`EC`'));
+    expect(categories.indexOf('`FUN`')).toBeLessThan(
+      categories.indexOf('`EC`'),
+    );
   });
 
   it('names the declared regions and lists the operators behind the rest', () => {
     const regions = section(renderReport(input()), 'By region');
 
-    expect(regions).toContain('| `s-bahn-zuerich` | S-Bahn Zürich (ZVV) | 2 | 0 | 2 |');
+    expect(regions).toContain(
+      '| `s-bahn-zuerich` | S-Bahn Zürich (ZVV) | 2 | 0 | 2 |',
+    );
     expect(regions).toContain('| `polybahn` | Poly-Bahn Zürich | 0 | 1 | 1 |');
-    expect(regions).toContain('| `kwo-seilbahnen` | KWO Seilbahnen | 0 | 1 | 1 |');
+    expect(regions).toContain(
+      '| `kwo-seilbahnen` | KWO Seilbahnen | 0 | 1 | 1 |',
+    );
   });
 
   it('groups the lines with no shape by reason, with what each came closest to', () => {
@@ -122,15 +140,23 @@ describe('renderReport', () => {
 
     expect(unmatched).toContain('3 lines in all');
     expect(unmatched).toContain('| `no-candidate` | 1 | 1 |');
-    expect(unmatched).toContain(`| \`${UNDRAWN_EC.id}\` | EC Brugg AG-Winterthur | \`EC\` | 52 | 34% |`);
-    expect(unmatched).toContain(`| \`${GELMERBAHN.id}\` | Gelmerbahn | \`FUN\` | — | \`polybahn:FUN-2350\` |`);
+    expect(unmatched).toContain(
+      `| \`${UNDRAWN_EC.id}\` | EC Brugg AG-Winterthur | \`EC\` | 52 | 34% |`,
+    );
+    expect(unmatched).toContain(
+      `| \`${GELMERBAHN.id}\` | Gelmerbahn | \`FUN\` | — | \`polybahn:FUN-2350\` |`,
+    );
   });
 
   it('folds a short-lived line away instead of listing it with the rest', () => {
     const unmatched = section(renderReport(input()), 'Lines with no OSM match');
-    const noCandidate = unmatched.slice(unmatched.indexOf('### `no-candidate`'));
+    const noCandidate = unmatched.slice(
+      unmatched.indexOf('### `no-candidate`'),
+    );
 
-    expect(noCandidate).toMatch(/_Only short-lived lines\._\n\n<details>\n<summary>1 short-lived line, running in 8 weeks or fewer<\/summary>/);
+    expect(noCandidate).toMatch(
+      /_Only short-lived lines\._\n\n<details>\n<summary>1 short-lived line, running in 8 weeks or fewer<\/summary>/,
+    );
     expect(noCandidate).toContain('| `s-bahn-zuerich:S5` | S5 | `S` | 4 |');
   });
 
@@ -148,8 +174,16 @@ describe('renderReport', () => {
           {
             id: 's-bahn-zuerich:S12',
             parts: [
-              { routeIds: ['a', 'b'], operators: ['SBB'], terminals: ['8500309', '8506000'] },
-              { routeIds: ['c'], operators: ['Thurbo'], terminals: ['8503424', '8599999'] },
+              {
+                routeIds: ['a', 'b'],
+                operators: ['SBB'],
+                terminals: ['8500309', '8506000'],
+              },
+              {
+                routeIds: ['c'],
+                operators: ['Thurbo'],
+                terminals: ['8503424', '8599999'],
+              },
             ],
           },
         ],
@@ -166,15 +200,26 @@ describe('renderReport', () => {
     const report = renderReport(input());
 
     expect(section(report, 'Possible duplicates')).toContain('_None._');
-    expect(section(report, 'Feed checks').match(/_None — the expected state\._/g)).toHaveLength(2);
+    expect(
+      section(report, 'Feed checks').match(/_None — the expected state\._/g),
+    ).toHaveLength(2);
   });
 
   it('lists flagged names apart from the other derived ones, and every seeded line', () => {
-    const names = section(renderReport(input({ inFeed: [GELMERBAHN.id] })), 'Names to check by hand');
+    const names = section(
+      renderReport(input({ inFeed: [GELMERBAHN.id] })),
+      'Names to check by hand',
+    );
 
-    expect(names).toContain('| `polybahn:FUN-2350` | Standseilbahn Polybahn | `unknown-operator` |');
-    expect(names).toContain('1 derived name with no flag, each worth a glance.');
-    expect(names).toContain(`| \`${UNDRAWN_EC.id}\` | EC Brugg AG-Winterthur | \`EC\` |`);
+    expect(names).toContain(
+      '| `polybahn:FUN-2350` | Standseilbahn Polybahn | `unknown-operator` |',
+    );
+    expect(names).toContain(
+      '1 derived name with no flag, each worth a glance.',
+    );
+    expect(names).toContain(
+      `| \`${UNDRAWN_EC.id}\` | EC Brugg AG-Winterthur | \`EC\` |`,
+    );
     expect(names).toContain(`| \`${GELMERBAHN.id}\` | Gelmerbahn | 2 | yes |`);
     expect(names).not.toContain('| `s-bahn-zuerich:S12` |');
   });
@@ -193,14 +238,21 @@ describe('renderReport', () => {
             },
           ],
           unknownRoutes: [
-            { routeType: '1700', routeDesc: 'HOV', routes: 3, reason: 'not in the allowlist' },
+            {
+              routeType: '1700',
+              routeDesc: 'HOV',
+              routes: 3,
+              reason: 'not in the allowlist',
+            },
           ],
         }),
       ),
       'Feed checks',
     );
 
-    expect(feed).toContain('| `8500001` | Nowhere | 45.12346 | — | no usable coordinate |');
+    expect(feed).toContain(
+      '| `8500001` | Nowhere | 45.12346 | — | no usable coordinate |',
+    );
     expect(feed).toContain('| `1700` | `HOV` | 3 | not in the allowlist |');
   });
 
@@ -212,7 +264,10 @@ describe('renderReport', () => {
         ...shuffled,
         lines: [...shuffled.lines].reverse(),
         unmatched: [...shuffled.unmatched].reverse(),
-        osmBase: { funicular: shuffled.osmBase.funicular, train: shuffled.osmBase.train },
+        osmBase: {
+          funicular: shuffled.osmBase.funicular,
+          train: shuffled.osmBase.train,
+        },
       }),
     ).toBe(renderReport(input()));
   });

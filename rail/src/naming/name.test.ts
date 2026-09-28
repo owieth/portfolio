@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
-import { derivedName, namingCandidate, numberedName, terminalNames } from './name.ts';
+import {
+  derivedName,
+  namingCandidate,
+  numberedName,
+  terminalNames,
+} from './name.ts';
 import type { Candidate } from './name.ts';
 
 function candidate(overrides: Partial<Candidate>): Candidate {
@@ -32,20 +37,30 @@ describe('terminalNames', () => {
   });
 
   it('keeps the Didok number of a station it has no name for', () => {
-    expect(terminalNames(['8509002', '8599999'], NAMES)).toEqual(['8599999', 'Landquart']);
+    expect(terminalNames(['8509002', '8599999'], NAMES)).toEqual([
+      '8599999',
+      'Landquart',
+    ]);
   });
 });
 
 describe('namingCandidate', () => {
   it('prefers the longest pattern over a busier short-turn', () => {
     const long = candidate({ stops: 12, trips: 10 });
-    const busy = candidate({ stops: 8, trips: 90, terminals: ['Chur', 'Landquart'] });
+    const busy = candidate({
+      stops: 8,
+      trips: 90,
+      terminals: ['Chur', 'Landquart'],
+    });
 
     expect(namingCandidate([busy, long])).toBe(long);
   });
 
   it('breaks a tie in length by trips', () => {
-    const more = candidate({ trips: 60, terminals: ['Klosters Platz', 'Landquart'] });
+    const more = candidate({
+      trips: 60,
+      terminals: ['Klosters Platz', 'Landquart'],
+    });
     const fewer = candidate({ trips: 40 });
 
     expect(namingCandidate([fewer, more])).toBe(more);
@@ -92,7 +107,11 @@ describe('namingCandidate', () => {
 describe('derivedName', () => {
   it('puts operator, category and terminals together', () => {
     expect(
-      derivedName({ category: 'R', operator: 'RhB', terminals: ['Davos Platz', 'Landquart'] }),
+      derivedName({
+        category: 'R',
+        operator: 'RhB',
+        terminals: ['Davos Platz', 'Landquart'],
+      }),
     ).toBe('RhB R Davos Platz-Landquart');
   });
 
@@ -114,12 +133,18 @@ describe('derivedName', () => {
         terminals: ['Neuchâtel, Ecluse (FUNI)', 'Neuchâtel, Plan (FUNI)'],
         withTerminals: true,
       }),
-    ).toBe('Standseilbahn transN Neuchâtel, Ecluse (FUNI)-Neuchâtel, Plan (FUNI)');
+    ).toBe(
+      'Standseilbahn transN Neuchâtel, Ecluse (FUNI)-Neuchâtel, Plan (FUNI)',
+    );
   });
 
   it('leaves out ZUG, which names no category and reads as the city', () => {
     expect(
-      derivedName({ category: 'ZUG', operator: 'SNCF', terminals: ['Genève', 'Lyon'] }),
+      derivedName({
+        category: 'ZUG',
+        operator: 'SNCF',
+        terminals: ['Genève', 'Lyon'],
+      }),
     ).toBe('SNCF Genève-Lyon');
   });
 });

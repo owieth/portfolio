@@ -26,7 +26,11 @@ const RETRYABLE_STATUSES = new Set([429, 502, 503, 504]);
 export class RetryableError extends Error {
   readonly retryAfterMs: number | null;
 
-  constructor(message: string, retryAfterMs: number | null = null, cause?: unknown) {
+  constructor(
+    message: string,
+    retryAfterMs: number | null = null,
+    cause?: unknown,
+  ) {
     super(message, { cause });
     this.name = 'RetryableError';
     this.retryAfterMs = retryAfterMs;
@@ -38,7 +42,10 @@ export function isRetryableStatus(status: number): boolean {
 }
 
 /** `Retry-After` as either delay-seconds or an HTTP date, per RFC 9110. */
-export function parseRetryAfter(value: string | null, now: Date): number | null {
+export function parseRetryAfter(
+  value: string | null,
+  now: Date,
+): number | null {
   if (value === null || value.trim() === '') {
     return null;
   }
@@ -56,7 +63,8 @@ export function parseRetryAfter(value: string | null, now: Date): number | null 
 
 export type Sleep = (ms: number) => Promise<void>;
 
-export const sleep: Sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+export const sleep: Sleep = ms =>
+  new Promise(resolve => setTimeout(resolve, ms));
 
 interface RetryOptions {
   label: string;

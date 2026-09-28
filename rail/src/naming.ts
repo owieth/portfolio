@@ -22,7 +22,12 @@ import { createHash } from 'node:crypto';
 
 import { compare } from './merge/key.ts';
 import type { Line } from './merge.ts';
-import { derivedName, namingCandidate, numberedName, terminalNames } from './naming/name.ts';
+import {
+  derivedName,
+  namingCandidate,
+  numberedName,
+  terminalNames,
+} from './naming/name.ts';
 import type { Candidate } from './naming/name.ts';
 import { verifyOperators } from './naming/operators.ts';
 import type { Operator } from './naming/operators.ts';
@@ -102,7 +107,10 @@ function isDerived(line: Line): boolean {
   return line.number === null || line.category === 'FUN';
 }
 
-function groupBy<T>(values: Iterable<T>, key: (value: T) => string): Map<string, T[]> {
+function groupBy<T>(
+  values: Iterable<T>,
+  key: (value: T) => string,
+): Map<string, T[]> {
   const groups = new Map<string, T[]>();
 
   for (const value of values) {
@@ -134,7 +142,8 @@ function choose(
       continue;
     }
 
-    const short = route.agencyId === null ? undefined : shortNames.get(route.agencyId);
+    const short =
+      route.agencyId === null ? undefined : shortNames.get(route.agencyId);
 
     for (const pattern of patterns.get(routeId) ?? []) {
       candidates.push({
@@ -166,7 +175,12 @@ function fallbacksOf(chosen: ReadonlyMap<string, Choice>): Fallback[] {
     choice.fallback === null ? [] : [choice.fallback],
   );
 
-  return [...groupBy(routes, route => `${route.agencyId ?? ''}\u0000${route.operator}`).values()]
+  return [
+    ...groupBy(
+      routes,
+      route => `${route.agencyId ?? ''}\u0000${route.operator}`,
+    ).values(),
+  ]
     .map(group => ({
       agencyId: group[0]?.agencyId ?? null,
       operator: group[0]?.operator ?? '',
@@ -184,7 +198,9 @@ function fingerprintOf(lines: readonly NamedLine[]): string {
   const hash = createHash('sha256');
 
   for (const line of lines) {
-    hash.update([line.id, line.name, line.nameSource, line.review.join(',')].join('|'));
+    hash.update(
+      [line.id, line.name, line.nameSource, line.review.join(',')].join('|'),
+    );
     hash.update('\n');
   }
 
@@ -200,14 +216,21 @@ export function nameLines(input: NamingInput, log: Log): Named {
 
   const routesById = new Map(routes.map(route => [route.routeId, route]));
   const patternsByRoute = groupBy(patterns, pattern => pattern.routeId);
-  const stationNames = new Map(stations.map(station => [station.didok, station.name]));
-  const shortNames = new Map(operators.map(operator => [operator.id, operator.short]));
+  const stationNames = new Map(
+    stations.map(station => [station.didok, station.name]),
+  );
+  const shortNames = new Map(
+    operators.map(operator => [operator.id, operator.short]),
+  );
 
   const chosen = new Map<string, Choice>();
 
   for (const line of lines) {
     if (isDerived(line)) {
-      chosen.set(line.id, choose(line, routesById, patternsByRoute, stationNames, shortNames));
+      chosen.set(
+        line.id,
+        choose(line, routesById, patternsByRoute, stationNames, shortNames),
+      );
     }
   }
 
@@ -244,7 +267,10 @@ export function nameLines(input: NamingInput, log: Log): Named {
       ...line,
       name: nameOf(line, crowded.has(line.id)),
       nameSource: choice === undefined ? 'number' : 'derived',
-      review: choice === undefined || choice.fallback === null ? [] : ['unknown-operator'],
+      review:
+        choice === undefined || choice.fallback === null
+          ? []
+          : ['unknown-operator'],
     };
   });
 

@@ -168,7 +168,9 @@ export function assertGeometry(
     );
   }
 
-  const disagrees = records.find(record => record.has_geometry !== drawn.has(record.id));
+  const disagrees = records.find(
+    record => record.has_geometry !== drawn.has(record.id),
+  );
 
   if (disagrees !== undefined) {
     throw new Error(
@@ -271,13 +273,19 @@ export interface EmittedWeb {
 }
 
 interface Drawn {
-  features: readonly { geometry: { coordinates: readonly (readonly unknown[])[] } }[];
+  features: readonly {
+    geometry: { coordinates: readonly (readonly unknown[])[] };
+  }[];
 }
 
 function pointsIn(collection: Drawn): number {
   return collection.features.reduce(
     (sum, feature) =>
-      sum + feature.geometry.coordinates.reduce((parts, part) => parts + part.length, 0),
+      sum +
+      feature.geometry.coordinates.reduce(
+        (parts, part) => parts + part.length,
+        0,
+      ),
     0,
   );
 }
@@ -293,7 +301,10 @@ function megabytes(bytes: number): string {
  */
 export async function emitWebGeometry(
   log: Log,
-  { source = join(RAIL_DIR, LINES_GEOJSON), dir = PUBLIC_RAIL_DIR }: WebOptions = {},
+  {
+    source = join(RAIL_DIR, LINES_GEOJSON),
+    dir = PUBLIC_RAIL_DIR,
+  }: WebOptions = {},
 ): Promise<EmittedWeb> {
   const full = JSON.parse(await readFile(source, 'utf8')) as SourceCollection;
   const web = toWebCollection(full, WEB_TOLERANCE_M);

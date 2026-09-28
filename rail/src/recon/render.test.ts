@@ -26,7 +26,13 @@ function findings(overrides: Partial<Findings> = {}): Findings {
     },
     categories: [
       { route_type: '109', route_desc: 'S', routes: 2, trips: 40, agencies: 1 },
-      { route_type: '1400', route_desc: 'FUN', routes: 1, trips: 5, agencies: 1 },
+      {
+        route_type: '1400',
+        route_desc: 'FUN',
+        routes: 1,
+        trips: 5,
+        agencies: 1,
+      },
     ],
     combinations: [
       {
@@ -115,10 +121,12 @@ describe('render', () => {
   /** A wall-clock stamp would make every rerun a diff and hide the feed changes. */
   it('carries nothing that changes between two runs of the same feed', () => {
     expect(render(findings())).toBe(render(findings()));
-    expect(render(findings())).not.toMatch(new RegExp(String(new Date().getFullYear() + 1)));
+    expect(render(findings())).not.toMatch(
+      new RegExp(String(new Date().getFullYear() + 1)),
+    );
   });
 
-  it('answers every one of the issue\'s six questions under its own heading', () => {
+  it("answers every one of the issue's six questions under its own heading", () => {
     const report = render(findings());
 
     for (const heading of [
@@ -148,36 +156,54 @@ describe('contradictions', () => {
   it('records a missing shapes.txt and reverses the README on geometry', () => {
     const report = render(findings());
 
-    expect(report).toContain('OpenStreetMap is the primary geometry source, not a fallback');
+    expect(report).toContain(
+      'OpenStreetMap is the primary geometry source, not a fallback',
+    );
     expect(report).toContain('**Neither GTFS source ships geometry.**');
   });
 
   it('says nothing about geometry when the feed does ship shapes', () => {
     const report = render(
-      findings({ feed: { ...findings().feed, members: [...MEMBERS, 'shapes.txt'] } }),
+      findings({
+        feed: { ...findings().feed, members: [...MEMBERS, 'shapes.txt'] },
+      }),
     );
 
     expect(report).toContain('**The feed has geometry.**');
-    expect(report).not.toContain('OpenStreetMap is the primary geometry source');
+    expect(report).not.toContain(
+      'OpenStreetMap is the primary geometry source',
+    );
   });
 
   it('records that route_long_name is empty rather than sparse', () => {
-    expect(render(findings())).toContain('`route_long_name` is empty on every route');
+    expect(render(findings())).toContain(
+      '`route_long_name` is empty on every route',
+    );
   });
 
   it('drops that one once an operator starts populating route_long_name', () => {
     const agencies = [{ ...findings().agencies[0], long_name: 2 }];
 
-    expect(render(findings({ agencies }))).not.toContain('is empty on every route');
+    expect(render(findings({ agencies }))).not.toContain(
+      'is empty on every route',
+    );
   });
 
   it('records the overlap between the 100-117 include range and the EXT exclusion', () => {
     const categories = [
       ...findings().categories,
-      { route_type: '117', route_desc: 'EXT', routes: 110, trips: 1771, agencies: 16 },
+      {
+        route_type: '117',
+        route_desc: 'EXT',
+        routes: 110,
+        trips: 1771,
+        agencies: 16,
+      },
     ];
 
-    expect(render(findings({ categories }))).toContain('`EXT` is `route_type` 117, 110 routes');
+    expect(render(findings({ categories }))).toContain(
+      '`EXT` is `route_type` 117, 110 routes',
+    );
   });
 
   it('says so plainly when nothing contradicts the brief', () => {
@@ -214,10 +240,15 @@ describe('the funicular and operator answers', () => {
   });
 
   it('reports a funicular that is absent from the feed as what #476 is for', () => {
-    const operators = [...findings().operators, { needle: 'Gurtenbahn', matches: [] }];
+    const operators = [
+      ...findings().operators,
+      { needle: 'Gurtenbahn', matches: [] },
+    ];
     const report = render(findings({ operators }));
 
-    expect(report).toContain('**1 operator of the ones searched for is absent**');
+    expect(report).toContain(
+      '**1 operator of the ones searched for is absent**',
+    );
     expect(report).toContain("#476's seed file");
   });
 });

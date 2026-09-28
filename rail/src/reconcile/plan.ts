@@ -114,7 +114,8 @@ const STOPS: Table<FeedStop> = {
 
     return true;
   },
-  station: stop => `${stop.stop_name} (${stop.didok ?? stop.sloid ?? 'no Didok'})`,
+  station: stop =>
+    `${stop.stop_name} (${stop.didok ?? stop.sloid ?? 'no Didok'})`,
 };
 
 function targetOf<Row>(table: Table<Row>, row: Row): Target {
@@ -178,7 +179,10 @@ function planTable<Row>(
       continue;
     }
 
-    if (current.edited_fields.length > 0 && table.sameStation?.(row, current) === false) {
+    if (
+      current.edited_fields.length > 0 &&
+      table.sameStation?.(row, current) === false
+    ) {
       const station = table.station ?? table.name;
       moved.push(
         `${table.label(row)} is now ${station(row)}, but its edits to ` +
@@ -198,7 +202,12 @@ function planTable<Row>(
       }
 
       if (edited.has(field)) {
-        plan.skipped.push({ ...target, field, kept: current[field], feed: row[field] });
+        plan.skipped.push({
+          ...target,
+          field,
+          kept: current[field],
+          feed: row[field],
+        });
         continue;
       }
 

@@ -71,20 +71,32 @@ describe('operators', () => {
   ];
 
   it('normalises case, accents and punctuation away', () => {
-    expect(normaliseOperator('Matterhorn Gotthard Bahn (fo)')).toBe('matterhorn gotthard bahn fo');
+    expect(normaliseOperator('Matterhorn Gotthard Bahn (fo)')).toBe(
+      'matterhorn gotthard bahn fo',
+    );
     expect(normaliseOperator('Rhätische Bahn')).toBe('rhatische bahn');
   });
 
   it('know a line operator by its feed name and its short form', () => {
-    const names = operatorNames(['Rhätische Bahn', 'Schweizerische Bundesbahnen SBB'], TABLE);
+    const names = operatorNames(
+      ['Rhätische Bahn', 'Schweizerische Bundesbahnen SBB'],
+      TABLE,
+    );
 
-    expect(names).toEqual(['rhatische bahn', 'rhb', 'schweizerische bundesbahnen sbb']);
+    expect(names).toEqual([
+      'rhatische bahn',
+      'rhb',
+      'schweizerische bundesbahnen sbb',
+    ]);
     expect(operatorMatches('RhB', names)).toBe(true);
     expect(operatorMatches('Rhätische Bahn', names)).toBe(true);
   });
 
   it('find a short form inside the feed name, as whole words only', () => {
-    const names = operatorNames(['Schweizerische Bundesbahnen SBB', 'Regionalverkehr Bern-Solothurn'], []);
+    const names = operatorNames(
+      ['Schweizerische Bundesbahnen SBB', 'Regionalverkehr Bern-Solothurn'],
+      [],
+    );
 
     expect(operatorMatches('SBB', names)).toBe(true);
     expect(operatorMatches('RB', names)).toBe(false);
@@ -92,11 +104,15 @@ describe('operators', () => {
   });
 
   it('try each operator of a relation run by two', () => {
-    expect(operatorMatches('SNCF; BLS', operatorNames(['BLS AG (bls)'], TABLE))).toBe(true);
+    expect(
+      operatorMatches('SNCF; BLS', operatorNames(['BLS AG (bls)'], TABLE)),
+    ).toBe(true);
   });
 
   it('match nothing on a relation with no operator', () => {
-    expect(operatorMatches(undefined, operatorNames(['BLS AG (bls)'], TABLE))).toBe(false);
+    expect(
+      operatorMatches(undefined, operatorNames(['BLS AG (bls)'], TABLE)),
+    ).toBe(false);
   });
 });
 
@@ -107,7 +123,13 @@ describe('namesAnotherLine', () => {
     ['an IC to an unnumbered IC', 'IC4', 'IC', null, false],
     ['a railjet to an EC', 'RJ', 'EC', null, true],
     ['a railjet to the feed’s RJX', 'RJ', 'RJX', null, false],
-    ['a EuroNight to the feed’s NJ, whatever its train number', 'EN40462', 'NJ', null, false],
+    [
+      'a EuroNight to the feed’s NJ, whatever its train number',
+      'EN40462',
+      'NJ',
+      null,
+      false,
+    ],
     ['the same number under another category', 'RE41', 'R', 'R41', false],
     ['a timetable field under the same category', 'R312', 'R', 'R61', false],
     ['a timetable field after ZUG', 'ZUG475', 'CC', '7', false],

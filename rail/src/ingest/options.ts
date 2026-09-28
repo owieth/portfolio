@@ -26,6 +26,8 @@ export interface IngestOptions {
 }
 
 /** A repeated `--force` is still just on; there is no value to disagree about. */
-export function parseIngestOptions(values: Record<string, FlagValue>): IngestOptions {
+export function parseIngestOptions(
+  values: Record<string, FlagValue>,
+): IngestOptions {
   return { force: values.force !== undefined && values.force !== false };
 }

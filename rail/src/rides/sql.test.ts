@@ -44,16 +44,20 @@ describe('renderRides', () => {
 
   it('gives each ride an id derived from its own values', () => {
     const [out] = renderRides(RIDES, CONTEXT).matchAll(/\('([0-9a-f-]{36})'/g);
-    const [again] = renderRides(RIDES, CONTEXT).matchAll(/\('([0-9a-f-]{36})'/g);
+    const [again] = renderRides(RIDES, CONTEXT).matchAll(
+      /\('([0-9a-f-]{36})'/g,
+    );
 
     expect(out[1]).toBe(again[1]);
-    expect(out[1]).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
+    expect(out[1]).toMatch(
+      /^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/,
+    );
   });
 
   it('gives the two directions of one day different ids', () => {
-    const ids = [...renderRides(RIDES, CONTEXT).matchAll(/\('([0-9a-f-]{36})'/g)].map(
-      match => match[1],
-    );
+    const ids = [
+      ...renderRides(RIDES, CONTEXT).matchAll(/\('([0-9a-f-]{36})'/g),
+    ].map(match => match[1]);
 
     expect(new Set(ids).size).toBe(2);
   });

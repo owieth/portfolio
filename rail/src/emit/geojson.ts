@@ -15,7 +15,12 @@
  * wall of coordinates.
  */
 
-import type { Feature, FeatureCollection, MultiLineString, Position } from 'geojson';
+import type {
+  Feature,
+  FeatureCollection,
+  MultiLineString,
+  Position,
+} from 'geojson';
 
 import type { Category } from '../allowlist/categories.ts';
 import type { Geometry } from '../match.ts';
@@ -69,7 +74,10 @@ export function roundParts(parts: Geometry['coordinates']): Position[][] {
     .map(part =>
       part
         .map(([lon, lat]): Position => [round(lon), round(lat)])
-        .filter((position, index, rounded) => !samePosition(rounded[index - 1], position)),
+        .filter(
+          (position, index, rounded) =>
+            !samePosition(rounded[index - 1], position),
+        ),
     )
     .filter(part => part.length >= 2);
 }
@@ -125,7 +133,9 @@ export function toCollection(
 }
 
 /** The collection as JSON, its header on the first line and one feature per line after it. */
-export function toGeoJson<Properties>(collection: LineCollection<Properties>): string {
+export function toGeoJson<Properties>(
+  collection: LineCollection<Properties>,
+): string {
   const header = JSON.stringify({
     type: collection.type,
     attribution: collection.attribution,

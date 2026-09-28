@@ -39,7 +39,9 @@ const RELATIONS = {
     type: 'relation',
     id: 1_663_445,
     tags: { type: 'route', route: 'train', ref: 'IR70', network: 'SBB' },
-    members: [{ type: 'way', ref: 20, role: '', geometry: [{ lat: 47.05, lon: 8.31 }] }],
+    members: [
+      { type: 'way', ref: 20, role: '', geometry: [{ lat: 47.05, lon: 8.31 }] },
+    ],
   },
 } as const;
 
@@ -60,7 +62,9 @@ function routeOf(init: RequestInit | undefined): Route {
 }
 
 /** Answers every query with its fixture, and counts what reached the network. */
-function server(answer: (route: Route) => Response = route => new Response(body(route))) {
+function server(
+  answer: (route: Route) => Response = route => new Response(body(route)),
+) {
   return vi.fn(async (_url: string | URL | Request, init?: RequestInit) =>
     answer(routeOf(init)),
   );
@@ -96,7 +100,9 @@ describe('fetchOsmRelations', () => {
 
     expect(fetch).toHaveBeenCalledTimes(2);
     expect(result.requests).toBe(2);
-    expect(result.relations.map(relation => [relation.id, relation.route])).toEqual([
+    expect(
+      result.relations.map(relation => [relation.id, relation.route]),
+    ).toEqual([
       [1_663_445, 'train'],
       [2_349_318, 'funicular'],
     ]);
@@ -110,8 +116,12 @@ describe('fetchOsmRelations', () => {
     const [url, init] = fetch.mock.calls[0];
     expect(url).toBe('https://overpass-api.de/api/interpreter');
     expect(init?.method).toBe('POST');
-    expect(new URLSearchParams(String(init?.body)).get('data')).toBe(buildQuery('train'));
-    expect((init?.headers as Record<string, string>)['user-agent']).toMatch(/portfolio/);
+    expect(new URLSearchParams(String(init?.body)).get('data')).toBe(
+      buildQuery('train'),
+    );
+    expect((init?.headers as Record<string, string>)['user-agent']).toMatch(
+      /portfolio/,
+    );
   });
 
   // The acceptance criterion: a second run makes zero network requests.
@@ -145,7 +155,9 @@ describe('fetchOsmRelations', () => {
 
   it('writes the ODbL attribution next to the responses and returns it', async () => {
     const result = await fetchOsmRelations(log, deps(server()));
-    const written = JSON.parse(await readFile(join(dir, 'attribution.json'), 'utf8'));
+    const written = JSON.parse(
+      await readFile(join(dir, 'attribution.json'), 'utf8'),
+    );
 
     expect(result.attribution).toEqual(written);
     expect(written).toMatchObject({
@@ -200,14 +212,16 @@ describe('fetchOsmRelations', () => {
 
   it('retries a request that never got an answer', async () => {
     let dropped = false;
-    const fetch = vi.fn(async (_url: string | URL | Request, init?: RequestInit) => {
-      if (!dropped) {
-        dropped = true;
-        throw new TypeError('fetch failed');
-      }
+    const fetch = vi.fn(
+      async (_url: string | URL | Request, init?: RequestInit) => {
+        if (!dropped) {
+          dropped = true;
+          throw new TypeError('fetch failed');
+        }
 
-      return new Response(body(routeOf(init)));
-    });
+        return new Response(body(routeOf(init)));
+      },
+    );
 
     await fetchOsmRelations(log, deps(fetch));
 
@@ -217,10 +231,13 @@ describe('fetchOsmRelations', () => {
   it('fails at once on a query Overpass rejects, and caches nothing', async () => {
     const fetch = server(
       () =>
-        new Response('<p><strong>Error</strong>: line 3: parse error: bad filter</p>', {
-          status: 400,
-          statusText: 'Bad Request',
-        }),
+        new Response(
+          '<p><strong>Error</strong>: line 3: parse error: bad filter</p>',
+          {
+            status: 400,
+            statusText: 'Bad Request',
+          },
+        ),
     );
 
     await expect(fetchOsmRelations(log, deps(fetch))).rejects.toThrow(
@@ -239,7 +256,8 @@ describe('fetchOsmRelations', () => {
         timedOut = true;
         return new Response(
           body(route, {
-            remark: 'runtime error: Query timed out in "query" at line 3 after 901 seconds.',
+            remark:
+              'runtime error: Query timed out in "query" at line 3 after 901 seconds.',
           }),
         );
       }
@@ -250,7 +268,9 @@ describe('fetchOsmRelations', () => {
     await fetchOsmRelations(log, deps(fetch));
 
     expect(fetch).toHaveBeenCalledTimes(3);
-    expect(log).toHaveBeenCalledWith(expect.stringContaining('Query timed out'));
+    expect(log).toHaveBeenCalledWith(
+      expect.stringContaining('Query timed out'),
+    );
 
     // And the answer that was cached is the complete one.
     const second = server();
@@ -260,7 +280,8 @@ describe('fetchOsmRelations', () => {
 
   it('gives up after the last backoff and leaves no response behind', async () => {
     const fetch = server(
-      () => new Response('busy', { status: 504, statusText: 'Gateway Timeout' }),
+      () =>
+        new Response('busy', { status: 504, statusText: 'Gateway Timeout' }),
     );
 
     await expect(fetchOsmRelations(log, deps(fetch))).rejects.toThrow(/504/);

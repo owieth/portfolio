@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
-import { assign, loadRules, operatorSlug, parseRules, verify } from './rules.ts';
+import {
+  assign,
+  loadRules,
+  operatorSlug,
+  parseRules,
+  verify,
+} from './rules.ts';
 import type { RouteFacts, Rule } from './rules.ts';
 
 const ZUERICH_HB = { didok: '8503000', name: 'Zürich HB' };
@@ -64,7 +70,11 @@ describe('parseRules', () => {
         { region: 'fernverkehr', categories: ['IC'] },
         { region: 's-bahn-zuerich', byOperator: true, serves: [ZUERICH_HB] },
         { region: 's-bahn-basel', serves: [ZUERICH_HB] },
-        { region: 's-bahn-bern', categories: ['BUS'], serves: [{ didok: '8507000' }] },
+        {
+          region: 's-bahn-bern',
+          categories: ['BUS'],
+          serves: [{ didok: '8507000' }],
+        },
         { region: 's-bahn-bern', station: [BERN] },
         { byOperator: false, lines: [] },
       ],
@@ -108,7 +118,9 @@ describe('parseRules', () => {
         { regions, rules: [{ region: 'fernverkehr', categories: ['IC'] }] },
         'regions.json',
       ),
-    ).toThrow('region s-bahn-zuerich is declared but no rule files anything under it');
+    ).toThrow(
+      'region s-bahn-zuerich is declared but no rule files anything under it',
+    );
   });
 });
 
@@ -122,29 +134,45 @@ describe('assign', () => {
   ];
 
   it('takes the first rule that matches, not the best one', () => {
-    const match = assign(route({ stations: [ZUERICH_HB.didok, BERN.didok] }), rules);
+    const match = assign(
+      route({ stations: [ZUERICH_HB.didok, BERN.didok] }),
+      rules,
+    );
 
-    expect(match).toMatchObject({ rule: { region: 's-bahn-zuerich' }, position: 3 });
+    expect(match).toMatchObject({
+      rule: { region: 's-bahn-zuerich' },
+      position: 3,
+    });
   });
 
   it('reports the anchor that decided it, in the rule’s own order', () => {
-    const match = assign(route({ stations: [ZUERICH_HB.didok, LUZERN.didok] }), rules);
+    const match = assign(
+      route({ stations: [ZUERICH_HB.didok, LUZERN.didok] }),
+      rules,
+    );
 
     expect(match?.via).toEqual(LUZERN);
   });
 
   it('requires every predicate of a rule to hold', () => {
-    expect(assign(route({ agencyId: RHB.id, shortName: 'S1' }), rules)).toMatchObject({
+    expect(
+      assign(route({ agencyId: RHB.id, shortName: 'S1' }), rules),
+    ).toMatchObject({
       position: 2,
       via: null,
     });
-    expect(assign(route({ agencyId: RHB.id, shortName: 'S2' }), rules)).toBeNull();
-    expect(assign(route({ agencyId: RHB.id, shortName: null }), rules)).toBeNull();
+    expect(
+      assign(route({ agencyId: RHB.id, shortName: 'S2' }), rules),
+    ).toBeNull();
+    expect(
+      assign(route({ agencyId: RHB.id, shortName: null }), rules),
+    ).toBeNull();
   });
 
   it('matches on category alone when that is all a rule asks', () => {
     expect(
-      assign(route({ category: 'IC', stations: [BERN.didok] }), rules)?.position,
+      assign(route({ category: 'IC', stations: [BERN.didok] }), rules)
+        ?.position,
     ).toBe(1);
     expect(assign(route({ category: 'FUN' }), rules)?.rule).toEqual({
       byOperator: true,
@@ -239,7 +267,9 @@ const S1_2026: [routeId: string, agencyId: string, stations: string][] = [
 
 describe('the committed rules', () => {
   it('load and validate', async () => {
-    await expect(loadRules()).resolves.toMatchObject({ rules: expect.any(Array) });
+    await expect(loadRules()).resolves.toMatchObject({
+      rules: expect.any(Array),
+    });
   });
 
   it('put every S1 of the 2026 feed in a distinct region', async () => {
@@ -256,7 +286,10 @@ describe('the committed rules', () => {
         rules,
       );
 
-      return [routeId, match?.rule.region ?? (match === null ? null : 'by operator')];
+      return [
+        routeId,
+        match?.rule.region ?? (match === null ? null : 'by operator'),
+      ];
     });
 
     expect(placed).toEqual([

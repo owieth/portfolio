@@ -4,7 +4,13 @@ import { join } from 'node:path';
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import { assertColumns, literal, missingStoreTables, openGtfs, STORE } from './db.ts';
+import {
+  assertColumns,
+  literal,
+  missingStoreTables,
+  openGtfs,
+  STORE,
+} from './db.ts';
 
 /**
  * A two-column feed is enough here: what is being tested is the wiring — that a
@@ -40,7 +46,9 @@ describe('openGtfs', () => {
     const db = await openGtfs(directory, ['agency', 'routes']);
 
     try {
-      expect(await db.query(`select count(*)::integer as n from routes`)).toEqual([{ n: 1 }]);
+      expect(
+        await db.query(`select count(*)::integer as n from routes`),
+      ).toEqual([{ n: 1 }]);
       expect(await db.query(`select agency_name from agency`)).toEqual([
         { agency_name: 'Schweizerische Bundesbahnen SBB' },
       ]);
@@ -66,18 +74,20 @@ describe('openGtfs', () => {
     const db = await openGtfs(directory, []);
 
     try {
-      expect(await db.query(`select ${literal("it's")} as a, ${literal('C:\\x')} as b`)).toEqual([
-        { a: "it's", b: 'C:\\x' },
-      ]);
+      expect(
+        await db.query(
+          `select ${literal("it's")} as a, ${literal('C:\\x')} as b`,
+        ),
+      ).toEqual([{ a: "it's", b: 'C:\\x' }]);
     } finally {
       db.close();
     }
   });
 
   it('names every missing member rather than failing at the first query', async () => {
-    await expect(openGtfs(directory, ['routes', 'stops', 'stop_times'])).rejects.toThrow(
-      /missing stop_times.txt, stops.txt/,
-    );
+    await expect(
+      openGtfs(directory, ['routes', 'stops', 'stop_times']),
+    ).rejects.toThrow(/missing stop_times.txt, stops.txt/);
   });
 
   it('reports the directory that could not be opened', async () => {
@@ -102,9 +112,9 @@ describe('openGtfs', () => {
     const reopened = await openGtfs(directory, [], { store });
 
     try {
-      expect(await reopened.query(`select route_id from ${STORE}.rideable`)).toEqual([
-        { route_id: '91-3-B-j26-1' },
-      ]);
+      expect(
+        await reopened.query(`select route_id from ${STORE}.rideable`),
+      ).toEqual([{ route_id: '91-3-B-j26-1' }]);
 
       // The CSV views are scaffolding for the run that made them; a store that
       // carried them would carry absolute paths into the next machine too.
@@ -157,11 +167,13 @@ describe('missingStoreTables', () => {
     });
 
     try {
-      await db.run(`create table ${STORE}.stop_times as select route_id from routes`);
+      await db.run(
+        `create table ${STORE}.stop_times as select route_id from routes`,
+      );
 
-      expect(await missingStoreTables(db, ['stop_times', 'service_days'])).toEqual([
-        'service_days',
-      ]);
+      expect(
+        await missingStoreTables(db, ['stop_times', 'service_days']),
+      ).toEqual(['service_days']);
     } finally {
       db.close();
     }

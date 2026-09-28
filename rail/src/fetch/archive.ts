@@ -50,7 +50,9 @@ export async function downloadArchive(
     );
   } catch (error) {
     await rm(part, { force: true });
-    throw new Error(`the download failed after ${bytes} bytes`, { cause: error });
+    throw new Error(`the download failed after ${bytes} bytes`, {
+      cause: error,
+    });
   }
 
   // Atomic within the directory, so the destination either does not exist or is

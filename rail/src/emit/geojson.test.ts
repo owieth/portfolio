@@ -6,7 +6,14 @@ import type { TerminiLine } from '../termini.ts';
 
 describe('roundParts', () => {
   it('rounds every coordinate to five decimals, longitude first', () => {
-    expect(roundParts([[[8.123456789, 47.987654321], [8.2, 47.1]]])).toEqual([
+    expect(
+      roundParts([
+        [
+          [8.123456789, 47.987654321],
+          [8.2, 47.1],
+        ],
+      ]),
+    ).toEqual([
       [
         [8.12346, 47.98765],
         [8.2, 47.1],
@@ -136,9 +143,15 @@ describe('toGeoJson', () => {
     const lines = text.split('\n');
 
     expect(lines).toHaveLength(5);
-    expect(lines[0]).toMatch(/^\{"type":"FeatureCollection","attribution":\{.*\},"features":\[$/);
-    expect(lines[1]).toMatch(/^\{"type":"Feature","properties":\{"id":"fernverkehr:EC:.*\}\},$/);
-    expect(lines[2]).toMatch(/^\{"type":"Feature","properties":\{"id":"s-bahn-zuerich:S12".*\}\}$/);
+    expect(lines[0]).toMatch(
+      /^\{"type":"FeatureCollection","attribution":\{.*\},"features":\[$/,
+    );
+    expect(lines[1]).toMatch(
+      /^\{"type":"Feature","properties":\{"id":"fernverkehr:EC:.*\}\},$/,
+    );
+    expect(lines[2]).toMatch(
+      /^\{"type":"Feature","properties":\{"id":"s-bahn-zuerich:S12".*\}\}$/,
+    );
     expect(lines.slice(3)).toEqual([']}', '']);
   });
 

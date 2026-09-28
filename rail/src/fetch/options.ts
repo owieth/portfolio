@@ -41,8 +41,7 @@ export interface FetchOptions {
 export type FlagValue = string | boolean | (string | boolean)[] | undefined;
 
 export type ParsedOptions =
-  | { ok: true; value: FetchOptions }
-  | { ok: false; error: string };
+  { ok: true; value: FetchOptions } | { ok: false; error: string };
 
 /**
  * The second Sunday of December, which is when the Swiss timetable switches.
@@ -116,7 +115,8 @@ export function parseFetchOptions(
     if (rawYear.value !== null) {
       return {
         ok: false,
-        error: '--year does not apply to --source geops; the mirror publishes one current feed',
+        error:
+          '--year does not apply to --source geops; the mirror publishes one current feed',
       };
     }
 
@@ -129,7 +129,10 @@ export function parseFetchOptions(
     year = timetableYearOn(now);
   } else {
     if (!/^\d{4}$/.test(rawYear.value)) {
-      return { ok: false, error: `--year ${rawYear.value} is not a four-digit year` };
+      return {
+        ok: false,
+        error: `--year ${rawYear.value} is not a four-digit year`,
+      };
     }
 
     year = Number(rawYear.value);

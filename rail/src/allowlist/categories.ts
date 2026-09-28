@@ -104,11 +104,17 @@ export type Classification =
  * `constructor` — the feed is operator-supplied text — resolves to nothing
  * instead of to a function on the prototype.
  */
-export function classify(routeDesc: string | null, routeType: string): Classification {
+export function classify(
+  routeDesc: string | null,
+  routeType: string,
+): Classification {
   const code = routeDesc?.trim().toUpperCase() ?? '';
 
   if (code === '') {
-    return { kind: 'unknown', reason: `no route_desc on route_type ${routeType}` };
+    return {
+      kind: 'unknown',
+      reason: `no route_desc on route_type ${routeType}`,
+    };
   }
 
   const type = Number.parseInt(routeType, 10);
@@ -128,7 +134,10 @@ export function classify(routeDesc: string | null, routeType: string): Classific
     return { kind: 'excluded', reason: EXCLUDED[code as ExcludedCode].reason };
   }
 
-  return { kind: 'unknown', reason: `${code} is not in the category vocabulary` };
+  return {
+    kind: 'unknown',
+    reason: `${code} is not in the category vocabulary`,
+  };
 }
 
 /**
@@ -140,7 +149,10 @@ export function classify(routeDesc: string | null, routeType: string): Classific
  * called `IC`; it is a line with no number, and the regions and merge steps have
  * to agree on which routes those are, so the test lives here once.
  */
-export function lineNumber(shortName: string | null, category: Category): string | null {
+export function lineNumber(
+  shortName: string | null,
+  category: Category,
+): string | null {
   const number = shortName?.trim() ?? '';
 
   return number === '' || number.toUpperCase() === category ? null : number;

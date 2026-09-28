@@ -3,14 +3,18 @@ import { describe, expect, it } from 'vitest';
 import { loadOperators, parseOperators, verifyOperators } from './operators.ts';
 
 const RHB = { id: '72', name: 'Rhätische Bahn', short: 'RhB' };
-const POLYBAHN = { id: '165', name: 'Poly-Bahn Zürich', short: 'Polybahn', note: 'why' };
+const POLYBAHN = {
+  id: '165',
+  name: 'Poly-Bahn Zürich',
+  short: 'Polybahn',
+  note: 'why',
+};
 
 describe('parseOperators', () => {
   it('accepts a well-formed file', () => {
-    expect(parseOperators({ operators: [RHB, POLYBAHN] }, 'operators.json')).toEqual([
-      RHB,
-      POLYBAHN,
-    ]);
+    expect(
+      parseOperators({ operators: [RHB, POLYBAHN] }, 'operators.json'),
+    ).toEqual([RHB, POLYBAHN]);
   });
 
   it('rejects a file without an operators list', () => {
@@ -49,11 +53,15 @@ describe('verifyOperators', () => {
   it('reports a name the feed spells differently', () => {
     expect(
       verifyOperators([RHB], [{ agencyId: '72', operator: 'Rhaetische Bahn' }]),
-    ).toEqual(['operator 72 is Rhaetische Bahn in the feed, not Rhätische Bahn']);
+    ).toEqual([
+      'operator 72 is Rhaetische Bahn in the feed, not Rhätische Bahn',
+    ]);
   });
 
   it('reports an entry for an operator that runs nothing in the feed', () => {
-    expect(verifyOperators([POLYBAHN], [{ agencyId: null, operator: '165' }])).toEqual([
+    expect(
+      verifyOperators([POLYBAHN], [{ agencyId: null, operator: '165' }]),
+    ).toEqual([
       'operator 165 Poly-Bahn Zürich runs no allowed route in this feed; it may be stale',
     ]);
   });

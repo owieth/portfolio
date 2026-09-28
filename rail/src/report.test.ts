@@ -51,7 +51,13 @@ const INPUT: ReportInput = {
   regionNames: { 's-bahn-zuerich': 'S-Bahn Zürich (ZVV)' },
   stations: STATIONS,
   unmatched: [
-    { id: GELMERBAHN.id, name: GELMERBAHN.name, reason: 'no-candidate', best: null, lostTo: [] },
+    {
+      id: GELMERBAHN.id,
+      name: GELMERBAHN.name,
+      reason: 'no-candidate',
+      best: null,
+      lostTo: [],
+    },
   ],
   suspect: [],
   inFeed: [],
@@ -99,7 +105,9 @@ describe('writeReport', () => {
     await writeReport(INPUT, log, { dir });
 
     expect(await readdir(dir)).toEqual([REPORT_MD]);
-    expect(await readFile(join(dir, REPORT_MD), 'utf8')).toBe(renderReport(INPUT));
+    expect(await readFile(join(dir, REPORT_MD), 'utf8')).toBe(
+      renderReport(INPUT),
+    );
   });
 
   it('writes the same bytes twice, with one fingerprint', async () => {

@@ -6,7 +6,11 @@ import type { Feed, State } from './rows.ts';
 
 const FEED: Feed = {
   lines: [IR35, S12],
-  stops: [stop(IR35, 1, 'Bern'), stop(IR35, 2, 'Luzern'), stop(S12, 1, 'Brugg AG')],
+  stops: [
+    stop(IR35, 1, 'Bern'),
+    stop(IR35, 2, 'Luzern'),
+    stop(S12, 1, 'Brugg AG'),
+  ],
 };
 
 /** The database right after the seed: the same rows, nothing edited. */
@@ -57,7 +61,10 @@ describe('planReconcile', () => {
     );
     const next: Feed = {
       ...FEED,
-      lines: [{ ...IR35, display_name: 'IR35 new', route_ids: ['91-35-j27-1'] }, S12],
+      lines: [
+        { ...IR35, display_name: 'IR35 new', route_ids: ['91-35-j27-1'] },
+        S12,
+      ],
     };
 
     const plan = planReconcile(next, state);
@@ -68,10 +75,14 @@ describe('planReconcile', () => {
         label: 'fernverkehr:IR35',
         name: 'Mine',
         set: { route_ids: ['91-35-j27-1'] },
-        changes: [{ field: 'route_ids', from: ['91-35-j26-1'], to: ['91-35-j27-1'] }],
+        changes: [
+          { field: 'route_ids', from: ['91-35-j26-1'], to: ['91-35-j27-1'] },
+        ],
       },
     ]);
-    expect(plan.lines.skipped.map(skip => skip.field)).toEqual(['display_name']);
+    expect(plan.lines.skipped.map(skip => skip.field)).toEqual([
+      'display_name',
+    ]);
   });
 
   it('compares lists by value, not by identity', () => {
@@ -92,19 +103,31 @@ describe('planReconcile', () => {
     const IR36 = { ...IR35, id: 'fernverkehr:IR36', display_name: 'IR36' };
     const next: Feed = {
       lines: [IR36, { ...S12, trips_per_week: 690 }],
-      stops: [stop(IR36, 1, 'Bern'), stop(S12, 1, 'Brugg'), stop(S12, 2, 'Baden')],
+      stops: [
+        stop(IR36, 1, 'Bern'),
+        stop(S12, 1, 'Brugg'),
+        stop(S12, 2, 'Baden'),
+      ],
     };
 
     const plan = planReconcile(next, state);
 
-    expect(plan.lines.inserts.map(line => line.id)).toEqual(['fernverkehr:IR36']);
+    expect(plan.lines.inserts.map(line => line.id)).toEqual([
+      'fernverkehr:IR36',
+    ]);
     expect(plan.lines.updates.map(update => update.set)).toEqual([
       { trips_per_week: 690 },
     ]);
     expect(plan.lines.flagged).toEqual([
-      { key: { id: 'fernverkehr:IR35' }, label: 'fernverkehr:IR35', name: 'IR35' },
+      {
+        key: { id: 'fernverkehr:IR35' },
+        label: 'fernverkehr:IR35',
+        name: 'IR35',
+      },
     ]);
-    expect(plan.lines.skipped.map(skip => skip.label)).toEqual(['s-bahn-zuerich:S12']);
+    expect(plan.lines.skipped.map(skip => skip.label)).toEqual([
+      's-bahn-zuerich:S12',
+    ]);
 
     expect(plan.stops.inserts.map(row => [row.line_id, row.sequence])).toEqual([
       ['fernverkehr:IR36', 1],
@@ -120,12 +143,19 @@ describe('planReconcile', () => {
   });
 
   it('flags a line’s stops in sequence order', () => {
-    const stops = [2, 10, 9, 1].map(sequence => stop(IR35, sequence, `Stop ${sequence}`));
-    const state: State = { lines: [], stops: stops.map(row => storedStop(row)) };
+    const stops = [2, 10, 9, 1].map(sequence =>
+      stop(IR35, sequence, `Stop ${sequence}`),
+    );
+    const state: State = {
+      lines: [],
+      stops: stops.map(row => storedStop(row)),
+    };
 
     const plan = planReconcile({ lines: [], stops: [] }, state);
 
-    expect(plan.stops.flagged.map(target => target.key.sequence)).toEqual([1, 2, 9, 10]);
+    expect(plan.stops.flagged.map(target => target.key.sequence)).toEqual([
+      1, 2, 9, 10,
+    ]);
   });
 
   it('does not flag again a row an earlier reconcile flagged', () => {
@@ -149,7 +179,11 @@ describe('planReconcile', () => {
     const plan = planReconcile(FEED, state);
 
     expect(plan.lines.restored).toEqual([
-      { key: { id: 'fernverkehr:IR35' }, label: 'fernverkehr:IR35', name: 'IR35' },
+      {
+        key: { id: 'fernverkehr:IR35' },
+        label: 'fernverkehr:IR35',
+        name: 'IR35',
+      },
     ]);
     expect(plan.lines.updates.map(update => update.set)).toEqual([
       { trips_per_week: 196 },
@@ -163,7 +197,11 @@ describe('planReconcile', () => {
       stops: [
         storedStop(stop(IR35, 1, 'Bern')),
         storedStop(
-          { ...stop(IR35, 2, 'Luzern'), didok: '8505000', stop_name: 'Luzern (corrected)' },
+          {
+            ...stop(IR35, 2, 'Luzern'),
+            didok: '8505000',
+            stop_name: 'Luzern (corrected)',
+          },
           { edited_fields: ['stop_name'] },
         ),
       ],
@@ -204,7 +242,9 @@ describe('planReconcile', () => {
     expect(plan.stops.inserts.map(row => [row.sequence, row.didok])).toEqual([
       [3, '8505000'],
     ]);
-    expect(plan.stops.updates.map(update => [update.label, update.set])).toEqual([
+    expect(
+      plan.stops.updates.map(update => [update.label, update.set]),
+    ).toEqual([
       ['fernverkehr:IR35 #2', { stop_name: 'Olten', didok: '8500218' }],
     ]);
   });
@@ -226,15 +266,15 @@ describe('planReconcile', () => {
 
     const plan = planReconcile(next, state);
 
-    expect(plan.stops.skipped.map(skip => [skip.field, skip.kept, skip.feed])).toEqual([
-      ['didok', '8505999', '8505000'],
-    ]);
+    expect(
+      plan.stops.skipped.map(skip => [skip.field, skip.kept, skip.feed]),
+    ).toEqual([['didok', '8505999', '8505000']]);
     expect(plan.stops.updates).toEqual([]);
   });
 
   it('refuses a feed with one key twice', () => {
-    expect(() => planReconcile({ ...FEED, lines: [IR35, IR35] }, seeded())).toThrow(
-      'lines.csv has fernverkehr:IR35 twice',
-    );
+    expect(() =>
+      planReconcile({ ...FEED, lines: [IR35, IR35] }, seeded()),
+    ).toThrow('lines.csv has fernverkehr:IR35 twice');
   });
 });

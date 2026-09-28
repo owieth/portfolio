@@ -24,7 +24,10 @@ const SBB = { id: '11', name: 'Schweizerische Bundesbahnen SBB' };
 const RHB = { id: '72', name: 'Rhätische Bahn' };
 const POLYBAHN = { id: '165', name: 'Poly-Bahn Zürich' };
 const TPN = { id: '15300', name: 'Transports Publics Neuchâtelois SA' };
-const SNCF = { id: '87_LEX', name: 'Société Nationale des Chemins de fer Français' };
+const SNCF = {
+  id: '87_LEX',
+  name: 'Société Nationale des Chemins de fer Français',
+};
 const UNKNOWN = { id: '999', name: 'Unbekannte Bahn AG' };
 
 const OPERATORS: Operator[] = [
@@ -53,7 +56,12 @@ function route(
   };
 }
 
-function pattern(routeId: string, stations: string[], trips = 10, runs = 300): Pattern {
+function pattern(
+  routeId: string,
+  stations: string[],
+  trips = 10,
+  runs = 300,
+): Pattern {
   return { routeId, hash: stations.join('').slice(-16), stations, trips, runs };
 }
 
@@ -87,8 +95,20 @@ const ROUTES: RegionedRoute[] = [
   route('91-35-A-j26-1', 'IR', 'IR35', 'fernverkehr', SBB),
   route('91-3-A-j26-1', 'ICE', '3', 'fernverkehr', SBB),
   route('93-24-j26-1', 'FUN', '24', 'poly-bahn-zuerich', POLYBAHN),
-  route('93-111-j26-1', 'FUN', '111', 'transports-publics-neuchatelois-sa', TPN),
-  route('93-112-j26-1', 'FUN', '112', 'transports-publics-neuchatelois-sa', TPN),
+  route(
+    '93-111-j26-1',
+    'FUN',
+    '111',
+    'transports-publics-neuchatelois-sa',
+    TPN,
+  ),
+  route(
+    '93-112-j26-1',
+    'FUN',
+    '112',
+    'transports-publics-neuchatelois-sa',
+    TPN,
+  ),
   route('91-9-Y-j26-1', 'R', 'R', 'unbekannte-bahn-ag', UNKNOWN),
   route('91-ZZ-Y-j26-1', 'ZUG', 'ZUG', 'fernverkehr', SNCF),
   route('91-D8-Y-j26-1', 'S', 'S', 's-bahn-basel', SBB),
@@ -123,7 +143,11 @@ beforeEach(() => {
   logged = [];
 });
 
-function input(routes = ROUTES, patterns = PATTERNS, stations = STATIONS): NamingInput {
+function input(
+  routes = ROUTES,
+  patterns = PATTERNS,
+  stations = STATIONS,
+): NamingInput {
   return {
     lines: mergeLines(routes, patterns, () => {}).lines,
     routes,
@@ -178,17 +202,23 @@ describe('nameLines', () => {
   });
 
   it('leaves the category out of a ZUG name', () => {
-    expect(nameOf('fernverkehr:ZUG:8501008-8774500')).toBe('SNCF Genève-Lyon Part-Dieu');
+    expect(nameOf('fernverkehr:ZUG:8501008-8774500')).toBe(
+      'SNCF Genève-Lyon Part-Dieu',
+    );
   });
 
   it('falls back to the full name of an operator the table does not know, and flags it', () => {
     const { lines, fallbacks } = nameLines(input(), log);
 
-    expect(lines.find(line => line.region === 'unbekannte-bahn-ag')).toMatchObject({
+    expect(
+      lines.find(line => line.region === 'unbekannte-bahn-ag'),
+    ).toMatchObject({
       name: 'Unbekannte Bahn AG R Chur-Landquart',
       review: ['unknown-operator'],
     });
-    expect(fallbacks).toEqual([{ agencyId: '999', operator: 'Unbekannte Bahn AG', lines: 1 }]);
+    expect(fallbacks).toEqual([
+      { agencyId: '999', operator: 'Unbekannte Bahn AG', lines: 1 },
+    ]);
     expect(logged).toContain(
       'operator 999 Unbekannte Bahn AG has no short name, so 1 line carries its full name; add it to data/operators.json',
     );
@@ -209,7 +239,9 @@ describe('nameLines', () => {
 
   it('reports an operator entry the feed spells differently', () => {
     const renamed = ROUTES.map(entry =>
-      entry.agencyId === RHB.id ? { ...entry, operator: 'Rhaetische Bahn' } : entry,
+      entry.agencyId === RHB.id
+        ? { ...entry, operator: 'Rhaetische Bahn' }
+        : entry,
     );
 
     nameLines(input(renamed), log);
@@ -223,7 +255,11 @@ describe('nameLines', () => {
     const first = nameLines(input(), log);
     const again = nameLines(input(), log);
     const reordered = nameLines(
-      input([...ROUTES].reverse(), [...PATTERNS].reverse(), [...STATIONS].reverse()),
+      input(
+        [...ROUTES].reverse(),
+        [...PATTERNS].reverse(),
+        [...STATIONS].reverse(),
+      ),
       log,
     );
 

@@ -34,19 +34,28 @@ describe('fetchFeed from the official source', () => {
   it('keeps the 404 wording for a year that does not exist', async () => {
     stubFetch(() => Promise.resolve(new Response('missing', { status: 404 })));
 
-    await expect(fetchFeed(OFFICIAL, silent)).rejects.toThrow(/no such timetable year/);
+    await expect(fetchFeed(OFFICIAL, silent)).rejects.toThrow(
+      /no such timetable year/,
+    );
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
   it('names the mirror when the portal answers 5xx', async () => {
     stubFetch(() =>
-      Promise.resolve(new Response('down', { status: 503, statusText: 'Service Unavailable' })),
+      Promise.resolve(
+        new Response('down', {
+          status: 503,
+          statusText: 'Service Unavailable',
+        }),
+      ),
     );
 
     const failure = expect(fetchFeed(OFFICIAL, silent)).rejects.toThrow(
       expect.objectContaining({
         message: expect.stringMatching(/--source geops/),
-        cause: expect.objectContaining({ message: expect.stringContaining('answered 503') }),
+        cause: expect.objectContaining({
+          message: expect.stringContaining('answered 503'),
+        }),
       }),
     );
     await vi.advanceTimersByTimeAsync(2_000);
@@ -58,7 +67,9 @@ describe('fetchFeed from the official source', () => {
   it('names the mirror when the portal cannot be reached', async () => {
     stubFetch(() => Promise.reject(new TypeError('fetch failed')));
 
-    const failure = expect(fetchFeed(OFFICIAL, silent)).rejects.toThrow(/--source geops/);
+    const failure = expect(fetchFeed(OFFICIAL, silent)).rejects.toThrow(
+      /--source geops/,
+    );
     await vi.advanceTimersByTimeAsync(2_000);
 
     await failure;

@@ -43,7 +43,12 @@ describe('extractArchive', () => {
     }
 
     // The real feed is a flat archive, so -j matches what the pipeline will see.
-    await run('zip', ['-q', '-j', archive, ...names.map(name => join(source, name))]);
+    await run('zip', [
+      '-q',
+      '-j',
+      archive,
+      ...names.map(name => join(source, name)),
+    ]);
   });
 
   afterEach(async () => {
@@ -59,7 +64,9 @@ describe('extractArchive', () => {
         .map(name => ({ name, bytes: Buffer.byteLength(MEMBERS[name]) })),
     );
 
-    expect((await readdir(destination)).sort()).toEqual(Object.keys(MEMBERS).sort());
+    expect((await readdir(destination)).sort()).toEqual(
+      Object.keys(MEMBERS).sort(),
+    );
     expect(await readFile(join(destination, 'routes.txt'), 'utf8')).toBe(
       MEMBERS['routes.txt'],
     );

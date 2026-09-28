@@ -10,9 +10,19 @@ import { sequenceLines } from './sequence.ts';
  * routes of two operators that run one stop list between them and a branch; the
  * Gelmerbahn is the hand-written line that has no patterns at all.
  */
-const [BERN, OLTEN, AARAU, ZUERICH, BASEL] = ['8507000', '8500218', '8502113', '8503000', '8500010'];
+const [BERN, OLTEN, AARAU, ZUERICH, BASEL] = [
+  '8507000',
+  '8500218',
+  '8502113',
+  '8503000',
+  '8500010',
+];
 
-function feedLine(id: string, routeIds: string[], stations: string[]): FeedLine {
+function feedLine(
+  id: string,
+  routeIds: string[],
+  stations: string[],
+): FeedLine {
   return {
     id,
     category: 'IR',
@@ -29,7 +39,11 @@ function feedLine(id: string, routeIds: string[], stations: string[]): FeedLine 
   };
 }
 
-const IR35 = feedLine('fernverkehr:IR35', ['bls', 'sbb'], [BERN, OLTEN, AARAU, ZUERICH, BASEL]);
+const IR35 = feedLine(
+  'fernverkehr:IR35',
+  ['bls', 'sbb'],
+  [BERN, OLTEN, AARAU, ZUERICH, BASEL],
+);
 
 const GELMERBAHN: ManualLine = {
   id: 'kwo-seilbahnen:FUN:8531013-8531014',
@@ -55,9 +69,27 @@ const TO_BERN = [ZUERICH, AARAU, OLTEN, BERN];
 const PATTERNS: Pattern[] = [
   { routeId: 'bls', hash: 'toBern', stations: TO_BERN, trips: 10, runs: 200 },
   { routeId: 'sbb', hash: 'toBern', stations: TO_BERN, trips: 6, runs: 150 },
-  { routeId: 'sbb', hash: 'toZuerich', stations: [...TO_BERN].reverse(), trips: 5, runs: 300 },
-  { routeId: 'sbb', hash: 'fromBasel', stations: [BASEL, OLTEN], trips: 5, runs: 40 },
-  { routeId: 'elsewhere', hash: 'elsewhere', stations: [BERN, BASEL], trips: 5, runs: 999 },
+  {
+    routeId: 'sbb',
+    hash: 'toZuerich',
+    stations: [...TO_BERN].reverse(),
+    trips: 5,
+    runs: 300,
+  },
+  {
+    routeId: 'sbb',
+    hash: 'fromBasel',
+    stations: [BASEL, OLTEN],
+    trips: 5,
+    runs: 40,
+  },
+  {
+    routeId: 'elsewhere',
+    hash: 'elsewhere',
+    stations: [BERN, BASEL],
+    trips: 5,
+    runs: 999,
+  },
 ];
 
 let logged: string[];
@@ -72,7 +104,10 @@ beforeEach(() => {
 
 describe('sequenceLines', () => {
   it('orders a line from every pattern of every route merged into it', () => {
-    const [line] = sequenceLines({ lines: [IR35], patterns: PATTERNS, stations: [] }, log).lines;
+    const [line] = sequenceLines(
+      { lines: [IR35], patterns: PATTERNS, stations: [] },
+      log,
+    ).lines;
 
     expect(line?.source === 'feed' ? line.sequence : null).toEqual([
       { didok: ZUERICH, via: 'backbone', junction: null },
@@ -84,11 +119,19 @@ describe('sequenceLines', () => {
   });
 
   it('keeps every distinct pattern, pooled across routes, with the way it runs', () => {
-    const [line] = sequenceLines({ lines: [IR35], patterns: PATTERNS, stations: [] }, log).lines;
+    const [line] = sequenceLines(
+      { lines: [IR35], patterns: PATTERNS, stations: [] },
+      log,
+    ).lines;
 
     expect(
       line?.source === 'feed'
-        ? line.patterns.map(({ hash, trips, runs, reversed }) => [hash, trips, runs, reversed])
+        ? line.patterns.map(({ hash, trips, runs, reversed }) => [
+            hash,
+            trips,
+            runs,
+            reversed,
+          ])
         : null,
     ).toEqual([
       ['toBern', 16, 350, false],
@@ -98,14 +141,27 @@ describe('sequenceLines', () => {
   });
 
   it('passes a hand-written line through untouched', () => {
-    const { lines } = sequenceLines({ lines: [IR35, GELMERBAHN], patterns: PATTERNS, stations: [] }, log);
+    const { lines } = sequenceLines(
+      { lines: [IR35, GELMERBAHN], patterns: PATTERNS, stations: [] },
+      log,
+    );
 
     expect(lines[1]).toBe(GELMERBAHN);
   });
 
   it('logs the branched lines and a fingerprint that two runs agree on', () => {
-    const first = sequenceLines({ lines: [IR35, GELMERBAHN], patterns: PATTERNS, stations: [] }, log);
-    const again = sequenceLines({ lines: [IR35, GELMERBAHN], patterns: [...PATTERNS].reverse(), stations: [] }, log);
+    const first = sequenceLines(
+      { lines: [IR35, GELMERBAHN], patterns: PATTERNS, stations: [] },
+      log,
+    );
+    const again = sequenceLines(
+      {
+        lines: [IR35, GELMERBAHN],
+        patterns: [...PATTERNS].reverse(),
+        stations: [],
+      },
+      log,
+    );
 
     expect(again).toEqual(first);
     expect(first.branched).toEqual(['fernverkehr:IR35']);
@@ -118,15 +174,23 @@ describe('sequenceLines', () => {
   it('stops on a feed line with no pattern', () => {
     const orphan = feedLine('fernverkehr:IR99', ['gone'], [BERN, OLTEN]);
 
-    expect(() => sequenceLines({ lines: [orphan], patterns: PATTERNS, stations: [] }, log)).toThrow(
+    expect(() =>
+      sequenceLines({ lines: [orphan], patterns: PATTERNS, stations: [] }, log),
+    ).toThrow(
       /line fernverkehr:IR99 reached the sequence step without a pattern/,
     );
   });
 
   it('stops when the sequence and the line disagree about its stations', () => {
-    const short = feedLine('fernverkehr:IR35', ['bls', 'sbb'], [BERN, OLTEN, AARAU]);
+    const short = feedLine(
+      'fernverkehr:IR35',
+      ['bls', 'sbb'],
+      [BERN, OLTEN, AARAU],
+    );
 
-    expect(() => sequenceLines({ lines: [short], patterns: PATTERNS, stations: [] }, log)).toThrow(
+    expect(() =>
+      sequenceLines({ lines: [short], patterns: PATTERNS, stations: [] }, log),
+    ).toThrow(
       /does not hold its stations once each — missing none, extra 8503000, 8500010/,
     );
   });

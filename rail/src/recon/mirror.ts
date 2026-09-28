@@ -68,7 +68,9 @@ export function findDirectory(tail: Buffer): Directory {
     };
   }
 
-  throw new Error('no end-of-central-directory record in the tail of the archive');
+  throw new Error(
+    'no end-of-central-directory record in the tail of the archive',
+  );
 }
 
 /** The locator sits immediately before the EOCD and points at the real record. */
@@ -76,15 +78,24 @@ function readZip64Locator(tail: Buffer, eocdIndex: number): number {
   const index = eocdIndex - ZIP64_LOCATOR_BYTES;
 
   if (index < 0 || tail.readUInt32LE(index) !== ZIP64_LOCATOR_SIGNATURE) {
-    throw new Error('the archive needs a ZIP64 record and does not have a locator');
+    throw new Error(
+      'the archive needs a ZIP64 record and does not have a locator',
+    );
   }
 
   return Number(tail.readBigUInt64LE(index + 8));
 }
 
-export function readZip64Directory(record: Buffer): Pick<Directory, 'offset' | 'bytes' | 'entries'> {
-  if (record.length < ZIP64_EOCD_BYTES || record.readUInt32LE(0) !== ZIP64_EOCD_SIGNATURE) {
-    throw new Error('the ZIP64 end-of-central-directory record is not where the locator said');
+export function readZip64Directory(
+  record: Buffer,
+): Pick<Directory, 'offset' | 'bytes' | 'entries'> {
+  if (
+    record.length < ZIP64_EOCD_BYTES ||
+    record.readUInt32LE(0) !== ZIP64_EOCD_SIGNATURE
+  ) {
+    throw new Error(
+      'the ZIP64 end-of-central-directory record is not where the locator said',
+    );
   }
 
   return {
@@ -131,21 +142,28 @@ export function listEntries(directory: Buffer, entries: number): string[] {
  * ignores `Range` answers 200 with the whole body, and streaming 194 MB into a
  * buffer to answer one question is exactly what this function exists to avoid.
  */
-async function range(url: string, spec: string): Promise<{ body: Buffer; total: number }> {
+async function range(
+  url: string,
+  spec: string,
+): Promise<{ body: Buffer; total: number }> {
   const response = await fetch(url, {
     headers: { range: `bytes=${spec}` },
     signal: AbortSignal.timeout(PROBE_TIMEOUT_MS),
   });
 
   if (response.status !== 206) {
-    throw new Error(`asked for bytes=${spec} and got ${response.status}, not 206 Partial Content`);
+    throw new Error(
+      `asked for bytes=${spec} and got ${response.status}, not 206 Partial Content`,
+    );
   }
 
   const contentRange = response.headers.get('content-range') ?? '';
   const total = Number(contentRange.split('/')[1]);
 
   if (!Number.isFinite(total)) {
-    throw new Error(`the mirror answered 206 without a usable content-range (${contentRange})`);
+    throw new Error(
+      `the mirror answered 206 without a usable content-range (${contentRange})`,
+    );
   }
 
   return { body: Buffer.from(await response.arrayBuffer()), total };
@@ -188,6 +206,10 @@ export async function probeMirror(url: string): Promise<MirrorProbe> {
       entries: listEntries(body, directory.entries).sort(),
     };
   } catch (error) {
-    return { ok: false, url, reason: error instanceof Error ? error.message : String(error) };
+    return {
+      ok: false,
+      url,
+      reason: error instanceof Error ? error.message : String(error),
+    };
   }
 }

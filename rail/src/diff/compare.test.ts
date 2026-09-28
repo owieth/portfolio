@@ -30,7 +30,11 @@ const POLYBAHN: DiffLine = {
   terminal_b: 'Zürich Polyterrasse ETH',
 };
 
-function stop(line: DiffLine, didok: string | null, stop_name = didok ?? ''): DiffStop {
+function stop(
+  line: DiffLine,
+  didok: string | null,
+  stop_name = didok ?? '',
+): DiffStop {
   return { line_id: line.id, stop_name, didok };
 }
 
@@ -58,7 +62,12 @@ describe('compareSnapshots', () => {
   });
 
   it('lists added and removed lines by id', () => {
-    const IR36: DiffLine = { ...IR35, id: 'fernverkehr:IR36', display_name: 'IR36', terminal_b: 'Zürich HB' };
+    const IR36: DiffLine = {
+      ...IR35,
+      id: 'fernverkehr:IR36',
+      display_name: 'IR36',
+      terminal_b: 'Zürich HB',
+    };
     const comparison = compareSnapshots(BEFORE, {
       lines: [IR36, S12, POLYBAHN],
       stops: STOPS.filter(entry => entry.line_id !== IR35.id),
@@ -79,7 +88,10 @@ describe('compareSnapshots', () => {
       terminal_a: 'Luzern',
       terminal_b: 'Bern',
     };
-    const comparison = compareSnapshots(BEFORE, { lines: [IR36, S12, POLYBAHN], stops: STOPS });
+    const comparison = compareSnapshots(BEFORE, {
+      lines: [IR36, S12, POLYBAHN],
+      stops: STOPS,
+    });
 
     expect(comparison.renumbered).toEqual([{ before: IR35, after: IR36 }]);
     expect(comparison.added).toEqual([]);
@@ -87,8 +99,16 @@ describe('compareSnapshots', () => {
   });
 
   it('does not pair when the terminals leave more than one candidate', () => {
-    const IR36: DiffLine = { ...IR35, id: 'fernverkehr:IR36', display_name: 'IR36' };
-    const IR37: DiffLine = { ...IR35, id: 'fernverkehr:IR37', display_name: 'IR37' };
+    const IR36: DiffLine = {
+      ...IR35,
+      id: 'fernverkehr:IR36',
+      display_name: 'IR36',
+    };
+    const IR37: DiffLine = {
+      ...IR35,
+      id: 'fernverkehr:IR37',
+      display_name: 'IR37',
+    };
     const comparison = compareSnapshots(BEFORE, {
       lines: [IR36, IR37, S12, POLYBAHN],
       stops: STOPS,
@@ -101,7 +121,10 @@ describe('compareSnapshots', () => {
 
   it('lists a line that kept its id under a new name as renamed', () => {
     const renamed = { ...POLYBAHN, display_name: 'Polybahn' };
-    const comparison = compareSnapshots(BEFORE, { lines: [IR35, S12, renamed], stops: STOPS });
+    const comparison = compareSnapshots(BEFORE, {
+      lines: [IR35, S12, renamed],
+      stops: STOPS,
+    });
 
     expect(comparison.renamed).toEqual([
       { id: POLYBAHN.id, before: 'Standseilbahn Polybahn', after: 'Polybahn' },
@@ -116,7 +139,9 @@ describe('compareSnapshots', () => {
       stops: STOPS,
     });
 
-    expect(comparison.recategorised).toEqual([{ id: IR35.id, before: 'IR', after: 'RE' }]);
+    expect(comparison.recategorised).toEqual([
+      { id: IR35.id, before: 'IR', after: 'RE' },
+    ]);
     expect(comparison.categories).toEqual([
       { key: 'IR', before: 1, after: 0 },
       { key: 'RE', before: 0, after: 1 },
@@ -124,7 +149,12 @@ describe('compareSnapshots', () => {
   });
 
   it('counts lines per category and per region, listing only the ones that moved', () => {
-    const S5: DiffLine = { ...S12, id: 's-bahn-zuerich:S5', display_name: 'S5', terminal_b: 'Pfäffikon SZ' };
+    const S5: DiffLine = {
+      ...S12,
+      id: 's-bahn-zuerich:S5',
+      display_name: 'S5',
+      terminal_b: 'Pfäffikon SZ',
+    };
     const comparison = compareSnapshots(BEFORE, {
       lines: [S12, S5, POLYBAHN],
       stops: STOPS,
@@ -149,7 +179,10 @@ describe('compareSnapshots', () => {
       stop(S12, '8503000', 'Zürich HB'),
       ...STOPS.filter(entry => entry.line_id === POLYBAHN.id),
     ];
-    const comparison = compareSnapshots(BEFORE, { lines: BEFORE.lines, stops: after });
+    const comparison = compareSnapshots(BEFORE, {
+      lines: BEFORE.lines,
+      stops: after,
+    });
 
     expect(comparison.stopChanges).toEqual([
       {
@@ -162,8 +195,14 @@ describe('compareSnapshots', () => {
   });
 
   it('tells a seeded stop without a Didok number by its name', () => {
-    const before: Snapshot = { lines: [POLYBAHN], stops: [stop(POLYBAHN, null, 'Gelmersee')] };
-    const after: Snapshot = { lines: [POLYBAHN], stops: [stop(POLYBAHN, null, 'Handegg')] };
+    const before: Snapshot = {
+      lines: [POLYBAHN],
+      stops: [stop(POLYBAHN, null, 'Gelmersee')],
+    };
+    const after: Snapshot = {
+      lines: [POLYBAHN],
+      stops: [stop(POLYBAHN, null, 'Handegg')],
+    };
 
     expect(compareSnapshots(before, after).stopChanges).toEqual([
       {
@@ -178,7 +217,11 @@ describe('compareSnapshots', () => {
   it('reports every line as added against an empty snapshot', () => {
     const comparison = compareSnapshots({ lines: [], stops: [] }, BEFORE);
 
-    expect(comparison.added.map(line => line.id)).toEqual([IR35.id, POLYBAHN.id, S12.id]);
+    expect(comparison.added.map(line => line.id)).toEqual([
+      IR35.id,
+      POLYBAHN.id,
+      S12.id,
+    ]);
     expect(comparison.stopChanges).toEqual([]);
   });
 });
@@ -187,19 +230,35 @@ describe('snapshotOf', () => {
   it('keeps the columns the diff reads', () => {
     const snapshot = snapshotOf(
       [{ ...IR35, operators: 'BLS AG', has_geometry: 'true' }],
-      [{ line_id: IR35.id, sequence: '1', stop_name: 'Bern', didok: '8507000', via: 'backbone' }],
+      [
+        {
+          line_id: IR35.id,
+          sequence: '1',
+          stop_name: 'Bern',
+          didok: '8507000',
+          via: 'backbone',
+        },
+      ],
     );
 
-    expect(snapshot).toEqual({ lines: [IR35], stops: [stop(IR35, '8507000', 'Bern')] });
+    expect(snapshot).toEqual({
+      lines: [IR35],
+      stops: [stop(IR35, '8507000', 'Bern')],
+    });
   });
 
   it('reads an empty Didok number as null', () => {
     expect(
-      snapshotOf([], [{ line_id: POLYBAHN.id, stop_name: 'Gelmersee', didok: null }]).stops,
+      snapshotOf(
+        [],
+        [{ line_id: POLYBAHN.id, stop_name: 'Gelmersee', didok: null }],
+      ).stops,
     ).toEqual([stop(POLYBAHN, null, 'Gelmersee')]);
   });
 
   it('rejects a row missing a column it reads', () => {
-    expect(() => snapshotOf([{ id: IR35.id }], [])).toThrow('lines.csv row 2 has no display_name');
+    expect(() => snapshotOf([{ id: IR35.id }], [])).toThrow(
+      'lines.csv row 2 has no display_name',
+    );
   });
 });

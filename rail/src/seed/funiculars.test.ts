@@ -16,23 +16,29 @@ const GELMERBAHN = {
 
 describe('parseFunicularSeed', () => {
   it('accepts a well-formed file', () => {
-    expect(parseFunicularSeed({ funiculars: [GELMERBAHN] }, 'funiculars.json')).toEqual([
-      GELMERBAHN,
-    ]);
+    expect(
+      parseFunicularSeed({ funiculars: [GELMERBAHN] }, 'funiculars.json'),
+    ).toEqual([GELMERBAHN]);
   });
 
   it('accepts a stop without a Didok number', () => {
-    const stops = [GELMERBAHN.stops[0], { name: 'Gelmersee', lat: 46.614439, lon: 8.320473 }];
+    const stops = [
+      GELMERBAHN.stops[0],
+      { name: 'Gelmersee', lat: 46.614439, lon: 8.320473 },
+    ];
 
     expect(
-      parseFunicularSeed({ funiculars: [{ ...GELMERBAHN, stops }] }, 'funiculars.json'),
+      parseFunicularSeed(
+        { funiculars: [{ ...GELMERBAHN, stops }] },
+        'funiculars.json',
+      ),
     ).toHaveLength(1);
   });
 
   it('rejects a file without a funiculars list', () => {
-    expect(() => parseFunicularSeed({ funicular: [] }, 'funiculars.json')).toThrow(
-      'funiculars.json must be an object with a "funiculars" list',
-    );
+    expect(() =>
+      parseFunicularSeed({ funicular: [] }, 'funiculars.json'),
+    ).toThrow('funiculars.json must be an object with a "funiculars" list');
   });
 
   it('reports every problem at once', () => {

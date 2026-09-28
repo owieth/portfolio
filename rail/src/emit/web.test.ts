@@ -87,7 +87,9 @@ describe('toWebCollection', () => {
     const reversed = { ...SOURCE, features: [...SOURCE.features].reverse() };
 
     expect(
-      toWebCollection(reversed, 30).features.map(feature => feature.properties.id),
+      toWebCollection(reversed, 30).features.map(
+        feature => feature.properties.id,
+      ),
     ).toEqual([EC.id, S12.id]);
   });
 });

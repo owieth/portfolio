@@ -23,7 +23,10 @@ describe('main', () => {
     ['a year that is not a year', ['build', '--year', 'twenty']],
     ['an unknown source', ['build', '--source', 'sbb']],
     // The mirror serves one current feed; a year would imply a selector.
-    ['a year against the mirror', ['build', '--source', 'geops', '--year', '2026']],
+    [
+      'a year against the mirror',
+      ['build', '--source', 'geops', '--year', '2026'],
+    ],
     // recon takes the same flags as build and has to reject them the same way,
     // rather than reaching the network and failing there.
     ['a bad source under recon', ['recon', '--source', 'sbb']],

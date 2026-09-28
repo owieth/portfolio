@@ -175,7 +175,11 @@ function problems(
     ['serves', 'didok'],
   ] as const) {
     for (const ref of nonEmptyList(rule, key, found)) {
-      if (!isRecord(ref) || !isNonEmptyString(ref[id]) || !isNonEmptyString(ref.name)) {
+      if (
+        !isRecord(ref) ||
+        !isNonEmptyString(ref[id]) ||
+        !isNonEmptyString(ref.name)
+      ) {
         found.push(
           `needs "${id}" and "name" on every entry in "${key}", got ${JSON.stringify(ref)}`,
         );
@@ -195,7 +199,11 @@ function problems(
  * deep at most, and a dependency for it would be the larger change.
  */
 export function parseRules(json: unknown, source: string): Rules {
-  if (!isRecord(json) || !isRecord(json.regions) || !Array.isArray(json.rules)) {
+  if (
+    !isRecord(json) ||
+    !isRecord(json.regions) ||
+    !Array.isArray(json.rules)
+  ) {
     throw new Error(
       `${source} must be an object with a "regions" map and a "rules" list`,
     );
@@ -268,9 +276,15 @@ export async function loadRules(path: string = RULES_FILE): Promise<Rules> {
  * anchor in the rule's own order that the route serves, so the explanation the
  * log prints is the same on every run.
  */
-export function assign(route: RouteFacts, rules: readonly Rule[]): Match | null {
+export function assign(
+  route: RouteFacts,
+  rules: readonly Rule[],
+): Match | null {
   for (const [index, rule] of rules.entries()) {
-    if (rule.categories !== undefined && !rule.categories.includes(route.category)) {
+    if (
+      rule.categories !== undefined &&
+      !rule.categories.includes(route.category)
+    ) {
       continue;
     }
 
@@ -357,7 +371,9 @@ export function verify(rules: readonly Rule[], feed: FeedNames): string[] {
       const actual = feed.agencies.get(agency.id);
 
       if (actual === undefined) {
-        found.push(`${label}: agency ${agency.id} ${agency.name} is not in the feed`);
+        found.push(
+          `${label}: agency ${agency.id} ${agency.name} is not in the feed`,
+        );
       } else if (actual !== agency.name) {
         found.push(
           `${label}: agency ${agency.id} is ${actual} in the feed, not ${agency.name}`,

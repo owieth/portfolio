@@ -4,7 +4,11 @@ import type { Category } from './allowlist/categories.ts';
 import { matchLines } from './match.ts';
 import type { MatchedLine } from './match.ts';
 import type { OsmMember, OsmRelation } from './overpass.ts';
-import type { SeasonalFeedLine, SeasonalLine, SeasonalManualLine } from './seasonal.ts';
+import type {
+  SeasonalFeedLine,
+  SeasonalLine,
+  SeasonalManualLine,
+} from './seasonal.ts';
 import type { Station } from './stations.ts';
 
 /**
@@ -69,7 +73,11 @@ function feedLine({
     nameSource: number === null ? 'derived' : 'number',
     review: [],
     source: 'feed',
-    sequence: stations.map(value => ({ didok: value, via: 'backbone', junction: null })),
+    sequence: stations.map(value => ({
+      didok: value,
+      via: 'backbone',
+      junction: null,
+    })),
     patterns: [],
     serviceDays: 364,
     serviceWeeks: 52,
@@ -138,10 +146,20 @@ function relation({
     };
   });
   const nodes: OsmMember[] = stops
-    ? through.map(index => ({ type: 'node', ref: index, role: 'stop', ...point(index) }))
+    ? through.map(index => ({
+        type: 'node',
+        ref: index,
+        role: 'stop',
+        ...point(index),
+      }))
     : [];
 
-  return { id, route, tags: { type: 'route', route, ...tags }, members: [...nodes, ...ways] };
+  return {
+    id,
+    route,
+    tags: { type: 'route', route, ...tags },
+    members: [...nodes, ...ways],
+  };
 }
 
 let logged: string[];
@@ -155,7 +173,10 @@ beforeEach(() => {
 });
 
 function run(lines: SeasonalLine[], relations: OsmRelation[]) {
-  return matchLines({ lines, relations, stations: STATIONS, operators: [] }, log);
+  return matchLines(
+    { lines, relations, stations: STATIONS, operators: [] },
+    log,
+  );
 }
 
 function find(lines: readonly MatchedLine[], id: string): MatchedLine {
@@ -170,23 +191,52 @@ function find(lines: readonly MatchedLine[], id: string): MatchedLine {
 
 describe('matchLines', () => {
   it('gives each of two S1s the relation in its own region, never the other', () => {
-    const bern = feedLine({ id: 's-bahn-bern:S1', number: 'S1', stops: [0, 1, 2, 3] });
-    const basel = feedLine({ id: 's-bahn-basel:S1', number: 'S1', lat: BASEL_LAT, stops: [0, 1, 2, 3] });
+    const bern = feedLine({
+      id: 's-bahn-bern:S1',
+      number: 'S1',
+      stops: [0, 1, 2, 3],
+    });
+    const basel = feedLine({
+      id: 's-bahn-basel:S1',
+      number: 'S1',
+      lat: BASEL_LAT,
+      stops: [0, 1, 2, 3],
+    });
     const { lines } = run(
       [basel, bern],
       [
         relation({ id: 1, tags: { ref: 'S1' }, through: [0, 1, 2, 3] }),
-        relation({ id: 2, tags: { ref: 'S1' }, lat: BASEL_LAT, through: [0, 1, 2, 3] }),
+        relation({
+          id: 2,
+          tags: { ref: 'S1' },
+          lat: BASEL_LAT,
+          through: [0, 1, 2, 3],
+        }),
       ],
     );
 
-    expect(find(lines, 's-bahn-bern:S1').match).toEqual({ rule: 'ref', confidence: 1, relations: [1] });
-    expect(find(lines, 's-bahn-basel:S1').match).toEqual({ rule: 'ref', confidence: 1, relations: [2] });
+    expect(find(lines, 's-bahn-bern:S1').match).toEqual({
+      rule: 'ref',
+      confidence: 1,
+      relations: [1],
+    });
+    expect(find(lines, 's-bahn-basel:S1').match).toEqual({
+      rule: 'ref',
+      confidence: 1,
+      relations: [2],
+    });
   });
 
   it('merges both directions into one MultiLineString', () => {
     const [line] = run(
-      [feedLine({ id: 'fernverkehr:IR35', category: 'IR', number: 'IR35', stops: [0, 1, 2] })],
+      [
+        feedLine({
+          id: 'fernverkehr:IR35',
+          category: 'IR',
+          number: 'IR35',
+          stops: [0, 1, 2],
+        }),
+      ],
       [
         relation({ id: 10, tags: { ref: 'IR 35' }, through: [0, 1, 2] }),
         relation({ id: 11, tags: { ref: 'IR 35' }, through: [2, 1, 0] }),
@@ -208,14 +258,24 @@ describe('matchLines', () => {
 
   it('joins a line mapped in sections, and keeps a gap between them open', () => {
     const [line] = run(
-      [feedLine({ id: 's-bahn-bern:S2', number: 'S2', stops: [0, 1, 2, 3, 4, 5] })],
+      [
+        feedLine({
+          id: 's-bahn-bern:S2',
+          number: 'S2',
+          stops: [0, 1, 2, 3, 4, 5],
+        }),
+      ],
       [
         relation({ id: 20, tags: { ref: 'S2' }, through: [0, 1, 2] }),
         relation({ id: 21, tags: { ref: 'S2' }, through: [3, 4, 5] }),
       ],
     ).lines;
 
-    expect(line?.match).toEqual({ rule: 'ref', confidence: 1, relations: [20, 21] });
+    expect(line?.match).toEqual({
+      rule: 'ref',
+      confidence: 1,
+      relations: [20, 21],
+    });
     expect(line?.geometry?.coordinates).toHaveLength(2);
   });
 
@@ -242,11 +302,19 @@ describe('matchLines', () => {
       ],
     );
 
-    expect(lines[0]?.match).toEqual({ rule: 'endpoints', confidence: 1, relations: [30] });
+    expect(lines[0]?.match).toEqual({
+      rule: 'endpoints',
+      confidence: 1,
+      relations: [30],
+    });
   });
 
   it('prefers a relation whose operator runs the line over one that only ends where it does', () => {
-    const line = feedLine({ id: 'berner-oberland:R:8507000-8507003', category: 'R', stops: [0, 1, 2, 3] });
+    const line = feedLine({
+      id: 'berner-oberland:R:8507000-8507003',
+      category: 'R',
+      stops: [0, 1, 2, 3],
+    });
     const { lines } = run(
       [line],
       [
@@ -255,14 +323,31 @@ describe('matchLines', () => {
       ],
     );
 
-    expect(lines[0]?.match).toEqual({ rule: 'operator', confidence: 1, relations: [40] });
+    expect(lines[0]?.match).toEqual({
+      rule: 'operator',
+      confidence: 1,
+      relations: [40],
+    });
   });
 
   it('leaves another line’s relation to the ref rule, however well it ends', () => {
-    const ic = feedLine({ id: 'fernverkehr:IC:8500000-8500003', category: 'IC', lat: BASEL_LAT, stops: [0, 3] });
+    const ic = feedLine({
+      id: 'fernverkehr:IC:8500000-8500003',
+      category: 'IC',
+      lat: BASEL_LAT,
+      stops: [0, 3],
+    });
     const { lines, unmatched } = run(
       [ic],
-      [relation({ id: 50, tags: { ref: 'ICE 20' }, lat: BASEL_LAT, through: [0, 1, 2, 3], stops: false })],
+      [
+        relation({
+          id: 50,
+          tags: { ref: 'ICE 20' },
+          lat: BASEL_LAT,
+          through: [0, 1, 2, 3],
+          stops: false,
+        }),
+      ],
     );
 
     expect(lines[0]?.hasGeometry).toBe(false);
@@ -279,7 +364,11 @@ describe('matchLines', () => {
   });
 
   it('gives a relation claimed twice to the stronger claim and lists the other as contested', () => {
-    const bls = feedLine({ id: 'a:R:8507000-8507002', category: 'R', stops: [0, 1, 2] });
+    const bls = feedLine({
+      id: 'a:R:8507000-8507002',
+      category: 'R',
+      stops: [0, 1, 2],
+    });
     const sbb = feedLine({
       id: 'b:R:8507000-8507002',
       category: 'R',
@@ -291,9 +380,19 @@ describe('matchLines', () => {
       [relation({ id: 70, tags: { operator: 'SBB' }, through: [0, 1, 2] })],
     );
 
-    expect(find(lines, 'b:R:8507000-8507002').match).toEqual({ rule: 'operator', confidence: 1, relations: [70] });
+    expect(find(lines, 'b:R:8507000-8507002').match).toEqual({
+      rule: 'operator',
+      confidence: 1,
+      relations: [70],
+    });
     expect(unmatched).toEqual([
-      { id: 'a:R:8507000-8507002', name: 'a:R:8507000-8507002', reason: 'contested', best: null, lostTo: ['b:R:8507000-8507002'] },
+      {
+        id: 'a:R:8507000-8507002',
+        name: 'a:R:8507000-8507002',
+        reason: 'contested',
+        best: null,
+        lostTo: ['b:R:8507000-8507002'],
+      },
     ]);
   });
 
@@ -310,16 +409,37 @@ describe('matchLines', () => {
       ],
     );
 
-    expect(find(lines, 'c:S1').match).toEqual({ rule: 'ref', confidence: 1, relations: [1] });
-    expect(find(lines, 'a:S1').match).toEqual({ rule: 'ref', confidence: 1, relations: [2] });
+    expect(find(lines, 'c:S1').match).toEqual({
+      rule: 'ref',
+      confidence: 1,
+      relations: [1],
+    });
+    expect(find(lines, 'a:S1').match).toEqual({
+      rule: 'ref',
+      confidence: 1,
+      relations: [2],
+    });
     expect(unmatched).toEqual([
-      { id: 'b:S1', name: 'S1', reason: 'contested', best: { rule: 'ref', confidence: 0.4, relations: [1] }, lostTo: ['a:S1'] },
+      {
+        id: 'b:S1',
+        name: 'S1',
+        reason: 'contested',
+        best: { rule: 'ref', confidence: 0.4, relations: [1] },
+        lostTo: ['a:S1'],
+      },
     ]);
   });
 
   it('keeps a relation named for one line from a line with no number', () => {
-    const numbered = feedLine({ id: 's-bahn-bern:S4', number: 'S4', stops: [0, 1, 2] });
-    const unnumbered = feedLine({ id: 's-bahn-bern:S:8507000-8507002', stops: [0, 1, 2] });
+    const numbered = feedLine({
+      id: 's-bahn-bern:S4',
+      number: 'S4',
+      stops: [0, 1, 2],
+    });
+    const unnumbered = feedLine({
+      id: 's-bahn-bern:S:8507000-8507002',
+      stops: [0, 1, 2],
+    });
     const { lines, unmatched } = run(
       [numbered, unnumbered],
       [relation({ id: 71, tags: { ref: 'S4' }, through: [0, 1, 2] })],
@@ -332,69 +452,154 @@ describe('matchLines', () => {
   });
 
   it('shares a relation between the lines its ref names by their own numbers', () => {
-    const re4 = feedLine({ id: 'rhaetische-bahn:RE4', category: 'RE', number: 'RE4', stops: [0, 1, 2, 3] });
-    const re24 = feedLine({ id: 'rhaetische-bahn:RE24', category: 'RE', number: 'RE24', stops: [0, 1, 2, 3] });
-    const { lines } = run([re24, re4], [relation({ id: 80, tags: { ref: 'RE24;RE4' }, through: [0, 1, 2, 3] })]);
+    const re4 = feedLine({
+      id: 'rhaetische-bahn:RE4',
+      category: 'RE',
+      number: 'RE4',
+      stops: [0, 1, 2, 3],
+    });
+    const re24 = feedLine({
+      id: 'rhaetische-bahn:RE24',
+      category: 'RE',
+      number: 'RE24',
+      stops: [0, 1, 2, 3],
+    });
+    const { lines } = run(
+      [re24, re4],
+      [relation({ id: 80, tags: { ref: 'RE24;RE4' }, through: [0, 1, 2, 3] })],
+    );
 
     expect(find(lines, 'rhaetische-bahn:RE4').match?.relations).toEqual([80]);
     expect(find(lines, 'rhaetische-bahn:RE24').match?.relations).toEqual([80]);
   });
 
   it('breaks a tie between two equal claims by line id', () => {
-    const first = feedLine({ id: 'a:R:8507000-8507002', category: 'R', stops: [0, 1, 2] });
-    const second = feedLine({ id: 'b:R:8507000-8507002', category: 'R', stops: [0, 1, 2] });
-    const { lines, unmatched } = run([second, first], [relation({ id: 90, through: [0, 1, 2] })]);
+    const first = feedLine({
+      id: 'a:R:8507000-8507002',
+      category: 'R',
+      stops: [0, 1, 2],
+    });
+    const second = feedLine({
+      id: 'b:R:8507000-8507002',
+      category: 'R',
+      stops: [0, 1, 2],
+    });
+    const { lines, unmatched } = run(
+      [second, first],
+      [relation({ id: 90, through: [0, 1, 2] })],
+    );
 
-    expect(find(lines, 'a:R:8507000-8507002').match).toEqual({ rule: 'endpoints', confidence: 1, relations: [90] });
-    expect(unmatched.map(entry => [entry.id, entry.reason, entry.lostTo])).toEqual([
-      ['b:R:8507000-8507002', 'contested', ['a:R:8507000-8507002']],
-    ]);
+    expect(find(lines, 'a:R:8507000-8507002').match).toEqual({
+      rule: 'endpoints',
+      confidence: 1,
+      relations: [90],
+    });
+    expect(
+      unmatched.map(entry => [entry.id, entry.reason, entry.lostTo]),
+    ).toEqual([['b:R:8507000-8507002', 'contested', ['a:R:8507000-8507002']]]);
   });
 
   it('draws a diversion only for a line nothing regular draws', () => {
-    const regular = relation({ id: 100, tags: { ref: 'S5' }, through: [0, 1, 2] });
-    const diversion = relation({ id: 101, tags: { ref: 'S5', state: 'alternate' }, through: [0, 1, 2] });
-    const s5 = feedLine({ id: 's-bahn-bern:S5', number: 'S5', stops: [0, 1, 2] });
+    const regular = relation({
+      id: 100,
+      tags: { ref: 'S5' },
+      through: [0, 1, 2],
+    });
+    const diversion = relation({
+      id: 101,
+      tags: { ref: 'S5', state: 'alternate' },
+      through: [0, 1, 2],
+    });
+    const s5 = feedLine({
+      id: 's-bahn-bern:S5',
+      number: 'S5',
+      stops: [0, 1, 2],
+    });
 
-    expect(run([s5], [regular, diversion]).lines[0]?.match?.relations).toEqual([100]);
+    expect(run([s5], [regular, diversion]).lines[0]?.match?.relations).toEqual([
+      100,
+    ]);
     expect(run([s5], [diversion]).lines[0]?.match?.relations).toEqual([101]);
   });
 
   it('never draws a disused relation', () => {
     const { lines } = run(
       [feedLine({ id: 's-bahn-bern:S6', number: 'S6', stops: [0, 1, 2] })],
-      [relation({ id: 110, tags: { ref: 'S6', disused: 'yes' }, through: [0, 1, 2] })],
+      [
+        relation({
+          id: 110,
+          tags: { ref: 'S6', disused: 'yes' },
+          through: [0, 1, 2],
+        }),
+      ],
     );
 
     expect(lines[0]?.hasGeometry).toBe(false);
   });
 
   it('records the share of the line a partial relation reaches, and refuses a fragment', () => {
-    const s7 = feedLine({ id: 's-bahn-bern:S7', number: 'S7', stops: [0, 1, 2, 3, 4, 5, 6, 7] });
+    const s7 = feedLine({
+      id: 's-bahn-bern:S7',
+      number: 'S7',
+      stops: [0, 1, 2, 3, 4, 5, 6, 7],
+    });
 
-    expect(run([s7], [relation({ id: 120, tags: { ref: 'S7' }, through: [0, 1, 2, 3, 4] })]).lines[0]?.match)
-      .toEqual({ rule: 'ref', confidence: 0.63, relations: [120] });
+    expect(
+      run(
+        [s7],
+        [relation({ id: 120, tags: { ref: 'S7' }, through: [0, 1, 2, 3, 4] })],
+      ).lines[0]?.match,
+    ).toEqual({ rule: 'ref', confidence: 0.63, relations: [120] });
 
-    const { lines, unmatched } = run([s7], [relation({ id: 121, tags: { ref: 'S7' }, through: [0, 1, 2] })]);
+    const { lines, unmatched } = run(
+      [s7],
+      [relation({ id: 121, tags: { ref: 'S7' }, through: [0, 1, 2] })],
+    );
 
     expect(lines[0]?.geometry).toBeNull();
-    expect(unmatched[0]).toMatchObject({ reason: 'low-coverage', best: { rule: 'ref', confidence: 0.38, relations: [121] } });
+    expect(unmatched[0]).toMatchObject({
+      reason: 'low-coverage',
+      best: { rule: 'ref', confidence: 0.38, relations: [121] },
+    });
   });
 
   it('gives a line nothing draws no geometry and a report entry, never an empty shape', () => {
-    const { lines, unmatched } = run([feedLine({ id: 's-bahn-bern:S8', number: 'S8', stops: [0, 1] })], []);
+    const { lines, unmatched } = run(
+      [feedLine({ id: 's-bahn-bern:S8', number: 'S8', stops: [0, 1] })],
+      [],
+    );
 
-    expect(lines[0]).toMatchObject({ hasGeometry: false, geometry: null, match: null });
+    expect(lines[0]).toMatchObject({
+      hasGeometry: false,
+      geometry: null,
+      match: null,
+    });
     expect(unmatched).toEqual([
-      { id: 's-bahn-bern:S8', name: 'S8', reason: 'no-candidate', best: null, lostTo: [] },
+      {
+        id: 's-bahn-bern:S8',
+        name: 'S8',
+        reason: 'no-candidate',
+        best: null,
+        lostTo: [],
+      },
     ]);
-    expect(logged.some(message => message.includes('unmatched, no-candidate: s-bahn-bern:S8'))).toBe(true);
+    expect(
+      logged.some(message =>
+        message.includes('unmatched, no-candidate: s-bahn-bern:S8'),
+      ),
+    ).toBe(true);
   });
 
   it('matches the same way twice', () => {
-    const lines = [feedLine({ id: 's-bahn-bern:S1', number: 'S1', stops: [0, 1, 2, 3] })];
-    const relations = [relation({ id: 1, tags: { ref: 'S1' }, through: [0, 1, 2, 3] })];
+    const lines = [
+      feedLine({ id: 's-bahn-bern:S1', number: 'S1', stops: [0, 1, 2, 3] }),
+    ];
+    const relations = [
+      relation({ id: 1, tags: { ref: 'S1' }, through: [0, 1, 2, 3] }),
+    ];
 
-    expect(run(lines, relations).fingerprint).toBe(run(lines, relations).fingerprint);
+    expect(run(lines, relations).fingerprint).toBe(
+      run(lines, relations).fingerprint,
+    );
   });
 });

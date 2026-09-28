@@ -27,7 +27,8 @@ function record(overrides: Partial<FeedRecord> = {}): FeedRecord {
     dataset: {
       id: 'timetable-2026-gtfs2020',
       page: 'https://data.opentransportdata.swiss/en/dataset/timetable-2026-gtfs2020',
-      catalogUrl: 'https://data.opentransportdata.swiss/en/dataset/timetable-2026-gtfs2020.jsonld',
+      catalogUrl:
+        'https://data.opentransportdata.swiss/en/dataset/timetable-2026-gtfs2020.jsonld',
       uuid: '3d2c18f9-9ef1-463f-a249-5c67604efd74',
       validFrom: '2025-12-14',
       validTo: '2026-12-12',
@@ -75,7 +76,12 @@ describe('feed ids', () => {
   });
 
   it('falls back to the fetch time when the mirror sends no validators', () => {
-    const id = geopsFeedId('complete', null, null, new Date('2026-09-22T14:00:00Z'));
+    const id = geopsFeedId(
+      'complete',
+      null,
+      null,
+      new Date('2026-09-22T14:00:00Z'),
+    );
 
     expect(id).toBe('geops-complete-20260922140000');
   });
@@ -91,29 +97,76 @@ describe('feed ids', () => {
 describe('withoutQuery', () => {
   it('strips the presigned credentials, which expire in a minute anyway', () => {
     expect(
-      withoutQuery('https://example.r2.cloudflarestorage.com/a.zip?X-Amz-Signature=deadbeef'),
+      withoutQuery(
+        'https://example.r2.cloudflarestorage.com/a.zip?X-Amz-Signature=deadbeef',
+      ),
     ).toBe('https://example.r2.cloudflarestorage.com/a.zip');
   });
 });
 
 describe('decideCache', () => {
-  const CASES: [string, FeedRecord | null, string | null, CacheState, string][] = [
-    ['a matching resource id and a complete directory', record(), RESOURCE, COMPLETE, 'hit'],
+  const CASES: [
+    string,
+    FeedRecord | null,
+    string | null,
+    CacheState,
+    string,
+  ][] = [
+    [
+      'a matching resource id and a complete directory',
+      record(),
+      RESOURCE,
+      COMPLETE,
+      'hit',
+    ],
     // The resource uuid is immutable per publication, so a different one is a
     // different feed, never the same bytes under a new name.
-    ['a new publication', record(), 'a-different-resource-id', COMPLETE, 'download'],
+    [
+      'a new publication',
+      record(),
+      'a-different-resource-id',
+      COMPLETE,
+      'download',
+    ],
     ['no record at all', null, RESOURCE, COMPLETE, 'download'],
-    ['an archive deleted by hand', record(), RESOURCE, { archiveBytes: null, gtfsPresent: true }, 'download'],
-    ['an archive of the wrong size', record(), RESOURCE, { archiveBytes: 12, gtfsPresent: true }, 'download'],
+    [
+      'an archive deleted by hand',
+      record(),
+      RESOURCE,
+      { archiveBytes: null, gtfsPresent: true },
+      'download',
+    ],
+    [
+      'an archive of the wrong size',
+      record(),
+      RESOURCE,
+      { archiveBytes: 12, gtfsPresent: true },
+      'download',
+    ],
     // An interrupted extraction leaves the archive intact and gtfs/ missing.
-    ['a missing extraction', record(), RESOURCE, { archiveBytes: 256091382, gtfsPresent: false }, 'download'],
+    [
+      'a missing extraction',
+      record(),
+      RESOURCE,
+      { archiveBytes: 256091382, gtfsPresent: false },
+      'download',
+    ],
     // The mirror's URL is mutable and undated, so only the server knows.
-    ['a geops record', record({ source: 'geops', resource: { ...record().resource, id: null } }), null, COMPLETE, 'revalidate'],
+    [
+      'a geops record',
+      record({ source: 'geops', resource: { ...record().resource, id: null } }),
+      null,
+      COMPLETE,
+      'revalidate',
+    ],
   ];
 
-  it.each(CASES)('returns %s → %s', (_label, cached, resourceId, state, expected) => {
-    expect(decideCache(cached, resourceId, state)).toBe(expected);
-  });
+  it.each(CASES)(
+    'returns %s → %s',
+    (_label, cached, resourceId, state, expected) => {
+      expect(decideCache(cached, resourceId, state)).toBe(expected);
+    },
+  );
 });
 
 describe('feed.json round trip', () => {

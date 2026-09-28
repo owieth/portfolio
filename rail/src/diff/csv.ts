@@ -83,6 +83,8 @@ export function parseCsv(text: string): CsvRow[] {
       );
     }
 
-    return Object.fromEntries(columns.map((column, at) => [column, fields[at]]));
+    return Object.fromEntries(
+      columns.map((column, at) => [column, fields[at]]),
+    );
   });
 }

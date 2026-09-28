@@ -39,30 +39,38 @@ describe('readFeed', () => {
   });
 
   it('says which file it could not read', async () => {
-    await expect(readFeed(dir)).rejects.toThrow(`cannot read ${join(dir, 'lines.csv')}`);
+    await expect(readFeed(dir)).rejects.toThrow(
+      `cannot read ${join(dir, 'lines.csv')}`,
+    );
   });
 });
 
 /** Opt-in, like `reconcile/db.test.ts`: needs a freshly reset local Supabase. */
 const DATABASE_URL = process.env.RAIL_TEST_DATABASE_URL;
 
-describe.skipIf(DATABASE_URL === undefined)('reconcileFeed against the seeded database', () => {
-  it('plans nothing for the CSVs the seed came from, and writes nothing', async () => {
-    const { plan, markdown } = await reconcileFeed(
-      { apply: false, dir: RAIL_DIR, databaseUrl: DATABASE_URL ?? '' },
-      () => {},
-    );
+describe.skipIf(DATABASE_URL === undefined)(
+  'reconcileFeed against the seeded database',
+  () => {
+    it('plans nothing for the CSVs the seed came from, and writes nothing', async () => {
+      const { plan, markdown } = await reconcileFeed(
+        { apply: false, dir: RAIL_DIR, databaseUrl: DATABASE_URL ?? '' },
+        () => {},
+      );
 
-    expect(plan.lines.inserts).toEqual([]);
-    expect(plan.lines.updates).toEqual([]);
-    expect(plan.lines.flagged).toEqual([]);
-    expect(markdown).toContain('Nothing to write.');
-  });
-});
+      expect(plan.lines.inserts).toEqual([]);
+      expect(plan.lines.updates).toEqual([]);
+      expect(plan.lines.flagged).toEqual([]);
+      expect(markdown).toContain('Nothing to write.');
+    });
+  },
+);
 
 const SOURCES = fileURLToPath(new URL('./', import.meta.url));
-const MIGRATIONS = fileURLToPath(new URL('../../supabase/migrations/', import.meta.url));
-const RECONCILE_MIGRATIONS = /_(flag_missing_rail_rows|track_rail_line_edits)\.sql$/;
+const MIGRATIONS = fileURLToPath(
+  new URL('../../supabase/migrations/', import.meta.url),
+);
+const RECONCILE_MIGRATIONS =
+  /_(flag_missing_rail_rows|track_rail_line_edits)\.sql$/;
 
 /**
  * The issue's third acceptance check, kept true by a test rather than by care:

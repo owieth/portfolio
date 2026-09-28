@@ -89,7 +89,9 @@ describe('CATEGORIES', () => {
   it('counts every route_type and route_desc in the feed, excluded ones included', async () => {
     const rows = await db.query<CategoryRow>(CATEGORIES);
 
-    expect(rows.map(row => [row.route_type, row.route_desc, row.routes, row.trips])).toEqual([
+    expect(
+      rows.map(row => [row.route_type, row.route_desc, row.routes, row.trips]),
+    ).toEqual([
       ['102', 'EC', 1, 1],
       ['109', 'S', 1, 2],
       ['117', 'EXT', 1, 1],
@@ -104,7 +106,12 @@ describe('COMBINATIONS', () => {
   it('covers rail and funicular and nothing else', async () => {
     const rows = await db.query<CombinationRow>(COMBINATIONS);
 
-    expect(rows.map(row => row.route_type).sort()).toEqual(['102', '109', '117', '1400']);
+    expect(rows.map(row => row.route_type).sort()).toEqual([
+      '102',
+      '109',
+      '117',
+      '1400',
+    ]);
     expect(rows.every(row => row.agency_name !== null)).toBe(true);
   });
 
@@ -112,7 +119,11 @@ describe('COMBINATIONS', () => {
     const rows = await db.query<CombinationRow>(COMBINATIONS);
     const sBahn = rows.find(row => row.route_desc === 'S');
 
-    expect(sBahn).toMatchObject({ routes: 1, trips: 2, agency_name: expect.any(String) });
+    expect(sBahn).toMatchObject({
+      routes: 1,
+      trips: 2,
+      agency_name: expect.any(String),
+    });
   });
 });
 
@@ -120,8 +131,14 @@ describe('CATEGORY_ONLY_SAMPLES', () => {
   it('returns only routes whose short name is the category, busiest first', async () => {
     const rows = await db.query<SampleRow>(CATEGORY_ONLY_SAMPLES);
 
-    expect(rows.map(row => row.route_id)).toEqual(['91-2A-Y-j26-1', '91-EXT-A-j26-1']);
-    expect(rows[0]).toMatchObject({ route_long_name: null, trip_short_name: '10' });
+    expect(rows.map(row => row.route_id)).toEqual([
+      '91-2A-Y-j26-1',
+      '91-EXT-A-j26-1',
+    ]);
+    expect(rows[0]).toMatchObject({
+      route_long_name: null,
+      trip_short_name: '10',
+    });
   });
 
   it('leaves the bus alone even though its short name is not a number', async () => {
@@ -142,8 +159,12 @@ describe('LINE_NUMBER_BY_AGENCY', () => {
   it('averages distinct trip_short_names per route, which is 1 for a line number', async () => {
     const rows = await db.query<AgencyRow>(LINE_NUMBER_BY_AGENCY);
 
-    expect(rows.find(row => row.agency_id === '165')?.trip_short_name_per_route).toBe(1);
-    expect(rows.find(row => row.agency_id === '11')?.trip_short_name_per_route).toBe(1.3);
+    expect(
+      rows.find(row => row.agency_id === '165')?.trip_short_name_per_route,
+    ).toBe(1);
+    expect(
+      rows.find(row => row.agency_id === '11')?.trip_short_name_per_route,
+    ).toBe(1.3);
   });
 });
 
@@ -195,12 +216,19 @@ describe('operatorSearch', () => {
     const rows = await db.query<OperatorRow>(operatorSearch('Poly'));
 
     expect(rows).toEqual([
-      { agency_id: '165', agency_name: 'Poly-Bahn Zürich', route_types: '1400', routes: 1 },
+      {
+        agency_id: '165',
+        agency_name: 'Poly-Bahn Zürich',
+        route_types: '1400',
+        routes: 1,
+      },
     ]);
   });
 
   it('returns nothing for an operator the feed does not carry', async () => {
-    expect(await db.query<OperatorRow>(operatorSearch('Gurtenbahn'))).toEqual([]);
+    expect(await db.query<OperatorRow>(operatorSearch('Gurtenbahn'))).toEqual(
+      [],
+    );
   });
 
   /** A wildcard in a name would otherwise match every operator and read as a hit. */

@@ -91,7 +91,9 @@ function assertOnLine(rides: Ride[], stops: Map<string, Set<string>>): void {
 async function lineStops(dir: string): Promise<Map<string, Set<string>>> {
   const stops = new Map<string, Set<string>>();
 
-  for (const row of parseCsv(await readFile(join(dir, LINE_STOPS_CSV), 'utf8'))) {
+  for (const row of parseCsv(
+    await readFile(join(dir, LINE_STOPS_CSV), 'utf8'),
+  )) {
     const { line_id: lineId, didok } = row;
 
     // Every cell of a CSV can be empty. A stop with no Didok cannot be an end of
@@ -142,7 +144,9 @@ export async function renderRidesFrom({
     if (!destination) {
       const place = JSON.stringify(event.location.split('\n')[0]);
 
-      throw new Error(`no destination for the ${event.date} office event at ${place}`);
+      throw new Error(
+        `no destination for the ${event.date} office event at ${place}`,
+      );
     }
 
     days.push({ date: event.date, destination });
@@ -156,11 +160,19 @@ export async function renderRidesFrom({
     days: days.length,
     rides,
     byLine,
-    sql: renderRides(rides, { digest, through: last, days: days.length, byLine }),
+    sql: renderRides(rides, {
+      digest,
+      through: last,
+      days: days.length,
+      byLine,
+    }),
   };
 }
 
-export async function writeRides(log: Log, paths: RidesPaths = {}): Promise<Rides> {
+export async function writeRides(
+  log: Log,
+  paths: RidesPaths = {},
+): Promise<Rides> {
   const rides = await renderRidesFrom(paths);
 
   await writeFile(paths.out ?? RIDES_SQL, rides.sql, 'utf8');
@@ -168,7 +180,9 @@ export async function writeRides(log: Log, paths: RidesPaths = {}): Promise<Ride
   const count = rides.rides.length.toLocaleString('en-US');
   const days = rides.days.toLocaleString('en-US');
 
-  log(`wrote ${count} rides over ${rides.byLine.size} lines from ${days} office days`);
+  log(
+    `wrote ${count} rides over ${rides.byLine.size} lines from ${days} office days`,
+  );
 
   return rides;
 }

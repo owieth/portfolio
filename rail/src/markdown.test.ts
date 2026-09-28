@@ -18,8 +18,21 @@ describe('cell', () => {
 
 describe('table', () => {
   it('writes a header, a rule and one row per row', () => {
-    expect(table(['Line', 'Trips'], [['IR35', 1204], ['S12', null]])).toBe(
-      ['| Line | Trips |', '| --- | --- |', '| IR35 | 1,204 |', '| S12 | — |'].join('\n'),
+    expect(
+      table(
+        ['Line', 'Trips'],
+        [
+          ['IR35', 1204],
+          ['S12', null],
+        ],
+      ),
+    ).toBe(
+      [
+        '| Line | Trips |',
+        '| --- | --- |',
+        '| IR35 | 1,204 |',
+        '| S12 | — |',
+      ].join('\n'),
     );
   });
 

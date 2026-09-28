@@ -47,7 +47,14 @@ export interface SeedLine {
   note?: string;
 }
 
-const LINE_KEYS = new Set(['id', 'name', 'operator', 'category', 'stops', 'note']);
+const LINE_KEYS = new Set([
+  'id',
+  'name',
+  'operator',
+  'category',
+  'stops',
+  'note',
+]);
 const STOP_KEYS = new Set(['didok', 'name', 'lat', 'lon']);
 
 /** A region slug, a colon, then what `compactNumber` allows plus `:`. */
@@ -67,7 +74,10 @@ function isCategory(value: unknown): value is Category {
   return typeof value === 'string' && Object.hasOwn(CATEGORIES, value);
 }
 
-function unknownKeys(entry: Record<string, unknown>, known: ReadonlySet<string>): string[] {
+function unknownKeys(
+  entry: Record<string, unknown>,
+  known: ReadonlySet<string>,
+): string[] {
   return Object.keys(entry)
     .filter(key => !known.has(key))
     .map(key => `has an unknown key "${key}"`);
@@ -86,15 +96,22 @@ function stopProblems(stop: Record<string, unknown>): string[] {
     found.push(`is at ${stop.lat}, ${stop.lon}, which is not in Switzerland`);
   }
 
-  if (stop.didok !== undefined && (typeof stop.didok !== 'string' || !DIDOK.test(stop.didok))) {
-    found.push(`has "didok" ${JSON.stringify(stop.didok)}, which is not a Swiss Didok number`);
+  if (
+    stop.didok !== undefined &&
+    (typeof stop.didok !== 'string' || !DIDOK.test(stop.didok))
+  ) {
+    found.push(
+      `has "didok" ${JSON.stringify(stop.didok)}, which is not a Swiss Didok number`,
+    );
   }
 
   return found;
 }
 
 function lineProblems(entry: Record<string, unknown>, label: string): string[] {
-  const found = unknownKeys(entry, LINE_KEYS).map(problem => `${label} ${problem}`);
+  const found = unknownKeys(entry, LINE_KEYS).map(
+    problem => `${label} ${problem}`,
+  );
 
   for (const key of ['id', 'name', 'operator'] as const) {
     if (!isNonEmptyString(entry[key])) {
@@ -103,11 +120,15 @@ function lineProblems(entry: Record<string, unknown>, label: string): string[] {
   }
 
   if (typeof entry.id === 'string' && !ID.test(entry.id)) {
-    found.push(`${label} has id "${entry.id}", which is not region:… in a line id's characters`);
+    found.push(
+      `${label} has id "${entry.id}", which is not region:… in a line id's characters`,
+    );
   }
 
   if (!isCategory(entry.category)) {
-    found.push(`${label} has category ${JSON.stringify(entry.category)}, which is not one you can ride`);
+    found.push(
+      `${label} has category ${JSON.stringify(entry.category)}, which is not one you can ride`,
+    );
   }
 
   if (entry.note !== undefined && !isNonEmptyString(entry.note)) {
@@ -173,7 +194,9 @@ export function parseFunicularSeed(json: unknown, source: string): SeedLine[] {
   return json.funiculars as SeedLine[];
 }
 
-export async function loadFunicularSeed(path: string = FUNICULARS_FILE): Promise<SeedLine[]> {
+export async function loadFunicularSeed(
+  path: string = FUNICULARS_FILE,
+): Promise<SeedLine[]> {
   const text = await readFile(path, 'utf8');
 
   let json: unknown;

@@ -153,7 +153,13 @@ function fingerprintOf(lines: readonly SeasonalFeedLine[]): string {
 
   for (const line of lines) {
     hash.update(
-      [line.id, line.serviceDays, line.serviceWeeks, line.seasonal ? 's' : 'y', line.tripsPerWeek].join('|'),
+      [
+        line.id,
+        line.serviceDays,
+        line.serviceWeeks,
+        line.seasonal ? 's' : 'y',
+        line.tripsPerWeek,
+      ].join('|'),
     );
     hash.update('\n');
   }
@@ -168,13 +174,22 @@ async function readLineService(
   week: DateRange,
 ): Promise<LineServiceRow[]> {
   const store = join(feedDir, STORE_FILE);
-  const db = await openGtfs(gtfsPath(feedDir), ['trips', 'frequencies'], { store });
+  const db = await openGtfs(gtfsPath(feedDir), ['trips', 'frequencies'], {
+    store,
+  });
 
   try {
-    await Promise.all([assertColumns(db, REQUIRED_COLUMNS), assertStore(db, store)]);
+    await Promise.all([
+      assertColumns(db, REQUIRED_COLUMNS),
+      assertStore(db, store),
+    ]);
 
     await db.run(
-      lineRoutes(lines.flatMap(line => line.routeIds.map(routeId => ({ lineId: line.id, routeId })))),
+      lineRoutes(
+        lines.flatMap(line =>
+          line.routeIds.map(routeId => ({ lineId: line.id, routeId })),
+        ),
+      ),
     );
     await db.run(FREQUENCY_WINDOWS);
 
@@ -201,19 +216,30 @@ export async function flagSeasonal(
   log: Log,
 ): Promise<Seasonal> {
   const { lines, window, referenceWeek } = input;
-  const feed = lines.filter((line): line is SequencedFeedLine => line.source === 'feed');
+  const feed = lines.filter(
+    (line): line is SequencedFeedLine => line.source === 'feed',
+  );
   const weeks = weeksIn(window);
   const threshold = weeks * SEASONAL_SHARE;
 
   const startedAt = performance.now();
   const rows = new Map(
-    (await readLineService(feedDir, feed, window, referenceWeek)).map(row => [row.line_id, row]),
+    (await readLineService(feedDir, feed, window, referenceWeek)).map(row => [
+      row.line_id,
+      row,
+    ]),
   );
   const elapsedMs = performance.now() - startedAt;
 
   const flagged = lines.map((line): SeasonalLine => {
     if (line.source === 'manual') {
-      return { ...line, serviceDays: null, serviceWeeks: null, seasonal: null, tripsPerWeek: null };
+      return {
+        ...line,
+        serviceDays: null,
+        serviceWeeks: null,
+        seasonal: null,
+        tripsPerWeek: null,
+      };
     }
 
     const row = rows.get(line.id);
@@ -236,12 +262,21 @@ export async function flagSeasonal(
     };
   });
 
-  const counted = flagged.filter((line): line is SeasonalFeedLine => line.source === 'feed');
+  const counted = flagged.filter(
+    (line): line is SeasonalFeedLine => line.source === 'feed',
+  );
   const seasonal = counted.filter(line => line.seasonal).map(line => line.id);
-  const idle = counted.filter(line => line.tripsPerWeek === 0).map(line => line.id);
+  const idle = counted
+    .filter(line => line.tripsPerWeek === 0)
+    .map(line => line.id);
   const expanded = [...rows.values()].filter(row => row.frequency_trips > 0);
-  const frequencyTrips = expanded.reduce((sum, row) => sum + row.frequency_trips, 0);
-  const fingerprint = fingerprintOf([...counted].sort((a, b) => compare(a.id, b.id)));
+  const frequencyTrips = expanded.reduce(
+    (sum, row) => sum + row.frequency_trips,
+    0,
+  );
+  const fingerprint = fingerprintOf(
+    [...counted].sort((a, b) => compare(a.id, b.id)),
+  );
 
   log(
     `${plural(seasonal.length, 'line')} of ${count(counted.length)} run in fewer than two thirds of the feed year's ${count(weeks)} weeks and are flagged seasonal — ${seconds(elapsedMs)}, fingerprint ${fingerprint}`,
@@ -266,5 +301,12 @@ export async function flagSeasonal(
     );
   }
 
-  return { lines: flagged, seasonal, idle, frequencyTrips, fingerprint, elapsedMs };
+  return {
+    lines: flagged,
+    seasonal,
+    idle,
+    frequencyTrips,
+    fingerprint,
+    elapsedMs,
+  };
 }

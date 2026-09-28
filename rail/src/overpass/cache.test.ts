@@ -29,7 +29,12 @@ describe('isCacheHit', () => {
     ['a response deleted by hand', record(), null, false],
     ['a response of another size', record(), 12, false],
     // Two queries sharing 64 bits of hash is unlikely, not impossible.
-    ['a record for another query under the same key', record({ query: 'other' }), 1024, false],
+    [
+      'a record for another query under the same key',
+      record({ query: 'other' }),
+      1024,
+      false,
+    ],
   ];
 
   it.each(CASES)('%s → %s', (_label, cached, bytes, expected) => {

@@ -12,7 +12,13 @@
 
 import { table } from '../markdown.ts';
 import type { Cell } from '../markdown.ts';
-import type { Comparison, DiffLine, DiffStop, Renamed, Shift } from './compare.ts';
+import type {
+  Comparison,
+  DiffLine,
+  DiffStop,
+  Renamed,
+  Shift,
+} from './compare.ts';
 import { isUnchanged } from './compare.ts';
 
 export interface DiffSides {
@@ -37,7 +43,9 @@ function terminals(line: DiffLine): string {
 }
 
 function stations(stops: readonly DiffStop[]): string | null {
-  return stops.length === 0 ? null : stops.map(stop => stop.stop_name).join(', ');
+  return stops.length === 0
+    ? null
+    : stops.map(stop => stop.stop_name).join(', ');
 }
 
 function section(title: string, items: number, body: string[]): string[] {
@@ -56,11 +64,22 @@ function lineRows(lines: readonly DiffLine[]): Cell[][] {
 
 const LINE_HEADERS = ['Id', 'Name', 'Category', 'Region', 'Terminals'];
 
-function changeRows(changes: readonly Renamed[], format: (value: string) => string): Cell[][] {
-  return changes.map(change => [code(change.id), format(change.before), format(change.after)]);
+function changeRows(
+  changes: readonly Renamed[],
+  format: (value: string) => string,
+): Cell[][] {
+  return changes.map(change => [
+    code(change.id),
+    format(change.before),
+    format(change.after),
+  ]);
 }
 
-function shiftTable(heading: string, shifts: readonly Shift[], format: (value: string) => string): string {
+function shiftTable(
+  heading: string,
+  shifts: readonly Shift[],
+  format: (value: string) => string,
+): string {
   return table(
     [heading, 'Committed', 'Generated', 'Change'],
     shifts.map(shift => [
@@ -73,12 +92,10 @@ function shiftTable(heading: string, shifts: readonly Shift[], format: (value: s
 }
 
 function totals(comparison: Comparison): string {
-  const row = (label: string, { before, after }: { before: number; after: number }): Cell[] => [
-    label,
-    before,
-    after,
-    signed(after - before),
-  ];
+  const row = (
+    label: string,
+    { before, after }: { before: number; after: number },
+  ): Cell[] => [label, before, after, signed(after - before)];
 
   return table(
     ['', 'Committed', 'Generated', 'Change'],
@@ -86,7 +103,10 @@ function totals(comparison: Comparison): string {
   );
 }
 
-export function renderDiff(comparison: Comparison, { base }: DiffSides): string {
+export function renderDiff(
+  comparison: Comparison,
+  { base }: DiffSides,
+): string {
   const head = [
     '# Rail lines — feed diff',
     '',
@@ -124,10 +144,16 @@ export function renderDiff(comparison: Comparison, { base }: DiffSides): string 
       ),
     ]),
     section('Renamed', comparison.renamed.length, [
-      table(['Id', 'Committed', 'Generated'], changeRows(comparison.renamed, name => name)),
+      table(
+        ['Id', 'Committed', 'Generated'],
+        changeRows(comparison.renamed, name => name),
+      ),
     ]),
     section('Category changed', comparison.recategorised.length, [
-      table(['Id', 'Committed', 'Generated'], changeRows(comparison.recategorised, code)),
+      table(
+        ['Id', 'Committed', 'Generated'],
+        changeRows(comparison.recategorised, code),
+      ),
     ]),
     section('Category shifts', comparison.categories.length, [
       shiftTable('Category', comparison.categories, code),

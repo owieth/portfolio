@@ -82,7 +82,9 @@ function count(value: number): string {
 function tallies(counts: Map<string, number>): Tally[] {
   return [...counts.entries()]
     .map(([country, stations]) => ({ country, stations }))
-    .sort((a, b) => b.stations - a.stations || a.country.localeCompare(b.country));
+    .sort(
+      (a, b) => b.stations - a.stations || a.country.localeCompare(b.country),
+    );
 }
 
 /**
@@ -109,7 +111,10 @@ async function assertColumns(
  * because `stops.txt` is all it reads and a test can then hand it a directory it
  * wrote itself instead of a stub of a download.
  */
-export async function resolveStations(gtfsDir: string, log: Log): Promise<Stations> {
+export async function resolveStations(
+  gtfsDir: string,
+  log: Log,
+): Promise<Stations> {
   const db = await openGtfs(gtfsDir, ['stops']);
 
   try {

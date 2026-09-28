@@ -36,7 +36,11 @@ export const S12: FeedLine = {
   trips_per_week: 700,
 };
 
-export function stop(line: FeedLine, sequence: number, stop_name: string): FeedStop {
+export function stop(
+  line: FeedLine,
+  sequence: number,
+  stop_name: string,
+): FeedStop {
   return {
     line_id: line.id,
     sequence,
@@ -67,6 +71,9 @@ export function storedLine(line: FeedLine, tracked?: Partial<Tracked>): DbLine {
   return stored(line, tracked);
 }
 
-export function storedStop(stopRow: FeedStop, tracked?: Partial<Tracked>): DbStop {
+export function storedStop(
+  stopRow: FeedStop,
+  tracked?: Partial<Tracked>,
+): DbStop {
   return stored(stopRow, tracked);
 }

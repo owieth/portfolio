@@ -68,7 +68,8 @@ const RAIL_LINES: Destination = {
 const RAIL_LINE_STOPS: Destination = {
   name: 'public.rail_line_stops',
   columns: ['line_id', 'sequence', ...STOP_FIELDS],
-  where: (sql, key) => sql`line_id = ${key.line_id} and sequence = ${key.sequence}`,
+  where: (sql, key) =>
+    sql`line_id = ${key.line_id} and sequence = ${key.sequence}`,
 };
 
 async function write<Planned>(
@@ -110,7 +111,10 @@ async function write<Planned>(
  * plan, so nothing can change between the read and the writes. The lock lets
  * readers carry on and makes any other writer wait until this commits.
  */
-export async function applyPlan(sql: TransactionSql, feed: Feed): Promise<Plan> {
+export async function applyPlan(
+  sql: TransactionSql,
+  feed: Feed,
+): Promise<Plan> {
   await sql`set local rail.reconciling = 'on'`;
   await sql`lock table public.rail_lines, public.rail_line_stops in share row exclusive mode`;
 

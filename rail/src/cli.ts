@@ -61,7 +61,14 @@ import { assertSpotChecks } from './spotcheck.ts';
 import { resolveStations } from './stations.ts';
 import { findTermini } from './termini.ts';
 
-const COMMANDS = ['build', 'diff', 'recon', 'seed', 'rides', 'reconcile'] as const;
+const COMMANDS = [
+  'build',
+  'diff',
+  'recon',
+  'seed',
+  'rides',
+  'reconcile',
+] as const;
 
 type Command = (typeof COMMANDS)[number];
 
@@ -145,7 +152,11 @@ function build(values: Record<string, FlagValue>): Promise<number> {
     // the one thing here that would rather have the memory to itself.
     // react-doctor-disable-next-line react-doctor/server-sequential-independent-await
     const resolved = await resolveStations(feed.gtfsDir, log);
-    const ingested = await ingestStopTimes(feed.dir, log, parseIngestOptions(values));
+    const ingested = await ingestStopTimes(
+      feed.dir,
+      log,
+      parseIngestOptions(values),
+    );
     // After the ingest by necessity rather than for the log: both write into
     // rail.duckdb, and a DuckDB file takes one writer at a time.
     // react-doctor-disable-next-line react-doctor/server-sequential-independent-await
@@ -173,7 +184,11 @@ function build(values: Record<string, FlagValue>): Promise<number> {
     );
     const seeded = seedLines(named.lines, await loadFunicularSeed(), log);
     const sequenced = sequenceLines(
-      { lines: seeded.lines, patterns: patterns.patterns, stations: resolved.stations },
+      {
+        lines: seeded.lines,
+        patterns: patterns.patterns,
+        stations: resolved.stations,
+      },
       log,
     );
     // Back into rail.duckdb for the service days the calendar step wrote.
@@ -192,7 +207,12 @@ function build(values: Record<string, FlagValue>): Promise<number> {
     // react-doctor-disable-next-line react-doctor/server-sequential-independent-await
     const osm = await fetchOsmRelations(log);
     const matched = matchLines(
-      { lines: seasonal.lines, relations: osm.relations, stations: resolved.stations, operators },
+      {
+        lines: seasonal.lines,
+        relations: osm.relations,
+        stations: resolved.stations,
+        operators,
+      },
       log,
     );
 
@@ -204,7 +224,11 @@ function build(values: Record<string, FlagValue>): Promise<number> {
       log,
     );
     const emitted = await emitArtifacts(
-      { lines: termini.lines, stations: resolved.stations, attribution: osm.attribution },
+      {
+        lines: termini.lines,
+        stations: resolved.stations,
+        attribution: osm.attribution,
+      },
       log,
       { verify: assertSpotChecks },
     );
@@ -314,7 +338,12 @@ export async function main(argv: string[]): Promise<number> {
   // values are consumed correctly, and validates them itself.
   const { positionals, values } = parseArgs({
     args: argv,
-    options: { ...FETCH_FLAGS, ...INGEST_FLAGS, ...DIFF_FLAGS, ...RECONCILE_FLAGS },
+    options: {
+      ...FETCH_FLAGS,
+      ...INGEST_FLAGS,
+      ...DIFF_FLAGS,
+      ...RECONCILE_FLAGS,
+    },
     strict: false,
     allowPositionals: true,
   });

@@ -72,7 +72,12 @@ function bump(counts: Map<string, Tally>, row: RouteRow, reason: string): void {
   const seen = counts.get(key);
 
   if (seen === undefined) {
-    counts.set(key, { routeType: row.route_type, routeDesc, routes: 1, reason });
+    counts.set(key, {
+      routeType: row.route_type,
+      routeDesc,
+      routes: 1,
+      reason,
+    });
     return;
   }
 
@@ -88,13 +93,18 @@ function byRouteType(excluded: Tally[]): string[] {
   const groups = new Map<string, Tally[]>();
 
   for (const tally of excluded) {
-    groups.set(tally.routeType, [...(groups.get(tally.routeType) ?? []), tally]);
+    groups.set(tally.routeType, [
+      ...(groups.get(tally.routeType) ?? []),
+      tally,
+    ]);
   }
 
   return [...groups.entries()]
     .sort(([a], [b]) => Number.parseInt(a, 10) - Number.parseInt(b, 10))
     .map(([routeType, rows]) => {
-      const codes = rows.map(row => `${row.routeDesc} ${count(row.routes)}`).join(', ');
+      const codes = rows
+        .map(row => `${row.routeDesc} ${count(row.routes)}`)
+        .join(', ');
       return `excluded route_type ${routeType} — ${codes}`;
     });
 }
@@ -104,7 +114,10 @@ function byRouteType(excluded: Tally[]): string[] {
  * because `routes.txt` is all it reads and a test can then hand it a directory
  * it wrote itself instead of a stub of a download.
  */
-export async function allowRoutes(gtfsDir: string, log: Log): Promise<Allowlist> {
+export async function allowRoutes(
+  gtfsDir: string,
+  log: Log,
+): Promise<Allowlist> {
   const db = await openGtfs(gtfsDir, ['routes']);
 
   try {
@@ -135,7 +148,10 @@ export async function allowRoutes(gtfsDir: string, log: Log): Promise<Allowlist>
         category: verdict.category,
       });
 
-      categories.set(verdict.category, (categories.get(verdict.category) ?? 0) + 1);
+      categories.set(
+        verdict.category,
+        (categories.get(verdict.category) ?? 0) + 1,
+      );
     }
 
     if (routes.length === 0) {

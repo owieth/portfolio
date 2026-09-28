@@ -23,7 +23,10 @@ describe('metresToLine', () => {
   ];
 
   it('measures square to the segment beside it', () => {
-    expect(metresToLine({ lat: 47.001, lon: 8.005 }, TRACK)).toBeCloseTo(111, 0);
+    expect(metresToLine({ lat: 47.001, lon: 8.005 }, TRACK)).toBeCloseTo(
+      111,
+      0,
+    );
   });
 
   it('measures to the nearer end past either end', () => {

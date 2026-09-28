@@ -65,10 +65,9 @@ describe('terminals', () => {
   });
 
   it('gives a loop that ends where it started the same station twice', () => {
-    expect(terminals(pattern({ stations: ['8503000', '8503010', '8503000'] }))).toEqual([
-      '8503000',
-      '8503000',
-    ]);
+    expect(
+      terminals(pattern({ stations: ['8503000', '8503010', '8503000'] })),
+    ).toEqual(['8503000', '8503000']);
   });
 });
 
@@ -86,21 +85,21 @@ describe('compactNumber', () => {
 
 describe('lineId', () => {
   it('is region and number for a numbered line', () => {
-    expect(lineId({ region: 's-bahn-zuerich', category: 'S', number: 'S10' })).toBe(
-      's-bahn-zuerich:S10',
-    );
+    expect(
+      lineId({ region: 's-bahn-zuerich', category: 'S', number: 'S10' }),
+    ).toBe('s-bahn-zuerich:S10');
   });
 
   it('puts the category in front of a number that does not carry it', () => {
-    expect(lineId({ region: 'fernverkehr', category: 'ICE', number: '3' })).toBe(
-      'fernverkehr:ICE-3',
-    );
+    expect(
+      lineId({ region: 'fernverkehr', category: 'ICE', number: '3' }),
+    ).toBe('fernverkehr:ICE-3');
     expect(lineId({ region: 'fernverkehr', category: 'NJ', number: '3' })).toBe(
       'fernverkehr:NJ-3',
     );
-    expect(lineId({ region: 'pilatus-bahnen', category: 'CC', number: 'T7' })).toBe(
-      'pilatus-bahnen:CC-T7',
-    );
+    expect(
+      lineId({ region: 'pilatus-bahnen', category: 'CC', number: 'T7' }),
+    ).toBe('pilatus-bahnen:CC-T7');
   });
 
   it('is region, category and terminals for a line without one', () => {

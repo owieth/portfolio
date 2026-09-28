@@ -48,7 +48,9 @@ function routeKey(day: OfficeDay): RouteKey {
   const key = `${era}:${day.destination}`;
 
   if (!(key in ROUTES)) {
-    throw new Error(`no route for ${key} — ${day.date} went somewhere unrouted`);
+    throw new Error(
+      `no route for ${key} — ${day.date} went somewhere unrouted`,
+    );
   }
 
   return key as RouteKey;
@@ -69,7 +71,9 @@ function returnsViaLuzern(days: OfficeDay[]): Set<string> {
     zug.length,
   );
 
-  return new Set(zug.filter((_, index) => dealt[index] === 'luzern').map(day => day.date));
+  return new Set(
+    zug.filter((_, index) => dealt[index] === 'luzern').map(day => day.date),
+  );
 }
 
 export interface Planned {
@@ -87,15 +91,20 @@ export function planRides(days: OfficeDay[]): Planned {
     const key = routeKey(day);
     const route = ROUTES[key];
     const back =
-      key === 'pre:zug' && viaLuzern.has(day.date) ? ZUG_BACK_VIA_LUZERN : route.back;
+      key === 'pre:zug' && viaLuzern.has(day.date)
+        ? ZUG_BACK_VIA_LUZERN
+        : route.back;
 
-    for (const leg of [...route.out, ...back]) slots.push({ date: day.date, leg });
+    for (const leg of [...route.out, ...back])
+      slots.push({ date: day.date, leg });
   }
 
   const lines = new Array<string>(slots.length);
 
   for (const pool of Object.keys(POOLS) as (keyof typeof POOLS)[]) {
-    const indices = slots.flatMap((slot, index) => (slot.leg.pool === pool ? [index] : []));
+    const indices = slots.flatMap((slot, index) =>
+      slot.leg.pool === pool ? [index] : [],
+    );
 
     if (indices.length === 0) continue;
 

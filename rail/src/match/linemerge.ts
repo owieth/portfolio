@@ -110,21 +110,33 @@ export function linemerge(ways: readonly Way[]): OsmPoint[][] {
 
     // Forward from the first way's end, then backward from its start, so the
     // string runs the way its first member does.
-    for (let node = first.end, index = next(node); index !== null; index = next(node)) {
+    for (
+      let node = first.end, index = next(node);
+      index !== null;
+      index = next(node)
+    ) {
       const edge = edges[index] as Edge;
       const forward = edge.start === node;
 
       used.add(index);
-      part.push(...(forward ? edge.points : [...edge.points].reverse()).slice(1));
+      part.push(
+        ...(forward ? edge.points : [...edge.points].reverse()).slice(1),
+      );
       node = forward ? edge.end : edge.start;
     }
 
-    for (let node = first.start, index = next(node); index !== null; index = next(node)) {
+    for (
+      let node = first.start, index = next(node);
+      index !== null;
+      index = next(node)
+    ) {
       const edge = edges[index] as Edge;
       const forward = edge.end === node;
 
       used.add(index);
-      part.unshift(...(forward ? edge.points : [...edge.points].reverse()).slice(0, -1));
+      part.unshift(
+        ...(forward ? edge.points : [...edge.points].reverse()).slice(0, -1),
+      );
       node = forward ? edge.start : edge.end;
     }
 

@@ -77,7 +77,8 @@ describe('the recon vocabulary', () => {
 
   it('is covered end to end — no code is in both registries and none is in neither', () => {
     const unclassified = VOCABULARY.filter(
-      ([, code]) => Object.hasOwn(CATEGORIES, code) === Object.hasOwn(EXCLUDED, code),
+      ([, code]) =>
+        Object.hasOwn(CATEGORIES, code) === Object.hasOwn(EXCLUDED, code),
     );
 
     expect(unclassified.map(([, code]) => code)).toEqual([]);
@@ -116,7 +117,10 @@ describe('classify', () => {
   });
 
   it('includes every funicular and no other 1400', () => {
-    expect(classify('FUN', '1400')).toEqual({ kind: 'included', category: 'FUN' });
+    expect(classify('FUN', '1400')).toEqual({
+      kind: 'included',
+      category: 'FUN',
+    });
   });
 
   it('includes TGV and RB but not TER', () => {
@@ -131,7 +135,10 @@ describe('classify', () => {
   });
 
   it('normalises whitespace and case before looking a code up', () => {
-    expect(classify('  s  ', '109')).toEqual({ kind: 'included', category: 'S' });
+    expect(classify('  s  ', '109')).toEqual({
+      kind: 'included',
+      category: 'S',
+    });
   });
 
   it('reports a known code on an unexpected route_type rather than trusting it', () => {

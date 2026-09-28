@@ -1,6 +1,11 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { RetryableError, isRetryableStatus, parseRetryAfter, withRetry } from './retry.ts';
+import {
+  RetryableError,
+  isRetryableStatus,
+  parseRetryAfter,
+  withRetry,
+} from './retry.ts';
 
 const NOW = new Date('2026-09-23T08:00:00Z');
 
@@ -35,7 +40,12 @@ describe('withRetry', () => {
   const DELAYS = [10, 20, 40];
 
   function options() {
-    return { label: 'test', log: vi.fn(), sleep: vi.fn(async () => {}), delays: DELAYS };
+    return {
+      label: 'test',
+      log: vi.fn(),
+      sleep: vi.fn(async () => {}),
+      delays: DELAYS,
+    };
   }
 
   it('waits longer after every failure until an attempt succeeds', async () => {
