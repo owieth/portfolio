@@ -20,4 +20,10 @@ describe('isInSchwyz', () => {
     expect(isInSchwyz({ lat, lon })).toBe(false);
   });
 
+  it.each([
+    ['Büsingen', 47.696, 8.69],
+    ['Campione', 45.969, 8.971],
+  ])('puts the %s enclave outside', (_, lat, lon) => {
+    expect(isInSchwyz({ lat, lon })).toBe(false);
+  });
 });
