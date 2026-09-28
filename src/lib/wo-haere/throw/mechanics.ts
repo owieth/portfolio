@@ -235,6 +235,9 @@ function kuratiertsZieu(wind: Wind, rand: Rand): LatLon {
   return clampInsCh(mitWind(ort, wind));
 }
 
+/** The share of Ei Tipp throws that ignore the curated destinations. */
+const ZUEFAU_ANTEIL = 0.15;
+
 /**
  * How many uniform draws over `CH_BOUNDS` a random Ei Tipp gets before it
  * falls back to a curated destination. About 46% of the rectangle is abroad,
@@ -257,15 +260,16 @@ function zuefäuigsOrtInDerSchwyz(rand: Rand): LatLon | null {
  * Ei Tipp — one tap, pure luck.
  *
  * Mostly lands near a curated destination so a single tap gives a usable
- * answer, but a fifth of the throws go anywhere in Switzerland, which is where
- * the "middle of a field" jokes come from. The wind still pushes those after
- * they are drawn, unclamped, so a draw on the border can drift across it.
+ * answer, but about one throw in seven goes anywhere in Switzerland, which is
+ * where the "middle of a field" jokes come from. The wind still pushes those
+ * after they are drawn, unclamped, so a draw on the border can drift across it.
  */
 export function tippZieu(wind: Wind, rand: Rand = Math.random): WurfErgebnis {
   const stil: WurfStil =
     rand() < CHNORZ_WAHRSCHYNLECHKEIT ? 'chnorz' : 'gschlämpert';
 
-  const zuefau = rand() < 0.8 ? null : zuefäuigsOrtInDerSchwyz(rand);
+  const zuefau =
+    rand() < 1 - ZUEFAU_ANTEIL ? null : zuefäuigsOrtInDerSchwyz(rand);
   const ort = zuefau ? mitWind(zuefau, wind) : kuratiertsZieu(wind, rand);
 
   return { zieu: { kind: 'ort', ort }, stil };
