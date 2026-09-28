@@ -10,18 +10,7 @@
  * so the buses never leave DuckDB.
  */
 
-import { literal, STORE } from '../db.ts';
-
-/**
- * The allowlist's verdict, handed to DuckDB as a table. The decision stays in
- * `allowlist/categories.ts`; restating it as a `where` clause here would give it
- * a second home.
- */
-export function allowed(routeIds: readonly string[]): string {
-  const rows = routeIds.map(routeId => `(${literal(routeId)})`).join(', ');
-
-  return `create table allowed as select * from (values ${rows}) as allowed(route_id)`;
-}
+import { STORE } from '../db.ts';
 
 /**
  * Every platform row in `stops.txt` carries its station's Didok number, so the
