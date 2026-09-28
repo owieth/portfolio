@@ -57,19 +57,6 @@ const BRETT_RADIUS = Math.min(SICHT.breiti, SICHT.hööchi) / 2;
 const PRO_SESSION = flag('session', 400);
 const SESSIONE = Math.max(1, Math.round(WUERF / PRO_SESSION));
 
-/** mulberry32. */
-function seedle(seed) {
-  let s = seed;
-  return () => {
-    s = (s + 0x6d2b79f5) | 0;
-    let t = Math.imul(s ^ (s >>> 15), 1 | s);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-Math.random = seedle(SEED);
-
 const rand = mulberry32(SEED);
 
 /**
