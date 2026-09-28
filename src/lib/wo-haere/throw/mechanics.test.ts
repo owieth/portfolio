@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { CH_BOUNDS, distanceKm, isInChBbox } from '@/lib/wo-haere/geo/ch';
+import { isInSchwyz } from '@/lib/wo-haere/geo/landesgrenze';
 import { ZIU } from '@/lib/wo-haere/data/ziu';
 import {
   MAX_ZUG_PX,
@@ -292,10 +293,33 @@ describe('tippZieu', () => {
     for (let i = 0; i < n; i++) {
       const { zieu } = tippZieu(nöieWind(rand), rand);
       if (zieu.kind !== 'ort') throw new Error('unerwartet');
-      if (isInChBbox(zieu.ort)) dinne++;
+      if (isInSchwyz(zieu.ort)) dinne++;
     }
 
     expect(dinne / n).toBeGreaterThan(0.95);
+  });
+
+  it('samples the random fifth inside Switzerland', () => {
+    for (let seed = 1; seed <= 1000; seed++) {
+      const rest = mulberry32(seed);
+      // A calm stil, then the uniform branch, then whatever the seed draws.
+      const züg = [0.5, 0.9];
+      const { zieu } = tippZieu(WIND, () => züg.shift() ?? rest());
+      if (zieu.kind !== 'ort') throw new Error('unerwartet');
+
+      expect(isInSchwyz(zieu.ort)).toBe(true);
+    }
+  });
+
+  it('falls back to a curated destination when every draw is abroad', () => {
+    // 0 is the south-west corner of CH_BOUNDS, which is France.
+    const züg = [0.5, 0.9];
+    const { zieu } = tippZieu(WIND, () => züg.shift() ?? 0);
+    if (zieu.kind !== 'ort') throw new Error('unerwartet');
+
+    expect(
+      distanceKm(zieu.ort, { lat: ZIU[0].lat, lon: ZIU[0].lon }),
+    ).toBeLessThan(0.001);
   });
 
   it('clamps the curated branch but lets the uniform fifth drift', () => {
