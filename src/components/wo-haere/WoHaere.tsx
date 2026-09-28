@@ -221,6 +221,7 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
   const charteZwaeg = useCallback(() => {
     if (!startWurf) return;
     track({ name: 'shared_throw_opened' });
+    if (laufend) return;
     const handle = charteRef.current;
     handle?.zeigOrt(startWurf);
     setWurfNr(n => n + 1);
@@ -228,7 +229,7 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
     replayRef.current = true;
     setZiel(mitti(handle?.container() ?? null));
     setLaufend(true);
-  }, [startWurf]);
+  }, [laufend, startWurf]);
 
   const gsammlet = gsammleteKantöne(wurfbuech);
   // Memoised because every pointer move re-renders the game, and a fresh array
