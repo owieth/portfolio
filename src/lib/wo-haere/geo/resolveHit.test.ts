@@ -4,6 +4,7 @@ import { BAERN, distanceKm, himmurichtig } from '@/lib/wo-haere/geo/ch';
 import { resolveHit } from '@/lib/wo-haere/geo/resolveHit';
 
 import greifenseeDorf from './__fixtures__/identify-greifensee-dorf.json';
+import greifenseeSee from './__fixtures__/identify-greifensee-see.json';
 import leer from './__fixtures__/identify-leer.json';
 import numeHistorisch from './__fixtures__/identify-nume-historisch.json';
 import thun from './__fixtures__/identify-thun.json';
@@ -112,6 +113,17 @@ describe('resolveHit', () => {
       gmeind: 'Greifensee',
       gdeNr: 194,
       wasser: false,
+    });
+  });
+
+  it('flags the lake that shares its name with a village', async () => {
+    stubSwisstopo({ identify: { body: greifenseeSee } });
+
+    expect(await resolveHit({ lat: 47.35, lon: 8.678 })).toMatchObject({
+      art: 'preich',
+      gmeind: 'Greifensee',
+      gdeNr: 9040,
+      wasser: true,
     });
   });
 
