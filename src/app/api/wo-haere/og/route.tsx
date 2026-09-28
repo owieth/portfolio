@@ -1,3 +1,6 @@
+import { readFile } from 'node:fs/promises';
+import { join } from 'node:path';
+
 import { ImageResponse } from 'next/og';
 
 import { trackServer } from '@/lib/analytics/server/track-server';
@@ -10,6 +13,52 @@ import { parseWurf } from '@/lib/wo-haere/wurfParam';
 export const runtime = 'nodejs';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
+
+const GEIST_WEIGHTS = [
+  {
+    path: join(
+      process.cwd(),
+      'node_modules/geist/dist/fonts/geist-sans/Geist-Regular.ttf',
+    ),
+    weight: 400,
+  },
+  {
+    path: join(
+      process.cwd(),
+      'node_modules/geist/dist/fonts/geist-sans/Geist-Bold.ttf',
+    ),
+    weight: 700,
+  },
+  {
+    path: join(
+      process.cwd(),
+      'node_modules/geist/dist/fonts/geist-sans/Geist-Black.ttf',
+    ),
+    weight: 900,
+  },
+] as const;
+
+/**
+ * `fonts` replaces the default set rather than adding to it, so Regular is
+ * loaded alongside the two heavy weights. satori cannot read woff2, and the
+ * `geist` package's `exports` map blocks resolving these deep paths.
+ */
+const readFonts = () =>
+  Promise.all(
+    GEIST_WEIGHTS.map(async ({ path, weight }) => ({
+      name: 'Geist',
+      data: await readFile(path),
+      weight,
+      style: 'normal' as const,
+    })),
+  );
+
+// Caught where it starts, so a failed read renders today's regular-only card
+// instead of surfacing as an unhandled rejection before any request awaits it.
+const fonts = readFonts().catch(error => {
+  console.error('og fonts failed', error);
+  return null;
+});
 
 interface Chaarte {
   titu: string;
@@ -67,7 +116,7 @@ const Chaarte = ({ titu, underTitu, zeile }: Chaarte) => (
       padding: '80px',
       background: '#e8dfcb',
       color: '#1c1917',
-      fontFamily: 'sans-serif',
+      fontFamily: 'Geist',
     }}
   >
     <div
@@ -131,5 +180,9 @@ export async function GET(request: Request) {
     request.headers,
   );
 
-  return new ImageResponse(<Chaarte {...chaarte} />, size);
+  const geist = await fonts;
+  return new ImageResponse(
+    <Chaarte {...chaarte} />,
+    geist ? { ...size, fonts: geist } : size,
+  );
 }
