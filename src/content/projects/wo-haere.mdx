@@ -56,13 +56,13 @@ Aiming only ever biases the throw — it never determines it, because nobody pla
 
 64.6 / 170 ≈ **0.38**, so a beginner’s spread is nearly 40% of the target radius. That is what this app throws with. The map is the dartboard, so σ scales with the map’s radius, and a throw at full force lands exactly on that beginner figure — ease off and you do better. Measured over 1.2M simulated throws per force level on a 1280×800 view, by a script that ships with the project and reads the constants off the game:
 
-| Force | σ      | Median miss | Off the board |
-| ----- | ------ | ----------- | ------------- |
-| 0%    | 61 px  | 23 km       | 0.1%          |
-| 50%   | 106 px | 40 km       | 1.6%          |
-| 100%  | 152 px | 57 km       | 7.8%          |
+| Force | σ      | Median miss | Off the board | Left Switzerland |
+| ----- | ------ | ----------- | ------------- | ---------------- |
+| 0%    | 61 px  | 23 km       | 0.1%          | 1.5%             |
+| 50%   | 106 px | 40 km       | 1.6%          | 8.1%             |
+| 100%  | 152 px | 57 km       | 7.8%          | 18.5%            |
 
-The paper’s remark that “a beginner will occasionally miss the board entirely” is where the occasional _Dernäbe!_ card comes from. An earlier calibration ran to 23% off-board at full force, which is not “occasionally”.
+The paper’s remark that “a beginner will occasionally miss the board entirely” is the off-the-board column. An earlier calibration ran to 23% off the board at full force, which is not “occasionally”. The _Dernäbe!_ card fires at the real border, so it follows the last column: aim at the middle of the map at full force and nearly a fifth of throws leave Switzerland. That rate is intended.
 
 Three further details, all of them things real throwers do:
 

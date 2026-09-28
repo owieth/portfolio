@@ -19,6 +19,7 @@ import { registerAlias } from './lib/ts-alias.mjs';
 registerAlias();
 
 const { CH_BOUNDS, distanceKm } = await import('@/lib/wo-haere/geo/ch');
+const { isInSchwyz } = await import('@/lib/wo-haere/geo/landesgrenze');
 const mech = await import('@/lib/wo-haere/throw/mechanics');
 const { mulberry32 } = await import('@/lib/wo-haere/throw/rng');
 
@@ -118,6 +119,7 @@ function zugUfsZiel(mech, chraft) {
 function simuliere(chraft) {
   const missKm = [];
   let abBrett = 0;
+  let usSchwyz = 0;
   const zug = zugUfsZiel(mech, chraft);
   const sigma = mech.streuigSigma(BRETT_RADIUS, chraft);
 
@@ -134,7 +136,9 @@ function simuliere(chraft) {
       );
       if (Math.hypot(zieu.x - ZIEL.x, zieu.y - ZIEL.y) > BRETT_RADIUS)
         abBrett++;
-      missKm.push(distanceKm(ZIEL_ORT, zumOrt(zieu.x, zieu.y)));
+      const ort = zumOrt(zieu.x, zieu.y);
+      if (!isInSchwyz(ort)) usSchwyz++;
+      missKm.push(distanceKm(ZIEL_ORT, ort));
     }
   }
 
@@ -144,13 +148,16 @@ function simuliere(chraft) {
     sigma,
     missKm: median(missKm),
     abBrett: (100 * abBrett) / missKm.length,
+    usSchwyz: (100 * usSchwyz) / missKm.length,
   };
 }
 
-const zeile = (a, b, c, d) =>
-  `${a.padStart(6)}  ${b.padStart(7)}  ${c.padStart(12)}  ${d.padStart(14)}`;
+const zeile = (a, b, c, d, e) =>
+  `${a.padStart(6)}  ${b.padStart(7)}  ${c.padStart(12)}  ${d.padStart(14)}  ${e.padStart(17)}`;
 
-console.log(zeile('Force', 'σ', 'Median miss', 'Off the board'));
+console.log(
+  zeile('Force', 'σ', 'Median miss', 'Off the board', 'Left Switzerland'),
+);
 
 for (const chraft of CHREFT) {
   const r = simuliere(chraft);
@@ -160,6 +167,7 @@ for (const chraft of CHREFT) {
       `${Math.round(r.sigma)} px`,
       `${Math.round(r.missKm)} km`,
       `${r.abBrett.toFixed(1)}%`,
+      `${r.usSchwyz.toFixed(1)}%`,
     ),
   );
 }

@@ -46,12 +46,16 @@ const NOVIZ_SIGMA = 0.38;
  * per pixel) — scripts/wo-haere-simulate.mjs reproduces this from the
  * constants below:
  *
- *   force   0%  σ =  61 px  median miss 23 km  off-board 0.1%
- *   force  50%  σ = 106 px  median miss 40 km  off-board 1.6%
- *   force 100%  σ = 152 px  median miss 57 km  off-board 7.8%
+ *   force   0%  σ =  61 px  median miss 23 km  off-board 0.1%  abroad  1.5%
+ *   force  50%  σ = 106 px  median miss 40 km  off-board 1.6%  abroad  8.1%
+ *   force 100%  σ = 152 px  median miss 57 km  off-board 7.8%  abroad 18.5%
  *
- * The earlier calibration ran to 23% off-board at full force, which buried the
- * player in "Dernäbe!" cards — far more than the paper's "occasionally".
+ * "Abroad" counts landings outside the national border, which is what fires a
+ * "Dernäbe!" card. Aimed at the middle of the map, about a fifth of full-force
+ * throws leave the country, and that is intended.
+ *
+ * The earlier calibration ran to 23% off the board at full force — far more
+ * than the paper's beginner who "will occasionally miss the board entirely".
  */
 const SIGMA_BI_CHRAFT = { min: 0.4, max: 1.0 } as const;
 
