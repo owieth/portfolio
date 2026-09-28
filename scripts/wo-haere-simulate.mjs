@@ -119,12 +119,11 @@ function zugUfsZiel(mech, chraft) {
 async function simuliere(chraft) {
   const missKm = [];
   let abBrett = 0;
-  let sigma = 0;
+  const zug = zugUfsZiel(mech, chraft);
+  const sigma = mech.streuigSigma(BRETT_RADIUS, chraft);
 
   for (let session = 0; session < SESSIONE; session++) {
     const hang = mech.zieheHang(rand);
-    const zug = zugUfsZiel(mech, chraft);
-    sigma = mech.streuigSigma(BRETT_RADIUS, chraft);
 
     for (let i = 0; i < PRO_SESSION; i++) {
       const { zieu } = mech.zugZieu(
