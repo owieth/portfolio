@@ -19,6 +19,7 @@ const HEIGHT_URL = 'https://api3.geo.admin.ch/rest/services/height';
 const CACHE = { next: { revalidate: 60 * 60 * 24 * 30 } } as const;
 
 const IDENTIFY_TIMEOUT_MS = 4000;
+const HOECHI_TIMEOUT_MS = 2000;
 
 interface IdentifyAttributes {
   gemname?: string;
@@ -79,7 +80,10 @@ async function fetchHoechi(lon: number, lat: number): Promise<number | null> {
   });
 
   try {
-    const res = await fetch(`${HEIGHT_URL}?${params}`, CACHE);
+    const res = await fetch(`${HEIGHT_URL}?${params}`, {
+      ...CACHE,
+      signal: AbortSignal.timeout(HOECHI_TIMEOUT_MS),
+    });
     if (!res.ok) return null;
     const json = (await res.json()) as { height?: string };
     const height = Number.parseFloat(json.height ?? '');
