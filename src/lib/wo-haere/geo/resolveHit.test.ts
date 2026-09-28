@@ -274,6 +274,15 @@ describe('resolveHit', () => {
       expect(urls[0].searchParams.get('timeInstant')).toBe('2026');
     });
 
+    it('takes the year from the clock, in UTC', async () => {
+      // Already 2031 in Zurich, still 2030 in UTC.
+      vi.setSystemTime(new Date('2030-12-31T23:30:00Z'));
+      stubSwisstopo({ identify: { body: thun } });
+      await resolveHit(THUN);
+
+      expect(identifyUrls()[0].searchParams.get('timeInstant')).toBe('2030');
+    });
+
     it('falls back to all years for border water', async () => {
       stubSwisstopo({
         identifyJahr: { body: leer },
