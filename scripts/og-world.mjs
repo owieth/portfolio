@@ -142,6 +142,13 @@ ${Object.entries(MAP_WINDOW)
   .join('\n')}
 };
 
+/** The size the path was projected at, in pixels. */
+export const WORLD_PATH_SIZE = {
+${Object.entries(MAP_SIZE)
+  .map(([side, pixels]) => `  ${side}: ${pixels},`)
+  .join('\n')}
+};
+
 export const WORLD_PATH =
   '${path}';
 `;
