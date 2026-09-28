@@ -88,6 +88,10 @@ async function identify(lon: number, lat: number): Promise<IdentifyRecord[]> {
   return json.results ?? [];
 }
 
+function currentRecord(records: IdentifyRecord[]): IdentifyRecord | undefined {
+  return records.find(r => r.attributes?.is_current_jahr === true);
+}
+
 async function fetchHoechi(lon: number, lat: number): Promise<number | null> {
   const { easting, northing } = wgs84ToLv95(lon, lat);
   const params = new URLSearchParams({
@@ -134,7 +138,7 @@ export async function resolveHit(rawPoint: LatLon): Promise<Wurf> {
   }
 
   const all = await identify(lon, lat);
-  const current = all.find(r => r.attributes?.is_current_jahr === true);
+  const current = currentRecord(all);
 
   if (!current?.attributes?.gemname) {
     return {
