@@ -259,6 +259,22 @@ describe('resolveHit', () => {
     expect(await resolveHit(THUN)).toMatchObject({ kanton: '', gdeNr: null });
   });
 
+  describe('the current-year query', () => {
+    beforeEach(() => {
+      vi.setSystemTime(new Date('2026-09-26T12:00:00Z'));
+    });
+
+    it('asks for the current year first and stops there', async () => {
+      stubSwisstopo({ identify: { body: thun } });
+      await resolveHit(THUN);
+
+      const urls = identifyUrls();
+
+      expect(urls).toHaveLength(1);
+      expect(urls[0].searchParams.get('timeInstant')).toBe('2026');
+    });
+  });
+
   describe('the mapExtent trap', () => {
     // A bogus extent makes identify return zero results instead of an error,
     // which is indistinguishable from "abroad". These assertions are the only
