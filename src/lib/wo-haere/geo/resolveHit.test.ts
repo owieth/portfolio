@@ -288,6 +288,32 @@ describe('resolveHit', () => {
         identifyUrls().map(url => url.searchParams.get('timeInstant')),
       ).toEqual(['2026', null]);
     });
+
+    it('falls back when the year record is not current', async () => {
+      stubSwisstopo({
+        identifyJahr: {
+          body: {
+            results: [
+              {
+                attributes: {
+                  gemname: 'Thun',
+                  kanton: 'BE',
+                  gde_nr: 942,
+                  is_current_jahr: false,
+                },
+              },
+            ],
+          },
+        },
+        identify: { body: thun },
+      });
+
+      expect(await resolveHit(THUN)).toMatchObject({
+        art: 'preich',
+        gmeind: 'Thun',
+      });
+      expect(identifyUrls()).toHaveLength(2);
+    });
   });
 
   describe('the mapExtent trap', () => {
