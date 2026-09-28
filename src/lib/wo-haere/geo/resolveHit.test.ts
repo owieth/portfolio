@@ -314,6 +314,18 @@ describe('resolveHit', () => {
       });
       expect(identifyUrls()).toHaveLength(2);
     });
+
+    it('reads two empty answers as abroad', async () => {
+      stubSwisstopo({ identifyJahr: { body: leer }, identify: { body: leer } });
+
+      expect(await resolveHit(THUN)).toMatchObject({
+        art: 'dernaebe',
+        grund: 'usland',
+      });
+      expect(
+        identifyUrls().map(url => url.searchParams.get('timeInstant')),
+      ).toEqual(['2026', null]);
+    });
   });
 
   describe('the mapExtent trap', () => {
