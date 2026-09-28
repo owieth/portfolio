@@ -27,7 +27,12 @@ interface Antwort {
 
 let fetchMock: ReturnType<typeof vi.fn>;
 
-function stubSwisstopo(antworte: { identify?: Antwort; hoechi?: Antwort }) {
+function stubSwisstopo(antworte: {
+  identify?: Antwort;
+  /** The current-year query; defaults to the `identify` answer. */
+  identifyJahr?: Antwort;
+  hoechi?: Antwort;
+}) {
   const antwort = ({ ok = true, status = 200, body = {} }: Antwort) =>
     Promise.resolve({
       ok,
@@ -44,9 +49,12 @@ function stubSwisstopo(antworte: { identify?: Antwort; hoechi?: Antwort }) {
     });
 
   fetchMock = vi.fn((url: string, init?: RequestInit) => {
+    const identify = antworte.identify ?? { body: leer };
     const soll = url.includes('/height')
       ? (antworte.hoechi ?? { body: { height: '560.2' } })
-      : (antworte.identify ?? { body: leer });
+      : url.includes('timeInstant=')
+        ? (antworte.identifyJahr ?? identify)
+        : identify;
 
     if (soll.chlöpft) return Promise.reject(new Error('offline'));
     if (soll.hanget) return haenge(init?.signal);
@@ -56,12 +64,11 @@ function stubSwisstopo(antworte: { identify?: Antwort; hoechi?: Antwort }) {
   vi.stubGlobal('fetch', fetchMock);
 }
 
-const identifyUrl = () =>
-  new URL(
-    fetchMock.mock.calls
-      .map(([url]) => url as string)
-      .find(url => url.includes('/identify'))!,
-  );
+const identifyUrls = () =>
+  fetchMock.mock.calls
+    .map(([url]) => url as string)
+    .filter(url => url.includes('/identify'))
+    .map(url => new URL(url));
 
 const laufAbSofort = () =>
   vi
@@ -77,6 +84,7 @@ beforeEach(() => {
 afterEach(() => {
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
+  vi.useRealTimers();
 });
 
 describe('resolveHit', () => {
@@ -251,35 +259,163 @@ describe('resolveHit', () => {
     expect(await resolveHit(THUN)).toMatchObject({ kanton: '', gdeNr: null });
   });
 
+  describe('the current-year query', () => {
+    beforeEach(() => {
+      vi.setSystemTime(new Date('2026-09-26T12:00:00Z'));
+    });
+
+    it('asks for the current year first and stops there', async () => {
+      stubSwisstopo({ identify: { body: thun } });
+      await resolveHit(THUN);
+
+      const urls = identifyUrls();
+
+      expect(urls).toHaveLength(1);
+      expect(urls[0].searchParams.get('timeInstant')).toBe('2026');
+    });
+
+    it('takes the year from the clock, in UTC', async () => {
+      // Already 2031 in Zurich, still 2030 in UTC.
+      vi.setSystemTime(new Date('2030-12-31T23:30:00Z'));
+      stubSwisstopo({ identify: { body: thun } });
+      await resolveHit(THUN);
+
+      expect(identifyUrls()[0].searchParams.get('timeInstant')).toBe('2030');
+    });
+
+    it('falls back to all years for border water', async () => {
+      stubSwisstopo({
+        identifyJahr: { body: leer },
+        identify: { body: numeHistorisch },
+      });
+
+      expect(await resolveHit({ lat: 46.4, lon: 6.4 })).toMatchObject({
+        art: 'dernaebe',
+        grund: 'grenzwasser',
+      });
+      expect(
+        identifyUrls().map(url => url.searchParams.get('timeInstant')),
+      ).toEqual(['2026', null]);
+    });
+
+    it('falls back when the year record is not current', async () => {
+      stubSwisstopo({
+        identifyJahr: {
+          body: {
+            results: [
+              {
+                attributes: {
+                  gemname: 'Thun',
+                  kanton: 'BE',
+                  gde_nr: 942,
+                  is_current_jahr: false,
+                },
+              },
+            ],
+          },
+        },
+        identify: { body: thun },
+      });
+
+      expect(await resolveHit(THUN)).toMatchObject({
+        art: 'preich',
+        gmeind: 'Thun',
+      });
+      expect(identifyUrls()).toHaveLength(2);
+    });
+
+    it('reads two empty answers as abroad', async () => {
+      stubSwisstopo({ identifyJahr: { body: leer }, identify: { body: leer } });
+
+      expect(await resolveHit(THUN)).toMatchObject({
+        art: 'dernaebe',
+        grund: 'usland',
+      });
+      expect(
+        identifyUrls().map(url => url.searchParams.get('timeInstant')),
+      ).toEqual(['2026', null]);
+    });
+
+    it('throws on a failed first query without a second one', async () => {
+      stubSwisstopo({
+        identifyJahr: { ok: false, status: 500 },
+        identify: { body: thun },
+      });
+
+      await expect(resolveHit(THUN)).rejects.toThrow(
+        'swisstopo identify failed with 500',
+      );
+      expect(identifyUrls()).toHaveLength(1);
+    });
+
+    it('throws when the all-years fallback fails', async () => {
+      stubSwisstopo({
+        identifyJahr: { body: leer },
+        identify: { ok: false, status: 503 },
+      });
+
+      await expect(resolveHit(THUN)).rejects.toThrow(
+        'swisstopo identify failed with 503',
+      );
+      expect(identifyUrls()).toHaveLength(2);
+    });
+
+    it('bounds the fallback with a timeout too', async () => {
+      const timeout = laufAbSofort();
+      stubSwisstopo({
+        identifyJahr: { body: leer },
+        identify: { body: numeHistorisch },
+      });
+      await resolveHit({ lat: 46.4, lon: 6.4 });
+
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+      for (const [, init] of fetchMock.mock.calls) {
+        expect((init as RequestInit).signal).toBeInstanceOf(AbortSignal);
+      }
+      expect(timeout.mock.calls).toEqual([[4000], [4000]]);
+    });
+  });
+
   describe('the mapExtent trap', () => {
     // A bogus extent makes identify return zero results instead of an error,
     // which is indistinguishable from "abroad". These assertions are the only
     // thing standing between a typo here and every Swiss throw reading as usland.
+    // An empty year answer forces the all-years fallback, so both URLs are checked.
     it('brackets the queried point', async () => {
-      stubSwisstopo({ identify: { body: thun } });
+      stubSwisstopo({ identifyJahr: { body: leer }, identify: { body: thun } });
       await resolveHit(THUN);
 
-      const [west, south, east, north] = identifyUrl()
-        .searchParams.get('mapExtent')!
-        .split(',')
-        .map(Number);
+      const urls = identifyUrls();
+      expect(urls).toHaveLength(2);
 
-      expect(west).toBeLessThan(THUN.lon);
-      expect(east).toBeGreaterThan(THUN.lon);
-      expect(south).toBeLessThan(THUN.lat);
-      expect(north).toBeGreaterThan(THUN.lat);
+      for (const url of urls) {
+        const [west, south, east, north] = url.searchParams
+          .get('mapExtent')!
+          .split(',')
+          .map(Number);
+
+        expect(west).toBeLessThan(THUN.lon);
+        expect(east).toBeGreaterThan(THUN.lon);
+        expect(south).toBeLessThan(THUN.lat);
+        expect(north).toBeGreaterThan(THUN.lat);
+      }
     });
 
     it('asks in the same reference system it sends coordinates in', async () => {
-      stubSwisstopo({ identify: { body: thun } });
+      stubSwisstopo({ identifyJahr: { body: leer }, identify: { body: thun } });
       await resolveHit(THUN);
 
-      const params = identifyUrl().searchParams;
+      const urls = identifyUrls();
+      expect(urls).toHaveLength(2);
 
-      expect(params.get('sr')).toBe('4326');
-      expect(params.get('tolerance')).toBe('0');
-      expect(params.get('geometry')).toBe(`${THUN.lon},${THUN.lat}`);
-      expect(params.get('imageDisplay')).toBe('800,600,96');
+      for (const url of urls) {
+        const params = url.searchParams;
+
+        expect(params.get('sr')).toBe('4326');
+        expect(params.get('tolerance')).toBe('0');
+        expect(params.get('geometry')).toBe(`${THUN.lon},${THUN.lat}`);
+        expect(params.get('imageDisplay')).toBe('800,600,96');
+      }
     });
   });
 

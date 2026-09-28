@@ -28,8 +28,12 @@ interface IdentifyAttributes {
   is_current_jahr?: boolean;
 }
 
+interface IdentifyRecord {
+  attributes?: IdentifyAttributes;
+}
+
 interface IdentifyResponse {
-  results?: { attributes?: IdentifyAttributes }[];
+  results?: IdentifyRecord[];
 }
 
 export type DernaebeGrund = 'usland' | 'grenzwasser' | 'nid_uf_der_charte';
@@ -54,7 +58,7 @@ export type Wurf =
       richtig: string;
     };
 
-function identifyUrl(lon: number, lat: number): string {
+function identifyUrl(lon: number, lat: number, jahr?: number): string {
   // mapExtent and imageDisplay are required by the API even with tolerance=0;
   // a bogus extent silently returns zero results, so keep it around the point.
   const d = 0.05;
@@ -68,7 +72,46 @@ function identifyUrl(lon: number, lat: number): string {
     sr: '4326',
     returnGeometry: 'false',
   });
+  if (jahr !== undefined) params.set('timeInstant', String(jahr));
   return `${IDENTIFY_URL}?${params}`;
+}
+
+async function identify(
+  lon: number,
+  lat: number,
+  jahr?: number,
+): Promise<IdentifyRecord[]> {
+  const res = await fetch(identifyUrl(lon, lat, jahr), {
+    ...CACHE,
+    signal: AbortSignal.timeout(IDENTIFY_TIMEOUT_MS),
+  });
+  if (!res.ok) {
+    throw new Error(`swisstopo identify failed with ${res.status}`);
+  }
+
+  const json = (await res.json()) as IdentifyResponse;
+  return json.results ?? [];
+}
+
+function currentRecord(records: IdentifyRecord[]): IdentifyRecord | undefined {
+  return records.find(r => r.attributes?.is_current_jahr === true);
+}
+
+/**
+ * Asks for the current year first: one record of about 1 KB, against about
+ * 160 KB for every year since 1850. Anything short of a named current record
+ * falls back to the full history, because only the history tells border water
+ * (old records, no current one) from abroad (none at all). The same fallback
+ * covers a new year that swisstopo has not published yet.
+ */
+async function identifyGemeinde(
+  lon: number,
+  lat: number,
+): Promise<IdentifyRecord[]> {
+  const diesJahr = await identify(lon, lat, new Date().getUTCFullYear());
+  return currentRecord(diesJahr)?.attributes?.gemname
+    ? diesJahr
+    : identify(lon, lat);
 }
 
 async function fetchHoechi(lon: number, lat: number): Promise<number | null> {
@@ -96,10 +139,15 @@ async function fetchHoechi(lon: number, lat: number): Promise<number | null> {
 /**
  * Turns a dart's coordinate into a place.
  *
- * swisstopo's Gemeinde layer answers three questions in one request:
+ * swisstopo's Gemeinde layer answers three questions:
  *   - a current record        -> a real Swiss municipality (or a Swiss lake)
  *   - historical records only -> border water such as the French part of Léman
  *   - nothing at all          -> abroad
+ *
+ * Most throws are settled by the current year alone. Without a named current
+ * record in that answer, the full history is fetched: it tells the last two
+ * apart, and still finds the municipality when the year answer is empty or out
+ * of date, as it is after New Year until swisstopo publishes the new year.
  *
  * The layer also holds a few foreign municipalities as current records
  * (BFS 7xxx: Liechtenstein, Büsingen, Campione). Those count as abroad too.
@@ -116,17 +164,8 @@ export async function resolveHit(rawPoint: LatLon): Promise<Wurf> {
     return { art: 'dernaebe', grund: 'usland', lat, lon };
   }
 
-  const res = await fetch(identifyUrl(lon, lat), {
-    ...CACHE,
-    signal: AbortSignal.timeout(IDENTIFY_TIMEOUT_MS),
-  });
-  if (!res.ok) {
-    throw new Error(`swisstopo identify failed with ${res.status}`);
-  }
-
-  const json = (await res.json()) as IdentifyResponse;
-  const all = json.results ?? [];
-  const current = all.find(r => r.attributes?.is_current_jahr === true);
+  const all = await identifyGemeinde(lon, lat);
+  const current = currentRecord(all);
 
   if (!current?.attributes?.gemname) {
     return {
