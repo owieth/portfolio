@@ -3,10 +3,10 @@ import { describe, expect, it } from 'vitest';
 import {
   CH_BOUNDS,
   distanceKm,
-  isInChBbox,
   offset,
   type LatLon,
 } from '@/lib/wo-haere/geo/ch';
+import { isInSchwyz } from '@/lib/wo-haere/geo/landesgrenze';
 import {
   MAX_ZUG_PX,
   nöieWind,
@@ -115,7 +115,7 @@ function mäss(chraft: number, rand: Rand, würf = WÜRF): Mässig {
 
     // Screen y points down, north points up.
     const richtig = ((Math.atan2(dx, -dy) * 180) / Math.PI + 360) % 360;
-    if (!isInChBbox(offset(MITTI, abwychig * KM_PRO_PX, richtig))) dernaebe++;
+    if (!isInSchwyz(offset(MITTI, abwychig * KM_PRO_PX, richtig))) dernaebe++;
   }
 
   abwychige.sort((a, b) => a - b);
@@ -176,16 +176,15 @@ describe('σ calibration', () => {
   });
 
   it('leaves Switzerland only occasionally', () => {
-    expect(lob.dernaebeAateil).toBeLessThan(0.005);
-    expect(haub.dernaebeAateil).toBeGreaterThan(0.005);
-    expect(haub.dernaebeAateil).toBeLessThan(0.03);
-    expect(vou.dernaebeAateil).toBeGreaterThan(0.04);
-    expect(vou.dernaebeAateil).toBeLessThan(0.12);
+    expect(lob.dernaebeAateil).toBeLessThan(0.03);
+    expect(haub.dernaebeAateil).toBeGreaterThan(0.05);
+    expect(haub.dernaebeAateil).toBeLessThan(0.11);
+    expect(vou.dernaebeAateil).toBeGreaterThan(0.15);
   });
 
   it('never goes back to burying the player in Dernäbe cards', () => {
     // The regression this whole file exists for.
-    expect(vou.dernaebeAateil).toBeLessThan(0.15);
+    expect(vou.dernaebeAateil).toBeLessThan(0.25);
   });
 
   it('gets worse with force, monotonically', () => {
