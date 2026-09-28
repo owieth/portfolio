@@ -139,7 +139,7 @@ async function fetchHoechi(lon: number, lat: number): Promise<number | null> {
 /**
  * Turns a dart's coordinate into a place.
  *
- * swisstopo's Gemeinde layer answers three questions in one request:
+ * swisstopo's Gemeinde layer answers three questions:
  *   - a current record        -> a real Swiss municipality (or a Swiss lake)
  *   - historical records only -> border water such as the French part of Léman
  *   - nothing at all          -> abroad
