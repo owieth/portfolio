@@ -226,9 +226,7 @@ export default function WoHaere({ startWurf }: WoHaereProps) {
     setWurfNr(n => n + 1);
     wartendOrtRef.current = startWurf;
     replayRef.current = true;
-    setZiel(
-      handle?.ortZuPixel(startWurf) ?? mitti(handle?.container() ?? null),
-    );
+    setZiel(mitti(handle?.container() ?? null));
     setLaufend(true);
   }, [startWurf]);
 
