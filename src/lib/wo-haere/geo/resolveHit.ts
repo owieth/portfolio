@@ -18,6 +18,8 @@ const HEIGHT_URL = 'https://api3.geo.admin.ch/rest/services/height';
 /** Boundaries and terrain do not move, so cache hard. */
 const CACHE = { next: { revalidate: 60 * 60 * 24 * 30 } } as const;
 
+const IDENTIFY_TIMEOUT_MS = 4000;
+
 interface IdentifyAttributes {
   gemname?: string;
   kanton?: string;
@@ -110,7 +112,10 @@ export async function resolveHit(rawPoint: LatLon): Promise<Wurf> {
     return { art: 'dernaebe', grund: 'usland', lat, lon };
   }
 
-  const res = await fetch(identifyUrl(lon, lat), CACHE);
+  const res = await fetch(identifyUrl(lon, lat), {
+    ...CACHE,
+    signal: AbortSignal.timeout(IDENTIFY_TIMEOUT_MS),
+  });
   if (!res.ok) {
     throw new Error(`swisstopo identify failed with ${res.status}`);
   }
