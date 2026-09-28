@@ -11,7 +11,7 @@ import {
   useTable,
   type Column,
 } from '@tanstack/react-table';
-import { useMemo } from 'react';
+import { Fragment, useMemo } from 'react';
 
 import Named from '@/components/stats/Named';
 import { Button } from '@/components/ui/button';
@@ -128,7 +128,7 @@ export default function RideLog({ log }: { log: RailLogTable }) {
   const { pageIndex, pageSize } = table.state.pagination;
 
   return (
-    <>
+    <Fragment>
       {/*
         Fixed, with the date column sized, so the columns hold still while
         the pages change under them.
@@ -193,6 +193,6 @@ export default function RideLog({ log }: { log: RailLogTable }) {
           </Button>
         </div>
       </div>
-    </>
+    </Fragment>
   );
 }
