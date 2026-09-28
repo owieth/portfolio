@@ -28,8 +28,12 @@ interface IdentifyAttributes {
   is_current_jahr?: boolean;
 }
 
+interface IdentifyRecord {
+  attributes?: IdentifyAttributes;
+}
+
 interface IdentifyResponse {
-  results?: { attributes?: IdentifyAttributes }[];
+  results?: IdentifyRecord[];
 }
 
 export type DernaebeGrund = 'usland' | 'grenzwasser' | 'nid_uf_der_charte';
