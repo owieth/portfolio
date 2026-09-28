@@ -7,6 +7,7 @@ import Wurfsteuerig, {
   type ZugStand,
 } from '@/components/wo-haere/Wurfsteuerig';
 import { FAEHLER } from '@/lib/wo-haere/data/bern';
+import { resultatText } from '@/lib/wo-haere/resultatText';
 import type { WurfErgebnis } from '@/lib/wo-haere/throw/mechanics';
 import type { Yschtellige as YschtelligeWert } from '@/lib/wo-haere/types';
 
@@ -56,6 +57,16 @@ export default function Underleischte({
           </p>
         </div>
       )}
+
+      <p aria-live="polite" className="sr-only">
+        {resultat
+          ? resultatText({
+              wurf: resultat.wurf,
+              ziuName: resultat.ziu?.name ?? null,
+              isPreich: resultat.isPreich,
+            })
+          : ''}
+      </p>
 
       {resultat ? (
         <Resultatcharte

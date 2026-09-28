@@ -29,6 +29,14 @@ interface ResultatchartéProps {
   teiletext: string;
 }
 
+/**
+ * The throw control that had focus unmounts when the card appears. Module
+ * scope keeps the ref callback stable, so re-renders do not steal focus back.
+ */
+function fokussiere(el: HTMLHeadingElement | null) {
+  el?.focus({ preventScroll: true });
+}
+
 export default function Resultatcharte({
   resultat,
   onNomau,
@@ -41,7 +49,6 @@ export default function Resultatcharte({
 
   return (
     <m.section
-      aria-live="polite"
       initial={reduced ? { opacity: 0 } : { opacity: 0, y: 12, scale: 0.98 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: reduced ? 0.12 : 0.2, ease: 'easeOut' }}
@@ -52,7 +59,11 @@ export default function Resultatcharte({
     >
       {wurf.art === 'dernaebe' ? (
         <>
-          <h2 className="text-2xl font-black text-balance text-red-700 dark:text-red-500">
+          <h2
+            ref={fokussiere}
+            tabIndex={-1}
+            className="text-2xl font-black text-balance text-red-700 outline-none dark:text-red-500"
+          >
             {DERNAEBE.titu}
           </h2>
           <p className="mt-2 text-pretty text-stone-700 dark:text-stone-300">
@@ -66,7 +77,11 @@ export default function Resultatcharte({
               🔔 {RESULTAT.preicht}
             </p>
           )}
-          <h2 className="text-sm font-semibold text-balance text-stone-500 uppercase dark:text-stone-400">
+          <h2
+            ref={fokussiere}
+            tabIndex={-1}
+            className="text-sm font-semibold text-balance text-stone-500 uppercase outline-none dark:text-stone-400"
+          >
             {wurf.wasser ? RESULTAT.duLandischIm : RESULTAT.duGaschUf}
           </h2>
           <p className="mt-1 text-3xl font-black text-balance text-stone-900 dark:text-white">
