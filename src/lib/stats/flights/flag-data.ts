@@ -23,6 +23,8 @@ const FLAG_SVG = {
   ES: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22.5 15"><path fill="#FFF" d="M0 0h22.5v15H0V0z"/><path fill="#D03433" d="M0 0h22.5v4H0V0zm0 11h22.5v4H0v-4z"/><path fill="#FBCA46" d="M0 4h22.5v7H0V4z"/><path fill="#FFF" d="M7.8 7h1v.5h-1V7z"/><path fill="#A41517" d="M7.2 8.5c0 .3.3.5.6.5s.6-.2.6-.5L8.5 7H7.1l.1 1.5zM6.6 7c0-.3.2-.5.4-.5h1.5c.3 0 .5.2.5.4V7l-.1 1.5c-.1.6-.5 1-1.1 1-.6 0-1-.4-1.1-1L6.6 7z"/><path fill="#A41517" d="M6.8 7.5h2V8h-.5l-.5 1-.5-1h-.5v-.5zM5.3 6h1v3.5h-1V6zm4 0h1v3.5h-1V6zm-2.5-.5c0-.3.2-.5.5-.5h1c.3 0 .5.2.5.5v.2c0 .2-.1.3-.3.3H7c-.1 0-.2-.1-.2-.2v-.3z"/></svg>',
   PT: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 513 342"><path fill="red" d="M0 0h513v342H0z"/><path fill="#060" d="M197 0v342H0V0z"/><circle fill="#FF0" cx="197.1" cy="171" r="64"/><path fill="red" d="M161.1 139v40c0 19.9 16.1 36 36 36s36-16.1 36-36v-40h-72z"/><path fill="#FFF" d="M197.1 191c-6.6 0-12-5.4-12-12v-16h24v16c0 6.6-5.3 12-12 12z"/></svg>',
   DE: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 513 342"><path fill="#D80027" d="M0 0h513v342H0z"/><path d="M0 0h513v114H0z"/><path fill="#FFDA44" d="M0 228h513v114H0z"/></svg>',
+  SE: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 513 342"><path fill="#004F8E" d="M0 0h513v342H0z"/><path fill="#F6C500" d="M192.4.3h-64.2v138.8H0v64.1h128.2V342h64.2V203.2H513v-64.1H192.4z"/></svg>',
+  DK: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 513 342"><path fill="#c60c30" d="M0 0h513v342H0z"/><path fill="#FFF" d="M190 0h-60v140H0v60h130v142h60V200h323v-60H190z"/></svg>',
 } as const satisfies Record<CountryCode, string>;
 
 /**

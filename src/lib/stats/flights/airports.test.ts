@@ -16,17 +16,17 @@ describe('AIRPORTS', () => {
     }
   });
 
-  it('holds the thirteen airports the seed flies between', () => {
-    expect(ENTRIES).toHaveLength(13);
+  it('holds the fifteen airports the log flies between', () => {
+    expect(ENTRIES).toHaveLength(15);
   });
 
-  it('spans eleven countries, not thirteen', () => {
+  it('spans thirteen countries, not fifteen', () => {
     // The gap is the whole reason `flightTotals` counts distinct countries
     // rather than airports: ZRH and GVA are both Switzerland, BOS and JFK are
     // both the United States.
     const countries = new Set(ENTRIES.map(([, entry]) => entry.country));
 
-    expect(countries.size).toBe(11);
+    expect(countries.size).toBe(13);
   });
 
   it('gives every entry a well-formed alpha-2 country code', () => {
@@ -44,10 +44,10 @@ describe('AIRPORTS', () => {
     }
   });
 
-  it('spans the same eleven countries by code as by name', () => {
+  it('spans the same thirteen countries by code as by name', () => {
     const codes = new Set(ENTRIES.map(([, entry]) => entry.countryCode));
 
-    expect(codes.size).toBe(11);
+    expect(codes.size).toBe(13);
   });
 
   it('puts EuroAirport in France', () => {

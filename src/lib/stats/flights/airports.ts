@@ -146,6 +146,24 @@ export const AIRPORTS = {
     lat: 52.3667,
     lon: 13.5033,
   },
+  ARN: {
+    iata: 'ARN',
+    name: 'Stockholm Arlanda',
+    city: 'Stockholm',
+    country: 'Sweden',
+    countryCode: 'SE',
+    lat: 59.6519,
+    lon: 17.9186,
+  },
+  CPH: {
+    iata: 'CPH',
+    name: 'Copenhagen Kastrup',
+    city: 'Copenhagen',
+    country: 'Denmark',
+    countryCode: 'DK',
+    lat: 55.6179,
+    lon: 12.656,
+  },
 } as const satisfies Record<string, Airport>;
 
 export type AirportCode = keyof typeof AIRPORTS;

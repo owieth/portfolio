@@ -29,6 +29,8 @@ export const COUNTRIES = {
   ES: { code: 'ES', name: 'Spain' },
   PT: { code: 'PT', name: 'Portugal' },
   DE: { code: 'DE', name: 'Germany' },
+  SE: { code: 'SE', name: 'Sweden' },
+  DK: { code: 'DK', name: 'Denmark' },
 } as const satisfies Record<string, Country>;
 
 export type CountryCode = keyof typeof COUNTRIES;
