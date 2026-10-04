@@ -4,8 +4,8 @@ import { country } from '@/lib/stats/flights/countries';
  * Where the flag for a country is served from.
  *
  * The files in `public/flags` are the `3x2` set of `country-flag-icons`
- * v1.6.20, copied in byte for byte rather than depended on: the eleven come to
- * 4,655 bytes, which is less than the package and one less thing to keep
+ * v1.6.20, copied in byte for byte rather than depended on: the thirteen come to
+ * 5,038 bytes, which is less than the package and one less thing to keep
  * current. MIT, Copyright (c) 2020 @catamphetamine — carrying the notice is the
  * licence's one condition, and this docblock is where it lives so the files
  * themselves stay identical to upstream.

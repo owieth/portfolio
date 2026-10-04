@@ -12,7 +12,7 @@ describe('COUNTRIES', () => {
     }
   });
 
-  it('holds the eleven countries the airports sit in, and no more', () => {
+  it('holds the thirteen countries the airports sit in, and no more', () => {
     // Both directions. A country with no airport is dead weight, and an
     // airport whose code is missing here is a flag that will not render — the
     // failure #453 would otherwise ship.
@@ -21,7 +21,7 @@ describe('COUNTRIES', () => {
     );
 
     expect(new Set(Object.keys(COUNTRIES))).toEqual(flown);
-    expect(ENTRIES).toHaveLength(11);
+    expect(ENTRIES).toHaveLength(13);
   });
 
   it('uses GB for the United Kingdom', () => {
