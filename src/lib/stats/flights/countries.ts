@@ -1,7 +1,7 @@
 import type { Country } from '@/lib/stats/flights/types';
 
 /**
- * The eleven countries the log reaches, ISO 3166-1 alpha-2 to the name.
+ * The thirteen countries the log reaches, ISO 3166-1 alpha-2 to the name.
  *
  * The names are copied from `airports.ts` rather than taken from a locale
  * package. `Intl.DisplayNames` would answer `United States` today and whatever

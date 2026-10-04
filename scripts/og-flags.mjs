@@ -1,5 +1,5 @@
 /**
- * Regenerates `src/lib/stats/flights/flag-data.ts` — the eleven flags inlined
+ * Regenerates `src/lib/stats/flights/flag-data.ts` — the thirteen flags inlined
  * as source, for the passport share card.
  *
  * `/stats` serves them as files, which an OG route cannot: satori resolves an
@@ -9,8 +9,8 @@
  * card would render on this machine and quietly lose its flags in production.
  *
  * Inlining moves that failure into `pnpm test`: `flag-data.test.ts` reads the
- * directory and fails if the generated copy has drifted from it. The eleven
- * come to 4,655 bytes, which is a cheaper thing to duplicate than a
+ * directory and fails if the generated copy has drifted from it. The thirteen
+ * come to 5,038 bytes, which is a cheaper thing to duplicate than a
  * deployment-only bug is to find.
  *
  *   pnpm og:flags

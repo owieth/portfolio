@@ -15,11 +15,11 @@ import type { Airport } from '@/lib/stats/flights/types';
  * truths pinned in `geo.test.ts` exactly at R = 6371.0088 km — ZRH-LHR 787.6,
  * ZRH-JFK 6309.3, GVA-LHR 753.7 — so a bad digit here fails there.
  *
- * `countryCode` is ISO 3166-1 alpha-2 and a key into `countries.ts`. Eleven
+ * `countryCode` is ISO 3166-1 alpha-2 and a key into `countries.ts`. Fifteen
  * lines written by hand: filtering the public-domain OurAirports dump
  * (https://ourairports.com/data/, regenerated nightly) down to our codes comes
  * to about 1.7 KB, but it is a build script plus a CSV parser to obtain one
- * field for thirteen rows. Worth revisiting the day hand-editing this registry
+ * field for fifteen rows. Worth revisiting the day hand-editing this registry
  * is the bottleneck.
  *
  * Flying somewhere new is one entry here alongside the new row in Supabase.
