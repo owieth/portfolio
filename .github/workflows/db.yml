@@ -1,6 +1,6 @@
 name: Database
 
-# Applies the migrations and both seeds to a local Supabase, then runs the rail
+# Applies the migrations and the seeds to a local Supabase, then runs the rail
 # tests that need a database: the reconcile's reads and writes, and the
 # edit-tracking trigger. Only on changes to the schema, the seeds or the
 # reconcile, so `build.yml` stays fast. Never touches the hosted project:
@@ -64,14 +64,14 @@ jobs:
       # On a fresh runner this applies the migrations, then the `[db.seed]` files.
       - run: supabase db start
 
-      # Against the seed's own tuple count, so the December refresh needs no edit here.
-      - name: Check the rides seed loaded
+      # Against the seeds' own tuple count, so the December refresh needs no edit here.
+      - name: Check the rides seeds loaded
         env:
           URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
         run: |
           loaded="$(psql "$URL" -tAc 'select count(*) from public.rail_rides')"
-          seeded="$(grep -c '^  (' supabase/seeds/rail_rides.sql)"
-          echo "rail_rides: $loaded loaded, $seeded in the seed"
+          seeded="$(cat supabase/seeds/rail_rides*.sql | grep -c '^  (')"
+          echo "rail_rides: $loaded loaded, $seeded in the seeds"
           test "$loaded" -eq "$seeded"
 
       - name: Run the database tests

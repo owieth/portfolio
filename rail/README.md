@@ -976,7 +976,9 @@ event is edited.
 Every row carries an id derived from its own values and the insert ends
 `on conflict (id) do nothing`, so the file is safe to run twice: without that a
 second `supabase db push --include-seed` would double a log whose whole purpose
-is counting. Rides added later belong in Studio, not in a rerun.
+is counting. Rides added later belong in `supabase/seeds/rail_rides_logged.sql`,
+not in a rerun: written by hand, one row per train actually taken, with ids
+from the same formula.
 
 ## Refreshing the data
 

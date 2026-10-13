@@ -51,8 +51,8 @@ supabase status
 
 Put the API URL and the publishable key that `supabase status` prints into
 `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` in `.env.local`. Then
-`supabase db reset` re-applies the migrations and loads both seeds,
-`seeds/rail.sql` and `seeds/rail_rides.sql`.
+`supabase db reset` re-applies the migrations and loads the seeds,
+`seeds/rail.sql`, `seeds/rail_rides.sql` and `seeds/rail_rides_logged.sql`.
 
 Production migrations and seeds are pushed by hand, with
 `supabase db push --include-seed`. No CI job pushes them.
