@@ -1,6 +1,6 @@
 name: Database
 
-# Applies the migrations and both seeds to a local Supabase, then runs the rail
+# Applies the migrations and the seeds to a local Supabase, then runs the rail
 # tests that need a database: the reconcile's reads and writes, and the
 # edit-tracking trigger. Only on changes to the schema, the seeds or the
 # reconcile, so `build.yml` stays fast. Never touches the hosted project:
