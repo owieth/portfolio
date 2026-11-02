@@ -878,7 +878,8 @@ The tables are created by
 It is generated rather than written because a hand-kept copy would drift from
 the pipeline's output, and a test compares the committed seed with the committed
 CSVs so it cannot. Locally, `supabase db reset` applies the migration and runs
-the seed. Against the project, `supabase db push --include-seed` does the same.
+the seed. Against the project, `pnpm supabase db push --include-seed` does the
+same.
 Every insert is `on conflict do nothing`, so running the seed twice changes
 nothing, and a seed run against tables that already hold edited rows leaves them
 as they are.
