@@ -35,6 +35,8 @@ insert into public.rail_rides (id, line_id, ridden_on, from_didok, to_didok) val
   ('e4f7bcb6-20b9-5caf-9b19-84433f813f10', 'fernverkehr:IC1', '2016-06-17', '8506302', '8507000'),
   ('0724f287-8fa8-505d-a9db-f6dc6049bc15', 's-bahn-bern:RE5', '2017-03-04', '8507000', '8500207'), -- placeholder date, the day is not known
   ('2aa7ca93-35da-5b67-8f6c-6376bc446d39', 's-bahn-bern:RE5', '2017-03-04', '8500207', '8507000'), -- placeholder date, the day is not known
+  ('1f735e83-3a9f-5f1e-b111-1e292eb412c3', 's-bahn-bern:S35', '2017-07-15', '8504414', '8504400'), -- placeholder date, summer 2017, the day is not known
+  ('b63c63bd-4a71-5fd3-9f4a-19f6560fcdd6', 's-bahn-bern:S35', '2017-07-15', '8504400', '8504414'), -- placeholder date, summer 2017, the day is not known
   ('e8b8dcce-dd83-5bc9-b838-978988714263', 's-bahn-bern:S5', '2017-08-17', '8507000', '8504128'),
   ('154f65fe-4feb-5ac2-ab3e-6609d3991b98', 's-bahn-bern:S5', '2017-08-17', '8504128', '8507000'),
   ('300489b5-36fa-59ba-a195-ad84f7d646ca', 's-bahn-bern:S8', '2017-10-07', '8507000', '8508059'), -- placeholder date, the day is not known
