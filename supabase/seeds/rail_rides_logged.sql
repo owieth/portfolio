@@ -41,6 +41,10 @@ insert into public.rail_rides (id, line_id, ridden_on, from_didok, to_didok) val
   ('dd870d69-cb4c-5fbb-99cd-e36fd66ce9ae', 'fernverkehr:IC5', '2018-03-17', '8504221', '8501008'),
   ('e4082581-49bf-555a-a67f-9dffeeafcd8d', 'fernverkehr:IC5', '2018-03-17', '8501008', '8504221'),
   ('56273c7a-66fd-5126-a46e-8f7bb59d261c', 'fernverkehr:IR66', '2018-03-17', '8504221', '8507000'),
+  ('877980ee-d9ef-5c5f-85c2-d8c999982a45', 'fernverkehr:IC1', '2018-04-14', '8507000', '8503000'), -- placeholder date, the day is not known
+  ('833c0813-bc0c-57b7-b38d-4101b6fe6c76', 'fernverkehr:IC2', '2018-04-14', '8503000', '8505300'), -- placeholder date, the day is not known
+  ('ac71bf16-c07f-5b86-9f17-19ffed8e6d36', 'fernverkehr:IC2', '2018-04-14', '8505300', '8503000'), -- placeholder date, the day is not known
+  ('cf8991b6-85bd-5a0a-8dee-a823ab710e35', 'fernverkehr:IC1', '2018-04-14', '8503000', '8507000'), -- placeholder date, the day is not known
   ('da03477f-1309-54e4-9d30-4b2f861511c0', 'fernverkehr:IR65', '2018-06-01', '8507000', '8504300'),
   ('256ab333-446e-56e2-9078-58aa0dc94843', 'arc-jurassien:R13', '2018-06-01', '8504300', '8504205'),
   ('2221bae0-5be6-56de-b2a5-3d6a3370e82c', 'fernverkehr:IC8', '2018-08-26', '8507000', '8503000'),
