@@ -105,6 +105,31 @@ const S1_STOPS = [
 
 const GEOMETRY = new Map([[S1.id, PARTS]]);
 
+/**
+ * A line OSM does not map, stopping where the S1 does, and a line that runs
+ * between the S1's first two stops the long way, north round a loop.
+ */
+const IR1 = line('test:IR1');
+const LOOP = line('test:LOOP');
+
+const IR1_STOPS = [
+  stop(IR1.id, 1, '8500001', at(7.005)),
+  stop(IR1.id, 2, '8500002', at(7.015)),
+  stop(IR1.id, 3, '8500003', at(7.035)),
+];
+const LOOP_STOPS = [
+  stop(LOOP.id, 1, '8500001', at(7.005)),
+  stop(LOOP.id, 2, '8500002', at(7.015)),
+];
+const LOOP_TRACK: Position[] = [
+  [7.005, 47],
+  [7.005, 47.05],
+  [7.015, 47.05],
+  [7.015, 47],
+];
+
+const BORROWING = new Map([...GEOMETRY, [LOOP.id, [LOOP_TRACK]]]);
+
 let rideCount = 0;
 
 /** Coverage as `toCoverage` would return it; the sequences go unread here. */
@@ -334,7 +359,7 @@ describe('rideStretches', () => {
   });
 
   it('skips a ride with a stop lying off the geometry, with a warning', () => {
-    const ride = covered('8500001', '8500005');
+    const ride = covered('8500004', '8500005');
 
     expect(rideStretches([ride], S1_STOPS, GEOMETRY)).toEqual([]);
     expect(warn).toHaveBeenCalledWith(
@@ -345,6 +370,19 @@ describe('rideStretches', () => {
       ),
     );
     expect(warn).not.toHaveBeenCalledWith(expect.stringContaining(' more'));
+  });
+
+  it('leaves a gap for a leg no track reaches, with a warning', () => {
+    const [stretch] = rideStretches(
+      [covered('8500001', '8500005')],
+      S1_STOPS,
+      GEOMETRY,
+    );
+
+    expect(stretch?.geometry.coordinates.flat()).toContainEqual([7.02, 47.015]);
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringMatching(/leaving gaps .*: no track for 8500004 → 8500005$/),
+    );
   });
 
   it('skips a ride with a stop that has no position, with a warning', () => {
@@ -367,7 +405,7 @@ describe('rideStretches', () => {
 
   it('keeps the other rides when one is skipped', () => {
     const stretches = rideStretches(
-      [covered('8500001', '8500005'), covered('8500002', '8500003')],
+      [covered('8500004', '8500005'), covered('8500002', '8500003')],
       S1_STOPS,
       GEOMETRY,
     );
@@ -420,19 +458,50 @@ describe('rideStretches', () => {
   });
 
   it('warns once for a stretch skipped on several rides', () => {
-    const first = covered('8500001', '8500005');
+    const first = covered('8500004', '8500005');
 
     expect(
-      rideStretches([first, covered('8500005', '8500001')], S1_STOPS, GEOMETRY),
+      rideStretches([first, covered('8500005', '8500004')], S1_STOPS, GEOMETRY),
     ).toEqual([]);
     expect(warn).toHaveBeenCalledTimes(1);
     expect(warn).toHaveBeenCalledWith(
       expect.stringMatching(
         new RegExp(
-          `^\\[stats/rail\\] skipping the stretch of ride ${first.ride.id} on 2026-09-24 and 1 more: 8500001 → 8500005: the to stop is \\d+ m off the line$`,
+          `^\\[stats/rail\\] skipping the stretch of ride ${first.ride.id} on 2026-09-24 and 1 more: 8500004 → 8500005: the to stop is \\d+ m off the line$`,
         ),
       ),
     );
+  });
+});
+
+describe('rideStretches, borrowing track', () => {
+  it('cuts a line with no geometry stop by stop from a line that has some', () => {
+    const [stretch] = rideStretches(
+      [covered('8500001', '8500003', IR1)],
+      [...IR1_STOPS, ...S1_STOPS],
+      GEOMETRY,
+    );
+
+    expect(stretch?.properties.id).toBe(IR1.id);
+    expect(stretch?.geometry.coordinates[0][0]).toEqual([7.005, 47]);
+    expect(stretch?.geometry.coordinates.at(-1)?.at(-1)).toEqual([7.035, 47]);
+    expect(warn).not.toHaveBeenCalled();
+  });
+
+  it('borrows the shortest of the lines stopping at both ends of a leg', () => {
+    const [stretch] = rideStretches(
+      [covered('8500001', '8500002', IR1)],
+      [...IR1_STOPS, ...LOOP_STOPS, ...S1_STOPS],
+      BORROWING,
+    );
+
+    expect(stretch?.geometry.coordinates).toEqual([
+      [
+        [7.005, 47],
+        [7.01, 47],
+        [7.015, 47],
+      ],
+    ]);
   });
 });
 
