@@ -105,6 +105,8 @@ insert into public.rail_rides (id, line_id, ridden_on, from_didok, to_didok) val
   ('2cdc8e78-8b69-5772-94aa-cf0fba1962b0', 's-bahn-st-gallen:S17', '2022-05-08', '8509411', '8503225'),
   ('10f645a4-26f4-59b0-a510-ca885a9ab09b', 's-bahn-zuerich:S2', '2022-05-08', '8503225', '8503000'),
   ('ffaa9811-7ce3-5c3f-a56c-332fe4a3ced7', 'fernverkehr:IC1', '2022-05-08', '8503000', '8507000'),
+  ('4ee795c6-7f64-53c8-baab-4c299b3b7d2f', 'fernverkehr:IC61', '2022-05-17', '8507000', '8500010'),
+  ('1ff3f1da-16b4-5c2a-ad02-0fcdbcfda650', 'fernverkehr:IC61', '2022-05-22', '8500010', '8507000'),
   ('4362537a-86f8-59f2-ab9f-20de9385ad43', 's-bahn-luzern:S1', '2026-06-18', '8502204', '8505000'),
   ('23042d4b-96da-57f3-9b25-79af33c5f4c3', 's-bahn-luzern:RE24', '2026-06-18', '8505000', '8500218'),
   ('41c20d35-74a0-58bb-9f35-d315cb98ed36', 'fernverkehr:IC6', '2026-06-18', '8500218', '8507000'),
