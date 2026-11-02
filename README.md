@@ -56,7 +56,9 @@ Put the API URL and the publishable key that `supabase status` prints into
 `seeds/rail.sql`, `seeds/rail_rides.sql` and `seeds/rail_rides_logged.sql`.
 
 Production migrations and seeds are pushed by hand, with
-`supabase db push --include-seed`. No CI job pushes them.
+`pnpm supabase db push --include-seed`. No CI job pushes them. The wrapper links
+the project on first use and runs as the account of `SUPABASE_ACCESS_TOKEN`, so
+the push cannot land in a project of another account the CLI is logged in to.
 
 ## Commands
 
