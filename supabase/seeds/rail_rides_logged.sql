@@ -9,6 +9,9 @@
 -- them entered in Studio.
 
 insert into public.rail_rides (id, line_id, ridden_on, from_didok, to_didok) values
+  ('71a06aa1-1291-5853-976d-f9b2467a6583', 'rigi-bahnen-ag:CC-82', '2026-09-19', '8508464', '8505069'),
+  ('e88c158f-c29e-5f26-aea8-c9deeaccf3c1', 'rigi-bahnen-ag:CC-81', '2026-09-19', '8505069', '8505063'),
+  ('97f1ff84-b4f9-5843-bd22-59239d108ac8', 'fernverkehr:IR-VAE', '2026-09-19', '8505004', '8505000'),
   ('3f3686de-6231-5fe8-9093-c933db1f912a', 'fernverkehr:IR70', '2026-09-26', '8505000', '8503000'),
   ('22a947a4-7bf1-53c0-8966-f7f1ce98f841', 'fernverkehr:IC5', '2026-09-26', '8503000', '8506302'),
   ('fa137676-38b2-51e8-ba6a-2cfbbaf3aee1', 'fernverkehr:IC5', '2026-09-26', '8506302', '8503000'),
