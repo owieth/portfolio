@@ -45,8 +45,17 @@ describe('logRows', () => {
   });
 
   it('gives back what the log printed before it was packed', () => {
-    const line = (displayName: string, terminalA: string, terminalB: string) =>
-      ({ id: `test:${displayName}`, displayName, terminalA, terminalB }) as RailLine;
+    const line = (
+      displayName: string,
+      trueTerminalA: string,
+      trueTerminalB: string,
+    ) =>
+      ({
+        id: `test:${displayName}`,
+        displayName,
+        trueTerminalA,
+        trueTerminalB,
+      }) as RailLine;
     const entry = (
       riddenOn: string,
       onLine: RailLine,
@@ -76,7 +85,7 @@ describe('logRows', () => {
       log.map(({ ride, line, from, to }) => [
         formatDay(ride.riddenOn),
         line.displayName,
-        `${line.terminalA} – ${line.terminalB}`,
+        `${line.trueTerminalA} – ${line.trueTerminalB}`,
         from && to ? `${from} → ${to}` : 'Whole line',
       ]),
     );

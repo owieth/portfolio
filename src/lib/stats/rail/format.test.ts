@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { formatShare } from '@/lib/stats/rail/format';
+import { formatShare, formatTermini } from '@/lib/stats/rail/format';
 
 describe('formatShare', () => {
   it('prints nothing ridden as 0%', () => {
@@ -40,5 +40,27 @@ describe('formatShare', () => {
     }
 
     expect(mismatches).toEqual([]);
+  });
+});
+
+describe('formatTermini', () => {
+  const termini = (trueTerminalA: string, trueTerminalB: string) =>
+    formatTermini({ trueTerminalA, trueTerminalB });
+
+  it('names where the trains really run between', () => {
+    expect(termini('Basel SBB', 'Paris Gare de Lyon')).toBe(
+      'Basel SBB – Paris Gare de Lyon',
+    );
+  });
+
+  it('drops a foreign station’s country tag', () => {
+    expect(termini('Domodossola (I)', 'Bern')).toBe('Domodossola – Bern');
+    expect(termini('Martigny', 'Vallorcine (F)')).toBe('Martigny – Vallorcine');
+  });
+
+  it('keeps brackets that are part of a name', () => {
+    expect(termini('Territet (funi)', 'Singen (Hohentwiel)')).toBe(
+      'Territet (funi) – Singen (Hohentwiel)',
+    );
   });
 });
