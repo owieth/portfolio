@@ -6,6 +6,7 @@ import {
   lineRidership,
   railTotals,
   rideLog,
+  rideStops,
   stationsVisited,
   toCoverage,
 } from '@/lib/stats/rail/stats';
@@ -218,6 +219,21 @@ describe('toCoverage', () => {
         ({ sequences }) => sequences,
       ),
     ).toEqual(sequencesOf(rides));
+  });
+});
+
+describe('rideStops', () => {
+  const didoksOf = (fromDidok: string, toDidok: string) =>
+    rideStops(S1_STOPS, fromDidok, toDidok)?.map(({ didok }) => didok);
+
+  it('passes the stops in running order, back through a junction', () => {
+    expect(didoksOf('8500008', '8500004')).toEqual([
+      '8500008',
+      '8500007',
+      '8500002',
+      '8500003',
+      '8500004',
+    ]);
   });
 });
 
