@@ -33,10 +33,14 @@ insert into public.rail_rides (id, line_id, ridden_on, from_didok, to_didok) val
   ('97afaedb-7f8c-5b01-8b20-9cb677a23cd4', 'fernverkehr:IR13', '2016-06-13', '8506302', '8506317'),
   ('1b5c022f-6e68-5e70-87f9-e967d7ccc0cd', 'fernverkehr:IR13', '2016-06-17', '8506317', '8506302'),
   ('e4f7bcb6-20b9-5caf-9b19-84433f813f10', 'fernverkehr:IC1', '2016-06-17', '8506302', '8507000'),
+  ('0724f287-8fa8-505d-a9db-f6dc6049bc15', 's-bahn-bern:RE5', '2017-03-04', '8507000', '8500207'), -- placeholder date, the day is not known
+  ('2aa7ca93-35da-5b67-8f6c-6376bc446d39', 's-bahn-bern:RE5', '2017-03-04', '8500207', '8507000'), -- placeholder date, the day is not known
   ('e8b8dcce-dd83-5bc9-b838-978988714263', 's-bahn-bern:S5', '2017-08-17', '8507000', '8504128'),
   ('154f65fe-4feb-5ac2-ab3e-6609d3991b98', 's-bahn-bern:S5', '2017-08-17', '8504128', '8507000'),
   ('850617c9-5870-5372-9fa6-0ca64b895a2d', 's-bahn-bern:S4', '2017-11-24', '8507100', '8508207'),
   ('ab733d1c-6bb8-5303-9e44-c813bb95c8ff', 's-bahn-bern:S2', '2017-11-24', '8508207', '8504194'),
+  ('670d2fb8-f24f-5d96-a8ed-c3e6d09eb77a', 's-bahn-bern:RE5', '2018-03-03', '8507000', '8500207'), -- placeholder date, the day is not known
+  ('fe1565db-9050-5b7f-890c-ed3bffcdba9f', 's-bahn-bern:RE5', '2018-03-03', '8500207', '8507000'), -- placeholder date, the day is not known
   ('2e714001-75c7-59f3-b6d9-0d0542c88530', 'fernverkehr:IR66', '2018-03-17', '8507000', '8504221'),
   ('dd870d69-cb4c-5fbb-99cd-e36fd66ce9ae', 'fernverkehr:IC5', '2018-03-17', '8504221', '8501008'),
   ('e4082581-49bf-555a-a67f-9dffeeafcd8d', 'fernverkehr:IC5', '2018-03-17', '8501008', '8504221'),
@@ -92,6 +96,8 @@ insert into public.rail_rides (id, line_id, ridden_on, from_didok, to_didok) val
   ('57502c79-3d68-5dd9-8af5-ed372de8cd17', 's-bahn-zuerich:S5', '2018-11-12', '8503000', '8502224'),
   ('3a5ad341-77b3-5446-8d75-f488853aefc1', 's-bahn-aargau:S26', '2018-11-12', '8502215', '8502119'),
   ('69e263ce-d064-5fba-8e87-c8b2c81c1074', 'fernverkehr:IR35', '2018-11-12', '8502119', '8507000'),
+  ('ffe9c422-9cac-529e-89ee-5d466d4b1f66', 's-bahn-bern:RE5', '2019-03-02', '8507000', '8500207'), -- placeholder date, the day is not known
+  ('7e4f8fb2-1c78-5db0-a6c6-df9ef076d496', 's-bahn-bern:RE5', '2019-03-02', '8500207', '8507000'), -- placeholder date, the day is not known
   ('078e08fc-dc50-5485-a116-9ade40875075', 'fernverkehr:IC8', '2019-09-14', '8507000', '8501609'),
   ('0bcb2d60-ea84-516b-86c6-f0fed9f3d5ec', 'matterhorn-gotthard-bahn-fo:R43', '2019-09-14', '8515296', '8501672'),
   ('911fa852-aad5-5d8f-99bb-10ffd19e93ca', 'matterhorn-gotthard-bahn-fo:R43', '2019-09-15', '8501672', '8515296'),
@@ -102,6 +108,8 @@ insert into public.rail_rides (id, line_id, ridden_on, from_didok, to_didok) val
   ('1050f35c-144f-5a7e-a2a1-17d146ff7584', 's-bahn-bern:S5', '2020-01-25', '8504128', '8507000'),
   ('ce9d7309-135b-562a-988d-e640efe582a7', 's-bahn-bern:S3', '2020-02-01', '8504410', '8504300'),
   ('36786435-09e4-5016-8937-930ad673a27e', 'verkehrsbetriebe-biel:FUN-22', '2020-02-01', '8504353', '8504355'),
+  ('758535ca-ba0b-5ab6-a982-048e5cab157d', 's-bahn-bern:RE5', '2020-03-07', '8507000', '8500207'), -- placeholder date, the day is not known
+  ('595a9e8b-3cc2-5f06-8a7a-4873bc99c103', 's-bahn-bern:RE5', '2020-03-07', '8500207', '8507000'), -- placeholder date, the day is not known
   ('01f692ca-5a01-568a-96b0-fbe141c50425', 'fernverkehr:IC3', '2020-07-06', '8509002', '8503000'),
   ('b68a7611-f296-5388-84e7-9c32ad4de31d', 'fernverkehr:IC1', '2020-07-06', '8503000', '8507000'),
   ('380c0d14-9715-57ed-8526-32ca402a54fc', 's-bahn-bern:S9', '2020-07-06', '8507000', '8508055'),
@@ -109,10 +117,14 @@ insert into public.rail_rides (id, line_id, ridden_on, from_didok, to_didok) val
   ('44575c47-0968-5eae-8972-730890baab83', 'fernverkehr:IC1', '2020-10-07', '8503000', '8507000'),
   ('c4192127-872c-5aa5-b6c8-fde55b3fff31', 's-bahn-bern:S44', '2021-02-23', '8507000', '8508272'),
   ('d101526c-fbb4-5754-bb5e-db89ef8b1ab2', 's-bahn-bern:S44', '2021-02-24', '8508272', '8507000'),
+  ('03eddbac-e37f-5ea2-8728-c1cdf2d1d01a', 's-bahn-bern:RE5', '2021-03-06', '8507000', '8500207'), -- placeholder date, the day is not known
+  ('5591bcff-a75f-5e4a-ba61-d956e7b038f6', 's-bahn-bern:RE5', '2021-03-06', '8500207', '8507000'), -- placeholder date, the day is not known
   ('b05646df-71ee-5dbc-b9e7-a75bf5870403', 'fernverkehr:ICE:8500090-8507492', '2021-07-21', '8507000', '8500090'),
   ('390bcf0c-3996-5531-97c5-07d929197f7a', 'fernverkehr:ICE:8500090-8507492', '2021-07-25', '8500090', '8507000'),
   ('a514e58c-3727-5c86-b2ce-e86bca5252a8', 'fernverkehr:IC1', '2022-02-06', '8507000', '8506000'),
   ('0fdbd2db-11ef-592e-94ae-77cd28f7647e', 'fernverkehr:IC1', '2022-02-06', '8506000', '8507000'),
+  ('c0b6336e-c4d5-5d87-ba73-829f9a2b2cb4', 's-bahn-bern:RE5', '2022-03-05', '8507000', '8500207'), -- placeholder date, the day is not known
+  ('f94719f4-2076-5dcd-bba8-2098f95d5030', 's-bahn-bern:RE5', '2022-03-05', '8500207', '8507000'), -- placeholder date, the day is not known
   ('1c0fafc8-f5f9-585a-9bac-10e1d080fce5', 'fernverkehr:IC1', '2022-05-08', '8507000', '8503000'),
   ('1771cdcf-806a-5e30-9ea0-f1cbc7685943', 'fernverkehr:IC3', '2022-05-08', '8503000', '8509002'),
   ('1990c6e7-349e-540b-ad98-8214e3a4c171', 'fernverkehr:IR13', '2022-05-08', '8509002', '8509404'),
@@ -157,6 +169,8 @@ insert into public.rail_rides (id, line_id, ridden_on, from_didok, to_didok) val
   ('43bc6d83-da89-5996-bdf3-afe10fdab382', 'fernverkehr:IC21', '2023-02-01', '8505000', '8505300'),
   ('f66dad97-5366-52a6-80e2-5543c142a338', 'fernverkehr:IC21', '2023-02-01', '8505300', '8505000'),
   ('39690389-8980-59fc-b532-4829f3b0111e', 'fernverkehr:IR15', '2023-02-01', '8505000', '8507000'),
+  ('01e24d8f-fea7-56c1-8337-746cea5cb131', 's-bahn-bern:RE5', '2023-03-04', '8507000', '8500207'), -- placeholder date, the day is not known
+  ('3831a725-2575-539f-aa74-176bbdac645c', 's-bahn-bern:RE5', '2023-03-04', '8500207', '8507000'), -- placeholder date, the day is not known
   ('596c97d7-fb18-5552-9495-bbd536e0b8df', 'fernverkehr:IC61', '2023-04-03', '8507000', '8500010'),
   ('daf69743-37db-5006-ba05-29b15528ded4', 'fernverkehr:IC61', '2023-04-08', '8500010', '8507000'),
   ('fc9b9221-5395-5f19-afe9-50669bed9da7', 'fernverkehr:IC61', '2023-05-15', '8507000', '8500010'),
@@ -174,6 +188,8 @@ insert into public.rail_rides (id, line_id, ridden_on, from_didok, to_didok) val
   ('aa9098c1-d7da-5907-8e98-34e51399ef61', 'fernverkehr:IR90', '2024-01-01', '8501605', '8501509'),
   ('8097214e-e6c2-5018-a227-41fb29cb2dbf', 'fernverkehr:IR90', '2024-01-05', '8501509', '8501605'),
   ('5c841b35-42a0-5977-bf59-9c378c8f50d1', 'fernverkehr:IC8', '2024-01-05', '8501605', '8507000'),
+  ('d64b2d27-655d-50f5-8a7f-adcc0b355f14', 's-bahn-bern:RE5', '2024-03-02', '8507000', '8500207'), -- placeholder date, the day is not known
+  ('9f4869b9-42e7-5313-852d-1d3cd4f8e451', 's-bahn-bern:RE5', '2024-03-02', '8500207', '8507000'), -- placeholder date, the day is not known
   ('d0cd7ccf-dc0b-51d6-8c44-ce950cf19e9d', 'fernverkehr:IC1', '2024-03-13', '8507000', '8503016'),
   ('a07c8d07-7f7b-538c-a8ab-fa5e291595dc', 'fernverkehr:IC1', '2024-03-17', '8503016', '8507000'),
   ('3575ecf6-6679-57f0-b6b9-6919b80dd620', 's-bahn-zuerich:S5', '2024-06-15', '8503000', '8502204'), -- placeholder date, the day is not known
@@ -187,6 +203,8 @@ insert into public.rail_rides (id, line_id, ridden_on, from_didok, to_didok) val
   ('656b37eb-b76e-556d-8e15-c6c10e852116', 's-bahn-st-gallen:S23', '2025-02-15', '8506210', '8506290'),
   ('4b7bc1cd-e487-5ab4-987a-d23e5576871f', 's-bahn-st-gallen:S23', '2025-02-16', '8506290', '8506210'),
   ('877362bb-a61d-5052-aaac-f5d88ae12434', 'fernverkehr:IC1', '2025-02-16', '8506210', '8507000'),
+  ('ef0a79b0-c05f-5a2c-a79c-a62d2df5354e', 's-bahn-bern:RE5', '2025-03-01', '8507000', '8500207'), -- placeholder date, the day is not known
+  ('a0bc298d-333d-57bf-9d38-b7bc9ea19093', 's-bahn-bern:RE5', '2025-03-01', '8500207', '8507000'), -- placeholder date, the day is not known
   ('7a0449f9-0b8f-5478-963b-61a8be62fa8f', 'fernverkehr:IC1', '2025-07-11', '8507000', '8503016'),
   ('288e90fb-fc47-5f28-9308-809ae5d95728', 'fernverkehr:IC1', '2025-07-18', '8503016', '8507000'),
   ('691e320c-97e5-5d62-acce-74085bf77ffa', 'fernverkehr:IC1', '2025-09-08', '8507000', '8503016'),
@@ -204,6 +222,8 @@ insert into public.rail_rides (id, line_id, ridden_on, from_didok, to_didok) val
   ('d58bd4c6-32f2-5b90-a16e-c1ef2ebc0dd7', 'fernverkehr:IC1', '2025-11-30', '8506000', '8507000'),
   ('d48cfea1-0517-55c3-b220-064f97e4878f', 'fernverkehr:IC1', '2025-12-12', '8507000', '8506000'),
   ('bcbc8a62-c0a1-5307-9267-5f3fe399ea73', 'fernverkehr:IC1', '2025-12-14', '8506000', '8507000'),
+  ('1d225f02-ca6a-5a30-aba1-b54393a1fe13', 's-bahn-bern:RE5', '2026-03-07', '8507000', '8500207'), -- placeholder date, the day is not known
+  ('049b6e66-e996-5649-a565-7eecdd31731d', 's-bahn-bern:RE5', '2026-03-07', '8500207', '8507000'), -- placeholder date, the day is not known
   ('e020439e-2929-5fd5-8d0c-b2af9a52256f', 'fernverkehr:IC1', '2026-04-03', '8507000', '8506000'),
   ('93334bec-8b1b-550d-a3bd-7896cf3d5a3d', 's-bahn-zuerich:S13', '2026-04-04', '8503283', '8503206'),
   ('7e9028de-e9b1-5bb3-bbcc-2a762a1fe774', 's-bahn-zuerich:S2', '2026-04-04', '8503206', '8503000'),
