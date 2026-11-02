@@ -9,6 +9,10 @@
 -- them entered in Studio.
 
 insert into public.rail_rides (id, line_id, ridden_on, from_didok, to_didok) values
+  ('758d5a1d-88c0-5dc8-bcf3-7dffa3c816b6', 'fernverkehr:IC1', '2010-06-14', '8507000', '8503000'),
+  ('bbcd0422-f74f-56f1-92c6-6e8bb0cc0d6a', 'fernverkehr:IC3', '2010-06-14', '8503000', '8509000'),
+  ('b54870b0-c41b-54e1-ab4f-ab2cc4b00616', 'fernverkehr:PE-GEX', '2010-06-14', '8509000', '8515296'),
+  ('3d36b4d2-26c5-5cc5-9503-f3549b888744', 'fernverkehr:IC8', '2010-06-14', '8501609', '8507000'),
   ('4362537a-86f8-59f2-ab9f-20de9385ad43', 's-bahn-luzern:S1', '2026-06-18', '8502204', '8505000'),
   ('23042d4b-96da-57f3-9b25-79af33c5f4c3', 's-bahn-luzern:RE24', '2026-06-18', '8505000', '8500218'),
   ('41c20d35-74a0-58bb-9f35-d315cb98ed36', 'fernverkehr:IC6', '2026-06-18', '8500218', '8507000'),
