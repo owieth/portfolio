@@ -400,10 +400,37 @@ function cutLeg(
 }
 
 /**
+ * How far along `passed` from `start` the line's own geometry reaches in one
+ * cut: the last stop it can be cut to, two or more stops on, or null.
+ */
+function ownSpan(
+  passed: Placed[],
+  start: number,
+  parts: Position[][] | undefined,
+): { end: number; coordinates: Position[][] } | null {
+  if (!parts) return null;
+
+  for (let end = passed.length - 1; end > start + 1; end -= 1) {
+    const slice = sliceLine(
+      parts,
+      passed[start].position,
+      passed[end].position,
+    );
+
+    if (slice.ok) return { end, coordinates: slice.coordinates };
+  }
+
+  return null;
+}
+
+/**
  * A stretch cut stop by stop, for when the line's own geometry cannot take it
  * whole: a line OSM does not map, or maps only in part, like the IC5 that
- * OSM ends at Lausanne. Each leg between neighbouring stops comes from
- * `cutLeg`, and a leg nothing reaches is left out and named in `gaps`.
+ * OSM ends at Lausanne. From each stop it keeps to its own track for as far
+ * as that reaches, so a leg between two stops its own track misses by a few
+ * hundred metres is not borrowed from a line that runs another way. Past
+ * that, each leg between neighbouring stops comes from `cutLeg`, and a leg
+ * nothing reaches is left out and named in `gaps`.
  */
 function cutByLegs(
   passed: Placed[],
@@ -413,14 +440,25 @@ function cutByLegs(
 ): { coordinates: Position[][]; gaps: string[] } {
   const coordinates: Position[][] = [];
   const gaps: string[] = [];
+  const own = geometry.get(lineId);
 
-  for (let index = 1; index < passed.length; index += 1) {
-    const from = passed[index - 1];
-    const to = passed[index];
+  for (let index = 0; index < passed.length - 1; ) {
+    const span = ownSpan(passed, index, own);
+
+    if (span) {
+      coordinates.push(...span.coordinates);
+      index = span.end;
+      continue;
+    }
+
+    const from = passed[index];
+    const to = passed[index + 1];
     const leg = cutLeg(from, to, lineId, geometry, linesAt);
 
     if (leg) coordinates.push(...leg);
     else gaps.push(`${from.didok} → ${to.didok}`);
+
+    index += 1;
   }
 
   return { coordinates, gaps };

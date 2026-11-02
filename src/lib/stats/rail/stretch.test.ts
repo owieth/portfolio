@@ -530,6 +530,38 @@ describe('rideStretches, borrowing track', () => {
     expect(back).toEqual(there);
   });
 
+  it('keeps to its own track past a stop it misses, rather than borrow', () => {
+    const S2 = line('test:S2');
+    const SPUR = line('test:SPUR');
+    const SPUR_TRACK: Position[] = [
+      [7.005, 47],
+      [7.005, 47.006],
+      [7.015, 47.006],
+    ];
+    const [stretch] = rideStretches(
+      [covered('8500001', '8500009', S2)],
+      [
+        stop(S2.id, 1, '8500001', at(7.005)),
+        stop(S2.id, 2, '8500007', at(7.015, 47.006)),
+        stop(S2.id, 3, '8500003', at(7.035)),
+        stop(S2.id, 4, '8500009', at(7.04, 47.05)),
+        stop(SPUR.id, 1, '8500001', at(7.005)),
+        stop(SPUR.id, 2, '8500007', at(7.015, 47.006)),
+      ],
+      new Map([
+        [S2.id, PARTS],
+        [SPUR.id, [SPUR_TRACK]],
+      ]),
+    );
+    const track = stretch?.geometry.coordinates.flat();
+
+    expect(track).toContainEqual([7.035, 47]);
+    expect(track).not.toContainEqual([7.005, 47.006]);
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringMatching(/no track for 8500003 → 8500009$/),
+    );
+  });
+
   it('skips a stretch no line reaches, naming the missing geometry', () => {
     expect(
       rideStretches([covered('8500001', '8500003', IR1)], IR1_STOPS, GEOMETRY),
