@@ -41,6 +41,7 @@ const LINE = {
   s9: 's-bahn-bern:S9',
   ic1: 'fernverkehr:IC1',
   ic8: 'fernverkehr:IC8',
+  ic81: 'fernverkehr:IC81',
   ir75: 'fernverkehr:IR75',
   ir70: 'fernverkehr:IR70',
   ec: 'fernverkehr:EC:8503000-8505307',
@@ -48,6 +49,8 @@ const LINE = {
   ir15: 'fernverkehr:IR15',
   ice: 'fernverkehr:ICE:8500090-8507492',
   ic6: 'fernverkehr:IC6',
+  ic61: 'fernverkehr:IC61',
+  ec6: 'fernverkehr:EC6',
   re12: 's-bahn-zuerich:RE12',
   ic21: 'fernverkehr:IC21',
   s29: 's-bahn-aargau:S29',
@@ -100,7 +103,8 @@ export const POOLS = {
   s9: [{ line: LINE.s9 }],
   bernZurich: [
     { line: LINE.ic1, share: 0.9 },
-    { line: LINE.ic8, share: 0.1 },
+    { line: LINE.ic8, share: 0.05 },
+    { line: LINE.ic81, share: 0.05 },
   ],
   zurichZug: [
     { line: LINE.s24, count: 30 },
@@ -110,7 +114,9 @@ export const POOLS = {
   ],
   bernOlten: [
     { line: LINE.ice, share: 0.5 },
-    { line: LINE.ic6, share: 0.5 },
+    { line: LINE.ec6, share: 0.5 / 3 },
+    { line: LINE.ic6, share: 0.5 / 3 },
+    { line: LINE.ic61, share: 0.5 / 3 },
   ],
   oltenWildegg: [{ line: LINE.re12 }],
   bernLuzern: [{ line: LINE.ir15 }],
