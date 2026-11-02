@@ -235,6 +235,23 @@ describe('rideStops', () => {
       '8500004',
     ]);
   });
+
+  it('runs from the stop the ride got on at', () => {
+    expect(didoksOf('8500004', '8500001')).toEqual([
+      '8500004',
+      '8500003',
+      '8500002',
+      '8500001',
+    ]);
+  });
+
+  it('is null for a stop the line does not have', () => {
+    expect(rideStops(S1_STOPS, '8500001', '8599999')).toBeNull();
+  });
+
+  it('is null between two stops nothing connects', () => {
+    expect(rideStops(S1_STOPS, '8500001', '8500010')).toBeNull();
+  });
 });
 
 describe('lineProgress', () => {

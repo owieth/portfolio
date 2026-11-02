@@ -503,6 +503,41 @@ describe('rideStretches, borrowing track', () => {
       ],
     ]);
   });
+
+  it('keeps to its own track for a leg it reaches, however long', () => {
+    const [stretch] = rideStretches(
+      [covered('8500001', '8500003', LOOP)],
+      [...LOOP_STOPS, stop(LOOP.id, 3, '8500003', at(7.035)), ...S1_STOPS],
+      BORROWING,
+    );
+
+    expect(stretch?.properties.id).toBe(LOOP.id);
+    expect(stretch?.geometry.coordinates[0]).toEqual(LOOP_TRACK);
+  });
+
+  it('cuts the same track whichever way the ride ran', () => {
+    const [there] = rideStretches(
+      [covered('8500001', '8500003', IR1)],
+      [...IR1_STOPS, ...S1_STOPS],
+      GEOMETRY,
+    );
+    const [back] = rideStretches(
+      [covered('8500003', '8500001', IR1)],
+      [...IR1_STOPS, ...S1_STOPS],
+      GEOMETRY,
+    );
+
+    expect(back).toEqual(there);
+  });
+
+  it('skips a stretch no line reaches, naming the missing geometry', () => {
+    expect(
+      rideStretches([covered('8500001', '8500003', IR1)], IR1_STOPS, GEOMETRY),
+    ).toEqual([]);
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringContaining(`${IR1.id} has no geometry`),
+    );
+  });
 });
 
 describe('wholeLineIds', () => {
