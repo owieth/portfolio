@@ -183,7 +183,6 @@ insert into public.rail_rides (id, line_id, ridden_on, from_didok, to_didok) val
   ('05ab6501-109b-524e-bc84-7c4ea6d20492', 'fernverkehr:IR90', '2023-01-07', '8501509', '8501605'),
   ('0ffb4495-49d0-5b53-9703-990559c9ad96', 'fernverkehr:IC8', '2023-01-07', '8501605', '8507000'),
   ('6eb59289-57b8-5de1-a344-5e6b8fd031f6', 'fernverkehr:IR70', '2023-01-20', '8502204', '8503000'),
-  ('5a447aa9-a4ba-5b33-a78c-d30394873c60', 'fernverkehr:IC1', '2023-01-20', '8503000', '8507000'),
   ('cfad9130-333b-55c3-a529-755e1a62ba3c', 's-bahn-bern:RE1', '2023-01-20', '8507000', '8507478'),
   ('7a45a20e-5717-5c40-9f43-3e4150ce4c11', 'fernverkehr:IR15', '2023-02-01', '8507000', '8505000'),
   ('43bc6d83-da89-5996-bdf3-afe10fdab382', 'fernverkehr:IC21', '2023-02-01', '8505000', '8505300'),
