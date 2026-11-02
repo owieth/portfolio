@@ -11,6 +11,7 @@
     "seed:data": "node rail/src/cli.ts seed",
     "rides:data": "node rail/src/cli.ts rides",
     "reconcile:data": "node --env-file-if-exists=.env.local rail/src/cli.ts reconcile",
+    "supabase": "node --env-file-if-exists=.env.local scripts/supabase.mjs",
     "start": "next start",
     "lint": "eslint",
     "react-doctor": "react-doctor",
