@@ -169,8 +169,8 @@ insert into public.rail_rides (id, line_id, ridden_on, from_didok, to_didok) val
   ('b7e6a435-ed0a-5099-a27c-15e41220aaa7', 's-bahn-bern:S8', '2022-10-01', '8508059', '8507000'), -- placeholder date, the day is not known
   ('3e40dc6e-8119-5a27-93a1-17cbf839b3c1', 'fernverkehr:IC1', '2022-10-27', '8507000', '8503016'),
   ('894d408d-869c-55ca-a1a3-a539b33dcb8a', 'fernverkehr:IC1', '2022-10-31', '8503016', '8507000'),
-  ('767785a9-fa4d-52df-9400-35cc068b9263', 'fernverkehr:IC8', '2022-11-02', '8507000', '8503000'),
-  ('42e8f33e-03c0-5451-a8f8-c0598030a963', 'fernverkehr:IC8', '2022-11-02', '8503000', '8507000'),
+  ('146a7cfe-f249-5603-81b7-80a4d8d4d8ed', 'fernverkehr:IC81', '2022-11-02', '8507000', '8503000'),
+  ('a3e18286-02e0-50e7-8f86-5ffbf403ca25', 'fernverkehr:IC81', '2022-11-02', '8503000', '8507000'),
   ('58ab5fa8-ec05-5156-91a3-b3f8f29b0ade', 'fernverkehr:IC8', '2022-11-03', '8507000', '8506000'),
   ('6a816d2b-ecb3-5cad-a084-791bbc8f0eaa', 'fernverkehr:IC8', '2022-11-04', '8506000', '8507000'),
   ('f8d9cbfb-b10e-5db9-a08b-f06f1501d95c', 'fernverkehr:IR15', '2022-12-03', '8501026', '8507000'),
