@@ -1,3 +1,4 @@
+import { formatTermini } from '@/lib/stats/rail/format';
 import type { RailRideLogEntry } from '@/lib/stats/rail/types';
 
 /**
@@ -67,10 +68,7 @@ export function toLogTable(
 ): RailLogTable {
   const printed = log.map(({ ride, line, from, to }) => ({
     day: ride.riddenOn,
-    line: [
-      line.displayName,
-      `${line.terminalA} – ${line.terminalB}`,
-    ] satisfies RailLogLine,
+    line: [line.displayName, formatTermini(line)] satisfies RailLogLine,
     stretch: from && to ? `${from} → ${to}` : WHOLE_LINE,
   }));
 

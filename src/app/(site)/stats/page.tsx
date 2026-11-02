@@ -26,7 +26,7 @@ import {
   toLegs,
 } from '@/lib/stats/flights/stats';
 import type { FlightLeg } from '@/lib/stats/flights/types';
-import { formatShare } from '@/lib/stats/rail/format';
+import { formatShare, formatTermini } from '@/lib/stats/rail/format';
 import { loadRailGeometry } from '@/lib/stats/rail/geometry';
 import { toLogTable } from '@/lib/stats/rail/log';
 import { mapLines } from '@/lib/stats/rail/map';
@@ -213,7 +213,7 @@ const Rail = ({
                   <Named
                     key="line"
                     code={line.displayName}
-                    name={`${line.terminalA} – ${line.terminalB}`}
+                    name={formatTermini(line)}
                   />,
                   rides,
                   complete ? 'Complete' : shareOf(covered, stops),

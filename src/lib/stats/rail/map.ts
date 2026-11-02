@@ -1,4 +1,4 @@
-import { formatShare } from '@/lib/stats/rail/format';
+import { formatShare, formatTermini } from '@/lib/stats/rail/format';
 import type { RailLineProgress } from '@/lib/stats/rail/types';
 
 /**
@@ -43,7 +43,7 @@ export function mapLines(progress: RailLineProgress[]): RailMapLine[] {
     .filter(({ line }) => line.hasGeometry)
     .map(entry => ({
       id: entry.line.id,
-      name: `${entry.line.displayName} · ${entry.line.terminalA} – ${entry.line.terminalB}`,
+      name: `${entry.line.displayName} · ${formatTermini(entry.line)}`,
       touched: entry.touched,
       detail: detailOf(entry),
     }))

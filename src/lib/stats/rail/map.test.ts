@@ -52,6 +52,22 @@ describe('mapLines', () => {
     expect(s1.name).toBe('S1 · A – B');
   });
 
+  it('names a line that runs abroad by where its trains really end', () => {
+    const [re1] = mapLines([
+      progress(
+        {
+          ...line('test:RE1', 'RE1'),
+          terminalA: 'Preglia',
+          trueTerminalA: 'Domodossola (I)',
+        },
+        0,
+        4,
+      ),
+    ]);
+
+    expect(re1.name).toBe('RE1 · Domodossola – B');
+  });
+
   it('sorts numbers as numbers, then by id', () => {
     const lines = mapLines([
       progress(line('test:S10', 'S10'), 0, 4),
