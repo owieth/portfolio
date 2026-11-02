@@ -304,6 +304,7 @@ insert into public.rail_rides (id, line_id, ridden_on, from_didok, to_didok) val
   ('22a947a4-7bf1-53c0-8966-f7f1ce98f841', 'fernverkehr:IC5', '2026-09-26', '8503000', '8506302'),
   ('fa137676-38b2-51e8-ba6a-2cfbbaf3aee1', 'fernverkehr:IC5', '2026-09-26', '8506302', '8503000'),
   ('8d1705c8-5085-58d7-9b13-ee19b3229e87', 'fernverkehr:IR70', '2026-09-26', '8503000', '8505000'),
+  ('c1d3a525-59b5-5e39-82d4-68619ed2b126', 'buergenstock-bahn-ag:FUN-2554', '2026-09-27', '8508489', '8508491'),
   ('29f58287-51f7-537e-8a46-c37553414ce3', 'fernverkehr:IR70', '2026-09-29', '8505000', '8502204'),
   ('24628fda-ae47-5a45-96ac-2935aa9d5f75', 'fernverkehr:IR70', '2026-09-29', '8502204', '8505000'),
   ('81f3548d-49be-5ba4-8cd0-06cdf4173bcd', 'fernverkehr:IR70', '2026-09-30', '8505000', '8503000'),
