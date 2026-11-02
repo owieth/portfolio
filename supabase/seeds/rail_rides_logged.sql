@@ -81,6 +81,8 @@ insert into public.rail_rides (id, line_id, ridden_on, from_didok, to_didok) val
   ('0bcb2d60-ea84-516b-86c6-f0fed9f3d5ec', 'matterhorn-gotthard-bahn-fo:R43', '2019-09-14', '8515296', '8501672'),
   ('911fa852-aad5-5d8f-99bb-10ffd19e93ca', 'matterhorn-gotthard-bahn-fo:R43', '2019-09-15', '8501672', '8515296'),
   ('96f6a699-b328-5997-8ce2-904248893b7f', 'fernverkehr:IC8', '2019-09-15', '8501609', '8507000'),
+  ('79cad6cc-da32-562c-90cb-f4b888a5b01b', 'fernverkehr:IR15', '2019-10-07', '8507000', '8501026'),
+  ('d85ed69f-800d-50fc-8f5e-4151e3f5d388', 'fernverkehr:IR15', '2019-10-11', '8501026', '8507000'),
   ('4362537a-86f8-59f2-ab9f-20de9385ad43', 's-bahn-luzern:S1', '2026-06-18', '8502204', '8505000'),
   ('23042d4b-96da-57f3-9b25-79af33c5f4c3', 's-bahn-luzern:RE24', '2026-06-18', '8505000', '8500218'),
   ('41c20d35-74a0-58bb-9f35-d315cb98ed36', 'fernverkehr:IC6', '2026-06-18', '8500218', '8507000'),
