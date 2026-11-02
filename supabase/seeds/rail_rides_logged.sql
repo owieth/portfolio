@@ -54,6 +54,10 @@ insert into public.rail_rides (id, line_id, ridden_on, from_didok, to_didok) val
   ('66a5d510-dd33-529a-bbe0-69688ea452f4', 's-bahn-bern:RE7', '2018-05-15', '8508208', '8507000'), -- placeholder date, the day is not known
   ('da03477f-1309-54e4-9d30-4b2f861511c0', 'fernverkehr:IR65', '2018-06-01', '8507000', '8504300'),
   ('256ab333-446e-56e2-9078-58aa0dc94843', 'arc-jurassien:R13', '2018-06-01', '8504300', '8504205'),
+  ('4154a388-0fe1-526e-90df-b4602c82d384', 'fernverkehr:IC1', '2018-07-14', '8507000', '8503000'), -- placeholder date, the day is not known
+  ('ba0f471a-b034-557f-93ab-aadfc797b8e5', 'fernverkehr:IC2', '2018-07-14', '8503000', '8505300'), -- placeholder date, the day is not known
+  ('c58f44db-7cbe-5c7c-9386-b409cf600bbb', 'fernverkehr:IC2', '2018-07-14', '8505300', '8503000'), -- placeholder date, the day is not known
+  ('63dd8b73-36d7-515f-b99d-5d0ac851d7af', 'fernverkehr:IC1', '2018-07-14', '8503000', '8507000'), -- placeholder date, the day is not known
   ('2221bae0-5be6-56de-b2a5-3d6a3370e82c', 'fernverkehr:IC8', '2018-08-26', '8507000', '8503000'),
   ('bb0b9b91-a053-59ec-87dc-72280a37aa0f', 'fernverkehr:IC8', '2018-08-26', '8503000', '8507000'),
   ('41555cdf-047c-59c4-a7ec-5f3437ff8e51', 's-bahn-bern:RE1', '2018-09-01', '8507000', '8507475'),
