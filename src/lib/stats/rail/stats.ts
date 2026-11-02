@@ -94,7 +94,10 @@ function lineGraph(stops: RailStop[]): LineGraph {
   };
 }
 
-/** The stops between two, both included, or null when nothing connects them. */
+/**
+ * The stops between two, both included, in the order a train from `from`
+ * passes them, or null when nothing connects them.
+ */
 function walk(graph: LineGraph, from: number, to: number): number[] | null {
   const cameFrom = new Map<number, number>([[from, from]]);
   const queue = [from];
@@ -119,7 +122,33 @@ function walk(graph: LineGraph, from: number, to: number): number[] | null {
     path.push(at);
   }
 
-  return path.sort((a, b) => a - b);
+  return path.reverse();
+}
+
+/**
+ * The stops a ride between two Didok numbers passes on its line, in the order
+ * it passes them, or null when either is not on the line or nothing connects
+ * them. The same walk `toCoverage` takes, kept in running order rather than
+ * sorted, for `rideStretches` to cut a ride stop by stop.
+ */
+export function rideStops(
+  lineStops: RailStop[],
+  fromDidok: string,
+  toDidok: string,
+): RailStop[] | null {
+  const graph = lineGraph(lineStops);
+  const from = graph.sequenceOf.get(fromDidok);
+  const to = graph.sequenceOf.get(toDidok);
+
+  if (from === undefined || to === undefined) return null;
+
+  const bySequence = new Map(lineStops.map((stop) => [stop.sequence, stop]));
+
+  return (
+    walk(graph, from, to)?.flatMap(
+      (sequence) => bySequence.get(sequence) ?? [],
+    ) ?? null
+  );
 }
 
 const skip = (ride: RailRide, reason: string) =>
@@ -209,7 +238,7 @@ export function toCoverage(
       continue;
     }
 
-    coverage.push({ ride, line, sequences });
+    coverage.push({ ride, line, sequences: sequences.sort((a, b) => a - b) });
   }
 
   return coverage;

@@ -1,6 +1,7 @@
 import type { Feature, MultiLineString, Position } from 'geojson';
 
 import type { LatLon } from '@/lib/geo/ch';
+import { rideStops } from '@/lib/stats/rail/stats';
 import type { RailRideCoverage, RailStop } from '@/lib/stats/rail/types';
 
 /**
@@ -332,6 +333,137 @@ function shortestPath(
   return path.reverse();
 }
 
+/** The length of a cut, in metres, to pick the shortest of several. */
+function lengthOf(coordinates: Position[][]): number {
+  const [lon, lat] = coordinates[0][0];
+  const plane = planeAt({ lat, lon });
+
+  return coordinates.reduce(
+    (total, run) =>
+      run.slice(1).reduce((sum, position, index) => {
+        const [ax, ay] = plane(run[index]);
+        const [bx, by] = plane(position);
+
+        return sum + Math.hypot(bx - ax, by - ay);
+      }, total),
+    0,
+  );
+}
+
+/** A stop a ride passed, placed. */
+interface Placed {
+  didok: string;
+  position: LatLon;
+}
+
+/**
+ * The track between two stops next to each other on a ride's line: off the
+ * line's own geometry when it reaches both, and otherwise off whichever other
+ * line stopping at both gives the shortest cut. A train between two neighbouring
+ * stops runs on the track any other train between them runs on, and the
+ * shortest is the one an express takes, through a base tunnel rather than over
+ * the old line, and down the one track a slower line has to itself.
+ */
+function cutLeg(
+  from: Placed,
+  to: Placed,
+  lineId: string,
+  geometry: ReadonlyMap<string, Position[][]>,
+  linesAt: ReadonlyMap<string, ReadonlySet<string>>,
+): Position[][] | null {
+  const own = geometry.get(lineId);
+  const ownSlice = own && sliceLine(own, from.position, to.position);
+
+  if (ownSlice?.ok) return ownSlice.coordinates;
+
+  let best: { coordinates: Position[][]; metres: number } | null = null;
+
+  for (const other of linesAt.get(from.didok) ?? []) {
+    const parts = geometry.get(other);
+
+    if (other === lineId || !parts || !linesAt.get(to.didok)?.has(other)) {
+      continue;
+    }
+
+    const slice = sliceLine(parts, from.position, to.position);
+
+    if (!slice.ok) continue;
+
+    const metres = lengthOf(slice.coordinates);
+
+    if (!best || metres < best.metres) {
+      best = { coordinates: slice.coordinates, metres };
+    }
+  }
+
+  return best?.coordinates ?? null;
+}
+
+/**
+ * How far along `passed` from `start` the line's own geometry reaches in one
+ * cut: the last stop it can be cut to, two or more stops on, or null.
+ */
+function ownSpan(
+  passed: Placed[],
+  start: number,
+  parts: Position[][] | undefined,
+): { end: number; coordinates: Position[][] } | null {
+  if (!parts) return null;
+
+  for (let end = passed.length - 1; end > start + 1; end -= 1) {
+    const slice = sliceLine(
+      parts,
+      passed[start].position,
+      passed[end].position,
+    );
+
+    if (slice.ok) return { end, coordinates: slice.coordinates };
+  }
+
+  return null;
+}
+
+/**
+ * A stretch cut stop by stop, for when the line's own geometry cannot take it
+ * whole: a line OSM does not map, or maps only in part, like the IC5 that
+ * OSM ends at Lausanne. From each stop it keeps to its own track for as far
+ * as that reaches, so a leg between two stops its own track misses by a few
+ * hundred metres is not borrowed from a line that runs another way. Past
+ * that, each leg between neighbouring stops comes from `cutLeg`, and a leg
+ * nothing reaches is left out and named in `gaps`.
+ */
+function cutByLegs(
+  passed: Placed[],
+  lineId: string,
+  geometry: ReadonlyMap<string, Position[][]>,
+  linesAt: ReadonlyMap<string, ReadonlySet<string>>,
+): { coordinates: Position[][]; gaps: string[] } {
+  const coordinates: Position[][] = [];
+  const gaps: string[] = [];
+  const own = geometry.get(lineId);
+
+  for (let index = 0; index < passed.length - 1; ) {
+    const span = ownSpan(passed, index, own);
+
+    if (span) {
+      coordinates.push(...span.coordinates);
+      index = span.end;
+      continue;
+    }
+
+    const from = passed[index];
+    const to = passed[index + 1];
+    const leg = cutLeg(from, to, lineId, geometry, linesAt);
+
+    if (leg) coordinates.push(...leg);
+    else gaps.push(`${from.didok} → ${to.didok}`);
+
+    index += 1;
+  }
+
+  return { coordinates, gaps };
+}
+
 /** The rides over one stretch of one line, whichever way each went. */
 interface Ridden {
   first: RailRideCoverage;
@@ -340,9 +472,12 @@ interface Ridden {
   rides: number;
 }
 
-const skip = ({ first: { ride }, rides }: Ridden, reason: string) =>
+const rideOf = ({ first: { ride }, rides }: Ridden) =>
+  `ride ${ride.id} on ${ride.riddenOn}${rides > 1 ? ` and ${rides - 1} more` : ''}`;
+
+const skip = (ridden: Ridden, reason: string) =>
   console.warn(
-    `[stats/rail] skipping the stretch of ride ${ride.id} on ${ride.riddenOn}${rides > 1 ? ` and ${rides - 1} more` : ''}: ${reason}`,
+    `[stats/rail] skipping the stretch of ${rideOf(ridden)}: ${reason}`,
   );
 
 /**
@@ -353,12 +488,17 @@ const skip = ({ first: { ride }, rides }: Ridden, reason: string) =>
  * the order their stretches first appear in. A whole-line ride has no
  * stretch: the map draws the line's own feature, which `wholeLineIds` names.
  *
+ * A stretch is cut off its line's own geometry when that reaches both stops.
+ * When it does not, it is cut stop by stop, borrowing the track of other
+ * lines for the legs its own does not reach (see `cutByLegs`), and keeps its
+ * line's id either way.
+ *
  * Off the coverage, so every ride here already resolved against its line and
  * its stops. What can still go wrong is the geometry: a stop with no position,
- * a line with no feature, a stop too far from its track, or two stops on parts
- * nothing joins. Each drops the stretch with one warning, naming its first
- * ride and how many more, the same as `toCoverage` drops a ride. The rides
- * still count towards the line's share.
+ * or a stretch no line's track reaches. Each drops the stretch with one
+ * warning, naming its first ride and how many more, the same as `toCoverage`
+ * drops a ride. A leg nothing reaches leaves a gap in the stretch, with a
+ * warning naming the leg. The rides still count towards the line's share.
  *
  * A Didok number listed twice on a line places the first stop to list it, the
  * same one `toCoverage` walks from.
@@ -369,11 +509,26 @@ export function rideStretches(
   geometry: ReadonlyMap<string, Position[][]>,
 ): RailStretch[] {
   const positions = new Map<string, LatLon | null>();
+  const stopsByLine = new Map<string, RailStop[]>();
+  const linesAt = new Map<string, Set<string>>();
 
-  for (const { lineId, didok, lat, lon } of stops) {
+  for (const stop of stops) {
+    const { lineId, didok, lat, lon } = stop;
+    const lineStops = stopsByLine.get(lineId);
+
+    if (lineStops) lineStops.push(stop);
+    else stopsByLine.set(lineId, [stop]);
+
+    if (didok === null) continue;
+
+    const lines = linesAt.get(didok);
+
+    if (lines) lines.add(lineId);
+    else linesAt.set(didok, new Set([lineId]));
+
     const key = `${lineId} ${didok}`;
 
-    if (didok === null || positions.has(key)) continue;
+    if (positions.has(key)) continue;
 
     positions.set(key, lat === null || lon === null ? null : { lat, lon });
   }
@@ -394,6 +549,12 @@ export function rideStretches(
   }
 
   const stretches: RailStretch[] = [];
+  const stretch = (id: string, coordinates: Position[][]) =>
+    stretches.push({
+      type: 'Feature',
+      geometry: { type: 'MultiLineString', coordinates },
+      properties: { id },
+    });
 
   for (const ridden of byStretch.values()) {
     const { line } = ridden.first;
@@ -411,24 +572,39 @@ export function rideStretches(
     }
 
     const parts = geometry.get(line.id);
+    const slice = parts && sliceLine(parts, from, to);
 
-    if (!parts) {
-      skip(ridden, `${line.id} has no geometry`);
+    if (slice?.ok) {
+      stretch(line.id, slice.coordinates);
       continue;
     }
 
-    const slice = sliceLine(parts, from, to);
+    const passed = (
+      rideStops(stopsByLine.get(line.id) ?? [], fromDidok, toDidok) ?? []
+    ).flatMap(({ didok }) => {
+      const position = didok && positions.get(`${line.id} ${didok}`);
 
-    if (!slice.ok) {
-      skip(ridden, `${fromDidok} → ${toDidok}: ${slice.reason}`);
-      continue;
-    }
-
-    stretches.push({
-      type: 'Feature',
-      geometry: { type: 'MultiLineString', coordinates: slice.coordinates },
-      properties: { id: line.id },
+      return didok && position ? [{ didok, position }] : [];
     });
+    const { coordinates, gaps } = cutByLegs(passed, line.id, geometry, linesAt);
+
+    if (coordinates.length === 0) {
+      skip(
+        ridden,
+        slice
+          ? `${fromDidok} → ${toDidok}: ${slice.reason}`
+          : `${line.id} has no geometry`,
+      );
+      continue;
+    }
+
+    if (gaps.length > 0) {
+      console.warn(
+        `[stats/rail] leaving gaps in the stretch of ${rideOf(ridden)}: no track for ${gaps.join(', ')}`,
+      );
+    }
+
+    stretch(line.id, coordinates);
   }
 
   return stretches;

@@ -6,6 +6,7 @@ import {
   lineRidership,
   railTotals,
   rideLog,
+  rideStops,
   stationsVisited,
   toCoverage,
 } from '@/lib/stats/rail/stats';
@@ -218,6 +219,38 @@ describe('toCoverage', () => {
         ({ sequences }) => sequences,
       ),
     ).toEqual(sequencesOf(rides));
+  });
+});
+
+describe('rideStops', () => {
+  const didoksOf = (fromDidok: string, toDidok: string) =>
+    rideStops(S1_STOPS, fromDidok, toDidok)?.map(({ didok }) => didok);
+
+  it('passes the stops in running order, back through a junction', () => {
+    expect(didoksOf('8500008', '8500004')).toEqual([
+      '8500008',
+      '8500007',
+      '8500002',
+      '8500003',
+      '8500004',
+    ]);
+  });
+
+  it('runs from the stop the ride got on at', () => {
+    expect(didoksOf('8500004', '8500001')).toEqual([
+      '8500004',
+      '8500003',
+      '8500002',
+      '8500001',
+    ]);
+  });
+
+  it('is null for a stop the line does not have', () => {
+    expect(rideStops(S1_STOPS, '8500001', '8599999')).toBeNull();
+  });
+
+  it('is null between two stops nothing connects', () => {
+    expect(rideStops(S1_STOPS, '8500001', '8500010')).toBeNull();
   });
 });
 
