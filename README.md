@@ -68,6 +68,7 @@ Production migrations and seeds are pushed by hand, with
 | `pnpm test`              | Runs the tests once.                                                       |
 | `pnpm test:watch`        | Runs the tests in watch mode.                                              |
 | `pnpm lint`              | Runs ESLint.                                                               |
+| `pnpm supabase`          | Runs the Supabase CLI against the hosted project, as its owner's account.  |
 | `pnpm react-doctor`      | Runs React Doctor over the components.                                     |
 | `pnpm og:world`          | Regenerates the land silhouette the passport share card is drawn on.       |
 | `pnpm og:flags`          | Regenerates the flags inlined into the passport share card.                |
