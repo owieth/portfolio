@@ -572,6 +572,67 @@ describe('rideStretches, borrowing track', () => {
   });
 });
 
+describe('rideStretches, before a base tunnel', () => {
+  /**
+   * Bellinzona to Lugano, straight through the tunnel on the IC2's track, and
+   * the long way round from Giubiasco on the S90's, the old line over the
+   * Monte Ceneri.
+   */
+  const IC2 = line('test:IC2');
+  const S90 = line('tilo:S90');
+  const STOPS = [
+    stop(IC2.id, 1, '8505213', at(7, 47)),
+    stop(IC2.id, 2, '8505214', at(7, 46.995)),
+    stop(IC2.id, 3, '8505300', at(7, 46.98)),
+    stop(S90.id, 1, '8505214', at(7, 46.995)),
+    stop(S90.id, 2, '8505216', at(7.01, 46.99)),
+    stop(S90.id, 3, '8505300', at(7, 46.98)),
+  ];
+  const TUNNEL: Position[] = [
+    [7, 47],
+    [7, 46.98],
+  ];
+  const OVER: Position[] = [
+    [7, 46.995],
+    [7.01, 46.995],
+    [7.01, 46.98],
+    [7, 46.98],
+  ];
+  const TRACKS = new Map([
+    [IC2.id, [TUNNEL]],
+    [S90.id, [OVER]],
+  ]);
+  const on = (riddenOn: string): RailRideCoverage => {
+    const entry = covered('8505213', '8505300', IC2);
+
+    return { ...entry, ride: { ...entry.ride, riddenOn } };
+  };
+
+  it('draws a ride before the tunnel opened over the old line', () => {
+    const [stretch] = rideStretches([on('2018-04-14')], STOPS, TRACKS);
+
+    expect(stretch?.properties.id).toBe(IC2.id);
+    expect(stretch?.geometry.coordinates.flat()).toContainEqual([7.01, 46.995]);
+    expect(warn).not.toHaveBeenCalled();
+  });
+
+  it('draws a ride since through the tunnel', () => {
+    expect(
+      rideStretches([on('2020-12-13')], STOPS, TRACKS)[0]?.geometry.coordinates,
+    ).toEqual([TUNNEL]);
+  });
+
+  it('keeps the same stops ridden either side of the opening apart', () => {
+    expect(
+      rideStretches(
+        [on('2018-04-14'), on('2021-05-01'), on('2018-07-14')],
+        STOPS,
+        TRACKS,
+      ),
+    ).toHaveLength(2);
+  });
+});
+
 describe('wholeLineIds', () => {
   it('names each line ridden end to end once', () => {
     const IR1 = line('test:IR1');

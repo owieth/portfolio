@@ -1,6 +1,12 @@
 import type { Feature, MultiLineString, Position } from 'geojson';
 
 import type { LatLon } from '@/lib/geo/ch';
+import {
+  OLD_ROUTES,
+  oldRouteBetween,
+  oldRoutesOn,
+  type OldRoute,
+} from '@/lib/stats/rail/old-routes';
 import { rideStops } from '@/lib/stats/rail/stats';
 import type { RailRideCoverage, RailStop } from '@/lib/stats/rail/types';
 
@@ -356,6 +362,13 @@ interface Placed {
   position: LatLon;
 }
 
+/** Every line's track, and where each station is and which lines stop there. */
+interface Network {
+  geometry: ReadonlyMap<string, Position[][]>;
+  linesAt: ReadonlyMap<string, ReadonlySet<string>>;
+  stations: ReadonlyMap<string, LatLon>;
+}
+
 /**
  * The track between two stops next to each other on a ride's line: off the
  * line's own geometry when it reaches both, and otherwise off whichever other
@@ -368,8 +381,7 @@ function cutLeg(
   from: Placed,
   to: Placed,
   lineId: string,
-  geometry: ReadonlyMap<string, Position[][]>,
-  linesAt: ReadonlyMap<string, ReadonlySet<string>>,
+  { geometry, linesAt }: Network,
 ): Position[][] | null {
   const own = geometry.get(lineId);
   const ownSlice = own && sliceLine(own, from.position, to.position);
@@ -400,17 +412,19 @@ function cutLeg(
 }
 
 /**
- * How far along `passed` from `start` the line's own geometry reaches in one
- * cut: the last stop it can be cut to, two or more stops on, or null.
+ * How far along `passed` from `start`, up to `last`, the line's own geometry
+ * reaches in one cut: the last stop it can be cut to, two or more stops on,
+ * or null.
  */
 function ownSpan(
   passed: Placed[],
   start: number,
+  last: number,
   parts: Position[][] | undefined,
 ): { end: number; coordinates: Position[][] } | null {
   if (!parts) return null;
 
-  for (let end = passed.length - 1; end > start + 1; end -= 1) {
+  for (let end = last; end > start + 1; end -= 1) {
     const slice = sliceLine(
       parts,
       passed[start].position,
@@ -424,6 +438,30 @@ function ownSpan(
 }
 
 /**
+ * The stations a leg passes: its two ends, or, on an old route, every station
+ * of the route between them that has a position.
+ */
+function legStations(
+  from: Placed,
+  to: Placed,
+  route: { stops: string[] } | null,
+  stations: ReadonlyMap<string, LatLon>,
+): Placed[] {
+  if (!route) return [from, to];
+
+  return route.stops.flatMap((didok) => {
+    const position =
+      didok === from.didok
+        ? from.position
+        : didok === to.didok
+          ? to.position
+          : stations.get(didok);
+
+    return position ? [{ didok, position }] : [];
+  });
+}
+
+/**
  * A stretch cut stop by stop, for when the line's own geometry cannot take it
  * whole: a line OSM does not map, or maps only in part, like the IC5 that
  * OSM ends at Lausanne. From each stop it keeps to its own track for as far
@@ -431,19 +469,57 @@ function ownSpan(
  * hundred metres is not borrowed from a line that runs another way. Past
  * that, each leg between neighbouring stops comes from `cutLeg`, and a leg
  * nothing reaches is left out and named in `gaps`.
+ *
+ * A leg on one of `routes`, the old lines still open on the day of the ride,
+ * is cut station by station off the route's `via` instead, and from `cutLeg`
+ * only where `via` does not reach. No span of its own track runs past one.
  */
 function cutByLegs(
   passed: Placed[],
   lineId: string,
-  geometry: ReadonlyMap<string, Position[][]>,
-  linesAt: ReadonlyMap<string, ReadonlySet<string>>,
+  network: Network,
+  routes: OldRoute[],
 ): { coordinates: Position[][]; gaps: string[] } {
   const coordinates: Position[][] = [];
   const gaps: string[] = [];
-  const own = geometry.get(lineId);
+  const own = network.geometry.get(lineId);
+  const oldLegs = passed.map((stop, index) =>
+    index === 0
+      ? null
+      : oldRouteBetween(routes, passed[index - 1].didok, stop.didok),
+  );
 
   for (let index = 0; index < passed.length - 1; ) {
-    const span = ownSpan(passed, index, own);
+    const route = oldLegs[index + 1];
+
+    if (route) {
+      const via = network.geometry.get(route.via);
+      const along = legStations(
+        passed[index],
+        passed[index + 1],
+        route,
+        network.stations,
+      );
+
+      for (let step = 1; step < along.length; step += 1) {
+        const from = along[step - 1];
+        const to = along[step];
+        const old = via && sliceLine(via, from.position, to.position);
+        const leg = old?.ok
+          ? old.coordinates
+          : cutLeg(from, to, lineId, network);
+
+        if (leg) coordinates.push(...leg);
+        else gaps.push(`${from.didok} → ${to.didok}`);
+      }
+
+      index += 1;
+      continue;
+    }
+
+    const nextOld = oldLegs.findIndex((leg, at) => at > index && leg !== null);
+    const last = nextOld === -1 ? passed.length - 1 : nextOld - 1;
+    const span = ownSpan(passed, index, last, own);
 
     if (span) {
       coordinates.push(...span.coordinates);
@@ -453,7 +529,7 @@ function cutByLegs(
 
     const from = passed[index];
     const to = passed[index + 1];
-    const leg = cutLeg(from, to, lineId, geometry, linesAt);
+    const leg = cutLeg(from, to, lineId, network);
 
     if (leg) coordinates.push(...leg);
     else gaps.push(`${from.didok} → ${to.didok}`);
@@ -469,6 +545,8 @@ interface Ridden {
   first: RailRideCoverage;
   fromDidok: string;
   toDidok: string;
+  /** The old routes it passes still open on the day, the same for each ride. */
+  routes: OldRoute[];
   rides: number;
 }
 
@@ -491,7 +569,9 @@ const skip = (ridden: Ridden, reason: string) =>
  * A stretch is cut off its line's own geometry when that reaches both stops.
  * When it does not, it is cut stop by stop, borrowing the track of other
  * lines for the legs its own does not reach (see `cutByLegs`), and keeps its
- * line's id either way.
+ * line's id either way. So is a stretch ridden before a base tunnel opened
+ * that passes it, over the line trains took then (see `./old-routes`): the
+ * same stops ridden before and after are two stretches.
  *
  * Off the coverage, so every ride here already resolved against its line and
  * its stops. What can still go wrong is the geometry: a stop with no position,
@@ -511,6 +591,7 @@ export function rideStretches(
   const positions = new Map<string, LatLon | null>();
   const stopsByLine = new Map<string, RailStop[]>();
   const linesAt = new Map<string, Set<string>>();
+  const stations = new Map<string, LatLon>();
 
   for (const stop of stops) {
     const { lineId, didok, lat, lon } = stop;
@@ -526,6 +607,10 @@ export function rideStretches(
     if (lines) lines.add(lineId);
     else linesAt.set(didok, new Set([lineId]));
 
+    if (lat !== null && lon !== null && !stations.has(didok)) {
+      stations.set(didok, { lat, lon });
+    }
+
     const key = `${lineId} ${didok}`;
 
     if (positions.has(key)) continue;
@@ -534,6 +619,31 @@ export function rideStretches(
   }
 
   const byStretch = new Map<string, Ridden>();
+  const routesPassed = new Map<string, OldRoute[]>();
+  const oldRoutesPassed = (
+    lineId: string,
+    fromDidok: string,
+    toDidok: string,
+  ) => {
+    const key = `${lineId} ${fromDidok} ${toDidok}`;
+    const known = routesPassed.get(key);
+
+    if (known) return known;
+
+    const didoks = (
+      rideStops(stopsByLine.get(lineId) ?? [], fromDidok, toDidok) ?? []
+    ).flatMap(({ didok }) => (didok === null ? [] : [didok]));
+    const routes = OLD_ROUTES.filter((route) =>
+      didoks.some(
+        (didok, index) =>
+          index > 0 && oldRouteBetween([route], didoks[index - 1], didok),
+      ),
+    );
+
+    routesPassed.set(key, routes);
+
+    return routes;
+  };
 
   for (const entry of coverage) {
     const { ride, line } = entry;
@@ -541,12 +651,31 @@ export function rideStretches(
     if (ride.fromDidok === null || ride.toDidok === null) continue;
 
     const [fromDidok, toDidok] = [ride.fromDidok, ride.toDidok].sort();
-    const key = `${line.id} ${fromDidok} ${toDidok}`;
+    const routes = oldRoutesOn(
+      ride.riddenOn,
+      oldRoutesPassed(line.id, fromDidok, toDidok),
+    );
+    const key = [
+      line.id,
+      fromDidok,
+      toDidok,
+      ...routes.map(({ name }) => name),
+    ].join(' ');
     const known = byStretch.get(key);
 
     if (known) known.rides += 1;
-    else byStretch.set(key, { first: entry, fromDidok, toDidok, rides: 1 });
+    else {
+      byStretch.set(key, {
+        first: entry,
+        fromDidok,
+        toDidok,
+        routes,
+        rides: 1,
+      });
+    }
   }
+
+  const network: Network = { geometry, linesAt, stations };
 
   const stretches: RailStretch[] = [];
   const stretch = (id: string, coordinates: Position[][]) =>
@@ -571,14 +700,6 @@ export function rideStretches(
       continue;
     }
 
-    const parts = geometry.get(line.id);
-    const slice = parts && sliceLine(parts, from, to);
-
-    if (slice?.ok) {
-      stretch(line.id, slice.coordinates);
-      continue;
-    }
-
     const passed = (
       rideStops(stopsByLine.get(line.id) ?? [], fromDidok, toDidok) ?? []
     ).flatMap(({ didok }) => {
@@ -586,14 +707,25 @@ export function rideStretches(
 
       return didok && position ? [{ didok, position }] : [];
     });
-    const { coordinates, gaps } = cutByLegs(passed, line.id, geometry, linesAt);
+    const { routes } = ridden;
+    const parts = geometry.get(line.id);
+    const slice = parts && sliceLine(parts, from, to);
+
+    if (slice?.ok && routes.length === 0) {
+      stretch(line.id, slice.coordinates);
+      continue;
+    }
+
+    const { coordinates, gaps } = cutByLegs(passed, line.id, network, routes);
 
     if (coordinates.length === 0) {
       skip(
         ridden,
-        slice
-          ? `${fromDidok} → ${toDidok}: ${slice.reason}`
-          : `${line.id} has no geometry`,
+        !slice
+          ? `${line.id} has no geometry`
+          : slice.ok
+            ? `${fromDidok} → ${toDidok}: no track on the old route`
+            : `${fromDidok} → ${toDidok}: ${slice.reason}`,
       );
       continue;
     }
