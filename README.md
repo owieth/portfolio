@@ -37,6 +37,7 @@ unset for local work:
 | `SUPABASE_URL`              | Server-only. Unset, the Supabase layer is a no-op and the client is never constructed.           |
 | `SUPABASE_PUBLISHABLE_KEY`  | Server-only, with `SUPABASE_URL`.                                                                |
 | `DATABASE_URL`              | Only for `pnpm reconcile:data`. It is the database password; never set it on Vercel.             |
+| `SUPABASE_ACCESS_TOKEN`     | Only for `pnpm supabase`. A token of the account that owns the project; never set it on Vercel.  |
 | `NEXT_PUBLIC_STATS_ENABLED` | Unset hides `/stats` from the nav, the footer and the sitemap. The route stays reachable.        |
 
 ## Local data
