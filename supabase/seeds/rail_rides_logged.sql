@@ -68,5 +68,7 @@ insert into public.rail_rides (id, line_id, ridden_on, from_didok, to_didok) val
   ('9ffc886f-7110-5001-9401-672abb0befe6', 'fernverkehr:IR70', '2026-10-26', '8502204', '8505000'),
   ('29495246-a81d-56f7-af3c-b94970d70e34', 'fernverkehr:IR70', '2026-10-27', '8505000', '8502204'),
   ('892ad0ee-5c88-52fc-8be7-db3be8a848cc', 'fernverkehr:IR70', '2026-10-27', '8502204', '8503000'),
-  ('99c79306-5e2c-5522-8277-375eb5b1512b', 'fernverkehr:IR70', '2026-10-27', '8503000', '8505000')
+  ('99c79306-5e2c-5522-8277-375eb5b1512b', 'fernverkehr:IR70', '2026-10-27', '8503000', '8505000'),
+  ('56bf4130-fa8c-53ba-92e9-8abf0541abbc', 'fernverkehr:IR70', '2026-10-28', '8505000', '8502204'),
+  ('305ecf3b-4827-5739-b760-9d114148b93a', 'fernverkehr:IR70', '2026-10-28', '8502204', '8505000')
 on conflict (id) do nothing;
