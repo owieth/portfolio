@@ -133,8 +133,8 @@ insert into public.rail_rides (id, line_id, ridden_on, from_didok, to_didok) val
   ('d101526c-fbb4-5754-bb5e-db89ef8b1ab2', 's-bahn-bern:S44', '2021-02-24', '8508272', '8507000'),
   ('03eddbac-e37f-5ea2-8728-c1cdf2d1d01a', 's-bahn-bern:RE5', '2021-03-06', '8507000', '8500207'), -- placeholder date, the day is not known
   ('5591bcff-a75f-5e4a-ba61-d956e7b038f6', 's-bahn-bern:RE5', '2021-03-06', '8500207', '8507000'), -- placeholder date, the day is not known
-  ('b05646df-71ee-5dbc-b9e7-a75bf5870403', 'fernverkehr:ICE:8500090-8507492', '2021-07-21', '8507000', '8500090'),
-  ('390bcf0c-3996-5531-97c5-07d929197f7a', 'fernverkehr:ICE:8500090-8507492', '2021-07-25', '8500090', '8507000'),
+  ('c594b955-bb60-5926-97e9-12e47076aac0', 'fernverkehr:ICE:8500090-8507492', '2021-07-21', '8507000', '8011160'),
+  ('45ee2550-58c0-50f1-ad9a-05b336cd95c2', 'fernverkehr:ICE:8500090-8507492', '2021-07-25', '8011160', '8507000'),
   ('98d42ab5-7dc4-5afe-b3f5-93174e2cee2e', 's-bahn-aargau:S14', '2021-08-07', '8502113', '8502165'), -- placeholder date, the day is not known
   ('50272c9f-91b0-53c2-a799-d2d70304febf', 's-bahn-bern:S8', '2021-10-02', '8507000', '8508059'), -- placeholder date, the day is not known
   ('8b97e66c-9713-5aa0-baf4-fb79d10b0d52', 's-bahn-bern:S8', '2021-10-02', '8508059', '8507000'), -- placeholder date, the day is not known
