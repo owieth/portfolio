@@ -1,6 +1,7 @@
 import type { Position } from 'geojson';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { RAIL_MAP_BOX } from '@/lib/stats/rail/bounds';
 import {
   rideStretches,
   sliceLine,
@@ -630,6 +631,86 @@ describe('rideStretches, before a base tunnel', () => {
         TRACKS,
       ),
     ).toHaveLength(2);
+  });
+});
+
+describe('rideStretches, abroad', () => {
+  const extent = (coordinates: Position[][]) => {
+    const points = coordinates.flat();
+
+    return {
+      west: Math.min(...points.map(([lon]) => lon)),
+      south: Math.min(...points.map(([, lat]) => lat)),
+      north: Math.max(...points.map(([, lat]) => lat)),
+    };
+  };
+
+  it('runs on past the border to the station abroad', () => {
+    const EC6 = line('fernverkehr:EC6');
+    const [stretch] = rideStretches(
+      [covered('8501605', '8301700', EC6)],
+      [
+        stop(EC6.id, 1, '8501605', at(7.88, 46.294)),
+        stop(EC6.id, 2, '8501609', at(7.988, 46.319)),
+      ],
+      new Map([
+        [
+          EC6.id,
+          [
+            [
+              [7.88, 46.294],
+              [7.988, 46.319],
+              [9.2045, 45.4864],
+            ],
+          ] as Position[][],
+        ],
+      ]),
+    );
+
+    expect(stretch?.properties.id).toBe(EC6.id);
+    expect(stretch?.geometry.coordinates.flat()).toContainEqual([7.88, 46.294]);
+    expect(stretch?.geometry.coordinates.flat()).toContainEqual([
+      9.2045, 45.4864,
+    ]);
+    expect(warn).not.toHaveBeenCalled();
+  });
+
+  it('stops at the edge of the map', () => {
+    const TGV = line('fernverkehr:TGV-612B');
+    const [stretch] = rideStretches(
+      [covered('8500010', '8768600', TGV)],
+      [stop(TGV.id, 1, '8500010', at(7.5896, 47.5474))],
+      new Map([
+        [
+          TGV.id,
+          [
+            [
+              [7.5896, 47.5474],
+              [2.3739, 48.8443],
+            ],
+          ] as Position[][],
+        ],
+      ]),
+    );
+
+    expect(extent(stretch?.geometry.coordinates ?? []).west).toBeCloseTo(
+      RAIL_MAP_BOX.west,
+      4,
+    );
+  });
+
+  it('takes a line without geometry abroad on the crossing’s track', () => {
+    const ICE = line('fernverkehr:ICE:8500090-8507492');
+    const [stretch] = rideStretches(
+      [covered('8500090', '8011160', ICE)],
+      [stop(ICE.id, 1, '8500090', at(7.6069, 47.5673))],
+      new Map(),
+    );
+    const { south, north } = extent(stretch?.geometry.coordinates ?? []);
+
+    expect(south).toBeLessThan(47.6);
+    expect(north).toBeGreaterThan(49.7);
+    expect(north).toBeLessThanOrEqual(RAIL_MAP_BOX.north);
   });
 });
 
