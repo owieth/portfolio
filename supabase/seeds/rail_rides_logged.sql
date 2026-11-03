@@ -191,7 +191,9 @@ insert into public.rail_rides (id, line_id, ridden_on, from_didok, to_didok) val
   ('01e24d8f-fea7-56c1-8337-746cea5cb131', 's-bahn-bern:RE5', '2023-03-04', '8507000', '8500207'), -- placeholder date, the day is not known
   ('3831a725-2575-539f-aa74-176bbdac645c', 's-bahn-bern:RE5', '2023-03-04', '8500207', '8507000'), -- placeholder date, the day is not known
   ('596c97d7-fb18-5552-9495-bbd536e0b8df', 'fernverkehr:IC61', '2023-04-03', '8507000', '8500010'),
+  ('8a3338a6-1945-5b0e-ac0d-2d93cad1baae', 'fernverkehr:TGV-612B', '2023-04-03', '8500010', '8768600'),
   ('daf69743-37db-5006-ba05-29b15528ded4', 'fernverkehr:IC61', '2023-04-08', '8500010', '8507000'),
+  ('8aee878e-964e-5b14-a908-12a39b97b866', 'fernverkehr:TGV-612B', '2023-04-08', '8768600', '8500010'),
   ('fc9b9221-5395-5f19-afe9-50669bed9da7', 'fernverkehr:IC61', '2023-05-15', '8507000', '8500010'),
   ('e2be4065-f9f3-51c9-854e-cad6d10ed562', 'fernverkehr:IC61', '2023-05-22', '8500010', '8507000'),
   ('27787dc0-3ac1-59be-b92c-c3b3aba3ea8f', 's-bahn-zuerich:S5', '2023-06-17', '8503000', '8502204'), -- placeholder date, the day is not known
