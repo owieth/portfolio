@@ -64,6 +64,7 @@
 }
 
 :root {
+  color-scheme: light dark;
   --background: #fff;
   --foreground: #0a0a0a;
   --muted: #5c5c5c;
