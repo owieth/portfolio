@@ -80,6 +80,15 @@
   }
 }
 
+/* Thin, muted scrollbars without a track, so the layout background shows through. */
+@layer base {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in oklab, var(--muted) 40%, transparent)
+      transparent;
+  }
+}
+
 body {
   color: var(--foreground);
   background: var(--background);
