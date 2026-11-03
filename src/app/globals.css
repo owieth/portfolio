@@ -64,6 +64,7 @@
 }
 
 :root {
+  color-scheme: light dark;
   --background: #fff;
   --foreground: #0a0a0a;
   --muted: #5c5c5c;
@@ -76,6 +77,15 @@
     --foreground: #fff;
     --muted: #a1a1a1;
     --line: rgb(255 255 255 / 0.5);
+  }
+}
+
+/* Thin, muted scrollbars without a track, so the layout background shows through. */
+@layer base {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in oklab, var(--muted) 40%, transparent)
+      transparent;
   }
 }
 
