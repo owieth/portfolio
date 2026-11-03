@@ -254,6 +254,46 @@ describe('rideStops', () => {
   });
 });
 
+describe('rides abroad', () => {
+  const EC6 = line('fernverkehr:EC6', 'EC');
+  const EC6_STOPS = [
+    stop(EC6.id, 1, '8500010'),
+    stop(EC6.id, 2, '8507000'),
+    stop(EC6.id, 3, '8501605'),
+    stop(EC6.id, 4, '8501609'),
+  ];
+  const coverageOf = (rides: RailRide[]) => toCoverage([EC6], EC6_STOPS, rides);
+
+  it('covers the Swiss stops up to the border, either way', () => {
+    expect(
+      coverageOf([
+        ride(EC6.id, '8507000', '8301700'),
+        ride(EC6.id, '8301700', '8507000'),
+      ]).map(({ sequences }) => sequences),
+    ).toEqual([
+      [2, 3, 4],
+      [2, 3, 4],
+    ]);
+    expect(warn).not.toHaveBeenCalled();
+  });
+
+  it('names the station abroad in the log', () => {
+    const rides = [ride(EC6.id, '8507000', '8301700')];
+    const [entry] = rideLog(coverageOf(rides), EC6_STOPS);
+
+    expect(entry).toMatchObject({
+      from: 'Stop 8507000',
+      to: 'Milano Centrale',
+    });
+  });
+
+  it('still drops a station abroad on a line that does not go there', () => {
+    expect(
+      toCoverage(LINES, STOPS, [ride(S1.id, '8500001', '8301700')]),
+    ).toEqual([]);
+  });
+});
+
 describe('lineProgress', () => {
   it('counts a stop two rides share once', () => {
     const progress = progressFor(

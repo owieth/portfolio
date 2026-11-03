@@ -1,3 +1,4 @@
+import { crossingTo, swissStop } from '@/lib/stats/rail/abroad';
 import type {
   RailCategoryProgress,
   RailLine,
@@ -165,6 +166,9 @@ const skip = (ride: RailRide, reason: string) =>
  * ride between two stops no train connects, which only a block that shares no
  * stop with its line can cause.
  *
+ * A ride to a station abroad (see `./abroad`) covers the Swiss stops up to
+ * the border it crossed.
+ *
  * Input order is preserved.
  */
 export function toCoverage(
@@ -212,9 +216,13 @@ export function toCoverage(
     }
 
     const from =
-      ride.fromDidok === null ? undefined : graph.sequenceOf.get(ride.fromDidok);
+      ride.fromDidok === null
+        ? undefined
+        : graph.sequenceOf.get(swissStop(line.id, ride.fromDidok));
     const to =
-      ride.toDidok === null ? undefined : graph.sequenceOf.get(ride.toDidok);
+      ride.toDidok === null
+        ? undefined
+        : graph.sequenceOf.get(swissStop(line.id, ride.toDidok));
 
     if (from === undefined || to === undefined) {
       const unknown = [
@@ -426,7 +434,11 @@ export function rideLog(
   }
 
   const nameOf = (lineId: string, didok: string | null) =>
-    didok === null ? null : (names.get(`${lineId} ${didok}`) ?? didok);
+    didok === null
+      ? null
+      : (names.get(`${lineId} ${didok}`) ??
+        crossingTo(lineId, didok)?.station.name ??
+        didok);
 
   return coverage.map(({ ride, line }) => ({
     ride,
