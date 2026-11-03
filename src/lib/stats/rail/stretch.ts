@@ -2,6 +2,12 @@ import type { Feature, MultiLineString, Position } from 'geojson';
 
 import type { LatLon } from '@/lib/geo/ch';
 import {
+  clipToBox,
+  crossingTo,
+  swissStop,
+  type Crossing,
+} from '@/lib/stats/rail/abroad';
+import {
   OLD_ROUTES,
   oldRouteBetween,
   oldRoutesOn,
@@ -540,6 +546,29 @@ function cutByLegs(
   return { coordinates, gaps };
 }
 
+/**
+ * The track a ride took past the border: from the Swiss stop it left from
+ * towards the station abroad, along the line's own geometry and the crossing's
+ * track, and only as far as the map reaches. A station farther than the track
+ * goes is taken as the track's nearest point to it, so a train to Berlin runs
+ * off the map's northern edge. Empty when there is no track to cut.
+ */
+function cutAbroad(
+  { station, track = [] }: Crossing,
+  border: LatLon,
+  own: Position[][] = [],
+): Position[][] {
+  const parts = [...own, ...track];
+  const toward = snap(parts, planeAt(border), station);
+
+  if (!toward) return [];
+
+  const [lon, lat] = toward.position;
+  const slice = sliceLine(parts, border, { lat, lon });
+
+  return slice.ok ? clipToBox(slice.coordinates) : [];
+}
+
 /** The rides over one stretch of one line, whichever way each went. */
 interface Ridden {
   first: RailRideCoverage;
@@ -653,7 +682,11 @@ export function rideStretches(
     const [fromDidok, toDidok] = [ride.fromDidok, ride.toDidok].sort();
     const routes = oldRoutesOn(
       ride.riddenOn,
-      oldRoutesPassed(line.id, fromDidok, toDidok),
+      oldRoutesPassed(
+        line.id,
+        swissStop(line.id, fromDidok),
+        swissStop(line.id, toDidok),
+      ),
     );
     const key = [
       line.id,
@@ -687,7 +720,11 @@ export function rideStretches(
 
   for (const ridden of byStretch.values()) {
     const { line } = ridden.first;
-    const { fromDidok, toDidok } = ridden;
+    const crossing =
+      crossingTo(line.id, ridden.fromDidok) ??
+      crossingTo(line.id, ridden.toDidok);
+    const fromDidok = swissStop(line.id, ridden.fromDidok);
+    const toDidok = swissStop(line.id, ridden.toDidok);
     const from = positions.get(`${line.id} ${fromDidok}`);
     const to = positions.get(`${line.id} ${toDidok}`);
 
@@ -697,6 +734,26 @@ export function rideStretches(
         .join(', ');
 
       skip(ridden, `${unplaced} has no position`);
+      continue;
+    }
+
+    const beyond = crossing
+      ? cutAbroad(
+          crossing,
+          crossing.border === fromDidok ? from : to,
+          geometry.get(line.id),
+        )
+      : [];
+
+    if (crossing && beyond.length === 0) {
+      console.warn(
+        `[stats/rail] leaving gaps in the stretch of ${rideOf(ridden)}: no track past ${crossing.border} to ${crossing.station.name}`,
+      );
+    }
+
+    if (fromDidok === toDidok) {
+      if (beyond.length > 0) stretch(line.id, beyond);
+      else skip(ridden, `no track past ${crossing?.border ?? fromDidok}`);
       continue;
     }
 
@@ -712,7 +769,7 @@ export function rideStretches(
     const slice = parts && sliceLine(parts, from, to);
 
     if (slice?.ok && routes.length === 0) {
-      stretch(line.id, slice.coordinates);
+      stretch(line.id, [...slice.coordinates, ...beyond]);
       continue;
     }
 
@@ -736,7 +793,7 @@ export function rideStretches(
       );
     }
 
-    stretch(line.id, coordinates);
+    stretch(line.id, [...coordinates, ...beyond]);
   }
 
   return stretches;
