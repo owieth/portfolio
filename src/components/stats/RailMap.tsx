@@ -16,6 +16,7 @@ import type { Feature, FeatureCollection, Point } from 'geojson';
 import { CH_BOUNDS } from '@/lib/geo/ch';
 import { loadMaplibre } from '@/lib/maplibre/load';
 import { flatStyle } from '@/lib/stats/maplibre/styles';
+import { RAIL_MAP_BOX } from '@/lib/stats/rail/bounds';
 import type { RailMapLine } from '@/lib/stats/rail/map';
 import type { RailStretch } from '@/lib/stats/rail/stretch';
 import type { RailStation } from '@/lib/stats/rail/types';
@@ -88,8 +89,8 @@ const CH_FIT: [[number, number], [number, number]] = [
  * portrait phone from ever seeing the whole of Switzerland.
  */
 const CH_ROOM: LngLatBoundsLike = [
-  [CH_BOUNDS.west - 2, CH_BOUNDS.south - 2],
-  [CH_BOUNDS.east + 2, CH_BOUNDS.north + 2],
+  [RAIL_MAP_BOX.west, RAIL_MAP_BOX.south],
+  [RAIL_MAP_BOX.east, RAIL_MAP_BOX.north],
 ];
 
 /**
