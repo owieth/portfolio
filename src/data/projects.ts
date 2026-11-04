@@ -17,6 +17,8 @@ export interface Project {
   title: string;
   tagline: string;
   year: number;
+  /** Last content change of the case study, `YYYY-MM-DD`. Feeds the sitemap. */
+  lastModified: string;
   stack: string[];
   links: ProjectLink[];
   /** Landscape, please: the listing renders every cover full-width in one column. */
@@ -55,6 +57,7 @@ export const projects: Project[] = [
     tagline:
       'Throw a dart at a map of Switzerland and let it decide where to go next.',
     year: 2026,
+    lastModified: '2026-09-21',
     stack: ['Next.js', 'MapLibre GL', 'swisstopo', 'Web Audio', 'Tailwind CSS'],
     links: [{ label: 'Play it', href: PLAY_PATH }],
     cover: woHaere(
@@ -87,6 +90,7 @@ export const projects: Project[] = [
     tagline:
       'A menu bar system monitor that reads its numbers straight out of Mach and the SMC.',
     year: 2026,
+    lastModified: '2026-09-21',
     stack: ['Swift 6', 'SwiftUI', 'AppKit', 'IOKit', 'Mach', 'No dependencies'],
     links: [
       // /releases/latest, never a versioned asset URL: a pinned one 404s the
@@ -132,6 +136,7 @@ export const projects: Project[] = [
     tagline:
       'Counts every keystroke and pixel of cursor travel, and stores nothing it could read back.',
     year: 2026,
+    lastModified: '2026-09-21',
     stack: [
       'Swift 6',
       'SwiftUI',

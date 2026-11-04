@@ -28,7 +28,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     // through a spread into .map(), so the literal would otherwise widen to string.
     ...projects.map(project => ({
       url: `${SITE_URL}/projects/${project.slug}`,
-      lastModified: SITE_LAST_MODIFIED,
+      lastModified: project.lastModified,
       changeFrequency: 'monthly' as const,
       priority: 0.8,
     })),
