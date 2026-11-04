@@ -1,24 +1,24 @@
 import { projects } from '@/data/projects';
-import { SITE_LAST_MODIFIED, SITE_URL } from '@/lib/site';
+import { ROUTE_LAST_MODIFIED, SITE_URL } from '@/lib/site';
 import type { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
       url: SITE_URL,
-      lastModified: SITE_LAST_MODIFIED,
+      lastModified: ROUTE_LAST_MODIFIED['/'],
       changeFrequency: 'monthly',
       priority: 1,
     },
     {
       url: `${SITE_URL}/projects`,
-      lastModified: SITE_LAST_MODIFIED,
+      lastModified: ROUTE_LAST_MODIFIED['/projects'],
       changeFrequency: 'monthly',
       priority: 0.9,
     },
     {
       url: `${SITE_URL}/stats`,
-      lastModified: SITE_LAST_MODIFIED,
+      lastModified: ROUTE_LAST_MODIFIED['/stats'],
       changeFrequency: 'monthly',
       priority: 0.9,
     },
@@ -34,13 +34,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     })),
     {
       url: `${SITE_URL}/design`,
-      lastModified: SITE_LAST_MODIFIED,
+      lastModified: ROUTE_LAST_MODIFIED['/design'],
       changeFrequency: 'monthly',
       priority: 0.8,
     },
     {
       url: `${SITE_URL}/privacy`,
-      lastModified: SITE_LAST_MODIFIED,
+      lastModified: ROUTE_LAST_MODIFIED['/privacy'],
       changeFrequency: 'monthly',
       priority: 0.3,
     },
