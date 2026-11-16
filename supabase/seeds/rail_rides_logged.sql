@@ -435,5 +435,9 @@ insert into public.rail_rides (id, line_id, ridden_on, from_didok, to_didok) val
   ('d6870b77-b9f3-5359-bada-b438f86ea1a9', 'fernverkehr:IR70', '2026-11-09', '8503000', '8505000'),
   ('eb56e382-96a3-5831-9b5b-2299d8e305a8', 'fernverkehr:IR70', '2026-11-11', '8505000', '8502204'),
   ('7229725e-5374-52c8-bf6a-56a89aa70bb1', 'fernverkehr:IR70', '2026-11-11', '8502204', '8503000'),
-  ('f557da80-a377-59b1-9fa7-316a281c9d70', 'fernverkehr:IR70', '2026-11-11', '8503000', '8505000')
+  ('f557da80-a377-59b1-9fa7-316a281c9d70', 'fernverkehr:IR70', '2026-11-11', '8503000', '8505000'),
+  ('c87d47d6-7fd6-530e-956a-d0a735f6c017', 'fernverkehr:IR75', '2026-11-14', '8505000', '8503202'),
+  ('8a8643a9-6d98-5c96-8033-3b8d0adf2edd', 'fernverkehr:IR35', '2026-11-14', '8503202', '8503207'),
+  ('3029539b-5612-519b-a225-0b9b64b20916', 's-bahn-zuerich:S8', '2026-11-14', '8503207', '8503202'),
+  ('a9be572b-e6aa-502b-a29e-a45fc72a173b', 'fernverkehr:IR75', '2026-11-14', '8503202', '8505000')
 on conflict (id) do nothing;
