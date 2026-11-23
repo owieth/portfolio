@@ -153,8 +153,10 @@ async function fetchHoechi(lon: number, lat: number): Promise<number | null> {
  * (BFS 7xxx: Liechtenstein, Büsingen, Campione). Those count as abroad too.
  *
  * The point is snapped to the grid first: this is the only place the app talks
- * to swisstopo, so snapping here keeps every upstream URL cache-aligned and
- * stops a caller from walking coordinates to generate unbounded requests.
+ * to swisstopo, so snapping here keeps every upstream URL cache-aligned. It
+ * does not bound distinct requests: the Swiss bounding box still holds about
+ * 9e8 grid cells. The Vercel Firewall rate-limit rule on `/api/wo-haere/*`
+ * does that.
  */
 export async function resolveHit(rawPoint: LatLon): Promise<Wurf> {
   const point = snapToGrid(rawPoint);
