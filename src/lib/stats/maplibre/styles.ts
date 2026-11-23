@@ -27,6 +27,17 @@ import type { StyleSpecification } from 'maplibre-gl';
 /** Same host as the `liberty` style wo häre? uses, so the CSP is unchanged. */
 const OPENMAPTILES_URL = 'https://tiles.openfreemap.org/planet';
 
+/**
+ * Written here rather than taken from the TileJSON at `OPENMAPTILES_URL`.
+ * MapLibre writes attribution with `innerHTML` behind a denylist sanitizer, and
+ * an explicit source `attribution` wins over the TileJSON's, so the remote
+ * string never reaches the page. Same credits and links OpenFreeMap serves.
+ */
+export const OPENMAPTILES_ATTRIBUTION =
+  '<a href="https://openfreemap.org" target="_blank" rel="noopener noreferrer">OpenFreeMap</a> ' +
+  '<a href="https://www.openmaptiles.org/" target="_blank" rel="noopener noreferrer">© OpenMapTiles</a> ' +
+  'Data from <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>';
+
 const SOURCE_ID = 'openmaptiles';
 
 type Scheme = 'light' | 'dark';
@@ -60,7 +71,11 @@ function basemap(
     version: 8,
     projection: { type: projection },
     sources: {
-      [SOURCE_ID]: { type: 'vector', url: OPENMAPTILES_URL },
+      [SOURCE_ID]: {
+        type: 'vector',
+        url: OPENMAPTILES_URL,
+        attribution: OPENMAPTILES_ATTRIBUTION,
+      },
     },
     layers: [
       // Land is the background: OpenMapTiles has no land polygon, it has water
