@@ -10,7 +10,6 @@ const navigation = [
   { name: 'Home', href: '/' },
   { name: 'Projects', href: '/projects' },
   { name: 'Stats', href: '/stats' },
-  // { name: 'Gallery', href: '/gallery' },
 ];
 
 const NavItem = ({
