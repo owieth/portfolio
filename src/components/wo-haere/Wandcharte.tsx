@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  Fragment,
   useCallback,
   useEffect,
   useImperativeHandle,
@@ -8,23 +9,22 @@ import {
   type RefObject,
 } from 'react';
 // maplibre-gl v6 has no default export — named imports only.
-import {
-  LngLat,
-  Map as MlMap,
-  Marker,
-  type StyleSpecification,
-} from 'maplibre-gl';
+import { LngLat, Map as MlMap, Marker } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
 import { track } from '@/lib/analytics/track';
 import { ensureMaplibreWorker } from '@/lib/maplibre/worker';
 import { CH_BOUNDS, type LatLon } from '@/lib/wo-haere/geo/ch';
 import {
-  CHARTE_STYLE,
+  CH_ROOM,
+  creditsFor,
+  styleFor,
+  wandcharteOptions,
+} from '@/lib/wo-haere/maplibre/options';
+import {
   SWISSTOPO_LAYER_ID,
   SWISSTOPO_SOURCE,
   SWISSTOPO_SOURCE_ID,
-  WAEUT_STYLE,
 } from '@/lib/wo-haere/maplibre/styles';
 import type { Aasicht, WurfEintrag } from '@/lib/wo-haere/types';
 import { prefersReducedMotion } from '@/lib/wo-haere/motion';
@@ -32,17 +32,6 @@ import { prefersReducedMotion } from '@/lib/wo-haere/motion';
 const CH_FIT: [[number, number], [number, number]] = [
   [CH_BOUNDS.west, CH_BOUNDS.south],
   [CH_BOUNDS.east, CH_BOUNDS.north],
-];
-
-/**
- * The camera is kept near Switzerland, but with slack around it. `maxBounds`
- * forces a minimum zoom at which the viewport fits *inside* the bounds, and
- * because Switzerland is far wider than tall that stops a portrait phone from
- * ever showing the whole country. The padding buys back that room.
- */
-const CH_ROOM: [[number, number], [number, number]] = [
-  [CH_BOUNDS.west - 3.5, CH_BOUNDS.south - 3.5],
-  [CH_BOUNDS.east + 3.5, CH_BOUNDS.north + 3.5],
 ];
 
 export interface WandcharteHandle {
@@ -78,10 +67,6 @@ type StyleMode = 'papier' | 'wäut';
 interface MapCtx {
   map: MlMap;
   styleZwaeg: boolean;
-}
-
-function styleFor(aasicht: Aasicht): string | StyleSpecification {
-  return aasicht === 'charte' ? CHARTE_STYLE : WAEUT_STYLE;
 }
 
 export default function Wandcharte({
@@ -234,12 +219,7 @@ export default function Wandcharte({
     ensureMaplibreWorker();
     const map = new MlMap({
       container,
-      style: styleFor(aasichtRef.current),
-      center: [8.2, 46.8],
-      zoom: aasichtRef.current === 'charte' ? 7 : 2.2,
-      attributionControl: { compact: true },
-      dragRotate: false,
-      maxBounds: aasichtRef.current === 'charte' ? CH_ROOM : undefined,
+      ...wandcharteOptions(aasichtRef.current),
     });
     mapRef.current = map;
     const ctx: MapCtx = { map, styleZwaeg: false };
@@ -358,5 +338,42 @@ export default function Wandcharte({
   // to the base layer of the scale and, being a stacking context, boxes
   // maplibre's own control z-indexes in here rather than letting them compete
   // with the app chrome outside.
-  return <div ref={containerRef} className="z-(--z-charte) size-full" />;
+  return (
+    <Fragment>
+      <div ref={containerRef} className="z-(--z-charte) size-full" />
+      <Quelle aasicht={aasicht} />
+    </Fragment>
+  );
+}
+
+/**
+ * The map credits, bottom right where MapLibre's control used to sit. While
+ * the settings panel is open it covers that corner, so the credits move left
+ * by the panel width (WoHaere's w-[min(20rem,100vw)]) to stay visible.
+ */
+function Quelle({ aasicht }: { aasicht: Aasicht }) {
+  return (
+    <p
+      className="absolute right-0 bottom-0 z-(--z-charte) bg-white/50 px-1.5 text-[10px] leading-5 text-black/75 in-data-panee-offe:mr-[min(20rem,100vw)]"
+      style={{ marginBottom: 'env(safe-area-inset-bottom)' }}
+    >
+      {creditsFor(aasicht).map((credit, i) => (
+        <Fragment key={credit.label}>
+          {i > 0 && ' | '}
+          {credit.href ? (
+            <a
+              href={credit.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:underline"
+            >
+              {credit.label}
+            </a>
+          ) : (
+            credit.label
+          )}
+        </Fragment>
+      ))}
+    </p>
+  );
 }
