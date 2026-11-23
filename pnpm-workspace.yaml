@@ -16,3 +16,12 @@ blockExoticSubdeps: true
 
 # Reject a package whose signature trust level drops between resolutions.
 trustPolicy: no-downgrade
+
+# Exact versions already in the lockfile that fail `no-downgrade` only because an
+# older major line was patched after the newer line gained provenance. Each entry
+# must match the locked integrity; drop it once nothing depends on that version.
+# - semver@6.3.1: the 2023 ReDoS backport (published by the npm CLI team after
+#   7.5.2 shipped with provenance), required by @babel/core via
+#   eslint-plugin-react-hooks.
+trustPolicyExclude:
+  - 'semver@6.3.1'
