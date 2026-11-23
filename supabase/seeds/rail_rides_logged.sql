@@ -447,5 +447,8 @@ insert into public.rail_rides (id, line_id, ridden_on, from_didok, to_didok) val
   ('9099c05d-2f6a-565c-be81-6e0f54bd99e2', 'fernverkehr:IR15', '2026-11-17', '8505000', '8507000'),
   ('526dfb61-e114-58e4-82a1-b29f59c7f7a4', 's-bahn-bern:S9', '2026-11-17', '8507000', '8508055'),
   ('a8f32bdf-25b7-51a4-85a4-f1cb983c9c66', 's-bahn-bern:S9', '2026-11-17', '8508055', '8507000'),
-  ('42b5cc4c-b6fe-55ee-9f86-8905b1e1e69e', 'fernverkehr:IR15', '2026-11-17', '8507000', '8505000')
+  ('42b5cc4c-b6fe-55ee-9f86-8905b1e1e69e', 'fernverkehr:IR15', '2026-11-17', '8507000', '8505000'),
+  ('0dd56e4c-538d-5ca4-963d-eb0f2626be84', 'rigi-bahnen-ag:CC-82', '2026-11-20', '8508464', '8505075'),
+  ('96eda797-e069-56d4-b3dc-5d463d299c1a', 'rigi-bahnen-ag:CC-82', '2026-11-20', '8505069', '8505074'),
+  ('1849ec07-6b1c-50e3-91a0-3702843477e0', 'rigi-bahnen-ag:CC-82', '2026-11-20', '8505074', '8508464')
 on conflict (id) do nothing;
