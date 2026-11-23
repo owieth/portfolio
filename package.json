@@ -62,6 +62,7 @@
     "react-doctor": "0.9.14",
     "tailwindcss": "4.3.3",
     "typescript": "6.0.3",
+    "vite": "8.2.6",
     "vitest": "5.0.5"
   },
   "packageManager": "pnpm@10.29.3",
