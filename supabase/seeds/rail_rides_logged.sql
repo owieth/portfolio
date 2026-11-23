@@ -450,5 +450,10 @@ insert into public.rail_rides (id, line_id, ridden_on, from_didok, to_didok) val
   ('42b5cc4c-b6fe-55ee-9f86-8905b1e1e69e', 'fernverkehr:IR15', '2026-11-17', '8507000', '8505000'),
   ('0dd56e4c-538d-5ca4-963d-eb0f2626be84', 'rigi-bahnen-ag:CC-82', '2026-11-20', '8508464', '8505075'),
   ('96eda797-e069-56d4-b3dc-5d463d299c1a', 'rigi-bahnen-ag:CC-82', '2026-11-20', '8505069', '8505074'),
-  ('1849ec07-6b1c-50e3-91a0-3702843477e0', 'rigi-bahnen-ag:CC-82', '2026-11-20', '8505074', '8508464')
+  ('1849ec07-6b1c-50e3-91a0-3702843477e0', 'rigi-bahnen-ag:CC-82', '2026-11-20', '8505074', '8508464'),
+  ('2ccd0887-b3f9-5502-b25f-8f0f23616f9e', 's-bahn-luzern:S9', '2026-11-21', '8505000', '8502034'),
+  ('9ffc3d16-a6b0-5e4c-bf31-1560f09164e7', 's-bahn-aargau:S14', '2026-11-21', '8502168', '8502165'),
+  ('8e25d8ec-7edf-502e-8eee-7aa7a7d8f937', 's-bahn-aargau:S14', '2026-11-21', '8502165', '8502113'),
+  ('697b9288-14ca-59d7-944a-c9997adf0281', 'fernverkehr:IC5', '2026-11-21', '8502113', '8500218'),
+  ('a9f50c59-e86c-5251-a120-17fe2308e7ab', 'fernverkehr:IR27', '2026-11-21', '8500218', '8505000')
 on conflict (id) do nothing;
