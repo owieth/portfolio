@@ -63,10 +63,10 @@ the push cannot land in a project of another account the CLI is logged in to.
 
 The wo häre? API routes, `/api/wo-haere/wurf` and `/api/wo-haere/og`, take
 anonymous requests and call swisstopo on every cache miss. The app has no rate
-limiter of its own; it relies on a Vercel Firewall rate-limit rule on
-`/api/wo-haere/*`, keyed per IP, at 30 requests per 60 seconds. A throw takes a
-few seconds to fly and read, so real play stays well below that. Keep the rule
-active, and keep a Spend Management cap set on the project.
+limiter of its own; it relies on the Vercel Firewall rule "Rate Limit Wurf API",
+which limits `/api/wo-haere/wurf` and `/api/wo-haere/og` to 25 requests per 60
+seconds per IP (fixed window). A throw takes a few seconds to fly and read, so
+real play stays well below that. Keep the rule active.
 
 ## Commands
 
