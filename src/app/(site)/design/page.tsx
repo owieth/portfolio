@@ -40,7 +40,7 @@ export default async function DesignPage() {
     <div className="flex flex-col justify-start">
       <MDXRemote
         source={markdown}
-        options={{ mdxOptions: { remarkPlugins: [remarkGfm] } }}
+        options={{ mdxOptions: { format: 'md', remarkPlugins: [remarkGfm] } }}
       />
     </div>
   );
