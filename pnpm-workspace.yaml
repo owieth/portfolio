@@ -21,7 +21,9 @@ trustPolicy: no-downgrade
 # older major line was patched after the newer line gained provenance. Each entry
 # must match the locked integrity; drop it once nothing depends on that version.
 # - semver@6.3.1: the 2023 ReDoS backport (published by the npm CLI team after
-#   7.5.2 shipped with provenance), required by @babel/core via
-#   eslint-plugin-react-hooks.
+#   7.5.2 shipped with provenance). Required by @babel/core and
+#   @babel/helper-compilation-targets (via eslint-plugin-react-hooks, and as
+#   styled-jsx's peer under next), eslint-plugin-import, eslint-plugin-react and
+#   node-exports-info (via resolve).
 trustPolicyExclude:
   - 'semver@6.3.1'
