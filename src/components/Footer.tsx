@@ -26,7 +26,6 @@ const Footer = () => (
             <CustomLink link="/stats" nav>
               Stats
             </CustomLink>
-            {/* <CustomLink link="/gallery" nav>Gallery</CustomLink> */}
           </Column>
 
           <Column>
