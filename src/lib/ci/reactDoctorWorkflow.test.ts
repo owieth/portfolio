@@ -33,6 +33,12 @@ describe('React Doctor workflow', () => {
     expect(WORKFLOW).not.toMatch(/uses:\s*millionco\/react-doctor@/);
   });
 
+  it('installs nothing outside the lockfile', () => {
+    expect(WORKFLOW).not.toMatch(
+      /\bnpm (install|i|exec)\b|\bnpx\b|\b(pnpm|yarn) dlx\b|\bbunx\b/,
+    );
+  });
+
   it('grants nothing at the workflow level', () => {
     expect(WORKFLOW).toMatch(/^permissions: \{\}$/m);
   });
