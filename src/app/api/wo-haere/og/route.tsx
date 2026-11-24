@@ -14,44 +14,45 @@ export const runtime = 'nodejs';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
-const GEIST_WEIGHTS = [
-  {
-    path: join(
-      process.cwd(),
-      'node_modules/geist/dist/fonts/geist-sans/Geist-Regular.ttf',
-    ),
-    weight: 400,
-  },
-  {
-    path: join(
-      process.cwd(),
-      'node_modules/geist/dist/fonts/geist-sans/Geist-Bold.ttf',
-    ),
-    weight: 700,
-  },
-  {
-    path: join(
-      process.cwd(),
-      'node_modules/geist/dist/fonts/geist-sans/Geist-Black.ttf',
-    ),
-    weight: 900,
-  },
-] as const;
+const geist = (data: Buffer, weight: 400 | 700 | 900) => ({
+  name: 'Geist',
+  data,
+  weight,
+  style: 'normal' as const,
+});
 
 /**
  * `fonts` replaces the default set rather than adding to it, so Regular is
  * loaded alongside the two heavy weights. satori cannot read woff2, and the
- * `geist` package's `exports` map blocks resolving these deep paths.
+ * `geist` package's `exports` map blocks resolving these deep paths. Each file
+ * gets its own `readFile` with its full literal path, so Turbopack traces
+ * exactly these three: a path from a variable traces the whole project, and a
+ * shared directory constant the whole font folder.
  */
-const readFonts = () =>
-  Promise.all(
-    GEIST_WEIGHTS.map(async ({ path, weight }) => ({
-      name: 'Geist',
-      data: await readFile(path),
-      weight,
-      style: 'normal' as const,
-    })),
-  );
+const readFonts = async () => {
+  const [regular, bold, black] = await Promise.all([
+    readFile(
+      join(
+        process.cwd(),
+        'node_modules/geist/dist/fonts/geist-sans/Geist-Regular.ttf',
+      ),
+    ),
+    readFile(
+      join(
+        process.cwd(),
+        'node_modules/geist/dist/fonts/geist-sans/Geist-Bold.ttf',
+      ),
+    ),
+    readFile(
+      join(
+        process.cwd(),
+        'node_modules/geist/dist/fonts/geist-sans/Geist-Black.ttf',
+      ),
+    ),
+  ]);
+
+  return [geist(regular, 400), geist(bold, 700), geist(black, 900)];
+};
 
 // Caught where it starts, so a failed read renders today's regular-only card
 // instead of surfacing as an unhandled rejection before any request awaits it.
