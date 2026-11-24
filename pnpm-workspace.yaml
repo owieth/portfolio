@@ -15,6 +15,12 @@ minimumReleaseAge: 10080
 blockExoticSubdeps: true
 
 # Reject a package whose signature trust level drops between resolutions.
+# The `eslint-import-resolver-typescript@3` override in `package.json` keeps this
+# whole: 3.10.1, the last 3.x, came from the v3.x branch, whose release workflow
+# never gained provenance, after 4.2.6 shipped with it, so it fails
+# `no-downgrade`. 3.10.0 predates 4.2.6 and differs from 3.10.1 only in brace
+# style and dependency floors. eslint-config-next asks for `^3.5.2`; drop the
+# override once it moves to 4.x.
 trustPolicy: no-downgrade
 
 # Exact versions already in the lockfile that fail `no-downgrade` only because an
