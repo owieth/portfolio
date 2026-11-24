@@ -73,4 +73,14 @@ describe('React Doctor workflow', () => {
       expect(action).toMatch(/@[0-9a-f]{40}$/);
     }
   });
+
+  it('pins the checked-out renderer to a full commit SHA', () => {
+    const refs = [...WORKFLOW.matchAll(/^\s+ref:\s*(\S+)/gm)].map(
+      ([, ref]) => ref,
+    );
+    expect(refs.length).toBeGreaterThan(0);
+    for (const ref of refs) {
+      expect(ref).toMatch(/^[0-9a-f]{40}$/);
+    }
+  });
 });
