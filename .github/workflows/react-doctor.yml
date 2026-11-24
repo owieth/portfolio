@@ -4,6 +4,13 @@
 # Runs the react-doctor devDependency from pnpm-lock.yaml, so CI gets the same
 # integrity-checked, quarantined versions as `pnpm react-doctor` locally.
 # Docs: https://www.react.doctor/ci
+#
+# Two jobs keep the write token away from the code under test:
+# - analyze checks out the pull request, installs from the lockfile and scans
+#   with a read-only token. It uploads the JSON report and rendered summary.
+# - report never checks out or installs anything. It downloads that artifact
+#   and posts the sticky summary comment, the inline review comments and the
+#   score commit status.
 
 name: React Doctor
 
@@ -25,6 +32,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    outputs:
+      reported: ${{ steps.upload.outcome == 'success' }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -86,3 +95,194 @@ jobs:
         env:
           REPORT_DIR: ${{ runner.temp }}/react-doctor
         run: exit "$(cat "$REPORT_DIR/exit-code")"
+
+  report:
+    name: Report
+    needs: analyze
+    # Fork and Dependabot pull requests get a read-only token, so the job is
+    # skipped for them. Their results stay in the Analyze job summary.
+    if: >-
+      !cancelled() && needs.analyze.outputs.reported == 'true' &&
+      (github.event_name == 'push' ||
+      (github.event.pull_request.head.repo.full_name == github.repository &&
+      github.actor != 'dependabot[bot]'))
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      statuses: write
+    env:
+      BOT_LOGIN: github-actions[bot]
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: react-doctor-report
+          path: ${{ runner.temp }}/react-doctor
+
+      - name: Read the summary
+        id: summary
+        env:
+          REPORT_DIR: ${{ runner.temp }}/react-doctor
+        run: |
+          grep -E '^(skipped|clean|score|error-count|warning-count)=[A-Za-z0-9]*$' "$REPORT_DIR/summary.env" >> "$GITHUB_OUTPUT" || true
+          echo "exit-code=$(grep -E '^[0-9]+$' "$REPORT_DIR/exit-code" || echo 1)" >> "$GITHUB_OUTPUT"
+
+      - name: Update the sticky summary comment
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        env:
+          COMMENT_FILE: ${{ runner.temp }}/react-doctor/comment.md
+          SKIPPED: ${{ steps.summary.outputs.skipped }}
+        with:
+          script: |
+            const fs = require('fs');
+            if (!fs.existsSync(process.env.COMMENT_FILE)) return;
+            const body = fs.readFileSync(process.env.COMMENT_FILE, 'utf8').trim();
+            if (!body) return;
+
+            const marker = '<!-- react-doctor:summary -->';
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              ...context.repo,
+              issue_number: context.issue.number,
+              per_page: 100,
+            });
+            const previous = comments.find(
+              (comment) =>
+                comment.user?.login === process.env.BOT_LOGIN &&
+                comment.body?.startsWith(marker),
+            );
+            if (previous) {
+              await github.rest.issues.updateComment({
+                ...context.repo,
+                comment_id: previous.id,
+                body,
+              });
+            } else if (process.env.SKIPPED !== 'true') {
+              await github.rest.issues.createComment({
+                ...context.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }
+
+      - name: Post inline review comments
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        env:
+          REPORT_FILE: ${{ runner.temp }}/react-doctor/report.json
+        with:
+          script: |
+            const fs = require('fs');
+            const report = JSON.parse(fs.readFileSync(process.env.REPORT_FILE, 'utf8'));
+            // A failed scan has no diagnostics. Keep the last inline feedback.
+            if (report.ok === false) return;
+            const diagnostics = Array.isArray(report.diagnostics) ? report.diagnostics : [];
+            const pullNumber = context.payload.pull_request.number;
+            const marker = '<!-- react-doctor:review -->';
+
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              ...context.repo,
+              pull_number: pullNumber,
+              per_page: 100,
+            });
+            // Right-side lines a review comment can sit on: added and context lines.
+            const commentableLines = new Map();
+            for (const file of files) {
+              if (!file.patch) continue;
+              const lines = new Set();
+              let line = 0;
+              for (const patchLine of file.patch.split('\n')) {
+                const hunk = patchLine.match(/^@@ -\d+(?:,\d+)? \+(\d+)(?:,\d+)? @@/);
+                if (hunk) {
+                  line = Number(hunk[1]);
+                } else if (patchLine.startsWith('+') || patchLine.startsWith(' ')) {
+                  lines.add(line);
+                  line += 1;
+                }
+              }
+              commentableLines.set(file.filename, lines);
+            }
+
+            const seen = new Set();
+            const comments = [];
+            for (const diagnostic of diagnostics) {
+              const path = String(diagnostic?.filePath ?? '')
+                .replace(/\\/g, '/')
+                .replace(/^\.\//, '');
+              const { line } = diagnostic ?? {};
+              if (!Number.isInteger(line) || !commentableLines.get(path)?.has(line)) continue;
+              const rule = `${diagnostic.plugin}/${diagnostic.rule}`;
+              const key = `${path}:${line}:${rule}`;
+              if (seen.has(key)) continue;
+              seen.add(key);
+              const severity = diagnostic.severity === 'error' ? 'error' : 'warning';
+              const fix = diagnostic.help ? `\n\n**Fix** → ${diagnostic.help}` : '';
+              comments.push({
+                path,
+                line,
+                side: 'RIGHT',
+                body: `${marker}\n**React Doctor** · \`${rule}\` _(${severity})_\n\n${diagnostic.message}${fix}\n\n[Docs](https://react.doctor/docs/rules/${rule})`,
+              });
+            }
+            // Findings that land outside the diff leave the last inline feedback alone.
+            if (comments.length === 0 && diagnostics.length > 0) return;
+
+            const previous = (
+              await github.paginate(github.rest.pulls.listReviewComments, {
+                ...context.repo,
+                pull_number: pullNumber,
+                per_page: 100,
+              })
+            ).filter(
+              (comment) =>
+                comment.user?.login === process.env.BOT_LOGIN &&
+                comment.body?.startsWith(marker),
+            );
+
+            // Capped so one run can't flood the pull request. The sticky
+            // summary comment lists every finding.
+            if (comments.length > 0) {
+              await github.rest.pulls.createReview({
+                ...context.repo,
+                pull_number: pullNumber,
+                commit_id: context.payload.pull_request.head.sha,
+                event: 'COMMENT',
+                comments: comments.slice(0, 50),
+              });
+            }
+            // Cleared only after the new review posted, so a failed post keeps them.
+            for (const comment of previous) {
+              await github.rest.pulls.deleteReviewComment({
+                ...context.repo,
+                comment_id: comment.id,
+              });
+            }
+
+      - name: Publish the score commit status
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        env:
+          SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          SCORE: ${{ steps.summary.outputs.score }}
+          ERROR_COUNT: ${{ steps.summary.outputs.error-count }}
+          WARNING_COUNT: ${{ steps.summary.outputs.warning-count }}
+          SKIPPED: ${{ steps.summary.outputs.skipped }}
+          EXIT_CODE: ${{ steps.summary.outputs.exit-code }}
+        with:
+          script: |
+            const pluralize = (count, noun) => `${count} ${noun}${count === 1 ? '' : 's'}`;
+            const { SCORE, SKIPPED, EXIT_CODE } = process.env;
+            const counts = `${pluralize(Number(process.env.ERROR_COUNT || 0), 'error')} · ${pluralize(Number(process.env.WARNING_COUNT || 0), 'warning')}`;
+            const failed = EXIT_CODE !== '0';
+            let description = counts;
+            if (SKIPPED === 'true') description = 'Skipped — no React files changed';
+            else if (SCORE) description = `Score: ${SCORE}/100 · ${counts}`;
+            else if (failed) description = 'Scan could not complete';
+
+            await github.rest.repos.createCommitStatus({
+              ...context.repo,
+              sha: process.env.SHA,
+              state: failed ? 'failure' : 'success',
+              context: 'React Doctor',
+              description: description.slice(0, 140),
+              target_url: process.env.RUN_URL,
+            });
