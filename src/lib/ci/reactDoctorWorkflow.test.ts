@@ -22,4 +22,14 @@ describe('React Doctor workflow', () => {
   it('grants the token no write permission', () => {
     expect(WORKFLOW).not.toMatch(/:\s*write\b/);
   });
+
+  it('pins every action to a full commit SHA', () => {
+    const actions = [...WORKFLOW.matchAll(/^\s*(?:- )?uses:\s*(\S+)/gm)].map(
+      ([, action]) => action,
+    );
+    expect(actions.length).toBeGreaterThan(0);
+    for (const action of actions) {
+      expect(action).toMatch(/@[0-9a-f]{40}$/);
+    }
+  });
 });
