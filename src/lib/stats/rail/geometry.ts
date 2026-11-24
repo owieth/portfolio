@@ -23,11 +23,9 @@ export const LINES_PATH = join(process.cwd(), 'public', 'rail', 'lines.geojson')
  * stretches, and the rest of the rail section renders as it would without
  * them.
  */
-export async function loadRailGeometry(
-  path = LINES_PATH,
-): Promise<Map<string, Position[][]>> {
+export async function loadRailGeometry(): Promise<Map<string, Position[][]>> {
   try {
-    const collection = JSON.parse(await readFile(path, 'utf8')) as
+    const collection = JSON.parse(await readFile(LINES_PATH, 'utf8')) as
       FeatureCollection<MultiLineString, { id: string }>;
 
     return new Map(
