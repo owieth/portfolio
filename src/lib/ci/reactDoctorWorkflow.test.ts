@@ -39,6 +39,11 @@ describe('React Doctor workflow', () => {
     );
   });
 
+  it('runs on pull_request, not pull_request_target', () => {
+    expect(WORKFLOW).toMatch(/^ {2}pull_request:$/m);
+    expect(WORKFLOW).not.toContain('pull_request_target');
+  });
+
   it('grants nothing at the workflow level', () => {
     expect(WORKFLOW).toMatch(/^permissions: \{\}$/m);
   });
