@@ -13,16 +13,18 @@ on:
   push:
     branches: ['main']
 
-permissions:
-  contents: read
+permissions: {}
 
 concurrency:
   group: react-doctor-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
-  react-doctor:
+  analyze:
+    name: Analyze
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -38,5 +40,49 @@ jobs:
       - run: pnpm install --frozen-lockfile
 
       # The whole project on every run, not only what the pull request changed.
-      # The backlog is clear, so a new error fails the check.
-      - run: pnpm react-doctor --scope full --blocking error
+      # The backlog is clear, so a new error fails the check. The exit code is
+      # kept for the last step, so the report still goes out when this fails.
+      - name: Scan
+        env:
+          REPORT_DIR: ${{ runner.temp }}/react-doctor
+        run: |
+          mkdir -p "$REPORT_DIR"
+          set +e
+          pnpm react-doctor --scope full --blocking error --json --json-compact --json-out "$REPORT_DIR/report.json"
+          echo "$?" > "$REPORT_DIR/exit-code"
+
+      # The summary renderer from the millionco/react-doctor action, which only
+      # uses Node built-ins. Checked out after the scan so it is never scanned.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: millionco/react-doctor
+          ref: 695e46eee203a5d1855020191aa7e9c010a1250e # v2.4.0
+          path: .react-doctor-action
+          sparse-checkout: scripts
+          persist-credentials: false
+
+      - name: Render the summary
+        env:
+          ACTION_SCRIPTS: .react-doctor-action/scripts
+          REPORT_DIR: ${{ runner.temp }}/react-doctor
+          GITHUB_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          REACT_DOCTOR_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          node "$ACTION_SCRIPTS/ensure-json-report.mjs" "$REPORT_DIR/report.json" "$(cat "$REPORT_DIR/exit-code")" \
+            || echo 1 > "$REPORT_DIR/exit-code"
+          GITHUB_OUTPUT="$REPORT_DIR/summary.env" \
+            node "$ACTION_SCRIPTS/render-github-action-comment.mjs" "$REPORT_DIR/report.json" "$REPORT_DIR/comment.md"
+          tee -a "$GITHUB_STEP_SUMMARY" < "$REPORT_DIR/comment.md"
+
+      - id: upload
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: react-doctor-report
+          path: ${{ runner.temp }}/react-doctor
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Fail on blocking findings
+        env:
+          REPORT_DIR: ${{ runner.temp }}/react-doctor
+        run: exit "$(cat "$REPORT_DIR/exit-code")"
