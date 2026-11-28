@@ -46,7 +46,7 @@
   },
   "devDependencies": {
     "@duckdb/node-api": "1.5.5-r.5",
-    "@tailwindcss/postcss": "4.3.3",
+    "@tailwindcss/postcss": "4.3.5",
     "@types/geojson": "7946.0.16",
     "@types/node": "26.6.2",
     "@types/react": "19.3.0",
